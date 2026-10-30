@@ -1,3 +1,4 @@
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,9 @@ Future<void> bootstrap(Flavor flavor) async {
   WidgetsFlutterBinding.ensureInitialized();
   // Logs can contain tokens and order/payment data: silence them in release.
   if (kReleaseMode) debugPrint = (String? message, {int? wrapWidth}) {};
+  // In-app HTTP inspector (Chucker) for the dev flavor, also in release/
+  // TestFlight builds, so testers can share the exact request/response.
+  ChuckerFlutter.showOnRelease = flavor == Flavor.DEV;
   // Timezone database for scheduled local notifications.
   tz.initializeTimeZones();
 

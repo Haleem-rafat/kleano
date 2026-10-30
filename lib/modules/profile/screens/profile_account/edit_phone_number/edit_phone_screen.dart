@@ -1,20 +1,18 @@
+import 'dart:math' as math;
+
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/profile/blocs/update_profile/update_profile_bloc.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/text-form-shared.dart';
 import 'package:thewasher/utilties/navigator.dart';
+import 'package:thewasher/utilties/phone_number.dart';
 import 'package:thewasher/utilties/validator.dart';
 
 class EditPhoneScreen extends StatefulWidget {
@@ -45,97 +43,72 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
         TextEditingController(text: widget.phoneNumber);
   }
 
+  Future<void> _selectCountryCode() async {
+    final CountryCode? code = await countryPicker.showPicker(context: context);
+    if (!mounted) return;
+    setState(() {
+      countryCode = code;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final MediaQueryData mq = MediaQuery.of(context);
     return Scaffold(
-      backgroundColor: Colors.white,
+      // The Save button is padded by the keyboard height itself.
+      resizeToAvoidBottomInset: false,
+      backgroundColor: c.background,
       appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          onPressed: () => pop(context),
-          icon: const Icon(Icons.arrow_back_ios),
-          color: ColorManager.primary,
-        ),
-        backgroundColor: ColorManager.white,
         automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: Text(translate(AppStrings.phoneNumber)),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              50.ph,
-              Padding(
-                padding: EdgeInsets.symmetric(
-                    horizontal: AppPadding.p20.w, vertical: AppPadding.p8.h),
-                child: Text(
-                  translate(AppStrings.phoneNumber),
-                  style: AppStyles.title16Regular
-                      .copyWith(color: ColorManager.darkGrey),
-                ),
-              ),
-              TextFormShared(
+              const SizedBox(height: KSpace.xxl),
+              KTextField(
+                label: translate(AppStrings.phoneNumber),
+                hint: translate(AppStrings.enterPhoneNumber),
                 controller: updateProfileBloc!.phoneController,
-                hintText: translate("enterPhoneNumber"),
                 validator: validatorPhone,
-                textInputType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                textInputFormat: [
-                  FilteringTextInputFormatter.deny(RegExp(r'^0+')),
+                keyboardType: TextInputType.phone,
+                autofillHints: const <String>[
+                  AutofillHints.telephoneNumberNational,
                 ],
-                prefix: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10.w),
-                      child: InkWell(
-                          onTap: () async {
-                            final CountryCode? code = await countryPicker
-                                .showPicker(context: context);
-                            setState(() {
-                              countryCode = code;
-                            });
-                            debugPrint(countryCode!.dialCode);
-                          },
-                          child: Row(
-                            children: <Widget>[
-                              countryCode != null
-                                  ? Text(
-                                      "(${countryCode!.dialCode}) ",
-                                      style: AppStyles.title16Regular.copyWith(
-                                          color: ColorManager.darkGrey),
-                                    )
-                                  : Text(
-                                      countryCodeSelected,
-                                      style: AppStyles.title16Regular.copyWith(
-                                          color: ColorManager.darkGrey),
-                                    ),
-                              SvgPicture.asset(AssetsManager.arrowLogo)
-                            ],
-                          )),
-                    ),
-                    Container(
-                      height: 23.h,
-                      width: 1.w,
-                      color: ColorManager.medGray,
-                      margin: const EdgeInsets.only(top: 2),
-                    ),
-                    5.pw,
-                  ],
+                textInputAction: TextInputAction.done,
+                inputFormatters: <TextInputFormatter>[
+                  PhoneDigitsFormatter(),
+                ],
+                prefix: TextButton(
+                  onPressed: _selectCountryCode,
+                  child: Text(
+                    countryCode?.dialCode ?? countryCodeSelected,
+                    textDirection: TextDirection.ltr,
+                  ),
                 ),
               ),
               const Spacer(),
-              ButtonsShared(
-                  onPressed: () {
-                    if (updateProfileBloc!.phoneController.text !=
-                            widget.phoneNumber &&
-                        updateProfileBloc!.phoneController.text
-                            .trim()
-                            .isNotEmpty) {}
-                  },
-                  text: translate(AppStrings.save)),
-              AppPadding.p32.ph,
-            ]),
+              Padding(
+                padding: EdgeInsets.only(
+                  bottom: math.max(mq.viewInsets.bottom, mq.viewPadding.bottom) +
+                      KSpace.l,
+                ),
+                // TODO(kleano): saving a new number is not wired to the API
+                // yet (unchanged from before the redesign).
+                child: KButton(
+                  label: translate(AppStrings.save),
+                  onPressed: () {},
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

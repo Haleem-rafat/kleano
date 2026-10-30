@@ -1,24 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/Auth/screens/log_in_screen.dart';
 import 'package:thewasher/modules/Auth/screens/sign_up_screen.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class ChooseRegisterView extends StatefulWidget {
   // bool comeFromMain;
-  const ChooseRegisterView({super.key,});
+  const ChooseRegisterView({super.key});
 
   @override
   State<ChooseRegisterView> createState() => _ChooseRegisterViewState();
@@ -40,92 +37,73 @@ class _ChooseRegisterViewState extends State<ChooseRegisterView> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: AppStyles.lightStatusBarIconsWithTransparentColorStyle,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
       child: Scaffold(
+        backgroundColor: Colors.black,
         body: Stack(
+          fit: StackFit.expand,
           children: <Widget>[
             Image.asset(
               AssetsManager.onBoardingFour,
-              height: 1.sh,
-              width: 1.sw,
-              gaplessPlayback: true,
               fit: BoxFit.cover,
+              gaplessPlayback: true,
             ),
-            Positioned(
-              top: 0.h,
-              right: 0.w,
-              child: ColorFiltered(
-                colorFilter: const ColorFilter.mode(
-                  ColorManager.primary,
-                  BlendMode.srcIn,
-                ),
-                child: SvgPicture.asset(
-                  AssetsManager.shapCircleRight,
+            const IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: <Color>[
+                      Color(0x40000000),
+                      Color(0x00000000),
+                      Color(0xD9000000),
+                    ],
+                    stops: <double>[0, 0.45, 1],
+                  ),
                 ),
               ),
             ),
-            Positioned(
-              top: 0.h,
-              left: 0.w,
-              child: SvgPicture.asset(
-                AssetsManager.shapCircleLeft,
-              ),
-            ),
-            Positioned(
-                top: 112.h,
-                right: 100.w,
-                left: 100.w,
-                child: SvgPicture.asset(
-                  AssetsManager.logoWhite,
-                )),
-            Positioned(
-              bottom: AppPadding.p45.h,
-              left: AppPadding.p24.w,
-              right: AppPadding.p24.w,
-              child: Column(
-                children: <Widget>[
-                  Hero(
-                    tag: 'buttons',
-                    child: ButtonsShared(
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  KSpace.xxl,
+                  KSpace.xxl,
+                  KSpace.xxl,
+                  KSpace.l,
+                ),
+                child: Column(
+                  children: <Widget>[
+                    const Spacer(),
+                    SvgPicture.asset(AssetsManager.logoWhite, height: 120),
+                    const Spacer(flex: 2),
+                    KButton(
+                      label: translate(AppStrings.signUp),
+                      onPressed: () => pushPage(context, const SignUpScreen()),
+                    ),
+                    const SizedBox(height: KSpace.m),
+                    KButton(
+                      label: translate(AppStrings.login),
+                      variant: KButtonVariant.secondary,
+                      onPressed: () => pushPage(context, const LogInScreen()),
+                    ),
+                    const SizedBox(height: KSpace.s),
+                    KButton(
+                      label: translate(AppStrings.continueAsAGuest),
+                      variant: KButtonVariant.text,
+                      color: Colors.white,
                       onPressed: () {
-                        pushPage(context, const SignUpScreen());
-                      },
-                      text: translate(AppStrings.signUp),
-                    ),
-                  ),
-                  AppPadding.p24.ph,
-                  ButtonsShared(
-                    onPressed: () {
-                      pushPage(context, const LogInScreen());
-                    },
-                    text: translate(AppStrings.login),
-                    colorBorder: ColorManager.secondary,
-                    colorButton: ColorManager.secondary.withValues(alpha: .050),
-                    colorText: ColorManager.white,
-                    showShadow: false,
-                  ),
-                  AppPadding.p24.ph,
-                  GestureDetector(
-                    onTap: () {
-                      AppShared.setToken("");
-                      isGuestUser = true;
-                      popALlAndPushPage(
+                        AppShared.setToken("");
+                        isGuestUser = true;
+                        popALlAndPushPage(
                           context,
-                          MainNavigationScreen(
-                            selectedIndex: 0,
-                          ));
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: Text(
-                      translate(AppStrings.continueAsAGuest),
-                      style: AppStyles.title16Medium.copyWith(
-                          color: ColorManager.white,
-                          decoration: TextDecoration.underline,
-                          decorationColor: ColorManager.white),
+                          MainNavigationScreen(selectedIndex: 0),
+                        );
+                      },
                     ),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
           ],

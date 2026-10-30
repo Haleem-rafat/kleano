@@ -496,4 +496,13 @@ class AppStrings {
   static const String applied = 'applied';
   static const String free = 'free';
   static const String homeLocation = 'homeLocaion';
+  static const welcomeBack = "welcomeBack";
+  static const userLoginSubtitle = "userLoginSubtitle";
+  static const createAccount = "createAccount";
+  static const createAccountSubtitle = "createAccountSubtitle";
+  static const verifyCodeTitle = "verifyCodeTitle";
+  static const verifyCodeSubtitle = "verifyCodeSubtitle";
+  static const resendCodeIn = "resendCodeIn";
+  static const acceptTermsFirst = "acceptTermsFirst";
+  static const acceptTerms = "acceptTerms";
 }

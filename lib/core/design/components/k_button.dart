@@ -22,6 +22,7 @@ class KButton extends StatelessWidget {
     this.expand = true,
     this.icon,
     this.sfSymbol,
+    this.color,
   });
 
   final String label;
@@ -36,6 +37,9 @@ class KButton extends StatelessWidget {
   /// SF Symbol shown on iOS instead of [icon].
   final String? sfSymbol;
 
+  /// Label colour for text buttons (e.g. white over photos). Defaults to brand.
+  final Color? color;
+
   static const double _iosHeight = 50;
   static const double _androidHeight = 52;
 
@@ -48,13 +52,31 @@ class KButton extends StatelessWidget {
       enabled: onPressed != null && !loading,
       label: loading ? '$label…' : null,
       child: SizedBox(
-        width: expand ? double.infinity : null,
+        width: expand
+            ? double.infinity
+            : (ios && variant != KButtonVariant.text ? _hugWidth(context) : null),
         height: variant == KButtonVariant.text
             ? KSpace.tapTarget
             : (ios ? _iosHeight : _androidHeight),
         child: button,
       ),
     );
+  }
+
+  /// Width of a content-hugging glass button. The native `UIButton` is a
+  /// platform view with no intrinsic size, so it must be measured here:
+  /// unbounded, it gets an infinite frame and iOS crashes.
+  double _hugWidth(BuildContext context) {
+    final TextPainter painter = TextPainter(
+      text: TextSpan(text: label, style: KType.headline),
+      textScaler: MediaQuery.textScalerOf(context),
+      textDirection: Directionality.of(context),
+      maxLines: 1,
+    )..layout();
+    final double symbol = sfSymbol == null ? 0 : KType.headline.fontSize! + KSpace.s;
+    final double width = painter.width + symbol + 2 * KSpace.xl;
+    painter.dispose();
+    return width < KSpace.tapTarget ? KSpace.tapTarget : width.ceilToDouble();
   }
 
   Widget _ios(BuildContext context) {
@@ -64,7 +86,7 @@ class KButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: KSpace.l),
         onPressed: loading ? null : onPressed,
         child: Text(label,
-            style: KType.headline.copyWith(color: c.brand),
+            style: KType.headline.copyWith(color: color ?? c.brand),
             maxLines: 1,
             overflow: TextOverflow.ellipsis),
       );
@@ -127,7 +149,13 @@ class KButton extends StatelessWidget {
           child: content,
         );
       case KButtonVariant.text:
-        return TextButton(onPressed: tap, child: content);
+        return TextButton(
+          onPressed: tap,
+          style: color == null
+              ? null
+              : TextButton.styleFrom(foregroundColor: color),
+          child: content,
+        );
     }
   }
 }

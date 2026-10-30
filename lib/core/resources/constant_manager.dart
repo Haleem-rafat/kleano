@@ -2,6 +2,10 @@ class AppConstants {
   static const int splashDelay = 2;
   static const String hintEmail = 'info@kleanoapp.com';
   static const String codeSaudiArabia = '+966';
+  static const String codeEgypt = '+20';
+
+  /// Country code pre-selected in phone fields (Egypt is the main market).
+  static const String defaultDialCode = codeEgypt;
   static const String subscriptionBooking = 'SUBSCRIPTION_BOOKING';
   static const String serviceBooking = 'SERVICE_BOOKING';
   static const String creadit = 'CREDIT';

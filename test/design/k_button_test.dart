@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:thewasher/core/design/kleano_theme.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 
 Widget host(Widget child, {double textScale = 1, double width = 390}) => MaterialApp(
       theme: kleanoTheme(brightness: Brightness.light),
@@ -61,6 +62,19 @@ void main() {
     });
   });
 
+  testWidgets('text button can use a custom colour (e.g. white over photos)',
+      (WidgetTester t) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+    await t.pumpWidget(host(KButton(
+        label: 'Continue as a guest',
+        variant: KButtonVariant.text,
+        color: Colors.white,
+        onPressed: () {})));
+    final TextButton b = t.widget(find.byType(TextButton));
+    expect(b.style!.foregroundColor!.resolve(<WidgetState>{}), Colors.white);
+    debugDefaultTargetPlatformOverride = null;
+  });
+
   group('iOS', () {
     setUp(() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
@@ -90,6 +104,30 @@ void main() {
       await t.pumpWidget(host(KButton(label: 'Log in', loading: true, onPressed: () {})));
       expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
       expect(find.byType(NativeGlassButton), findsNothing);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    // Regression: a native view with unbounded width crashes iOS
+    // ("CALayer position contains NaN") on the onboarding screen.
+    testWidgets('a hugging button in a Row gets a finite width from its label',
+        (WidgetTester t) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      await t.pumpWidget(host(Row(children: <Widget>[
+        KButton(
+            label: 'Skip',
+            variant: KButtonVariant.secondary,
+            expand: false,
+            onPressed: () {}),
+        const Spacer(),
+        KButton(label: 'العربية', expand: false, onPressed: () {}),
+      ])));
+      expect(t.takeException(), isNull);
+      for (final Element e in find.byType(NativeGlassButton).evaluate()) {
+        final Size s = (e.renderObject! as RenderBox).size;
+        expect(s.width.isFinite, isTrue);
+        expect(s.width, greaterThan(KSpace.tapTarget));
+        expect(s.width, lessThan(200));
+      }
       debugDefaultTargetPlatformOverride = null;
     });
   });

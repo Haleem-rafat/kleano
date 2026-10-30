@@ -453,5 +453,15 @@
   "pleaseEnterPointsToApply": "Please enter points to apply",
   "pleaseEnterValidNumberOfPoints": "Please enter a valid number of points",
   "applied": "Applied",
-  "free": "Free"
+  "free": "Free",
+  "welcomeBack": "Welcome back",
+  "userLoginSubtitle": "Enter your phone number to continue",
+  "createAccount": "Create your account",
+  "createAccountSubtitle": "Book a car wash at your door in minutes",
+  "verifyCodeTitle": "Enter the code",
+  "resendCodeIn": "Resend code in",
+  "verifyCodeSubtitle": "We sent a 6-digit code to",
+  "acceptTermsFirst": "Please accept the terms and conditions first",
+  "acceptTerms": "I accept the terms and conditions",
+  "notValidEmail": "Please enter a valid email address"
 }

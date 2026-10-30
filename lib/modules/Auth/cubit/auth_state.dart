@@ -49,7 +49,8 @@ class AuthState {
       logoutStatus: logoutStatus ?? this.logoutStatus,
       sendOTPStatus: sendOTPStatus ?? this.sendOTPStatus,
       verifyOTPStatus: verifyOTPStatus ?? this.verifyOTPStatus,
-      resendRegisterOTPStatus: resendRegisterOTPStatus ?? this.resendRegisterOTPStatus,
+      resendRegisterOTPStatus:
+          resendRegisterOTPStatus ?? this.resendRegisterOTPStatus,
       logoutErrorMessage: logoutErrorMessage ?? this.logoutErrorMessage,
       loginErrorMessage: loginErrorMessage ?? this.loginErrorMessage,
       sendOTPErrorMessage: sendOTPErrorMessage ?? this.sendOTPErrorMessage,

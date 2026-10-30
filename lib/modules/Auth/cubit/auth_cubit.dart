@@ -10,103 +10,135 @@ import 'package:thewasher/modules/Auth/repository/auth_repository.dart';
 import 'package:thewasher/repository/user_repo.dart';
 
 class AuthCubit extends Cubit<AuthState> {
-  AuthCubit() : super(AuthState());
-  final AuthRepository authRepository = AuthRepository();
+  AuthCubit({AuthRepository? repository})
+    : authRepository = repository ?? AuthRepository(),
+      super(AuthState());
+  final AuthRepository authRepository;
 
-  Future<void> signup(
-      {required String userName,
-      required String phone,
-      String? email,
-      required String fcmToken}) async {
-    emit(state.copyWith(
-      signUpStatus: RequestStatus.loading,
-      signUpErrorMessage: null,
-    ));
+  Future<void> signup({
+    required String userName,
+    required String phone,
+    String? email,
+    required String fcmToken,
+  }) async {
+    emit(
+      state.copyWith(
+        signUpStatus: RequestStatus.loading,
+        signUpErrorMessage: null,
+      ),
+    );
     try {
       debugPrint(email);
       await authRepository.signup(
-          userName: userName, phone: phone, email: email, fcmToken: fcmToken);
+        userName: userName,
+        phone: phone,
+        email: email,
+        fcmToken: fcmToken,
+      );
       emit(state.copyWith(signUpStatus: RequestStatus.loaded));
     } catch (e) {
       final msg = _extractErrorMessage(e);
-      emit(state.copyWith(
-        signUpStatus: RequestStatus.failure,
-        signUpErrorMessage: msg,
-      ));
+      emit(
+        state.copyWith(
+          signUpStatus: RequestStatus.failure,
+          signUpErrorMessage: msg,
+        ),
+      );
       debugPrint(msg);
     }
   }
 
-  Future<void> login(
-      {required String phone,
-      required String fcmToken,
-      required String otp}) async {
-    emit(state.copyWith(
-      loginStatus: RequestStatus.loading,
-      loginErrorMessage: null,
-    ));
+  Future<void> login({
+    required String phone,
+    required String fcmToken,
+    required String otp,
+  }) async {
+    // The cubit is app-wide: a stale verifyOTPStatus.loaded from an earlier
+    // sign-up would make the OTP screen navigate home before login finishes.
+    emit(
+      state.copyWith(
+        loginStatus: RequestStatus.loading,
+        verifyOTPStatus: RequestStatus.initial,
+      ),
+    );
     try {
       await authRepository.login(phone: phone, fcmToken: fcmToken, otp: otp);
       emit(state.copyWith(loginStatus: RequestStatus.loaded));
     } catch (e) {
       final msg = _extractErrorMessage(e);
       debugPrint(msg);
-      emit(state.copyWith(
-        loginStatus: RequestStatus.failure,
-        loginErrorMessage: msg,
-      ));
+      emit(
+        state.copyWith(
+          loginStatus: RequestStatus.failure,
+          loginErrorMessage: msg,
+        ),
+      );
     }
   }
 
   Future<void> sendOTP({required String phone}) async {
-    emit(state.copyWith(
-      sendOTPStatus: RequestStatus.loading,
-      sendOTPErrorMessage: null,
-    ));
+    // A new OTP starts a new attempt: drop results of the previous one.
+    emit(
+      state.copyWith(
+        sendOTPStatus: RequestStatus.loading,
+        loginStatus: RequestStatus.initial,
+        verifyOTPStatus: RequestStatus.initial,
+      ),
+    );
     try {
       await authRepository.sendOTP(phone: phone);
       emit(state.copyWith(sendOTPStatus: RequestStatus.loaded));
     } catch (e) {
       final msg = _extractErrorMessage(e);
       debugPrint(msg);
-      emit(state.copyWith(
-        sendOTPStatus: RequestStatus.failure,
-        sendOTPErrorMessage: msg,
-      ));
+      emit(
+        state.copyWith(
+          sendOTPStatus: RequestStatus.failure,
+          sendOTPErrorMessage: msg,
+        ),
+      );
     }
   }
 
   Future<void> resendRegisterOTP({required String phone}) async {
-    emit(state.copyWith(
-      resendRegisterOTPStatus: RequestStatus.loading,
-    ));
+    emit(state.copyWith(resendRegisterOTPStatus: RequestStatus.loading));
     try {
       await authRepository.resendRegisterOTP(phone: phone);
       emit(state.copyWith(resendRegisterOTPStatus: RequestStatus.loaded));
     } catch (e) {
       final msg = _extractErrorMessage(e);
       debugPrint(msg);
-      emit(state.copyWith(
-        resendRegisterOTPStatus: RequestStatus.failure,
-        resendRegisterOTPErrorMessage: msg,
-      ));
+      emit(
+        state.copyWith(
+          resendRegisterOTPStatus: RequestStatus.failure,
+          resendRegisterOTPErrorMessage: msg,
+        ),
+      );
     }
   }
 
-  Future<void> verifySignupOTP({required String otp, required String phone}) async {
-    emit(state.copyWith(
-      verifyOTPStatus: RequestStatus.loading,
-    ));
+  Future<void> verifySignupOTP({
+    required String otp,
+    required String phone,
+  }) async {
+    emit(
+      state.copyWith(
+        verifyOTPStatus: RequestStatus.loading,
+        loginStatus: RequestStatus.initial,
+      ),
+    );
     try {
       await authRepository.verifySignupOTP(otp: otp, phone: phone);
       emit(state.copyWith(verifyOTPStatus: RequestStatus.loaded));
     } catch (e) {
       final msg = _extractErrorMessage(e);
       debugPrint(msg);
-      emit(state.copyWith(
-        verifyOTPStatus: RequestStatus.failure,
-        verifyOTPErrorMessage: msg,
-      ));
+      emit(
+        state.copyWith(
+          verifyOTPStatus: RequestStatus.failure,
+          verifyOTPErrorMessage: msg,
+        ),
+      );
     }
   }
 
@@ -129,18 +161,20 @@ class AuthCubit extends Cubit<AuthState> {
       if (response.success) {
         // Clear all local data
         await AppShared.clearAllData();
-        emit(state.copyWith(logoutStatus: RequestStatus.loaded));
+        emit(AuthState(logoutStatus: RequestStatus.loaded));
       } else {
-        emit(state.copyWith(
-          logoutStatus: RequestStatus.failure,
-          logoutErrorMessage: 'Failed to logout. Please try again.',
-        ));
+        emit(
+          state.copyWith(
+            logoutStatus: RequestStatus.failure,
+            logoutErrorMessage: 'Failed to logout. Please try again.',
+          ),
+        );
       }
     } catch (e) {
       debugPrint('Logout error: $e');
       // Even if API call fails, clear local data and logout
       await AppShared.clearAllData();
-      emit(state.copyWith(logoutStatus: RequestStatus.loaded));
+      emit(AuthState(logoutStatus: RequestStatus.loaded));
     }
   }
 

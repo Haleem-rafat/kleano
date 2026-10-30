@@ -1,3 +1,4 @@
+import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewasher/core/design/adaptive_screen.dart';
@@ -29,7 +30,9 @@ import 'package:thewasher/shared/services/service_locator.dart';
 import 'flavors.dart';
 import 'package:thewasher/layout/services/notification_manager_service.dart';
 
-final GlobalKey<NavigatorState> navigatorKeyAlice = GlobalKey<NavigatorState>();
+/// Root navigator. It is Chucker's key so its in-app HTTP log (dev flavor)
+/// can show its notification and open its screen.
+final GlobalKey<NavigatorState> navigatorKeyAlice = ChuckerFlutter.navigatorKey;
 
 class App extends StatefulWidget {
   const App({super.key});

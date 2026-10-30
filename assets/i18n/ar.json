@@ -368,7 +368,7 @@
   "addressLabel": "اسم العنوان",
   "quickLabels": "اسم العنوان",
   "home": "الرئيسية",
-  "homeLocaion":"المنزل",
+  "homeLocaion": "المنزل",
   "work": "العمل",
   "other": "أخرى",
   "saving": "جاري الحفظ...",
@@ -458,5 +458,15 @@
   "pleaseEnterPointsToApply": "يرجى إدخال النقاط للتطبيق",
   "pleaseEnterValidNumberOfPoints": "يرجى إدخال عدد صحيح من النقاط",
   "applied": "تم تطبيق",
-  "free": "مجانا"
+  "free": "مجانا",
+  "welcomeBack": "مرحبًا بعودتك",
+  "userLoginSubtitle": "أدخل رقم جوالك للمتابعة",
+  "createAccount": "أنشئ حسابك",
+  "createAccountSubtitle": "احجز غسيل سيارتك عند باب منزلك خلال دقائق",
+  "verifyCodeTitle": "أدخل الرمز",
+  "resendCodeIn": "إعادة الإرسال بعد",
+  "verifyCodeSubtitle": "أرسلنا رمزًا من 6 أرقام إلى",
+  "acceptTermsFirst": "يرجى الموافقة على الشروط والأحكام أولًا",
+  "acceptTerms": "أوافق على الشروط والأحكام",
+  "notValidEmail": "يرجى إدخال بريد إلكتروني صحيح"
 }

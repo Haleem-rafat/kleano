@@ -1,28 +1,24 @@
-import 'dart:math' as math;
 import 'package:thewasher/core/services/appsflyer_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:thewasher/core/services/fcm_token.dart';
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/components/k_auth_scaffold.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/enums/status.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_cubit.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_state.dart';
 import 'package:thewasher/modules/Auth/screens/otp_screen.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/list_tile_text_form.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:thewasher/utilties/navigator.dart';
+import 'package:thewasher/utilties/phone_number.dart';
 import 'package:thewasher/utilties/validator.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -51,7 +47,12 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   Future<void> _initializeFCM() async {
-    await FirebaseMessaging.instance.requestPermission();
+    // Push is optional for logging in: never let Firebase errors block it.
+    try {
+      await FirebaseMessaging.instance.requestPermission();
+    } catch (e) {
+      debugPrint('Notification permission unavailable: $e');
+    }
     fcmToken = await FcmToken.get();
   }
 
@@ -69,202 +70,85 @@ class _LogInScreenState extends State<LogInScreen> {
     });
   }
 
+  /// The full international number sent to the backend.
+  String _fullPhone() =>
+      buildInternationalPhone(
+        dialCode: countryCode?.dialCode ?? AppConstants.defaultDialCode,
+        input: loginController.text,
+      );
+
+  void _submit() {
+    if (_loginFormKey.currentState!.validate()) {
+      context.read<AuthCubit>().sendOTP(phone: _fullPhone());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: AppStyles.darkStatusBarIconsWithTransparentColorStyle,
-      child: GestureDetector(
-        onTap: () {
-          phoneFocusNode.unfocus();
-        },
-        child: Scaffold(
-          body: Stack(
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (BuildContext context, AuthState state) {
+        if (state.sendOTPStatus == RequestStatus.loaded) {
+          AppsFlyerService.logEvent('af_login');
+          // Replace the login screen to avoid duplicate pushes.
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => OtpScreen(
+                isSignup: false,
+                phone: _fullPhone(),
+                fcmToken: fcmToken ?? "Notifications is Unaccessible",
+              ),
+            ),
+          );
+        } else if (state.sendOTPStatus == RequestStatus.failure) {
+          showSnackBar(
+            buildContext: context,
+            message:
+                state.sendOTPErrorMessage ?? translate('somethingWentWrong'),
+            icon: Icons.error_outline,
+            backgroundColor: KColors.of(context).error,
+          );
+        }
+      },
+      builder: (BuildContext context, AuthState state) {
+        return Form(
+          key: _loginFormKey,
+          child: KAuthScaffold(
+            title: translate(AppStrings.welcomeBack),
+            subtitle: translate(AppStrings.userLoginSubtitle),
+            showBack: true,
+            onBack: () => pop(context),
+            primaryAction: KButton(
+              label: translate(AppStrings.login),
+              loading: state.sendOTPStatus == RequestStatus.loading,
+              onPressed: _submit,
+            ),
             children: <Widget>[
-              SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(height: AppSize.s60.h),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () => pop(context),
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            size: AppSize.s24.r,
-                            color: ColorManager.primary,
-                          ),
-                        ),
-                        Localizations.localeOf(context).languageCode == "en"
-                            ? Image.asset(
-                                AssetsManager.registerAnimate,
-                                width: 132.w,
-                                height: 174.h,
-                              )
-                            : Transform(
-                                alignment: Alignment.center,
-                                transform: Matrix4.rotationY(math.pi),
-                                child: Image.asset(
-                                  AssetsManager.registerAnimate,
-                                  width: 132.w,
-                                  height: 174.h,
-                                ),
-                              ),
-                      ],
-                    ),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-                      child: SizedBox(
-                        child: Image.asset(AssetsManager.logoN),
-                      ),
-                    ),
-                    32.verticalSpace,
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-                      child: Text(
-                        translate(AppStrings.login),
-                        style: AppStyles.title24Bold.copyWith(
-                          color: ColorManager.black,
-                        ),
-                      ),
-                    ),
-                    // ElevatedButton(
-                    //     onPressed: () {
-                    //       pushPage(
-                    //           context,
-                    //           OtpScreen(
-                    //             fcmToken: "test",
-                    //             isSignup: false,
-                    //             phone: "+201202939672",
-                    //           ));
-                    //     },
-                    //     child: Text("otp")),
-                    SizedBox(height: AppSize.s8.h),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-                      child: Text(
-                        translate(AppStrings.helloAgain),
-                        style: AppStyles.titleGray16Regular,
-                      ),
-                    ),
-                    SizedBox(height: AppSize.s60.h),
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-                      child: Form(
-                        key: _loginFormKey,
-                        child: ListTileTextForm(
-                          focusNode: phoneFocusNode,
-                          validator: validatorPhone,
-                          title: translate(AppStrings.phoneNumber),
-                          hintText: '533720654',
-                          textInputType: TextInputType.phone,
-                          controller: loginController,
-                          textInputFormatter: [
-                            FilteringTextInputFormatter.deny(RegExp(r'^0+')),
-                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                          ],
-                          prefix: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                                child: InkWell(
-                                  onTap: _selectCountryCode,
-                                  child: Row(
-                                    children: <Widget>[
-                                      Text(
-                                        "(${countryCode?.dialCode ?? AppConstants.codeSaudiArabia}) ",
-                                        style:
-                                            AppStyles.title16Regular.copyWith(
-                                          color: ColorManager.darkGrey,
-                                        ),
-                                      ),
-                                      SvgPicture.asset(AssetsManager.arrowLogo),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                height: 23.h,
-                                width: 1.w,
-                                color: ColorManager.medGray,
-                                margin: const EdgeInsets.only(top: 2),
-                              ),
-                              SizedBox(width: 5.w),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    32.verticalSpace,
-                    Center(
-                      child: BlocConsumer<AuthCubit, AuthState>(
-                        listener: (context, state) async {
-                          if (state.sendOTPStatus == RequestStatus.loaded) {
-                            setState(() {
-                              islLoading = false;
-                            });
-
-                            AppsFlyerService.logEvent('af_login');
-
-                            // Navigate to OTP screen and replace the login screen to avoid duplicate pushes
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => OtpScreen(
-                                  isSignup: false,
-                                  phone: countryCode == null
-                                      ? "${AppConstants.codeSaudiArabia}${loginController.text}"
-                                      : "${countryCode!.dialCode}${loginController.text}",
-                                  fcmToken: fcmToken ??
-                                      "Notifications is Unaccessible",
-                                ),
-                              ),
-                            );
-                          } else if (state.sendOTPStatus ==
-                              RequestStatus.failure) {
-                            setState(() {
-                              islLoading = false;
-                            });
-                            showSnackBar(
-                              buildContext: context,
-                              message: state.sendOTPErrorMessage ??
-                                  'Something went wrong. Please try again.',
-                              icon: Icons.error_outline,
-                              backgroundColor: ColorManager.red,
-                            );
-                          }
-                        },
-                        builder: (context, state) {
-                          return ButtonsShared(
-                            onPressed: () async {
-                              if (_loginFormKey.currentState!.validate()) {
-                                context.read<AuthCubit>().sendOTP(
-                                      phone: countryCode == null
-                                          ? "${AppConstants.codeSaudiArabia}${loginController.text}"
-                                          : "${countryCode!.dialCode}${loginController.text}",
-                                    );
-                              }
-                            },
-                            text: islLoading
-                                ? "Logging in..."
-                                : translate(AppStrings.login),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
+              KTextField(
+                label: translate(AppStrings.phoneNumber),
+                controller: loginController,
+                focusNode: phoneFocusNode,
+                keyboardType: TextInputType.phone,
+                autofillHints: const <String>[
+                  AutofillHints.telephoneNumberNational,
+                ],
+                inputFormatters: <TextInputFormatter>[
+                  PhoneDigitsFormatter(),
+                ],
+                validator: validatorPhone,
+                textInputAction: TextInputAction.done,
+                onSubmitted: (_) => _submit(),
+                prefix: TextButton(
+                  onPressed: _selectCountryCode,
+                  child: Text(
+                    countryCode?.dialCode ?? AppConstants.defaultDialCode,
+                    textDirection: TextDirection.ltr,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

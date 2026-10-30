@@ -17,8 +17,8 @@ class FcmToken {
   static Future<String?> get({
     Duration apnsWait = const Duration(seconds: 10),
   }) async {
-    final FirebaseMessaging messaging = FirebaseMessaging.instance;
     try {
+      final FirebaseMessaging messaging = FirebaseMessaging.instance;
       if (Platform.isIOS) {
         final DateTime deadline = DateTime.now().add(apnsWait);
         while (await messaging.getAPNSToken() == null &&

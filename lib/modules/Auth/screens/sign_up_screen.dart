@@ -1,29 +1,25 @@
-import 'dart:math' as math;
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:thewasher/core/services/fcm_token.dart';
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/components/k_auth_scaffold.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/core/enums/status.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_cubit.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_state.dart';
 import 'package:thewasher/modules/Auth/screens/otp_screen.dart';
 import 'package:thewasher/modules/about_us/screens/terms_and_conditions.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/list_tile_text_form.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:thewasher/utilties/navigator.dart';
+import 'package:thewasher/utilties/phone_number.dart';
 import 'package:thewasher/utilties/validator.dart';
 import 'package:thewasher/core/services/appsflyer_service.dart';
 
@@ -70,7 +66,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _initializeFCM() async {
-    await FirebaseMessaging.instance.requestPermission();
+    // Push is optional for logging in: never let Firebase errors block it.
+    try {
+      await FirebaseMessaging.instance.requestPermission();
+    } catch (e) {
+      debugPrint('Notification permission unavailable: $e');
+    }
     fcmToken = await FcmToken.get();
   }
 
@@ -81,247 +82,137 @@ class _SignUpScreenState extends State<SignUpScreen> {
     });
   }
 
+  /// The full international number sent to the backend.
+  String _fullPhone() =>
+      buildInternationalPhone(
+        dialCode: countryCode?.dialCode ?? AppConstants.defaultDialCode,
+        input: phoneController.text,
+      );
+
+  void _submit() {
+    if (!_signUpFormKey.currentState!.validate()) return;
+    if (!isChecked) {
+      showSnackBar(
+        buildContext: context,
+        message: translate(AppStrings.acceptTermsFirst),
+      );
+      return;
+    }
+    context.read<AuthCubit>().signup(
+      userName: nameController.text,
+      phone: _fullPhone(),
+      email: emailController.text.isEmpty ? null : emailController.text,
+      fcmToken: fcmToken ?? 'Notifications is Unaccessible',
+    );
+    isGuestUser = false;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        phoneFocusNode.unfocus();
-        emailFocusNode.unfocus();
-        nameFocusNode.unfocus();
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          systemOverlayStyle:
-              AppStyles.darkStatusBarIconsWithTransparentColorStyle,
-          automaticallyImplyLeading: true,
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          toolbarHeight: 30.h,
-          leading: IconButton(
-            onPressed: () => pop(context),
-            icon: Icon(
-              Icons.arrow_back_ios,
-              size: AppSize.s24.r,
-              color: ColorManager.primary,
-            ),
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(height: 50.h),
-                      Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: AppPadding.p24.w),
-                          child: SvgPicture.asset(AssetsManager.logo)),
-                      SizedBox(height: 37.h),
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-                        child: Text(
-                          translate(AppStrings.signUp),
-                          style: AppStyles.title24Bold.copyWith(
-                            color: ColorManager.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Localizations.localeOf(context).languageCode == "en"
-                      ? Image.asset(
-                          AssetsManager.registerAnimate,
-                          width: 132.w,
-                          height: 174.h,
-                        )
-                      : Transform(
-                          alignment: Alignment.center,
-                          transform: Matrix4.rotationY(math.pi),
-                          child: Image.asset(
-                            AssetsManager.registerAnimate,
-                            width: 132.w,
-                            height: 174.h,
-                          ))
-                ],
+    return BlocConsumer<AuthCubit, AuthState>(
+      listener: (BuildContext context, AuthState state) {
+        if (state.signUpStatus == RequestStatus.loaded) {
+          AppsFlyerService.logEvent("af_sign_up");
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => OtpScreen(
+                isSignup: true,
+                phone: _fullPhone(),
+                fcmToken: fcmToken ?? "Notifications is Unaccessible",
               ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppPadding.p23.w),
-                child: Form(
-                  key: _signUpFormKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ListTileTextForm(
-                        focusNode: nameFocusNode,
-                        validator: validatorName,
-                        title: translate(AppStrings.name),
-                        hintText: translate(AppStrings.username),
-                        textInputType: TextInputType.name,
-                        controller: nameController,
-                      ),
-                      SizedBox(height: AppSize.s8.h),
-                      ListTileTextForm(
-                        focusNode: emailFocusNode,
-                        isOptional: true,
-                        title: translate(AppStrings.email),
-                        hintText: AppConstants.hintEmail,
-                        textInputType: TextInputType.emailAddress,
-                        controller: emailController,
-                      ),
-                      SizedBox(height: AppSize.s8.h),
-                      ListTileTextForm(
-                        focusNode: phoneFocusNode,
-                        validator: validatorPhone,
-                        title: translate(AppStrings.phoneNumber),
-                        hintText: '533720654',
-                        textInputType: TextInputType.phone,
-                        controller: phoneController,
-                        textInputFormatter: [
-                          FilteringTextInputFormatter.deny(RegExp(r'^0+')),
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                        ],
-                        prefix: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.w),
-                              child: InkWell(
-                                onTap: _selectCountryCode,
-                                child: Row(
-                                  children: <Widget>[
-                                    Text(
-                                      "(${countryCode?.dialCode ?? AppConstants.codeSaudiArabia}) ",
-                                      style: AppStyles.title16Regular
-                                          .copyWith(color: ColorManager.black),
-                                    ),
-                                    SvgPicture.asset(AssetsManager.arrowLogo)
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              height: 23.h,
-                              width: 1.w,
-                              color: ColorManager.medGray,
-                              margin: const EdgeInsets.only(top: 2),
-                            ),
-                            SizedBox(width: 5.w)
-                          ],
+            ),
+          );
+        } else if (state.signUpStatus == RequestStatus.failure) {
+          showSnackBar(
+            buildContext: context,
+            message:
+                state.signUpErrorMessage ?? translate('somethingWentWrong'),
+            icon: Icons.error_outline,
+            backgroundColor: KColors.of(context).error,
+          );
+        }
+      },
+      builder: (BuildContext context, AuthState state) {
+        return Form(
+          key: _signUpFormKey,
+          child: KAuthScaffold(
+            title: translate(AppStrings.createAccount),
+            subtitle: translate(AppStrings.createAccountSubtitle),
+            showBack: true,
+            onBack: () => pop(context),
+            primaryAction: KButton(
+              label: translate(AppStrings.signUp),
+              loading: state.signUpStatus == RequestStatus.loading,
+              onPressed: _submit,
+            ),
+            children: <Widget>[
+              AutofillGroup(
+                child: Column(
+                  children: <Widget>[
+                    KTextField(
+                      label: translate(AppStrings.name),
+                      controller: nameController,
+                      focusNode: nameFocusNode,
+                      keyboardType: TextInputType.name,
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const <String>[AutofillHints.name],
+                      validator: validatorName,
+                    ),
+                    const SizedBox(height: KSpace.m),
+                    KTextField(
+                      label: translate(AppStrings.email),
+                      hint: AppConstants.hintEmail,
+                      controller: emailController,
+                      focusNode: emailFocusNode,
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      autofillHints: const <String>[AutofillHints.email],
+                      validator: validatorEmail,
+                    ),
+                    const SizedBox(height: KSpace.m),
+                    KTextField(
+                      label: translate(AppStrings.phoneNumber),
+                      controller: phoneController,
+                      focusNode: phoneFocusNode,
+                      keyboardType: TextInputType.phone,
+                      autofillHints: const <String>[
+                        AutofillHints.telephoneNumberNational,
+                      ],
+                      inputFormatters: <TextInputFormatter>[
+                        PhoneDigitsFormatter(),
+                      ],
+                      validator: validatorPhone,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _submit(),
+                      prefix: TextButton(
+                        onPressed: _selectCountryCode,
+                        child: Text(
+                          countryCode?.dialCode ?? AppConstants.defaultDialCode,
+                          textDirection: TextDirection.ltr,
                         ),
                       ),
-                      SizedBox(height: AppSize.s8.h),
-                      Row(
-                        children: <Widget>[
-                          SizedBox(
-                            height: 24.h,
-                            width: 24.w,
-                            child: Checkbox(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.r)),
-                              checkColor: ColorManager.white,
-                              activeColor: ColorManager.primary,
-                              value: isChecked,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  isChecked = value!;
-                                });
-                              },
-                            ),
-                          ),
-                          SizedBox(width: 6.w),
-                          SizedBox(
-                            width: 273.w,
-                            child: TextButton(
-                              onPressed: () {
-                                pushPage(
-                                    context, const TermsAndConditionsScreen());
-                              },
-                              child: Text(
-                                translate(AppStrings.termsConditions),
-                                style: AppStyles.titleGray16Regular.copyWith(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: AppSize.s28.h),
-                      Center(
-                        child: BlocConsumer<AuthCubit, AuthState>(
-                          listener: (context, state) async {
-                            if (state.signUpStatus == RequestStatus.loading) {
-                              setState(() => isLoading = true);
-                            } else {
-                              setState(() => isLoading = false);
-                            }
-
-                            if (state.signUpStatus == RequestStatus.loaded) {
-                              AppsFlyerService.logEvent("af_sign_up");
-
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) => OtpScreen(
-                                    isSignup: true,
-                                    phone: countryCode == null
-                                        ? "${AppConstants.codeSaudiArabia}${phoneController.text}"
-                                        : "${countryCode!.dialCode}${phoneController.text}",
-                                    fcmToken: fcmToken ??
-                                        "Notifications is Unaccessible",
-                                  ),
-                                ),
-                              );
-                            } else if (state.signUpStatus ==
-                                RequestStatus.failure) {
-                              showSnackBar(
-                                buildContext: context,
-                                message: state.signUpErrorMessage ??
-                                    'Something went wrong. Please try again.',
-                                icon: Icons.error_outline,
-                                backgroundColor: ColorManager.red,
-                              );
-                            }
-                          },
-                          builder: (context, state) {
-                            return ButtonsShared(
-                              onPressed: () async {
-                                if (_signUpFormKey.currentState!.validate() &&
-                                    isChecked) {
-                                  context.read<AuthCubit>().signup(
-                                        userName: nameController.text,
-                                        phone: countryCode == null
-                                            ? "${AppConstants.codeSaudiArabia}${phoneController.text}"
-                                            : "${countryCode!.dialCode}${phoneController.text}",
-                                        email: emailController.text.isEmpty
-                                            ? null
-                                            : emailController.text,
-                                        fcmToken: fcmToken ??
-                                            'Notifications is Unaccessible',
-                                      );
-                                }
-
-                                isGuestUser = false;
-                              },
-                              text: isLoading
-                                  ? "Signing up..."
-                                  : translate(AppStrings.signUp),
-                            );
-                          },
-                        ),
-                      ),
-                      SizedBox(height: AppSize.s12.h),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
+              ),
+              const SizedBox(height: KSpace.s),
+              CheckboxListTile.adaptive(
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                value: isChecked,
+                onChanged: (bool? v) => setState(() => isChecked = v ?? false),
+                title: Text(translate(AppStrings.acceptTerms)),
+              ),
+              KButton(
+                label: translate(AppStrings.termsConditions),
+                variant: KButtonVariant.text,
+                onPressed: () =>
+                    pushPage(context, const TermsAndConditionsScreen()),
               ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
