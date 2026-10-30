@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,7 +8,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
@@ -123,284 +123,180 @@ class _MainServicesState extends State<MainServices> {
             final List<dynamic>? description =
                 service.description as List<dynamic>?;
 
-            return AnimatedScale(
-              scale: 1.0,
-              duration: const Duration(milliseconds: 150),
-              child: GestureDetector(
-                onTapDown: (_) {
-                  // Add haptic feedback for better UX
-                  HapticFeedback.lightImpact();
-                },
-                onTap: () {
-                  if (isSelected) {
-                    int deleteIndex = offersBloc.cartServicesList.indexOf(
-                      service,
-                    );
-                    offersBloc.add(
-                      DeleteServiceCart(index: deleteIndex, service: service),
-                    );
-                  } else {
-                    offersBloc.add(
-                      AddServiceCart(
-                        service: service,
-                        selectedMainServiceIndex: index,
-                      ),
-                    );
-                  }
-                  widget.addOrRemoveMainServices?.call(index);
-                },
+            final KColors c = KColors.of(context);
+            final bool expanded = expandedStates[index] == true;
+            void toggle() {
+              HapticFeedback.selectionClick();
+              if (isSelected) {
+                offersBloc.add(
+                  DeleteServiceCart(
+                    index: offersBloc.cartServicesList.indexOf(service),
+                    service: service,
+                  ),
+                );
+              } else {
+                offersBloc.add(
+                  AddServiceCart(
+                    service: service,
+                    selectedMainServiceIndex: index,
+                  ),
+                );
+              }
+              widget.addOrRemoveMainServices?.call(index);
+            }
+
+            // Design: CustomerHome — one card, brand ring when selected,
+            // details behind a link instead of a nested box.
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: KSpace.s),
+              child: Semantics(
+                selected: isSelected,
                 child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: EdgeInsets.symmetric(vertical: AppMargin.m8.h),
-                  padding: EdgeInsets.all(16.w),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isSelected
-                          ? ColorManager.secondary
-                          : ColorManager.lightGray,
-                      width: isSelected ? 2.w : 1.w,
+                  duration: KMotion.of(context, KMotion.fast),
+                  decoration: ShapeDecoration(
+                    color: c.surface,
+                    shape: RoundedSuperellipseBorder(
+                      borderRadius: BorderRadius.circular(KRadius.card),
+                      side: BorderSide(
+                        color: isSelected ? c.brand : Colors.transparent,
+                        width: 2,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(16.r),
-                    color: ColorManager.white,
-                    boxShadow: <BoxShadow>[
+                    shadows: const <BoxShadow>[
                       BoxShadow(
-                        color: isSelected
-                            ? ColorManager.secondary.withValues(alpha: 0.15)
-                            : ColorManager.black.withValues(alpha: 0.08),
-                        blurRadius: isSelected ? 8.r : 4.r,
-                        offset: Offset(0, isSelected ? 4.h : 2.h),
+                        color: Color(0x0F000000),
+                        blurRadius: 12,
+                        offset: Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          // Radio Button
-                          Padding(
-                            padding: EdgeInsets.only(top: 2.h),
-                            child: SizedBox(
-                              height: AppSize.s20.h,
-                              width: AppSize.s20.w,
-                              child: RadioGroup<int>(
-                                groupValue: isSelected ? index : null,
-                                onChanged: (int? value) {
-                                  if (value != null) {
-                                    if (isSelected) {
-                                      int deleteIndex = offersBloc
-                                          .cartServicesList
-                                          .indexOf(service);
-                                      offersBloc.add(
-                                        DeleteServiceCart(
-                                          index: deleteIndex,
-                                          service: service,
-                                        ),
-                                      );
-                                    } else {
-                                      offersBloc.add(
-                                        AddServiceCart(
-                                          service: service,
-                                          selectedMainServiceIndex: index,
-                                        ),
-                                      );
-                                    }
-                                    widget.addOrRemoveMainServices?.call(index);
-                                  }
-                                },
-                                child: Radio<int>(
-                                  value: index,
-                                  activeColor: ColorManager.primary,
-                                  materialTapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(width: 12.w),
-
-                          // Service Icon
-                          Container(
-                            padding: EdgeInsets.all(12.r),
-                            decoration: BoxDecoration(
-                              color: ColorManager.gray,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: ColorManager.lightGray,
-                                width: 1.w,
-                              ),
-                            ),
-                            child: ImageShared(
-                              image: service.icon?.iconLink ?? '',
-                              height: 48.h,
-                              width: 48.w,
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-
-                          // Service Details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      customBorder: RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.circular(KRadius.card),
+                      ),
+                      onTap: toggle,
+                      child: Padding(
+                        padding: const EdgeInsets.all(KSpace.m),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
                               children: <Widget>[
-                                // Service Name
-                                Text(
-                                  service.name ?? '',
-                                  style: AppStyles.body14Medium.copyWith(
-                                    color: ColorManager.black,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                SizedBox(height: 8.h),
-
-                                // Service Details Grid
-                                Wrap(
-                                  spacing: 16.w,
-                                  runSpacing: 6.h,
-                                  children: [
-                                    // Points
-                                    // _buildDetailItem(
-                                    //   icon: AssetsManager.walletCoin,
-                                    //   text: widget
-                                    //       .mainServices[index].pointsToPay
-                                    //       .toString(),
-                                    // ),
-
-                                    // Duration
-                                    if (service.duration != null)
-                                      _buildDetailItem(
-                                        color: ColorManager.black,
-                                        icon: AssetsManager.timeIconLogo,
-                                        text:
-                                            "${service.duration} ${translate(service.durationUnit ?? '')} ${translate(AppStrings.toService)}",
-                                      ),
-
-                                    // Price
-                                    _buildDetailItem(
-                                      color: ColorManager.black,
-                                      icon: AssetsManager.serviceCoinSvg,
-                                      text: "${service.price ?? ''} ",
-                                      suffix: SvgPicture.asset(
-                                        AssetsManager.saudiRiyalSymbol,
-                                        height: 12.h,
-                                        width: 12.w,
-                                      ),
+                                ClipRSuperellipse(
+                                  borderRadius: BorderRadius.circular(14),
+                                  child: ColoredBox(
+                                    color: c.fill,
+                                    child: ImageShared(
+                                      image: service.icon?.iconLink ?? '',
+                                      height: 64,
+                                      width: 64,
                                     ),
-                                  ],
+                                  ),
+                                ),
+                                const SizedBox(width: KSpace.m),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        service.name ?? '',
+                                        style: KType.headline
+                                            .copyWith(color: c.text),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: KSpace.xs),
+                                      Wrap(
+                                        spacing: KSpace.m,
+                                        runSpacing: KSpace.xs,
+                                        children: <Widget>[
+                                          if (service.duration != null)
+                                            _buildDetailItem(
+                                              color: c.textSecondary,
+                                              icon: AssetsManager.timeIconLogo,
+                                              text:
+                                                  "${service.duration} ${translate(service.durationUnit ?? '')}",
+                                            ),
+                                          _buildDetailItem(
+                                            color: c.text,
+                                            icon: AssetsManager.serviceCoinSvg,
+                                            text: "${service.price ?? ''} ",
+                                            suffix: SvgPicture.asset(
+                                              AssetsManager.saudiRiyalSymbol,
+                                              height: 12,
+                                              width: 12,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: KSpace.s),
+                                AnimatedContainer(
+                                  duration: KMotion.of(context, KMotion.fast),
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? c.brand
+                                          : c.separator,
+                                      width: isSelected ? 7 : 2,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                      // Description Section with Enhanced Design
-                      if (description?.isNotEmpty == true)
-                        Container(
-                          margin: EdgeInsets.only(top: 12.h),
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            color: ColorManager.gray.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.lightGray,
-                              width: 1.w,
-                            ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Description Title
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.info_outline,
-                                    size: 16.h,
-                                    color: ColorManager.primary,
+                            if (description?.isNotEmpty == true) ...<Widget>[
+                              const SizedBox(height: KSpace.s),
+                              Semantics(
+                                button: true,
+                                expanded: expanded,
+                                child: InkWell(
+                                  borderRadius: BorderRadius.circular(8),
+                                  onTap: () => setState(
+                                    () => expandedStates[index] = !expanded,
                                   ),
-                                  SizedBox(width: 6.w),
-                                  Text(
-                                    translate('serviceDetails'),
-                                    style: AppStyles.caption12Medium.copyWith(
-                                      color: ColorManager.primary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 8.h),
-
-                              // Description Items
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Show first item always
-                                  _buildDescriptionItem(
-                                    description?[0]?.toString() ?? '',
-                                  ),
-                                  // Show additional items only when expanded
-                                  if (expandedStates[index] == true)
-                                    ...List.generate(
-                                      (description?.length ?? 1) - 1,
-                                      (i) => _buildDescriptionItem(
-                                        description?[i + 1]?.toString() ?? '',
-                                      ),
-                                    ),
-                                ],
-                              ),
-
-                              // Show see more/hide button only if there are multiple items
-                              if ((description?.length ?? 0) > 1) ...[
-                                SizedBox(height: 8.h),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      expandedStates[index] =
-                                          !(expandedStates[index] ?? false);
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 4.h,
-                                      horizontal: 8.w,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: ColorManager.primary.withValues(alpha: 
-                                        0.1,
-                                      ),
-                                      borderRadius: BorderRadius.circular(6.r),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: KSpace.xs,
                                     ),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
-                                      children: [
+                                      children: <Widget>[
                                         Text(
-                                          expandedStates[index] == true
-                                              ? translate('hide')
-                                              : translate('seeMore'),
-                                          style: AppStyles.caption12Medium
-                                              .copyWith(
-                                                color: ColorManager.primary,
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                          translate('serviceDetails'),
+                                          style: KType.footnote.copyWith(
+                                            color: c.brand,
+                                            fontWeight: FontWeight.w600,
+                                          ),
                                         ),
-                                        SizedBox(width: 4.w),
                                         Icon(
-                                          expandedStates[index] == true
-                                              ? Icons.keyboard_arrow_up
-                                              : Icons.keyboard_arrow_down,
-                                          size: 16.h,
-                                          color: ColorManager.primary,
+                                          expanded
+                                              ? Icons.keyboard_arrow_up_rounded
+                                              : Icons
+                                                  .keyboard_arrow_down_rounded,
+                                          size: 18,
+                                          color: c.brand,
                                         ),
                                       ],
                                     ),
                                   ),
                                 ),
-                              ],
+                              ),
+                              if (expanded)
+                                for (final dynamic item in description!)
+                                  _buildDescriptionItem(item?.toString() ?? ''),
                             ],
-                          ),
+                          ],
                         ),
-                    ],
+                      ),
+                    ),
                   ),
                 ),
               ),
