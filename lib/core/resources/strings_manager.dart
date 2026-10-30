@@ -123,6 +123,7 @@ class AppStrings {
   static const selectYourVehicles = "selectYourVehicles";
   static const addNewVehicles = "addNewVehicles";
   static const editVehicle = "editVehicle";
+  static const chooseCarBrand = "chooseCarBrand";
   static const myVehicles = "myVehicles";
   static const addCarInfo = "addCarInfo";
   static const plateNo = "plateNo";

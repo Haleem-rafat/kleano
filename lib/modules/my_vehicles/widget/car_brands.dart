@@ -73,7 +73,7 @@ class _CardBrandsWidgetState extends State<CardBrandsWidget> {
             padding: const EdgeInsets.only(top: KSpace.l),
             child: KPickerField<CarBrandsModel>(
               label: translate(AppStrings.carBrand),
-              placeholder: translate("hint1"),
+              placeholder: translate(AppStrings.chooseCarBrand),
               items: const <CarBrandsModel>[],
               itemLabel: (CarBrandsModel b) => b.name,
               onSelected: onSelectBrand,
@@ -86,7 +86,7 @@ class _CardBrandsWidgetState extends State<CardBrandsWidget> {
           padding: const EdgeInsets.only(top: KSpace.l),
           child: KPickerField<CarBrandsModel>(
             label: translate(AppStrings.carBrand),
-            placeholder: translate("hint1"),
+            placeholder: translate(AppStrings.chooseCarBrand),
             items: carBrands,
             itemLabel: (CarBrandsModel b) => b.name,
             value: notEmptyCarBrand ? selectBrandName : null,
