@@ -20,8 +20,8 @@ class PhoneNumberAlreadyExistsState extends PhoneNumberVerificationState {
   const PhoneNumberAlreadyExistsState();
 }
 
-class PhoneNumberAlreadyExistsSignUpState extends PhoneNumberVerificationState {
-}
+class PhoneNumberAlreadyExistsSignUpState
+    extends PhoneNumberVerificationState {}
 
 class PhoneNumberIsInvalidState extends PhoneNumberVerificationState {
   const PhoneNumberIsInvalidState();

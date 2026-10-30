@@ -43,10 +43,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     if (permission == LocationPermission.deniedForever) {}
     Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    );
     currentPosition = LatLng(position.latitude, position.longitude);
     List<Placemark> placeMarks = await placemarkFromCoordinates(
-        currentPosition.latitude, currentPosition.longitude);
+      currentPosition.latitude,
+      currentPosition.longitude,
+    );
     currentAddress = placeMarks.first.street!;
     administrativeArea = placeMarks.first.subAdministrativeArea!;
     country = placeMarks.first.country!;
@@ -64,7 +67,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
         // If token is not available yet, try to get it directly
         if (fcmToken == null || fcmToken.isEmpty) {
-          debugPrint("⚠️ Token not available from helper, trying direct fetch...");
+          debugPrint(
+            "⚠️ Token not available from helper, trying direct fetch...",
+          );
           fcmToken = await firebaseCloudMessagingService.getFcmToken();
         }
 
@@ -74,22 +79,30 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (fcmToken != null && fcmToken.isNotEmpty) {
           debugPrint("✅ FCM Token retrieved successfully!");
           debugPrint(
-              "📤 Sending FCM token to backend: ${fcmToken.substring(0, 30)}...");
+            "📤 Sending FCM token to backend: ${fcmToken.substring(0, 30)}...",
+          );
         } else {
           debugPrint("❌ FCM Token unavailable - sending placeholder");
         }
 
         final Either<ErrorModel, GenericResponse> response =
             await AuthRepo.bikerLogin(
-                event.userName, event.passWord, tokenToSend);
+              event.userName,
+              event.passWord,
+              tokenToSend,
+            );
         response.fold(
           (ErrorModel l) {
             debugPrint(
-                "❌ Login failed: ${l.getErrorMessage(Localizations.localeOf(event.context).languageCode)}");
-            emit(BikerLoginFailed(
-              error: l.getErrorMessage(
-                  Localizations.localeOf(event.context).languageCode),
-            ));
+              "❌ Login failed: ${l.getErrorMessage(Localizations.localeOf(event.context).languageCode)}",
+            );
+            emit(
+              BikerLoginFailed(
+                error: l.getErrorMessage(
+                  Localizations.localeOf(event.context).languageCode,
+                ),
+              ),
+            );
           },
           (GenericResponse r) async {
             debugPrint("✅ Login successful!");
@@ -116,21 +129,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           token = response;
           emit(BikerCheckPhoneSuccess(token: response));
         } else {
-          emit(BikerCheckPhoneFailed(
-              error: translate(AppStrings.phoneNotAlreadyExist)));
+          emit(
+            BikerCheckPhoneFailed(
+              error: translate(AppStrings.phoneNotAlreadyExist),
+            ),
+          );
         }
       } catch (e) {
         emit(BikerLoginFailed(error: e.toString()));
       }
     });
 
-    on<BikerResetPassword>(
-        (BikerResetPassword event, Emitter<AuthState> emit) async {
+    on<BikerResetPassword>((
+      BikerResetPassword event,
+      Emitter<AuthState> emit,
+    ) async {
       try {
         debugPrint("Biker Reset Password ... ");
         emit(BikerResetPasswordLoading());
-        final bool response =
-            await AuthRepo.bikerResetPassword(event.newPassword, event.token);
+        final bool response = await AuthRepo.bikerResetPassword(
+          event.newPassword,
+          event.token,
+        );
 
         if (response) {
           emit(BikerResetPasswordSuccess());
@@ -142,22 +162,25 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     });
 
-    on<BikerUpdatePassword>(
-        (BikerUpdatePassword event, Emitter<AuthState> emit) async {
+    on<BikerUpdatePassword>((
+      BikerUpdatePassword event,
+      Emitter<AuthState> emit,
+    ) async {
       try {
         debugPrint("Biker Update Password ... ");
         emit(BikerUpdatePasswordLoading());
         final Either<ErrorModel, bool> response =
             await AuthRepo.bikerUpdatePassword(
-          event.oldPassword,
-          event.newPassword,
-        );
+              event.oldPassword,
+              event.newPassword,
+            );
 
         response.fold(
           (ErrorModel l) => emit(
             BikerUpdatePasswordFailed(
               error: l.getErrorMessage(
-                  Localizations.localeOf(event.context).languageCode),
+                Localizations.localeOf(event.context).languageCode,
+              ),
             ),
           ),
           (bool r) => emit(BikerUpdatePasswordSuccess()),
@@ -214,8 +237,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           // network error (e.g. backend cold start) keeps the biker signed in.
           String? response;
           try {
-            response = await ApiService.refreshToken()
-                .timeout(const Duration(seconds: 45));
+            response = await ApiService.refreshToken().timeout(
+              const Duration(seconds: 45),
+            );
           } catch (e) {
             debugPrint("Token refresh unavailable: $e");
             emit(BikerSplashAlreadyUser());

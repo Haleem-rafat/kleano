@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../tokens.dart';
 
@@ -18,6 +19,7 @@ class KTextField extends StatefulWidget {
     this.onSubmitted,
     this.prefix,
     this.focusNode,
+    this.inputFormatters,
   });
 
   final String label;
@@ -33,6 +35,7 @@ class KTextField extends StatefulWidget {
   /// Leading content inside the field (e.g. a country code).
   final Widget? prefix;
   final FocusNode? focusNode;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<KTextField> createState() => _KTextFieldState();
@@ -58,6 +61,7 @@ class _KTextFieldState extends State<KTextField> {
           focusNode: widget.focusNode,
           obscureText: _hidden,
           keyboardType: widget.keyboardType,
+          inputFormatters: widget.inputFormatters,
           autofillHints: widget.autofillHints,
           validator: widget.validator,
           textInputAction: widget.textInputAction,

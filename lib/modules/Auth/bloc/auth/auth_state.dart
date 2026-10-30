@@ -4,12 +4,15 @@ part of 'auth_bloc.dart';
 abstract class AuthState {}
 
 class AuthInitial extends AuthState {}
+
 class BikerLoginLoading extends AuthState {}
+
 class BikerLoginSuccess extends AuthState {
   final AuthModel authModel;
 
   BikerLoginSuccess({required this.authModel});
 }
+
 class BikerLoginFailed extends AuthState {
   final String error;
 
@@ -17,11 +20,13 @@ class BikerLoginFailed extends AuthState {
 }
 
 class BikerCheckPhoneLoading extends AuthState {}
+
 class BikerCheckPhoneSuccess extends AuthState {
   final String token;
 
   BikerCheckPhoneSuccess({required this.token});
 }
+
 class BikerCheckPhoneFailed extends AuthState {
   final String error;
 
@@ -29,7 +34,9 @@ class BikerCheckPhoneFailed extends AuthState {
 }
 
 class BikerResetPasswordLoading extends AuthState {}
+
 class BikerResetPasswordSuccess extends AuthState {}
+
 class BikerResetPasswordFailed extends AuthState {
   final String error;
 
@@ -37,7 +44,9 @@ class BikerResetPasswordFailed extends AuthState {
 }
 
 class BikerUpdatePasswordLoading extends AuthState {}
+
 class BikerUpdatePasswordSuccess extends AuthState {}
+
 class BikerUpdatePasswordFailed extends AuthState {
   final String error;
 
@@ -64,17 +73,20 @@ class BikerProfileEditFailed extends AuthState {
   BikerProfileEditFailed({required this.error});
 }*/
 
-
 class BikerLogOutLoading extends AuthState {}
+
 class BikerLogOutSuccess extends AuthState {}
+
 class BikerLogOutFailed extends AuthState {
   final String error;
 
   BikerLogOutFailed({required this.error});
 }
 
+class BikerSplashLoading extends AuthState {}
 
-class BikerSplashLoading extends AuthState{}
-class BikerSplashAlreadyUser extends AuthState{}
-class BikerSplashExpiredToken extends AuthState{}
-class BikerSplashNotUser extends AuthState{}
+class BikerSplashAlreadyUser extends AuthState {}
+
+class BikerSplashExpiredToken extends AuthState {}
+
+class BikerSplashNotUser extends AuthState {}

@@ -296,4 +296,19 @@ class AppStrings {
   static const String allTime = "allTime";
   static const String weekends = "weekends";
   static const String orders = "orders";
+  static const String welcomeBack = "welcomeBack";
+  static const String bikerLoginSubtitle = "bikerLoginSubtitle";
+  static const String badgeBiker = "badgeBiker";
+  static const String resetPasswordTitle = "resetPasswordTitle";
+  static const String resetPasswordSubtitle = "resetPasswordSubtitle";
+  static const String verifyCodeTitle = "verifyCodeTitle";
+  static const String verifyCodeSubtitle = "verifyCodeSubtitle";
+  static const String newPasswordTitle = "newPasswordTitle";
+  static const String newPasswordSubtitle = "newPasswordSubtitle";
+  static const String onboardTitle1 = "onboardTitle1";
+  static const String onboardBody1 = "onboardBody1";
+  static const String onboardTitle2 = "onboardTitle2";
+  static const String onboardBody2 = "onboardBody2";
+  static const String onboardTitle3 = "onboardTitle3";
+  static const String onboardBody3 = "onboardBody3";
 }

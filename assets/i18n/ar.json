@@ -128,5 +128,20 @@
   "totalCommission": "إجمالي العمولة",
   "allTime": "كل الوقت",
   "weekends": "عطلات نهاية الأسبوع",
-  "orders": "طلبات"
+  "orders": "طلبات",
+  "welcomeBack": "مرحبًا بعودتك",
+  "bikerLoginSubtitle": "سجّل الدخول لتبدأ استقبال طلبات الغسيل",
+  "badgeBiker": "الكابتن",
+  "resetPasswordTitle": "إعادة تعيين كلمة المرور",
+  "resetPasswordSubtitle": "أدخل رقم جوالك وسنرسل لك رمزًا",
+  "verifyCodeTitle": "أدخل الرمز",
+  "verifyCodeSubtitle": "أرسلنا رمزًا من 6 أرقام إلى",
+  "newPasswordTitle": "أنشئ كلمة مرور جديدة",
+  "newPasswordSubtitle": "استخدم 8 أحرف على الأقل",
+  "onboardTitle1": "استقبل الطلبات",
+  "onboardBody1": "طلبات غسيل جديدة بالقرب منك فور وصولها.",
+  "onboardTitle2": "اجعل السيارات تلمع",
+  "onboardBody2": "تابع كل غسلة خطوة بخطوة مع صور قبل وبعد.",
+  "onboardTitle3": "اربح مع كل غسلة",
+  "onboardBody3": "شاهد أرباح اليوم وتقييمك بنظرة واحدة."
 }

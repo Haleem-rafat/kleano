@@ -10,7 +10,7 @@ part 'phone_number_verification_state.dart';
 
 class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
   PhoneNumberVerificationCubit()
-      : super(const PhoneNumberVerificationInitialState());
+    : super(const PhoneNumberVerificationInitialState());
 
   static final FirebaseAuthenticationService _firebaseAuthenticationService =
       FirebaseAuthenticationService();
@@ -88,20 +88,21 @@ class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
     try {
       final PhoneAuthCredential phoneAuthCredential =
           PhoneAuthProvider.credential(
-        verificationId: verificationId,
-        smsCode: smsCode,
-      );
+            verificationId: verificationId,
+            smsCode: smsCode,
+          );
 
       if (_firebaseAuthenticationService.firebaseAuth.currentUser != null) {
-        await _firebaseAuthenticationService.firebaseAuth
-            .signInWithCredential(phoneAuthCredential);
+        await _firebaseAuthenticationService.firebaseAuth.signInWithCredential(
+          phoneAuthCredential,
+        );
       } else {
-        await _firebaseAuthenticationService.firebaseAuth
-            .signInWithCredential(phoneAuthCredential);
+        await _firebaseAuthenticationService.firebaseAuth.signInWithCredential(
+          phoneAuthCredential,
+        );
       }
       if (signup) {
-      } else {
-      }
+      } else {}
       emit(PhoneNumberVerifiedSuccessfullyState(fcmToken: fcmToken!));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'provider-already-linked' ||
