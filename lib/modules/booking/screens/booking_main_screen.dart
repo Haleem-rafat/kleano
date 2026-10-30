@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/design/components/k_chip_button.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:badges/badges.dart' as badge;
 import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -533,56 +534,22 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                       return const DotedWidget();
                                                     } else if (state
                                                         is GetUserProfileSuccess) {
-                                                      return InkWell(
-                                                        onTap: () {
-                                                          AlertHelper.pointAlert(
-                                                            context,
-                                                          );
-                                                        },
-                                                        child: Container(
-                                                          height: 23.h,
-                                                          padding:
-                                                              EdgeInsets.symmetric(
-                                                                vertical: 3.h,
-                                                                horizontal: 8.w,
-                                                              ),
-                                                          decoration: BoxDecoration(
-                                                            color: ColorManager
-                                                                .secondary,
-                                                            borderRadius:
-                                                                BorderRadius.circular(
-                                                                  15.r,
-                                                                ),
-                                                          ),
-                                                          child: Center(
-                                                            child: Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              crossAxisAlignment:
-                                                                  CrossAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                SvgPicture.asset(
-                                                                  AssetsManager
-                                                                      .walletCoin,
-                                                                  height: 10.h,
-                                                                  width: 10.w,
-                                                                ),
-                                                                2.pw,
-                                                                Text(
-                                                                  "${state.userProfile.data?.points ?? 0.0}",
-                                                                  style: AppStyles
-                                                                      .subtext14Regular
-                                                                      .copyWith(
-                                                                        color: ColorManager
-                                                                            .white,
-                                                                      ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
+                                                      return KChipButton(
+                                                        leading: SvgPicture.asset(
+                                                          AssetsManager
+                                                              .walletCoin,
+                                                          height: 16,
+                                                          width: 16,
                                                         ),
+                                                        label:
+                                                            "${state.userProfile.data?.points ?? 0}",
+                                                        semanticLabel: translate(
+                                                          AppStrings.points,
+                                                        ),
+                                                        onTap: () =>
+                                                            AlertHelper.pointAlert(
+                                                              context,
+                                                            ),
                                                       );
                                                     }
                                                     return const SizedBox();
@@ -590,54 +557,53 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                 ),
                                           // Notifications section
                                           SizedBox(width: 8.w),
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (_isGuest) {
-                                                pushPage(
-                                                  context,
-                                                  const GuestNotificationScreen(),
-                                                );
-                                              } else {
-                                                pushPage(
-                                                  context,
-                                                  const NotificationsScreen(),
-                                                );
-                                              }
-                                              if (mounted) {
-                                                setState(() {
-                                                  generalSingleton
-                                                          .hasUnreadNotification =
-                                                      false;
-                                                });
-                                              }
-                                            },
-                                            behavior: HitTestBehavior.opaque,
-                                            child: SizedBox(
-                                              height: AppSize.s20.h,
-                                              width: AppSize.s20.w,
-                                              child: Stack(
-                                                alignment: Alignment.topLeft,
-                                                children: <Widget>[
-                                                  SvgPicture.asset(
-                                                    AssetsManager.notification,
-                                                    fit: BoxFit.cover,
-                                                    colorFilter:
-                                                        const ColorFilter.mode(
-                                                          ColorManager.primary,
-                                                          BlendMode.srcIn,
-                                                        ),
-                                                  ),
-                                                  if (generalSingleton
-                                                      .hasUnreadNotification)
-                                                    SizedBox(
-                                                      height: 6.h,
-                                                      width: 6.w,
-                                                      child:
-                                                          const badge.Badge(),
-                                                    ),
-                                                ],
+                                          Stack(
+                                            clipBehavior: Clip.none,
+                                            children: <Widget>[
+                                              GlassIconButton(
+                                                icon: Icons
+                                                    .notifications_none_rounded,
+                                                sfSymbol: 'bell',
+                                                size: KChipButton.height,
+                                                color: KColors.of(context).brand,
+                                                tooltip: translate(
+                                                  AppStrings.notifications,
+                                                ),
+                                                onPressed: () {
+                                                  pushPage(
+                                                    context,
+                                                    _isGuest
+                                                        ? const GuestNotificationScreen()
+                                                        : const NotificationsScreen(),
+                                                  );
+                                                  if (mounted) {
+                                                    setState(() {
+                                                      generalSingleton
+                                                              .hasUnreadNotification =
+                                                          false;
+                                                    });
+                                                  }
+                                                },
                                               ),
-                                            ),
+                                              if (generalSingleton
+                                                  .hasUnreadNotification)
+                                                PositionedDirectional(
+                                                  top: 4,
+                                                  end: 4,
+                                                  child: IgnorePointer(
+                                                    child: Container(
+                                                      width: 9,
+                                                      height: 9,
+                                                      decoration: BoxDecoration(
+                                                        color: KColors.of(
+                                                          context,
+                                                        ).error,
+                                                        shape: BoxShape.circle,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
                                           ),
                                           // Location chip section
                                           if (!_isGuest) ...[
@@ -671,48 +637,26 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                   }
 
                                                   if (defaultAddress != null) {
-                                                    return GestureDetector(
-                                                      onTap: () {
-                                                        pushPage(
-                                                          context,
-                                                          SetBookingLocationScreen(),
-                                                        );
-                                                      },
-                                                      child: Chip(
-                                                        backgroundColor:
-                                                            ColorManager
-                                                                .primary,
-                                                        label: Text(
+                                                    return KChipButton(
+                                                      leading: const Icon(
+                                                        Icons.location_on_rounded,
+                                                      ),
+                                                      label:
                                                           defaultAddress
-                                                                      .savedName
-                                                                      ?.isNotEmpty ==
-                                                                  true
-                                                              ? defaultAddress
-                                                                    .savedName!
-                                                              : defaultAddress
-                                                                        .streetName ??
-                                                                    translate(
-                                                                      AppStrings
-                                                                          .defaultAddress,
-                                                                    ),
-                                                          style: AppStyles
-                                                              .title16Bold
-                                                              .copyWith(
-                                                                color:
-                                                                    ColorManager
-                                                                        .white,
-                                                                fontSize: 12.sp,
-                                                              ),
-                                                          maxLines: 1,
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                        avatar: const Icon(
-                                                          Icons.location_on,
-                                                          color: ColorManager
-                                                              .white,
-                                                          size: 14,
-                                                        ),
+                                                                  .savedName
+                                                                  ?.isNotEmpty ==
+                                                              true
+                                                          ? defaultAddress
+                                                                .savedName!
+                                                          : defaultAddress
+                                                                    .streetName ??
+                                                                translate(
+                                                                  AppStrings
+                                                                      .defaultAddress,
+                                                                ),
+                                                      onTap: () => pushPage(
+                                                        context,
+                                                        SetBookingLocationScreen(),
                                                       ),
                                                     );
                                                   }
