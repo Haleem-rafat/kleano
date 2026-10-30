@@ -361,6 +361,9 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
     return Scaffold(
       backgroundColor: c.background,
       resizeToAvoidBottomInset: true,
+      // The form scrolls under the floating glass button, like Apple's apps;
+      // on a solid strip the glass has nothing to refract.
+      extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: GlassBackButton(onPressed: () => pop(context)),
@@ -372,8 +375,8 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
         onTap: () => FocusScope.of(context).unfocus(),
         child: ListView(
           controller: scrollController,
-          padding: const EdgeInsets.fromLTRB(
-              KSpace.xl, KSpace.l, KSpace.xl, KSpace.xxl),
+          padding: EdgeInsets.fromLTRB(KSpace.xl, KSpace.l, KSpace.xl,
+              MediaQuery.viewPaddingOf(context).bottom + 96),
           children: <Widget>[
             _photo(c),
             const SizedBox(height: KSpace.l),
