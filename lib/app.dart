@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
+import 'package:thewhsherbiker/core/design/kleano_theme.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/theme_manager.dart';
@@ -52,17 +53,14 @@ class App extends StatelessWidget {
           builder: (_) {
             return MaterialApp(
               navigatorKey: navigatorKeyAlice,
+              theme: kleanoTheme(brightness: Brightness.light),
+              darkTheme: kleanoTheme(brightness: Brightness.dark),
+              // Light until every screen uses the design tokens.
+              themeMode: ThemeMode.light,
               builder: (BuildContext context, Widget? navigator) {
-                final String lang = Localizations.localeOf(context).languageCode;
-                return Theme(
-                  data: LiquidGlassTheme.apply(
-                    getApplicationTheme(lang),
-                    primary: ColorManager.primary,
-                  ),
-                  child: BackdropGroup(
-                    child: LiquidGlassTheme.clampTextScale(
-                          context, FoldScope(child: SystemBarInset(child: navigator!))),
-                  ),
+                return BackdropGroup(
+                  child: LiquidGlassTheme.clampTextScale(context,
+                      FoldScope(child: SystemBarInset(child: navigator!))),
                 );
               },
               debugShowCheckedModeBanner: false,
