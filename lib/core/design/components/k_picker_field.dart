@@ -162,10 +162,6 @@ class _PickerSheetState<T> extends State<_PickerSheet<T>> {
               autofocus: widget.items.length > 12,
               placeholder: widget.searchHint,
               style: KType.body.copyWith(color: c.text),
-              // The app doesn't bundle the CupertinoIcons font (they render
-              // as "?"), so use the bundled Material icons.
-              prefixIcon: const Icon(Icons.search_rounded),
-              suffixIcon: const Icon(Icons.cancel_rounded),
               onChanged: (String v) => setState(() => _query = v.trim()),
             )
           else
