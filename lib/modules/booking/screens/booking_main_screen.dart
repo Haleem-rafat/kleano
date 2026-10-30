@@ -454,15 +454,13 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                               children: [
                                                 Text(
                                                   translate(AppStrings.hello),
-                                                  style: AppStyles
-                                                      .titleWhite16Bold,
+                                                  style: KType.title.copyWith(color: KColors.of(context).text),
                                                 ),
                                                 AppSize.s1_5.pw,
                                                 _isGuest
                                                     ? Text(
                                                         '...',
-                                                        style: AppStyles
-                                                            .titleWhite16Bold,
+                                                        style: KType.title.copyWith(color: KColors.of(context).text),
                                                       )
                                                     : (context
                                                                   .read<
@@ -483,9 +481,8 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                                 } else if (state
                                                                     is GetUserProfileSuccess) {
                                                                   return Text(
-                                                                    ' ${state.userProfile.data?.userName!.split(' ').first}',
-                                                                    style: AppStyles
-                                                                        .titleWhite16Bold,
+                                                                    ' ${(state.userProfile.data?.userName ?? '').split(' ').first}',
+                                                                    style: KType.title.copyWith(color: KColors.of(context).text),
                                                                   );
                                                                 }
                                                                 return const SizedBox();

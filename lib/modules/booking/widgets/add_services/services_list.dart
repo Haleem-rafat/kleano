@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -326,9 +327,7 @@ class _ServicesListState extends State<ServicesList> {
               8.verticalSpace,
               Text(
                 translate(AppStrings.chooseYourMainService),
-                style: AppStyles.title16Bold.copyWith(
-                  color: ColorManager.black,
-                ),
+                style: KType.title.copyWith(color: KColors.of(context).text),
               ),
               // 8.verticalSpace,
               MainServices(
@@ -342,9 +341,7 @@ class _ServicesListState extends State<ServicesList> {
               if (extraServicesData.isNotEmpty) ...[
                 Text(
                   translate(AppStrings.chooseYourExtraServices),
-                  style: AppStyles.title16Bold.copyWith(
-                    color: ColorManager.black,
-                  ),
+                style: KType.title.copyWith(color: KColors.of(context).text),
                 ),
                 SizedBox(height: 2.h),
                 Column(
