@@ -1,20 +1,23 @@
 import 'dart:io';
 
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/car_model/cars_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/color_model.dart';
@@ -24,8 +27,6 @@ import 'package:thewasher/modules/my_vehicles/widget/car_model_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:thewasher/modules/my_vehicles/widget/edit_car_title.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
@@ -88,341 +89,38 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
   }
 
   void _showImagePickerDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0.r))),
-              contentPadding: EdgeInsets.zero,
-              content: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.6,
-                  maxWidth: MediaQuery.of(context).size.width * 0.85,
-                  minHeight: 200.h,
-                  minWidth: 280.w,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        // Header with icon
-                        Container(
-                          width: 60.w,
-                          height: 60.w,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                          child: Icon(
-                            Icons.add_photo_alternate,
-                            size: 30.sp,
-                            color: ColorManager.primary,
-                          ),
-                        ),
-                        AppPadding.p8.ph,
-                        Text(
-                          translate("makeChoice"),
-                          style: AppStyles.title16Bold.copyWith(
-                            color: ColorManager.darkGrey,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        AppPadding.p4.ph,
-                        Text(
-                          "Select an image source",
-                          style: AppStyles.title16Regular.copyWith(
-                            color: ColorManager.medGray,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        AppPadding.p16.ph,
-                        // Camera option
-                        Container(
-                          width: double.infinity,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.primary.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12.r),
-                              onTap: () {
-                                pickImage(true);
-                                pop(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.camera_alt,
-                                    size: 24.sp,
-                                    color: ColorManager.primary,
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    translate("camera"),
-                                    style: AppStyles.title16Medium.copyWith(
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        AppPadding.p8.ph,
-                        // Gallery option
-                        Container(
-                          width: double.infinity,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.darkGrey.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12.r),
-                              onTap: () {
-                                pickImage(false);
-                                pop(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.photo_library,
-                                    size: 24.sp,
-                                    color: ColorManager.primary,
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    translate("gallery"),
-                                    style: AppStyles.title16Medium.copyWith(
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ));
-        });
-  }
-
-  void _showImageOptionsDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return AlertDialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(16.0.r))),
-              contentPadding: EdgeInsets.zero,
-              content: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.7,
-                  maxWidth: MediaQuery.of(context).size.width * 0.85,
-                  minHeight: 240.h,
-                  minWidth: 280.w,
-                ),
-                decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(20.w),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        // Header with icon
-                        Container(
-                          width: 60.w,
-                          height: 60.w,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(30.r),
-                          ),
-                          child: Icon(
-                            Icons.image,
-                            size: 30.sp,
-                            color: ColorManager.primary,
-                          ),
-                        ),
-                        AppPadding.p12.ph,
-                        Text(
-                          "Image Options",
-                          style: AppStyles.title16Bold.copyWith(
-                            color: ColorManager.darkGrey,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        AppPadding.p4.ph,
-                        Text(
-                          "Choose what you want to do",
-                          style: AppStyles.title16Regular.copyWith(
-                            color: ColorManager.medGray,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        AppPadding.p16.ph,
-                        // View Full Screen option
-                        Container(
-                          width: double.infinity,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.primary.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12.r),
-                              onTap: () {
-                                pop(context);
-                                _showFullScreenImage(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.visibility,
-                                    size: 24.sp,
-                                    color: ColorManager.primary,
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    "View Full Screen",
-                                    style: AppStyles.title16Medium.copyWith(
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        AppPadding.p8.ph,
-                        // Pick Another Image option
-                        Container(
-                          width: double.infinity,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.primary.withValues(alpha: 0.2),
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12.r),
-                              onTap: () {
-                                pop(context);
-                                _showImagePickerDialog(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.camera_alt,
-                                    size: 24.sp,
-                                    color: ColorManager.primary,
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Text(
-                                    "Pick Another Image",
-                                    style: AppStyles.title16Medium.copyWith(
-                                      color: ColorManager.primary,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        AppPadding.p8.ph,
-                        // Cancel option
-                        Container(
-                          width: double.infinity,
-                          height: 48.h,
-                          decoration: BoxDecoration(
-                            color: ColorManager.primary,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: ColorManager.medGray.withValues(alpha: 0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(12.r),
-                              onTap: () {
-                                pop(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Cancel",
-                                    style: AppStyles.title16Medium.copyWith(
-                                      color: ColorManager.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ));
-        });
+    showKSheet<void>(
+      context: context,
+      builder: (BuildContext sheetContext) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: KSpace.s),
+            child: Text(translate("makeChoice"),
+                textAlign: TextAlign.center,
+                style: KType.headline
+                    .copyWith(color: KColors.of(sheetContext).text)),
+          ),
+          KListRow(
+            title: translate("camera"),
+            leading: const Icon(Icons.photo_camera_rounded),
+            onTap: () {
+              pop(sheetContext);
+              pickImage(true);
+            },
+          ),
+          KListRow(
+            title: translate("gallery"),
+            leading: const Icon(Icons.photo_library_rounded),
+            onTap: () {
+              pop(sheetContext);
+              pickImage(false);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   void _showFullScreenImage(BuildContext context) {
@@ -529,264 +227,210 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
         carImage: pick != null ? pick!.path : ""));
   }
 
+  bool get _hasImage =>
+      pick != null ||
+      (!widget.create && (widget.vehicleData?.imageLink?.isNotEmpty ?? false));
+
+  void _save() {
+    if (carModelController.text.isNotEmpty &&
+        carPlateController.text.isNotEmpty &&
+        carBrandController.text.isNotEmpty) {
+      FocusScope.of(context).unfocus();
+      widget.create ? createNewCar() : editCar();
+    } else {
+      showSnackBar(
+        buildContext: context,
+        message: Localizations.localeOf(context).languageCode == "ar"
+            ? "فضلاً اكمال باقي البيانات"
+            : "Please complete the remaining data",
+      );
+    }
+  }
+
+  Widget _photo(KColors c) {
+    final Widget image = pick != null
+        ? Image.file(pick!, fit: BoxFit.cover)
+        : _hasImage
+            ? Image.network(widget.vehicleData!.imageLink!, fit: BoxFit.cover)
+            : Center(
+                child: SvgPicture.asset(
+                  AssetsManager.car,
+                  height: 56,
+                  colorFilter:
+                      ColorFilter.mode(c.textSecondary, BlendMode.srcIn),
+                ),
+              );
+    return KCard(
+      padding: EdgeInsets.zero,
+      onTap: _hasImage
+          ? () => _showFullScreenImage(context)
+          : () => _showImagePickerDialog(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Hero(
+              tag: 'car_image_${widget.vehicleData?.plateNumber ?? 'new'}',
+              child: ColoredBox(color: c.fill, child: image),
+            ),
+          ),
+          KButton(
+            label: translate(AppStrings.uploadCarPhoto),
+            variant: KButtonVariant.text,
+            onPressed: () => _showImagePickerDialog(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _colours(KColors c) {
+    return Wrap(
+      spacing: KSpace.m,
+      runSpacing: KSpace.m,
+      children: <Widget>[
+        for (final ColorType colour in colorList)
+          Semantics(
+            button: true,
+            selected: selectedColor == colour.id,
+            label: colour.colorName,
+            child: GestureDetector(
+              onTap: () => setState(() {
+                selectedColor = colour.id!;
+                selectedColorName = colour.colorName;
+              }),
+              child: SizedBox(
+                width: 56,
+                child: Column(
+                  children: <Widget>[
+                    AnimatedContainer(
+                      duration: KMotion.of(context, KMotion.fast),
+                      width: 44,
+                      height: 44,
+                      padding: const EdgeInsets.all(3),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: selectedColor == colour.id
+                              ? c.brand
+                              : Colors.transparent,
+                          width: 2.5,
+                        ),
+                      ),
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: colour.color,
+                          border: Border.all(color: c.separator),
+                        ),
+                        child: selectedColor == colour.id
+                            ? Icon(Icons.check_rounded,
+                                size: 18,
+                                color: (colour.color ?? Colors.white)
+                                            .computeLuminance() >
+                                        0.5
+                                    ? Colors.black
+                                    : Colors.white)
+                            : null,
+                      ),
+                    ),
+                    const SizedBox(height: KSpace.xs),
+                    Text(colour.colorName,
+                        style: KType.caption.copyWith(color: c.textSecondary),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: AppStyles.lightStatusBarIconsWithTransparentColorStyle,
-      child: Scaffold(
-        resizeToAvoidBottomInset: true,
-        appBar: PreferredSize(
-          preferredSize: Size(AppSize.s375, 60.h),
-          child: AppBarShared(
-            titleAppBar: widget.create
-                ? translate(AppStrings.addNewVehicles)
-                : translate(AppStrings.selectYourVehicles),
-            isTextOnly: false,
-          ),
-        ),
-        body: GestureDetector(
-          onTap: () {
-            // Unfocus all fields to close any open dropdowns
-            FocusScope.of(context).unfocus();
-          },
-          child: SingleChildScrollView(
-            controller: scrollController,
-            physics: const BouncingScrollPhysics(),
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom + 20.h,
+    final KColors c = KColors.of(context);
+    Widget label(String key) => Padding(
+          padding: const EdgeInsetsDirectional.only(
+              start: KSpace.xs, bottom: KSpace.s, top: KSpace.xl),
+          child: Text(translate(key),
+              style: KType.footnote.copyWith(color: c.textSecondary)),
+        );
+    return Scaffold(
+      backgroundColor: c.background,
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: Text(widget.create
+            ? translate(AppStrings.addNewVehicles)
+            : translate(AppStrings.editVehicle)),
+      ),
+      body: GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: ListView(
+          controller: scrollController,
+          padding: const EdgeInsets.fromLTRB(
+              KSpace.xl, KSpace.l, KSpace.xl, KSpace.xxl),
+          children: <Widget>[
+            _photo(c),
+            const SizedBox(height: KSpace.l),
+            KeyedSubtree(
+              key: carBrandKey,
+              child: CardBrandsWidget(carBrandController: carBrandController),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                AppPadding.p24.ph,
-                editCarTitle(AppStrings.uploadCarPhoto),
-                AppPadding.p18.ph,
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: InkWell(
-                    onTap: () {
-                      // Check if there's already an image
-                      bool hasImage = pick != null ||
-                          (!widget.create &&
-                              widget.vehicleData?.imageLink?.isNotEmpty ==
-                                  true);
-
-                      if (hasImage) {
-                        _showImageOptionsDialog(context);
-                      } else {
-                        _showImagePickerDialog(context);
-                      }
-                    },
-                    child: DottedBorder(
-                      options: RoundedRectDottedBorderOptions(
-                        dashPattern: const <double>[4, 3, 1, 0],
-                        color: ColorManager.darkGrey,
-                        radius: Radius.circular(24.r),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24.r),
-                        ),
-                        constraints: BoxConstraints(
-                          maxHeight: 120.h,
-                          maxWidth: double.infinity,
-                          minHeight: 80.h,
-                          minWidth: 120.w,
-                        ),
-                        child: AspectRatio(
-                          aspectRatio:
-                              1.2, // Slightly wider than square for better car photos
-                          child: !widget.create && pick == null
-                              ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(24.r),
-                                  child: widget.vehicleData!.imageLink!.isEmpty
-                                      ? Icon(
-                                          Icons.image_outlined,
-                                          size: 48.sp,
-                                          color: ColorManager.darkGrey,
-                                        )
-                                      : Image.network(
-                                          widget.vehicleData!.imageLink!,
-                                          fit: BoxFit.cover,
-                                          errorBuilder:
-                                              (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.image_outlined,
-                                              size: 48.sp,
-                                              color: ColorManager.darkGrey,
-                                            );
-                                          },
-                                        ),
-                                )
-                              : pick == null
-                                  ? Icon(
-                                      Icons.image_outlined,
-                                      size: 48.sp,
-                                      color: ColorManager.darkGrey,
-                                    )
-                                  : ClipRRect(
-                                      borderRadius: BorderRadius.circular(24.r),
-                                      child: Image.file(
-                                        pick!,
-                                        fit: BoxFit.cover,
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return Icon(
-                                            Icons.image_outlined,
-                                            size: 48.sp,
-                                            color: ColorManager.darkGrey,
-                                          );
-                                        },
-                                      ),
-                                    ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                AppPadding.p32.ph,
-                Container(
-                  key: carBrandKey,
-                  child: CardBrandsWidget(
-                    carBrandController: carBrandController,
-                  ),
-                ),
-                Container(
-                  key: carModelKey,
-                  child: CarModelWidget(
-                    carModelController: carModelController,
-                  ),
-                ),
-                // _carModel(),
-                16.verticalSpace,
-                editCarTitle(AppStrings.carPlate),
-                AppPadding.p8.ph,
-                Padding(
-                  key: carPlateKey,
-                  padding: EdgeInsets.symmetric(horizontal: 24.w),
-                  child: SizedBox(
-                    width: 328.w,
-                    height: 56.h,
-                    child: editTextForm(
-                      translate("hint3"),
-                      carPlateController,
-                      carPlateFocusNode,
-                      inputFormatters: [CarPlateFormatter()],
-                      keyboardType: TextInputType.text,
-                    ),
-                  ),
-                ),
-                AppPadding.p32.ph,
-                editCarTitle(AppStrings.carColor),
-                AppPadding.p20.ph,
-                Container(
-                  color: ColorManager.thirdColor200,
-                  height: 50.h,
-                  child: ListView.separated(
-                    itemCount: colorList.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return 8.horizontalSpace;
-                    },
-                    scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 24.w),
-                    itemBuilder: (context, index) {
-                      return Stack(
-                        children: <Widget>[
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                selectedColor = colorList[index].id!;
-                                selectedColorName = colorList[index].colorName;
-                              });
-                            },
-                            child: SvgPicture.asset(
-                              AssetsManager.car,
-                              height: 50.h,
-                              width: 34.w,
-                              colorFilter: colorList[index].color == null ? null : ColorFilter.mode(colorList[index].color!, BlendMode.srcIn),
-                            ),
-                          ),
-                          if (selectedColor == colorList[index].id)
-                            Positioned(
-                              top: 2,
-                              right: 0,
-                              child: Container(
-                                height: 18.h,
-                                width: 20.w,
-                                decoration: const BoxDecoration(
-                                    color: ColorManager.primary,
-                                    shape: BoxShape.circle),
-                                child: const Icon(
-                                  Icons.check,
-                                  color: ColorManager.white,
-                                  size: 15,
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
-                  ),
-                )
-              ],
+            KeyedSubtree(
+              key: carModelKey,
+              child: CarModelWidget(carModelController: carModelController),
             ),
-          ),
-        ),
-        bottomNavigationBar: BlocConsumer<VehiclesBloc, VehiclesState>(
-          bloc: sl<VehiclesBloc>(),
-          listener: (context, VehiclesState state) {
-            if (state is CreateNewCarError) {
-              showSnackBar(
-                buildContext: context,
-                message: state.error!,
-              );
-            } else if (state is UpdateCarError) {
-              showSnackBar(
-                buildContext: context,
-                message: state.error!,
-              );
-            } else if (state is CreateNewCarSuccess ||
-                state is UpdateCarSuccess) {
-              AlertHelper.updateCarAlert(context);
-            }
-          },
-          builder: (context, VehiclesState state) {
-            if (state is CreateNewCarLoading || state is UpdateCarLoading) {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
-                child: SizedBox(
-                  height: 50.h,
-                  child: const LoadingWidget(),
+            KeyedSubtree(
+              key: carPlateKey,
+              child: Padding(
+                padding: const EdgeInsets.only(top: KSpace.l),
+                child: KTextField(
+                  label: translate(AppStrings.carPlate),
+                  hint: translate("hint3"),
+                  controller: carPlateController,
+                  focusNode: carPlateFocusNode,
+                  keyboardType: TextInputType.text,
+                  inputFormatters: <TextInputFormatter>[CarPlateFormatter()],
+                  textInputAction: TextInputAction.done,
                 ),
-              );
-            } else {
-              return Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
-                child: ButtonsShared(
-                  onPressed: () {
-                    if (carModelController.text.isNotEmpty &&
-                        carPlateController.text.isNotEmpty &&
-                        carBrandController.text.isNotEmpty) {
-                      FocusScope.of(context).unfocus();
-                      widget.create ? createNewCar() : editCar();
-                    } else {
-                      showSnackBar(
-                        buildContext: context,
-                        message:
-                            Localizations.localeOf(context).languageCode == "ar"
-                                ? "فضلاً اكمال باقي البيانات"
-                                : "Please complete the remaining data",
-                      );
-                    }
-                  },
-                  text: widget.create
-                      ? translate(AppStrings.addVehicle)
-                      : translate(AppStrings.save),
-                ),
-              );
-            }
-          },
+              ),
+            ),
+            label(AppStrings.carColor),
+            _colours(c),
+          ],
         ),
+      ),
+      bottomNavigationBar: BlocConsumer<VehiclesBloc, VehiclesState>(
+        bloc: sl<VehiclesBloc>(),
+        listener: (BuildContext context, VehiclesState state) {
+          if (state is CreateNewCarError) {
+            showSnackBar(buildContext: context, message: state.error!);
+          } else if (state is UpdateCarError) {
+            showSnackBar(buildContext: context, message: state.error!);
+          } else if (state is CreateNewCarSuccess ||
+              state is UpdateCarSuccess) {
+            AlertHelper.updateCarAlert(context);
+          }
+        },
+        builder: (BuildContext context, VehiclesState state) {
+          return SafeArea(
+            minimum: const EdgeInsets.fromLTRB(
+                KSpace.xl, KSpace.s, KSpace.xl, KSpace.l),
+            child: KButton(
+              label: widget.create
+                  ? translate(AppStrings.addVehicle)
+                  : translate(AppStrings.save),
+              loading:
+                  state is CreateNewCarLoading || state is UpdateCarLoading,
+              onPressed: _save,
+            ),
+          );
+        },
       ),
     );
   }

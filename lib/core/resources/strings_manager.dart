@@ -122,6 +122,7 @@ class AppStrings {
   static const areYouSureYouWantToDelete = "areYouSureYouWantToDelete";
   static const selectYourVehicles = "selectYourVehicles";
   static const addNewVehicles = "addNewVehicles";
+  static const editVehicle = "editVehicle";
   static const myVehicles = "myVehicles";
   static const addCarInfo = "addCarInfo";
   static const plateNo = "plateNo";
