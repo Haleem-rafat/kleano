@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewasher/modules/booking/data/models/apply_promo_code_model.dart';
@@ -22,7 +23,7 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
   PromoBloc() : super(PromoInitial()) {
     on<GetActivePromo>((GetActivePromo event, Emitter<PromoState> emit) async {
       try {
-        print("Get All Active Promo Code");
+        debugPrint("Get All Active Promo Code");
         emit(GetActivePromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
             PromoCodeTypes.active.name.toUpperCase());
@@ -44,7 +45,7 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
     on<GetExpiredPromo>(
         (GetExpiredPromo event, Emitter<PromoState> emit) async {
       try {
-        print("Get All Expired Promo Code");
+        debugPrint("Get All Expired Promo Code");
         emit(GetExpiredPromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
             PromoCodeTypes.expired.name.toUpperCase());
@@ -65,7 +66,7 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
     });
     on<GetUsedPromo>((GetUsedPromo event, Emitter<PromoState> emit) async {
       try {
-        print("Get All Used Promo Code");
+        debugPrint("Get All Used Promo Code");
         emit(GetUsedPromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
             PromoCodeTypes.used.name.toUpperCase());
@@ -127,7 +128,7 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
                   ErrorModel.fromJson(responseData['message']);
               emit(GetPromoCodeDetailError(errorModel: errorModel));
             } catch (parseError) {
-              print('Error parsing error message: $parseError');
+              debugPrint('Error parsing error message: $parseError');
               emit(GetPromoCodeDetailError(error: e.toString()));
             }
           } else {

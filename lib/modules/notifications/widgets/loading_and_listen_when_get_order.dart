@@ -10,9 +10,9 @@ import 'package:thewasher/utilties/navigator.dart';
 class LoadingAndListenWhenGetOrder extends StatelessWidget {
   // final bool completed;
   LoadingAndListenWhenGetOrder({
-    Key? key,
+    super.key,
     // required this.completed,
-  }) : super(key: key);
+  });
   final GeneralSingleton generalSingleton = GeneralSingleton();
 
   @override

@@ -9,7 +9,6 @@ import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/booking/widgets/review_order/payment_method/select_points_or_wallet.dart';
 import 'package:thewasher/modules/profile/blocs/promo_code/promo_bloc.dart';
 import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
@@ -27,7 +26,7 @@ class ApplyPromCode extends StatefulWidget {
 class _ApplyPromCodeState extends State<ApplyPromCode> {
   @override
   Widget build(BuildContext context) {
-    bool showPromoCode = sl<PromoBloc>.call().code != '' ? true : false;
+    bool showPromoCode = sl.call<PromoBloc>.call().code != '' ? true : false;
     return Padding(
       padding: EdgeInsets.only(top: AppPadding.p25.h),
       child: StatefulBuilder(builder: (context, myState) {
@@ -81,18 +80,18 @@ class _ApplyPromCodeState extends State<ApplyPromCode> {
               AppPadding.p23.ph,
               if (showPromoCode)
                 TextFormShared(
-                  initialValue: sl<PromoBloc>.call().code,
+                  initialValue: sl.call<PromoBloc>.call().code,
                   hintText: '',
                   onChanged: (value) {
                     myState(() {
-                      sl<PromoBloc>.call().code = value.trim();
+                      sl.call<PromoBloc>.call().code = value.trim();
                     });
                   },
                   textInputAction: TextInputAction.done,
                   onSubmit: (_) {
-                    sl<PromoBloc>.call().code.isNotEmpty && showPromoCode
-                        ? sl<PromoBloc>.call().add(ApplyPromoCode(
-                            code: sl<PromoBloc>.call().code,
+                    sl.call<PromoBloc>.call().code.isNotEmpty && showPromoCode
+                        ? sl.call<PromoBloc>.call().add(ApplyPromoCode(
+                            code: sl.call<PromoBloc>.call().code,
                             orderId: widget.orderId,
                           ))
                         : null;
@@ -105,7 +104,7 @@ class _ApplyPromCodeState extends State<ApplyPromCode> {
                             message: 'Success Apply PromoCode');
                         myState(() {
                           showPromoCode = false;
-                          sl<PromoBloc>.call().code = '';
+                          sl.call<PromoBloc>.call().code = '';
                         });
                       } else if (state is ApplyPromoError) {
                         showSnackBar(
@@ -127,9 +126,9 @@ class _ApplyPromCodeState extends State<ApplyPromCode> {
                       }
                       return GestureDetector(
                         onTap: () {
-                          sl<PromoBloc>.call().code.isNotEmpty && showPromoCode
-                              ? sl<PromoBloc>.call().add(ApplyPromoCode(
-                                  code: sl<PromoBloc>.call().code,
+                          sl.call<PromoBloc>.call().code.isNotEmpty && showPromoCode
+                              ? sl.call<PromoBloc>.call().add(ApplyPromoCode(
+                                  code: sl.call<PromoBloc>.call().code,
                                   orderId: widget.orderId,
                                 ))
                               : null;

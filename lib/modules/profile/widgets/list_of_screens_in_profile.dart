@@ -4,7 +4,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/about_us/screens/about_us_screen.dart';
-import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
 import 'package:thewasher/modules/profile/data/models/profile_user.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/profile_account.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/promo_codes/pormo_codes_screen.dart';

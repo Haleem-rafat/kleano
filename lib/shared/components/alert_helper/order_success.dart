@@ -43,7 +43,7 @@ class _OrderSuccessState extends State<OrderSuccess> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -68,7 +68,7 @@ class _OrderSuccessState extends State<OrderSuccess> {
                       child: SvgPicture.asset(
                         AssetsManager.paymentSuccess,
                         fit: BoxFit.contain,
-                        color: ColorManager.black,
+                        colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
                       )),
                   AppPadding.p16.ph,
                   Text(

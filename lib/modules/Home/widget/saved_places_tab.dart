@@ -18,7 +18,7 @@ import 'package:thewasher/utilties/navigator.dart';
 class SavedPlacesTab extends StatelessWidget {
   Completer<GoogleMapController> myController;
 
-  SavedPlacesTab({Key? key, required this.myController}) : super(key: key);
+  SavedPlacesTab({super.key, required this.myController});
 
   @override
   Widget build(BuildContext context) {

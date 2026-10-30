@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'package:thewasher/api/api_path.dart';
 import 'package:thewasher/api/api_service.dart';
@@ -20,7 +21,7 @@ class MyBookingRepo {
         );
       }
     } catch (e) {
-      print(e);
+      debugPrint('${e}');
     }
 
     return null;

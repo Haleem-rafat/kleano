@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 
 class EmptyScreen extends StatelessWidget {
   final String image;
   final String text;
   const EmptyScreen({
-    Key? key,
+    super.key,
     required this.image,
     required this.text,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +21,7 @@ class EmptyScreen extends StatelessWidget {
       children: <Widget>[
         SvgPicture.asset(
           image,
-          color: ColorManager.black,
+          colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
         ),
         Text(
           translate(text),

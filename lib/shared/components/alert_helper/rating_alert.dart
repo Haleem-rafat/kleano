@@ -44,7 +44,7 @@ class RatingOrderAlert extends StatelessWidget {
   GeneralSingleton generalSingleton = GeneralSingleton();
 
   double ratingCount = 0.0;
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -141,7 +141,7 @@ class RatingOrderAlert extends StatelessWidget {
                       return ButtonsShared(
                         onPressed: () {
                           ratingCount != 0.0
-                              ? sl<BookingOrderBloc>.call().add(RateOrder(
+                              ? sl.call<BookingOrderBloc>.call().add(RateOrder(
                                   orderId: orderId!, starsNum: ratingCount))
                               : null;
                         },

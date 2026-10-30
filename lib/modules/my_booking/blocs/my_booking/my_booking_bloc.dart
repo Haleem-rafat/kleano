@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:equatable/equatable.dart';
@@ -64,29 +65,29 @@ class MyBookingBloc extends Bloc<MyBookingEvent, MyBookingState> {
         onSuccess(mutableList);
         final newState = state.copyWith(myBookingStatus: RequestStatus.success);
         emit(newState);
-        print('Transitioning to state: $newState');
+        debugPrint('Transitioning to state: $newState');
       } else {
         final errorModel =
             ErrorModel.fromJson(jsonDecode(response.message.toString()));
         final newState = state.copyWith(
             myBookingStatus: RequestStatus.failure, error: errorModel);
         emit(newState);
-        print('Transitioning to state: $newState');
+        debugPrint('Transitioning to state: $newState');
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       _handleDioError(emit, e);
     } catch (e) {
       final errorModel = ErrorModel(en: e.toString());
       final newState = state.copyWith(
           myBookingStatus: RequestStatus.failure, error: errorModel);
       emit(newState);
-      print(
+      debugPrint(
           'Transitioning to state: $newState'); // Log the transition to the failure state
     }
   }
 
   // Handle Dio errors
-  void _handleDioError(Emitter<MyBookingState> emit, DioError e) {
+  void _handleDioError(Emitter<MyBookingState> emit, DioException e) {
     if (e.message!.contains('SocketException')) {
       emit(state.copyWith(myBookingStatus: RequestStatus.connectionError));
     } else {
@@ -195,7 +196,7 @@ class MyBookingBloc extends Bloc<MyBookingEvent, MyBookingState> {
             myBookingStatus: RequestStatus.failure,
             error: response.errorModel));
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       _handleDioError(emit, e);
     } catch (e) {
       emit(state.copyWith(

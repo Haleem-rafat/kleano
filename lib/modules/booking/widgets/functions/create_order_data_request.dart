@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:intl/intl.dart';
@@ -45,7 +46,7 @@ class CreateOrderFunction {
   late String timeSlot;
 
   void createOrderDataRequest() {
-    print("sadassasdaads ${singleton.orderTime}");
+    debugPrint("sadassasdaads ${singleton.orderTime}");
 
     latitude = blcoPosition.latitude;
     longitude = blcoPosition.longitude;
@@ -96,11 +97,11 @@ class CreateOrderFunction {
     }
 
     bookingDate = singleton.orderTime!.toUtc().toIso8601String();
-    print("dsasddasasdasdsd: $bookingDate");
+    debugPrint("dsasddasasdasdsd: $bookingDate");
 
     // Format time slot as "HH:mm" (e.g., "13:15")
     timeSlot = DateFormat('HH:mm', 'en').format(singleton.orderTime!);
-    print("Time slot formatted: $timeSlot");
+    debugPrint("Time slot formatted: $timeSlot");
 
     // Only send promo code if user actually applied it successfully
     if (promoBloc.state is GetPromoCodeDetailSuccess &&
@@ -109,8 +110,8 @@ class CreateOrderFunction {
     } else {
       code = null; // Don't send promo code if not applied
     }
-    print("dsasadwdqwqw: ${singleton.isCarFreshened}");
-    print("dsasadwdqwqw: ${Platform.isAndroid ? 'ANDROID' : 'IOS'}");
+    debugPrint("dsasadwdqwqw: ${singleton.isCarFreshened}");
+    debugPrint("dsasadwdqwqw: ${Platform.isAndroid ? 'ANDROID' : 'IOS'}");
     orderBloc.add(
       CreateOrder(
         createOrderRequest: CreateOrderRequest(

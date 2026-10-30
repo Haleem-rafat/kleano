@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
@@ -16,32 +17,18 @@ class AppBarWhiteShared extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return AppBar(
+    return GlassAppBar(
       automaticallyImplyLeading: false,
-      centerTitle: false,
-      title: Row(
-        children: <Widget>[
-          GestureDetector(
-            onTap: onTap ?? () => pop(context),
-            behavior: HitTestBehavior.opaque,
-            child: Icon(
-              Icons.arrow_back_ios,
-              size: 24.r,
-              color: ColorManager.primary,
-            ),
-          ),
-          AppSize.s6.pw,
-          Text(
-            titleText,
-            //  translate(AppStrings.account),
-            style: AppStyles.title16Bold.copyWith(
-              color: ColorManager.black,
-            ),
-          ),
-        ],
+      centerTitle: true,
+      leadingWidth: 60,
+      leading: GlassBackButton(
+        color: ColorManager.primary,
+        onPressed: onTap ?? () => pop(context),
       ),
-      backgroundColor: ColorManager.white,
-      elevation: 0,
+      title: Text(
+        titleText,
+        style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
+      ),
     );
   }
 }

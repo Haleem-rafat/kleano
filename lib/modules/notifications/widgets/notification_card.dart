@@ -13,9 +13,9 @@ import 'package:thewasher/shared/components/snack_bar.dart';
 
 class NotificationCard extends StatefulWidget {
   const NotificationCard({
-    Key? key,
+    super.key,
     required this.notification,
-  }) : super(key: key);
+  });
 
   final Notifications notification;
 

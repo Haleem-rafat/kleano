@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:thewasher/core/error/error.dart';
 import 'package:thewasher/responses/base_response.dart';
 
@@ -30,7 +31,7 @@ class GenericResponse<T> {
       }
       if (json['message'] != null) {
         errorModel = ErrorModel.fromJson(json['message']);
-        print('+++++++${errorModel!.en}');
+        debugPrint('+++++++${errorModel!.en}');
       }
       if (json['data'] != null) {
         if (isList) {

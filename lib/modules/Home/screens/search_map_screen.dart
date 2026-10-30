@@ -229,8 +229,10 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
             final details = await fetchPlaceDetails(placeId, googleApiKey);
             if (details['geometry']?['location']?['lat'] != null &&
                 details['geometry']?['location']?['lng'] != null) {
+              if (!context.mounted) return;
               Navigator.pop(context, details);
             } else {
+              if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
                   content: Text('لا يمكن تحديد موقع العنوان، جرب عنوان آخر.'),

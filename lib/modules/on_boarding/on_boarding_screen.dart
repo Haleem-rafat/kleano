@@ -70,8 +70,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                     },
                     child: Image.asset(
                       e.image,
-                      height: AppSize.s812.h,
-                      width: AppSize.s375.w,
+                      height: 1.sh,
+                      width: 1.sw,
                       gaplessPlayback: true,
                       fit: BoxFit.cover,
                     ));
@@ -82,7 +82,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
               right: 0.w,
               child: SvgPicture.asset(
                 AssetsManager.shapCircleRight,
-                color: ColorManager.primary,
+                colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
               ),
             ),
             Positioned(
@@ -157,7 +157,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                             innerPadding: AppPadding.p8.w,
                             selectedColor: ColorManager.white,
                             unselectedColor:
-                                ColorManager.white.withOpacity(.50),
+                                ColorManager.white.withValues(alpha: .50),
                           )),
                     ),
                     78.verticalSpace,

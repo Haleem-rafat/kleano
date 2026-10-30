@@ -86,7 +86,7 @@ class LocalNotificationServices {
       );
 
       await flutterLocalNotificationsPlugin.initialize(
-        initializationSettings,
+        settings: initializationSettings,
         onDidReceiveNotificationResponse: _onSelectNotification,
       );
 
@@ -94,9 +94,9 @@ class LocalNotificationServices {
       await _createNotificationChannels();
 
       _isInitialized = true;
-      print("✅ Local notifications initialized successfully");
+      debugPrint("✅ Local notifications initialized successfully");
     } catch (e) {
-      print("❌ Error initializing local notifications: $e");
+      debugPrint("❌ Error initializing local notifications: $e");
     }
   }
 
@@ -161,7 +161,7 @@ class LocalNotificationServices {
 
     try {
       // Handle different notification types
-      print("📱 Notification tapped: ${response.payload}");
+      debugPrint("📱 Notification tapped: ${response.payload}");
 
       // Navigate based on notification type
       switch (response.payload) {
@@ -186,14 +186,14 @@ class LocalNotificationServices {
           pushPage(_context!, const NotificationsScreen());
       }
     } catch (e) {
-      print("❌ Error handling notification tap: $e");
+      debugPrint("❌ Error handling notification tap: $e");
     }
   }
 
   // Show immediate notification
   Future<void> showNotification(NotificationData notificationData) async {
     if (!_isInitialized) {
-      print("❌ Local notifications not initialized");
+      debugPrint("❌ Local notifications not initialized");
       return;
     }
 
@@ -236,18 +236,18 @@ class LocalNotificationServices {
       );
 
       await flutterLocalNotificationsPlugin.show(
-        notificationId,
-        notificationData.title,
-        notificationData.body,
-        notificationDetails,
+        id: notificationId,
+        title: notificationData.title,
+        body: notificationData.body,
+        notificationDetails: notificationDetails,
         payload: notificationData.payload != null
             ? notificationData.payload.toString()
             : notificationData.type.name,
       );
 
-      print("✅ Local notification shown: ${notificationData.title}");
+      debugPrint("✅ Local notification shown: ${notificationData.title}");
     } catch (e) {
-      print("❌ Error showing notification: $e");
+      debugPrint("❌ Error showing notification: $e");
     }
   }
 
@@ -258,7 +258,7 @@ class LocalNotificationServices {
     String? repeatInterval,
   }) async {
     if (!_isInitialized) {
-      print("❌ Local notifications not initialized");
+      debugPrint("❌ Local notifications not initialized");
       return;
     }
 
@@ -291,34 +291,34 @@ class LocalNotificationServices {
       );
 
       await flutterLocalNotificationsPlugin.zonedSchedule(
-        notificationId,
-        notificationData.title,
-        notificationData.body,
-        tz.TZDateTime.from(scheduledDate, tz.local),
-        notificationDetails,
+        id: notificationId,
+        title: notificationData.title,
+        body: notificationData.body,
+        scheduledDate: tz.TZDateTime.from(scheduledDate, tz.local),
+        notificationDetails: notificationDetails,
+        // Inexact needs no SCHEDULE_EXACT_ALARM permission (restricted on Android 14+).
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
         payload: notificationData.payload != null
             ? notificationData.payload.toString()
             : notificationData.type.name,
-        uiLocalNotificationDateInterpretation:
-            UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: repeatInterval != null
             ? _getDateTimeComponents(repeatInterval)
             : null,
       );
 
-      print("✅ Notification scheduled for: $scheduledDate");
+      debugPrint("✅ Notification scheduled for: $scheduledDate");
     } catch (e) {
-      print("❌ Error scheduling notification: $e");
+      debugPrint("❌ Error scheduling notification: $e");
     }
   }
 
   // Cancel notification by ID
   Future<void> cancelNotification(int id) async {
     try {
-      await flutterLocalNotificationsPlugin.cancel(id);
-      print("✅ Notification cancelled: $id");
+      await flutterLocalNotificationsPlugin.cancel(id: id);
+      debugPrint("✅ Notification cancelled: $id");
     } catch (e) {
-      print("❌ Error cancelling notification: $e");
+      debugPrint("❌ Error cancelling notification: $e");
     }
   }
 
@@ -326,9 +326,9 @@ class LocalNotificationServices {
   Future<void> cancelAllNotifications() async {
     try {
       await flutterLocalNotificationsPlugin.cancelAll();
-      print("✅ All notifications cancelled");
+      debugPrint("✅ All notifications cancelled");
     } catch (e) {
-      print("❌ Error cancelling all notifications: $e");
+      debugPrint("❌ Error cancelling all notifications: $e");
     }
   }
 
@@ -338,7 +338,7 @@ class LocalNotificationServices {
       return await flutterLocalNotificationsPlugin
           .pendingNotificationRequests();
     } catch (e) {
-      print("❌ Error getting pending notifications: $e");
+      debugPrint("❌ Error getting pending notifications: $e");
       return [];
     }
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -18,12 +17,11 @@ class PromoContainerWidget extends StatefulWidget {
   final bool isVisible;
   final bool isHighlighted;
   const PromoContainerWidget(
-      {Key? key,
+      {super.key,
       required this.type,
       required this.promoCodeModel,
       required this.isVisible,
-      this.isHighlighted = false})
-      : super(key: key);
+      this.isHighlighted = false});
 
   @override
   State<PromoContainerWidget> createState() => _PromoContainerWidgetState();
@@ -54,7 +52,7 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
       return {
         'value': 0,
         'type': 'none',
-        'displayText': '${translate(AppStrings.promoTitle)}'
+        'displayText': translate(AppStrings.promoTitle)
       };
     }
   }
@@ -64,7 +62,7 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
     final discountInfo = getDiscountInfo();
     final bool highlight = widget.isHighlighted;
 
-    Color _resolveTypeColor() {
+    Color resolveTypeColor() {
       if (widget.type == PromoCodeTypes.expired.name) {
         return ColorManager.red;
       } else if (widget.type == PromoCodeTypes.used.name) {
@@ -73,13 +71,13 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
       return ColorManager.primary;
     }
 
-    final Color typeColor = _resolveTypeColor();
+    final Color typeColor = resolveTypeColor();
     final Color borderColor =
-        highlight ? ColorManager.primary : typeColor.withOpacity(0.7);
+        highlight ? ColorManager.primary : typeColor.withValues(alpha: 0.7);
     final List<BoxShadow> boxShadows = highlight
         ? <BoxShadow>[
             BoxShadow(
-              color: ColorManager.primary.withOpacity(.2),
+              color: ColorManager.primary.withValues(alpha: .2),
               blurRadius: 18.r,
               offset: const Offset(0, 8),
             ),
@@ -88,8 +86,8 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
             BoxShadow(
               color: widget.type == PromoCodeTypes.active.name ||
                       widget.type == PromoCodeTypes.used.name
-                  ? ColorManager.primary.withOpacity(.08)
-                  : ColorManager.black.withOpacity(.05),
+                  ? ColorManager.primary.withValues(alpha: .08)
+                  : ColorManager.black.withValues(alpha: .05),
               blurRadius: 8.r,
               offset: const Offset(0, 4),
             ),
@@ -99,7 +97,7 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
       margin: EdgeInsets.symmetric(horizontal: 24.w),
       decoration: BoxDecoration(
         color: highlight
-            ? ColorManager.primary.withOpacity(0.05)
+            ? ColorManager.primary.withValues(alpha: 0.05)
             : ColorManager.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
@@ -117,10 +115,10 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
               width: double.infinity,
               padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
               decoration: BoxDecoration(
-                color: ColorManager.primary.withOpacity(0.1),
+                color: ColorManager.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8.r),
                 border: Border.all(
-                  color: ColorManager.primary.withOpacity(0.3),
+                  color: ColorManager.primary.withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
@@ -172,12 +170,12 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
                             AssetsManager.saudiRiyalSymbol,
                             height: 16.h,
                             width: 16.w,
-                            color: widget.type == PromoCodeTypes.active.name ||
+                            colorFilter: ColorFilter.mode(widget.type == PromoCodeTypes.active.name ||
                                     widget.type == PromoCodeTypes.used.name
                                 ? ColorManager.primary
                                 : widget.type == PromoCodeTypes.used.name
                                     ? ColorManager.darkGrey
-                                    : ColorManager.red,
+                                    : ColorManager.red, BlendMode.srcIn),
                           ),
                         if (discountInfo['type'] != 'none')
                           Text(
@@ -204,10 +202,10 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               decoration: BoxDecoration(
                 color: widget.type == PromoCodeTypes.active.name
-                    ? ColorManager.primary.withOpacity(0.1)
+                    ? ColorManager.primary.withValues(alpha: 0.1)
                     : widget.type == PromoCodeTypes.used.name
-                        ? ColorManager.darkGrey.withOpacity(0.1)
-                        : ColorManager.red.withOpacity(0.1),
+                        ? ColorManager.darkGrey.withValues(alpha: 0.1)
+                        : ColorManager.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Row(
@@ -245,10 +243,10 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               decoration: BoxDecoration(
                 color: widget.type == PromoCodeTypes.active.name
-                    ? ColorManager.primary.withOpacity(0.1)
+                    ? ColorManager.primary.withValues(alpha: 0.1)
                     : widget.type == PromoCodeTypes.used.name
-                        ? ColorManager.darkGrey.withOpacity(0.1)
-                        : ColorManager.red.withOpacity(0.1),
+                        ? ColorManager.darkGrey.withValues(alpha: 0.1)
+                        : ColorManager.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Row(
@@ -289,13 +287,13 @@ class _PromoContainerWidgetState extends State<PromoContainerWidget> {
                                 AssetsManager.saudiRiyalSymbol,
                                 height: 12.h,
                                 width: 12.w,
-                                color: widget.type ==
+                                colorFilter: ColorFilter.mode(widget.type ==
                                             PromoCodeTypes.active.name ||
                                         widget.type == PromoCodeTypes.used.name
                                     ? ColorManager.primary
                                     : widget.type == PromoCodeTypes.used.name
                                         ? ColorManager.darkGrey
-                                        : ColorManager.red,
+                                        : ColorManager.red, BlendMode.srcIn),
                               ),
                             ),
                           TextSpan(

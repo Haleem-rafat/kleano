@@ -10,7 +10,7 @@ import 'package:thewasher/modules/on_boarding/on_boarding_screen.dart';
 import 'package:thewasher/modules/splash/address_check_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:thewasher/core/services/appsflyer_service.dart';
 
 class SplashTwoScreen extends StatefulWidget {
   const SplashTwoScreen({super.key});
@@ -25,27 +25,11 @@ class _SplashTwoScreenState extends State<SplashTwoScreen>
   late final Animation<double> _animation;
   bool _hasNavigated = false;
 
-  late final AppsflyerSdk _appsFlyerSdk;
-
   @override
   void initState() {
     super.initState();
 
-    final AppsFlyerOptions options = AppsFlyerOptions(
-      afDevKey: "vTBNf24bS4fxnsgxuRE7nK",
-      appId: "6744847373",
-      showDebug: true,
-    );
-
-    _appsFlyerSdk = AppsflyerSdk(options);
-
-    _appsFlyerSdk.initSdk(
-      registerConversionDataCallback: true,
-      registerOnAppOpenAttributionCallback: true,
-      registerOnDeepLinkingCallback: true,
-    );
-
-    _appsFlyerSdk.logEvent("af_app_opened", {});
+    AppsFlyerService.logEvent("af_app_opened");
 
     _controllerA = AnimationController(
       duration: const Duration(milliseconds: 1000),

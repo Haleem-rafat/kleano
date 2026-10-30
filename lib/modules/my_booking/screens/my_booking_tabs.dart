@@ -31,7 +31,7 @@ class _MyBookingMainTabsScreenState extends State<MyBookingMainTabsScreen>
     initialTabs();
   }
 
-  initialTabs() {
+  void initialTabs() {
     currentTabIndex = 0;
     _tabController = TabController(length: 3, vsync: this);
     _tabs = <Widget>[

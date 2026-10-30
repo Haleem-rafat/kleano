@@ -216,7 +216,7 @@
 //               color: Colors.white,
 //               borderRadius: BorderRadius.circular(12.r),
 //               border:
-//                   Border.all(color: ColorManager.lightGray.withOpacity(0.3)),
+//                   Border.all(color: ColorManager.lightGray.withValues(alpha: 0.3)),
 //             ),
 //             child: Row(
 //               mainAxisAlignment: MainAxisAlignment.spaceBetween,

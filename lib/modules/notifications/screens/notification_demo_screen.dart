@@ -41,7 +41,7 @@
 //                 borderRadius: BorderRadius.circular(AppSize.s12.r),
 //                 boxShadow: [
 //                   BoxShadow(
-//                     color: ColorManager.black.withOpacity(0.1),
+//                     color: ColorManager.black.withValues(alpha: 0.1),
 //                     blurRadius: 8,
 //                     offset: const Offset(0, 2),
 //                   ),
@@ -78,7 +78,7 @@
 //                 borderRadius: BorderRadius.circular(AppSize.s12.r),
 //                 boxShadow: [
 //                   BoxShadow(
-//                     color: ColorManager.black.withOpacity(0.1),
+//                     color: ColorManager.black.withValues(alpha: 0.1),
 //                     blurRadius: 8,
 //                     offset: const Offset(0, 2),
 //                   ),
@@ -98,7 +98,7 @@
 //                 borderRadius: BorderRadius.circular(AppSize.s12.r),
 //                 boxShadow: [
 //                   BoxShadow(
-//                     color: ColorManager.black.withOpacity(0.1),
+//                     color: ColorManager.black.withValues(alpha: 0.1),
 //                     blurRadius: 8,
 //                     offset: const Offset(0, 2),
 //                   ),
@@ -230,7 +230,7 @@
 //             Text(
 //               subtitle,
 //               style: AppStyles.titleGray16Regular.copyWith(
-//                 color: ColorManager.white.withOpacity(0.9),
+//                 color: ColorManager.white.withValues(alpha: 0.9),
 //               ),
 //             ),
 //           ],

@@ -5,7 +5,6 @@ import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/fonts_manager.dart';
-import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
@@ -35,7 +34,7 @@ class CardAddOns extends StatelessWidget {
               width: 2.w),
           boxShadow: <BoxShadow>[
             BoxShadow(
-                color: ColorManager.black.withOpacity(.12),
+                color: ColorManager.black.withValues(alpha: .12),
                 blurRadius: 2.r,
                 offset: const Offset(0, 0))
           ]),
@@ -96,10 +95,10 @@ class CardAddOns extends StatelessWidget {
                       AssetsManager.saudiRiyalSymbol,
                       height: 12.h,
                       width: 12.w,
-                      color: offersBloc.cartAddOnsList
+                      colorFilter: ColorFilter.mode(offersBloc.cartAddOnsList
                               .contains(offersBloc.addOnsList[index])
                           ? ColorManager.white
-                          : ColorManager.primary,
+                          : ColorManager.primary, BlendMode.srcIn),
                     ),
                   ],
                 ),

@@ -51,7 +51,7 @@ class CardPaymentMethod extends StatelessWidget {
             ),
             child: SvgPicture.asset(
               type.image,
-              color: isSelected ? ColorManager.white : ColorManager.white,
+              colorFilter: ColorFilter.mode(isSelected ? ColorManager.white : ColorManager.white, BlendMode.srcIn),
             ),
           ),
           SizedBox(width: AppPadding.p12.w),
@@ -75,10 +75,10 @@ class CardPaymentMethod extends StatelessWidget {
                       vertical: 4.h,
                     ),
                     decoration: BoxDecoration(
-                      color: ColorManager.primary.withOpacity(0.1),
+                      color: ColorManager.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                       border: Border.all(
-                        color: ColorManager.primary.withOpacity(0.2),
+                        color: ColorManager.primary.withValues(alpha: 0.2),
                         width: 1.w,
                       ),
                     ),
@@ -110,7 +110,7 @@ class CardPaymentMethod extends StatelessWidget {
                           AssetsManager.saudiRiyalSymbol,
                           width: 12.w,
                           height: 12.w,
-                          color: ColorManager.primary,
+                          colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
                         ),
                       ],
                     ),

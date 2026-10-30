@@ -32,7 +32,7 @@ class MyBookingCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: ColorManager.black.withOpacity(.05),
+              color: ColorManager.black.withValues(alpha: .05),
               blurRadius: 6.r,
               offset: const Offset(0, 3),
             ),
@@ -87,7 +87,7 @@ class MyBookingCard extends StatelessWidget {
                   padding:
                       EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                   decoration: BoxDecoration(
-                    color: ColorManager.primary.withOpacity(0.1),
+                    color: ColorManager.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
@@ -137,9 +137,9 @@ class MyBookingCard extends StatelessWidget {
       case 'ACTIVE':
         return const Color.fromRGBO(76, 175, 80, 0.1);
       case 'CANCELLED_BY_USER':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'CANCELLED_BY_ADMIN':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'ACCEPTED_BY_BIKER':
         return const Color.fromRGBO(111, 251, 76, 0.1);
       case 'WAITING_FOR_BIKER_BY_ADMIN':
@@ -147,7 +147,7 @@ class MyBookingCard extends StatelessWidget {
       case 'BIKER_ON_THE_WAY':
         return const Color.fromRGBO(103, 135, 198, 0.1);
       case 'CANCELLED_BY_BIKER':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'BIKER_ARRIVED':
         return const Color.fromRGBO(251, 174, 76, 0.1);
       case 'ON_WASHING':

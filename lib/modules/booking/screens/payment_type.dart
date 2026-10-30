@@ -30,7 +30,7 @@ class SelectPaymentTypeScreen extends StatefulWidget {
   final num? amount;
   final String? createdAt;
 
-  SelectPaymentTypeScreen({
+  const SelectPaymentTypeScreen({
     this.amount,
     this.createdAt,
     super.key,
@@ -139,7 +139,7 @@ class _SelectPaymentTypeScreenState extends State<SelectPaymentTypeScreen> {
                                     : state.errorModel!.en!);
                       } else if (state is CreateSubscriptionSuccess) {
                         if (paymentTypeString == 'CREDIT') {
-                          print('^^^^^^^${state.subscriptionId}');
+                          debugPrint('^^^^^^^${state.subscriptionId}');
                           pop(context);
                           pushPage(
                             context,
@@ -149,7 +149,7 @@ class _SelectPaymentTypeScreenState extends State<SelectPaymentTypeScreen> {
                           );
                         } else if (paymentTypeString == 'APPLE_PAY') {
                           if (Platform.isIOS) {
-                            print('^^^^^^^${state.subscriptionId}');
+                            debugPrint('^^^^^^^${state.subscriptionId}');
                             ApplePayService
                                 .showApplePayBottomSheetForSubscription(
                               context: context,
@@ -246,8 +246,8 @@ class _SelectPaymentTypeScreenState extends State<SelectPaymentTypeScreen> {
                               paymentTypeString = 'CREDIT';
                           }
 
-                          print("Plan ID: ${widget.planId}");
-                          print("Payment Type: $paymentTypeString");
+                          debugPrint("Plan ID: ${widget.planId}");
+                          debugPrint("Payment Type: $paymentTypeString");
                           sl<PlansAndSubscriptionBloc>().add(
                             CreateUserSubscription(
                               planId: widget.planId ?? '',

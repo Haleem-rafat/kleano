@@ -5,7 +5,6 @@ import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
@@ -186,7 +185,7 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: slots.length,
-      separatorBuilder: (_, __) => 10.horizontalSpace,
+      separatorBuilder: (_, _) => 10.horizontalSpace,
       itemBuilder: (_, i) {
         final slot = slots[i];
         return TimeSlotItem(

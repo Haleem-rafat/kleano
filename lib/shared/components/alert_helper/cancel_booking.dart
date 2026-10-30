@@ -49,7 +49,7 @@ class _CancelBookingState extends State<CancelBooking> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -117,7 +117,7 @@ class _CancelBookingState extends State<CancelBooking> {
                     },
                     builder: (context, state) {
                       if (state is CancelOrderLoading) {
-                        return Container(
+                        return SizedBox(
                           height: 50.h,
                           child: Column(
                             children: [
@@ -187,7 +187,7 @@ class _CancelBookingState extends State<CancelBooking> {
           borderRadius: BorderRadius.circular(24.r),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -208,7 +208,7 @@ class _CancelBookingState extends State<CancelBooking> {
                     width: 80.w,
                     height: 80.w,
                     decoration: BoxDecoration(
-                      color: ColorManager.green.withOpacity(0.1),
+                      color: ColorManager.green.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -286,7 +286,7 @@ class _CancelBookingState extends State<CancelBooking> {
               borderRadius: BorderRadius.circular(24.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -301,7 +301,7 @@ class _CancelBookingState extends State<CancelBooking> {
                   width: 80.w,
                   height: 80.w,
                   decoration: BoxDecoration(
-                    color: ColorManager.red.withOpacity(0.1),
+                    color: ColorManager.red.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(

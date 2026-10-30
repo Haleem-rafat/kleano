@@ -48,7 +48,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375.w, AppSize.s60.h),
+        preferredSize: Size(1.sw, AppSize.s60.h),
         child: AppBarShared(
           titleAppBar: translate(AppStrings.washDetails),
           isTextOnly: false,
@@ -91,7 +91,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                         gradient: LinearGradient(
                           colors: [
                             ColorManager.primary,
-                            ColorManager.primary.withOpacity(0.8),
+                            ColorManager.primary.withValues(alpha: 0.8),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -99,7 +99,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                         borderRadius: BorderRadius.circular(20.r),
                         boxShadow: [
                           BoxShadow(
-                            color: ColorManager.primary.withOpacity(0.3),
+                            color: ColorManager.primary.withValues(alpha: 0.3),
                             blurRadius: 15,
                             offset: const Offset(0, 5),
                           ),
@@ -142,10 +142,10 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                                     vertical: 6.h,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.red.withOpacity(0.2),
+                                    color: Colors.red.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(12.r),
                                     border: Border.all(
-                                      color: Colors.red.withOpacity(0.3),
+                                      color: Colors.red.withValues(alpha: 0.3),
                                       width: 1,
                                     ),
                                   ),
@@ -177,7 +177,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                                   child: Container(
                                     padding: EdgeInsets.all(8.w),
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
+                                      color: Colors.white.withValues(alpha: 0.2),
                                       borderRadius: BorderRadius.circular(12.r),
                                     ),
                                     child: Icon(
@@ -200,10 +200,10 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                                     vertical: 10.h,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
+                                    color: Colors.white.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(12.r),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withValues(alpha: 0.3),
                                       width: 1,
                                     ),
                                   ),
@@ -235,10 +235,10 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                                   ),
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.15),
+                                    color: Colors.white.withValues(alpha: 0.15),
                                     borderRadius: BorderRadius.circular(12.r),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.3),
+                                      color: Colors.white.withValues(alpha: 0.3),
                                       width: 1,
                                     ),
                                   ),
@@ -292,7 +292,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                           borderRadius: BorderRadius.circular(16.r),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(0.05),
+                              color: Colors.black.withValues(alpha: 0.05),
                               blurRadius: 10,
                               offset: const Offset(0, 2),
                             ),
@@ -307,7 +307,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                                   padding: EdgeInsets.all(8.w),
                                   decoration: BoxDecoration(
                                     color:
-                                        ColorManager.primary.withOpacity(0.1),
+                                        ColorManager.primary.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(8.r),
                                   ),
                                   child: Icon(
@@ -345,15 +345,15 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             colors: [
-                              ColorManager.green.withOpacity(0.1),
-                              ColorManager.green.withOpacity(0.05),
+                              ColorManager.green.withValues(alpha: 0.1),
+                              ColorManager.green.withValues(alpha: 0.05),
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           ),
                           borderRadius: BorderRadius.circular(16.r),
                           border: Border.all(
-                            color: ColorManager.green.withOpacity(0.3),
+                            color: ColorManager.green.withValues(alpha: 0.3),
                             width: 1.5,
                           ),
                         ),
@@ -362,7 +362,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                             Container(
                               padding: EdgeInsets.all(12.w),
                               decoration: BoxDecoration(
-                                color: ColorManager.green.withOpacity(0.2),
+                                color: ColorManager.green.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(12.r),
                               ),
                               child: Icon(
@@ -429,7 +429,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                         borderRadius: BorderRadius.circular(16.r),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),
@@ -506,15 +506,15 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            ColorManager.primary.withOpacity(0.05),
-                            ColorManager.primary.withOpacity(0.02),
+                            ColorManager.primary.withValues(alpha: 0.05),
+                            ColorManager.primary.withValues(alpha: 0.02),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                         borderRadius: BorderRadius.circular(16.r),
                         border: Border.all(
-                          color: ColorManager.primary.withOpacity(0.1),
+                          color: ColorManager.primary.withValues(alpha: 0.1),
                           width: 1,
                         ),
                       ),
@@ -526,7 +526,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                               Container(
                                 padding: EdgeInsets.all(8.w),
                                 decoration: BoxDecoration(
-                                  color: ColorManager.primary.withOpacity(0.1),
+                                  color: ColorManager.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8.r),
                                 ),
                                 child: Icon(
@@ -566,7 +566,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                           // Divider
                           Container(
                             height: 1,
-                            color: ColorManager.divider.withOpacity(0.3),
+                            color: ColorManager.divider.withValues(alpha: 0.3),
                           ),
                           SizedBox(height: 16.h),
                           // Total Pay Row
@@ -628,7 +628,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -643,7 +643,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: ColorManager.primary.withOpacity(0.1),
+                  color: ColorManager.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
@@ -670,7 +670,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                 borderRadius: BorderRadius.circular(12.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -705,7 +705,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                             circleId: const CircleId('service_area'),
                             center: serviceLocation,
                             radius: 100,
-                            fillColor: ColorManager.red.withOpacity(0.2),
+                            fillColor: ColorManager.red.withValues(alpha: 0.2),
                             strokeWidth: 2,
                             strokeColor: ColorManager.red,
                           ),
@@ -727,7 +727,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(12.r),
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                         ),
                         child: Center(
                           child: Container(
@@ -736,7 +736,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                               vertical: 6.h,
                             ),
                             decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
+                              color: Colors.black.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(20.r),
                             ),
                             child: Row(
@@ -771,10 +771,10 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
           Container(
             padding: EdgeInsets.all(16.w),
             decoration: BoxDecoration(
-              color: ColorManager.primary.withOpacity(0.05),
+              color: ColorManager.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(
-                color: ColorManager.primary.withOpacity(0.2),
+                color: ColorManager.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),
@@ -785,7 +785,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                     Container(
                       padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
-                        color: ColorManager.primary.withOpacity(0.1),
+                        color: ColorManager.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8.r),
                       ),
                       child: Icon(
@@ -838,7 +838,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -852,7 +852,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: ColorManager.primary.withOpacity(0.1),
+                  color: ColorManager.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
@@ -908,7 +908,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
           boxShadow: [
             BoxShadow(
               color: (isBefore ? ColorManager.red : ColorManager.green)
-                  .withOpacity(0.2),
+                  .withValues(alpha: 0.2),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -975,7 +975,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                         decoration: BoxDecoration(
                           color:
                               (isBefore ? ColorManager.red : ColorManager.green)
-                                  .withOpacity(0.9),
+                                  .withValues(alpha: 0.9),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Text(
@@ -995,7 +995,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
                       child: Container(
                         padding: EdgeInsets.all(6.w),
                         decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
+                          color: Colors.black.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Icon(
@@ -1058,7 +1058,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
         Container(
           padding: EdgeInsets.all(10.w),
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(0.1),
+            color: iconColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Icon(
@@ -1090,7 +1090,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
             ],
           ),
         ),
-        if (trailing != null) trailing,
+        ?trailing,
       ],
     );
   }
@@ -1135,7 +1135,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
               AssetsManager.saudiRiyalSymbol,
               height: isTotal ? 16.h : 14.h,
               width: isTotal ? 16.w : 14.w,
-              color: textColor,
+              colorFilter: ColorFilter.mode(textColor, BlendMode.srcIn),
             ),
           ],
         ),
@@ -1153,9 +1153,9 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
       case 'ACTIVE':
         return const Color.fromRGBO(76, 175, 80, 0.1);
       case 'CANCELLED_BY_USER':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'CANCELLED_BY_ADMIN':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'ACCEPTED_BY_BIKER':
         return const Color.fromRGBO(111, 251, 76, 0.1);
       case 'WAITING_FOR_BIKER_BY_ADMIN':
@@ -1163,7 +1163,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
       case 'BIKER_ON_THE_WAY':
         return const Color.fromRGBO(103, 135, 198, 0.1);
       case 'CANCELLED_BY_BIKER':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withValues(alpha: 0.1);
       case 'BIKER_ARRIVED':
         return const Color.fromRGBO(251, 174, 76, 0.1);
       case 'ON_WASHING':
@@ -1234,10 +1234,10 @@ class FullScreenImageViewer extends StatelessWidget {
   final String title;
 
   const FullScreenImageViewer({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1384,7 +1384,7 @@ class _FullScreenMapViewState extends State<_FullScreenMapView> {
                 circleId: const CircleId('service_area'),
                 center: widget.latLng,
                 radius: 100,
-                fillColor: ColorManager.red.withOpacity(0.2),
+                fillColor: ColorManager.red.withValues(alpha: 0.2),
                 strokeWidth: 2,
                 strokeColor: ColorManager.red,
               ),
@@ -1409,7 +1409,7 @@ class _FullScreenMapViewState extends State<_FullScreenMapView> {
                 borderRadius: BorderRadius.circular(16.r),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 10,
                     offset: const Offset(0, 2),
                   ),
@@ -1424,7 +1424,7 @@ class _FullScreenMapViewState extends State<_FullScreenMapView> {
                       Container(
                         padding: EdgeInsets.all(8.w),
                         decoration: BoxDecoration(
-                          color: ColorManager.primary.withOpacity(0.1),
+                          color: ColorManager.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Icon(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
@@ -20,44 +21,22 @@ class AppBarShared extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      systemOverlayStyle: AppStyles.lightStatusBarIconsWithTransparentColorStyle,
-      backgroundColor: ColorManager.primary,
-      shadowColor: const Color.fromRGBO(0, 0, 0, 0.08),
-      // elevation: 3,
-      centerTitle: isTextOnly
-          ? true
-          : isCenter
-              ? true
-              : false,
+    // iOS 26/27 navigation bar: no coloured bar; brand colour tints the
+    // glass back button instead.
+    return GlassAppBar(
+      centerTitle: isTextOnly || isCenter,
       automaticallyImplyLeading: false,
       title: Text(
         titleAppBar,
-        style: AppStyles.titleWhite16Bold,
+        style: AppStyles.titleWhite16Bold.copyWith(color: ColorManager.black),
       ),
-      titleSpacing: 0,
-      leadingWidth: 50.w,
+      leadingWidth: 60,
       leading: isTextOnly
           ? null
-          : InkWell(
-              onTap: () {
-                if (onTap != null) {
-                  onTap!();
-                } else {
-                  pop(context);
-                }
-              },
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: ColorManager.white,
-                size: AppSize.s24,
-              ),
+          : GlassBackButton(
+              color: ColorManager.primary,
+              onPressed: onTap ?? () => pop(context),
             ),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          bottom: Radius.circular(12),
-        ),
-      ),
     );
   }
 }

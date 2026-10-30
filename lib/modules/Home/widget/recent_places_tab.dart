@@ -6,15 +6,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/widget/saved_places_tab.dart';
-import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
@@ -22,8 +19,7 @@ class RecentPlacesTab extends StatelessWidget {
   Completer<GoogleMapController> myController;
   TextEditingController nameController;
   RecentPlacesTab(
-      {Key? key, required this.myController, required this.nameController})
-      : super(key: key);
+      {super.key, required this.myController, required this.nameController});
 
   @override
   Widget build(BuildContext context) {

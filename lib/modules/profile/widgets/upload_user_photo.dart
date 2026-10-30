@@ -26,7 +26,7 @@ class _UserPhotoState extends State<UserPhoto> {
   final ImagePicker picker = ImagePicker();
   GeneralSingleton generalSingleton = GeneralSingleton();
   late String userPhoto;
-  getGalleryImage() {
+  void getGalleryImage() {
     picker
         .pickImage(
             source: ImageSource.gallery,
@@ -41,7 +41,7 @@ class _UserPhotoState extends State<UserPhoto> {
     });
   }
 
-  getCameraImage() {
+  void getCameraImage() {
     picker
         .pickImage(
             source: ImageSource.camera,

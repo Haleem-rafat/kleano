@@ -54,7 +54,7 @@ class EventsStepper extends StatelessWidget {
                           height: 20.h,
                           width: 20.w,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(.5),
+                            color: ColorManager.primary.withValues(alpha: .5),
                             shape: BoxShape.circle,
                           ),
                         ),

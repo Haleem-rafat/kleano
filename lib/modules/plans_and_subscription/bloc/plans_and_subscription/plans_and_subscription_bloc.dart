@@ -32,7 +32,7 @@ class PlansAndSubscriptionBloc
         } else {
           emit(GetPlanFailed(error: response.message));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(PlansAndSubscriptionConnectionError());
         } else {
@@ -73,7 +73,7 @@ class PlansAndSubscriptionBloc
         emit(PlansAndSubscriptioSuccessState(
             allPlans: plans ?? <Plan>[],
             subscription: subscriptionResponse.results!.data!));
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(PlansAndSubscriptionConnectionError());
         } else {
@@ -103,7 +103,7 @@ class PlansAndSubscriptionBloc
         } else {
           emit(CreateSubscriptionFailed(errorModel: response.errorModel!));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(PlansAndSubscriptionConnectionError());
         } else {
@@ -131,7 +131,7 @@ class PlansAndSubscriptionBloc
         } else {
           emit(PaySubscriptionFailed(errorModel: response.errorModel!));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(PlansAndSubscriptionConnectionError());
         } else {
@@ -163,7 +163,7 @@ class PlansAndSubscriptionBloc
         } else {
           emit(SubscriptionByLocationFailed(error: response.errorMessage));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(PlansAndSubscriptionConnectionError());
         } else {

@@ -8,10 +8,8 @@ import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/layout/main_navigation_screen.dart';
-import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/update_profile/update_profile_bloc.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class DropDownLanguage extends StatefulWidget {
@@ -52,7 +50,7 @@ class _DropDownLanguageState extends State<DropDownLanguage> {
     });
   }
 
-  _updateUserLanguage(String val) {
+  void _updateUserLanguage(String val) {
     if (val == AppConstants.english) {
       _changeLocale('en');
     } else if (val == AppConstants.arabic) {
@@ -84,7 +82,7 @@ class _DropDownLanguageState extends State<DropDownLanguage> {
             borderRadius: BorderRadius.circular(10.r),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: ColorManager.black.withOpacity(.05),
+                color: ColorManager.black.withValues(alpha: .05),
                 blurRadius: 3.r,
                 offset: const Offset(0, 3),
               ),

@@ -21,7 +21,7 @@ class DeleteUserAccountBloc
         } else {
           emit(DeleteAccountFailed(error: response.errorMessage!));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(DeleteAccountConnectionError());
         } else {

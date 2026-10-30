@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
@@ -43,20 +42,20 @@ class _HeaderProfileWidgetState extends State<HeaderProfileWidget> {
   Widget build(BuildContext context) {
     return Container(
         height: 201.h,
-        width: 375.w,
+        width: 1.sw,
         color: Colors.transparent,
         child: Stack(
           children: <Widget>[
             Container(
               height: 110.h,
-              width: 375.w,
+              width: 1.sw,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(12),
                 ),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                      color: ColorManager.black.withOpacity(.05),
+                      color: ColorManager.black.withValues(alpha: .05),
                       blurRadius: 3.r,
                       offset: const Offset(0, 6))
                 ],

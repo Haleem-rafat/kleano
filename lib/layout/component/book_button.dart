@@ -36,7 +36,7 @@ class BookButton extends StatelessWidget {
             ? []
             : [
                 BoxShadow(
-                  color: ColorManager.primary.withOpacity(0.4),
+                  color: ColorManager.primary.withValues(alpha: 0.4),
                   blurRadius: 10,
                   spreadRadius: 2,
                   offset: const Offset(0, 4),

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:custom_marker/marker_icon.dart';
+import 'package:thewasher/core/utilis/marker_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
@@ -36,7 +36,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<GetSavedLocation>(
         (GetSavedLocation event, Emitter<LocationState> emit) async {
       try {
-        print("Saved Locations ...");
+        debugPrint("Saved Locations ...");
         emit(GetSavedLocationLoading());
         final SavedResponse response = await HomeRepo.getSavedLocations();
         if (response.success) {
@@ -48,7 +48,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
           );
           blcoPosition =
               LatLng(defaultLocation.latitude!, defaultLocation.longitude!);
-          print("dsdsaaddaadsdsdas: $blcoPosition");
+          debugPrint("dsdsaaddaadsdsdas: $blcoPosition");
           justLocationName = defaultLocation.savedName!;
           fullLocationName =
               "${defaultLocation.streetName!} ${defaultLocation.subAdministrativeArea!} ${defaultLocation.country!} ${defaultLocation.savedName!}";
@@ -69,7 +69,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
     on<SaveLocation>((SaveLocation event, Emitter<LocationState> emit) async {
       try {
-        print("Save Locations ...");
+        debugPrint("Save Locations ...");
         emit(SaveLocationLoading());
         final SavedResponse response = await HomeRepo.saveLocations(
             event.latitude,
@@ -95,7 +95,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<UnSaveLocation>(
         (UnSaveLocation event, Emitter<LocationState> emit) async {
       try {
-        print("Un Save Locations ...");
+        debugPrint("Un Save Locations ...");
         emit(UnSaveLocationLoading());
         final bool response = await HomeRepo.unSavedLocations(event.id);
         if (response) {
@@ -116,7 +116,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<ClearSavedLocation>(
         (ClearSavedLocation event, Emitter<LocationState> emit) async {
       try {
-        print("Clear Save Locations ...");
+        debugPrint("Clear Save Locations ...");
         emit(ClearSaveLocationLoading());
         final bool response = await HomeRepo.clearSavedLocations();
         if (response) {
@@ -133,7 +133,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     on<SavePickedLocation>(
         (SavePickedLocation event, Emitter<LocationState> emit) async {
       try {
-        print("Save Picked Locations ...");
+        debugPrint("Save Picked Locations ...");
         emit(SavePickedLocationLoading());
         pickedLocationModel = event.pickedLocationModel;
         emit(SavePickedLocationSuccess());
@@ -154,7 +154,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
     on<GoToLocation>((GoToLocation event, Emitter<LocationState> emit) async {
       try {
-        print("To Locations ...");
+        debugPrint("To Locations ...");
         emit(GoToLocationLoading());
         final icon = await MarkerIcon.svgAsset(
             assetName: AssetsManager.pinSvg, context: event.context, size: 24);

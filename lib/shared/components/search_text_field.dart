@@ -44,7 +44,7 @@ class DropdownSearchShared extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
             color: isSelected
-                ? ColorManager.primary.withOpacity(0.1)
+                ? ColorManager.primary.withValues(alpha: 0.1)
                 : Colors.white,
           ),
           child: Row(

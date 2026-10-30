@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:socket_io_client/socket_io_client.dart' as socket;
@@ -34,11 +35,11 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
                 .build());
         socketIo!.connect();
         socketIo!.onConnect((_) {
-          print('Connection established ${socketIo!.connected}');
+          debugPrint('Connection established ${socketIo!.connected}');
         });
-        socketIo!.onDisconnect((_) => print('Connection Disconnection'));
-        socketIo!.onConnectError((err) => print("asdasdsa ${err}"));
-        socketIo!.onError((err) => print("eeeeee ${err}"));
+        socketIo!.onDisconnect((_) => debugPrint('Connection Disconnection'));
+        socketIo!.onConnectError((err) => debugPrint("asdasdsa $err"));
+        socketIo!.onError((err) => debugPrint("eeeeee $err"));
 
         socketIo!.onAny((String event, dynamic data) {
           if (event == AppConstants.orderAccepted) {
@@ -101,7 +102,7 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
                   AppDateFormatter.dateToStringHHMMA(
                 DateTime.parse(baseModelSocketStatus.time!).toLocal(),
               );
-              sl<MyBookingBloc>.call().add(FetchMyBookingActive(
+              sl.call<MyBookingBloc>.call().add(FetchMyBookingActive(
                 isRefresh: false,
               ));
               add(RatingYourWash(orderId: data['_id']));

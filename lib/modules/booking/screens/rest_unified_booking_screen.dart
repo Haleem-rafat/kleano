@@ -92,15 +92,15 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (!didPop) return;
         singleton.orderId = null;
         singleton.totalPay = null;
         singleton.orderTime = null;
         singleton.nearByDescription = null;
         singleton.isCarFreshened = false;
         sl<PromoBloc>().add(ClearPromoCodeDetail());
-        return true;
       },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
@@ -220,7 +220,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
                 child: ListView.separated(
                   scrollDirection: Axis.horizontal,
                   itemCount: sl<VehiclesBloc>().vehiclesList.length,
-                  separatorBuilder: (_, __) => SizedBox(width: 10.w),
+                  separatorBuilder: (_, _) => SizedBox(width: 10.w),
                   itemBuilder: (context, index) {
                     final selectedColor = colorList.indexWhere(
                       (e) =>
@@ -272,7 +272,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
           ),
           SizedBox(height: 10.h),
           BlocBuilder<LocationBloc, LocationState>(
-            builder: (_, __) {
+            builder: (_, _) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -332,7 +332,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
           SizedBox(height: 12.h),
           SwitchListTile(
             value: singleton.isCarFreshened,
-            activeColor: ColorManager.primary,
+            activeThumbColor: ColorManager.primary,
             title: Text(
               translate(AppStrings.addCarFreshenedService),
               style: AppStyles.subtext14Regular,

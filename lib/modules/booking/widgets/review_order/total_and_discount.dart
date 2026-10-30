@@ -22,7 +22,7 @@ class DiscountAndTotal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("sjfnvonvnson ${sl<PromoBloc>().totalPayModel.discount}");
+    debugPrint("sjfnvonvnson ${sl<PromoBloc>().totalPayModel.discount}");
     return BlocBuilder<PromoBloc, PromoState>(
       builder: (context, state) {
         return Column(

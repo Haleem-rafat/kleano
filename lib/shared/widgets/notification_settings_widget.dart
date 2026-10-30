@@ -8,7 +8,7 @@ import 'package:thewasher/layout/services/notification_manager_service.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 
 class NotificationSettingsWidget extends StatefulWidget {
-  const NotificationSettingsWidget({Key? key}) : super(key: key);
+  const NotificationSettingsWidget({super.key});
 
   @override
   State<NotificationSettingsWidget> createState() =>
@@ -220,9 +220,9 @@ class _NotificationSettingsWidgetState
         trailing: Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: ColorManager.primary,
+          activeThumbColor: ColorManager.primary,
           inactiveThumbColor: ColorManager.lightGray,
-          inactiveTrackColor: ColorManager.lightGray.withOpacity(0.3),
+          inactiveTrackColor: ColorManager.lightGray.withValues(alpha: 0.3),
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: AppPadding.p16.w,
@@ -234,7 +234,7 @@ class _NotificationSettingsWidgetState
 }
 
 class NotificationTestWidget extends StatelessWidget {
-  const NotificationTestWidget({Key? key}) : super(key: key);
+  const NotificationTestWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

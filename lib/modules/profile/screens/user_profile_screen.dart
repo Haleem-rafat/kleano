@@ -137,13 +137,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                 ),
                                                 decoration: BoxDecoration(
                                                   color: ColorManager.red
-                                                      .withOpacity(0.08),
+                                                      .withValues(alpha: 0.08),
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           16.r),
                                                   border: Border.all(
                                                     color: ColorManager.red
-                                                        .withOpacity(0.2),
+                                                        .withValues(alpha: 0.2),
                                                     width: 1,
                                                   ),
                                                 ),
@@ -154,7 +154,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                                                           EdgeInsets.all(8.r),
                                                       decoration: BoxDecoration(
                                                         color: ColorManager.red
-                                                            .withOpacity(0.15),
+                                                            .withValues(alpha: 0.15),
                                                         borderRadius:
                                                             BorderRadius
                                                                 .circular(10.r),

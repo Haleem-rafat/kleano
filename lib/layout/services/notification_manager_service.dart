@@ -63,9 +63,9 @@ class NotificationManagerService {
       _setupNotificationListeners();
 
       _isInitialized = true;
-      print("✅ Notification Manager initialized successfully");
+      debugPrint("✅ Notification Manager initialized successfully");
     } catch (e) {
-      print("❌ Error initializing Notification Manager: $e");
+      debugPrint("❌ Error initializing Notification Manager: $e");
     }
   }
 
@@ -76,18 +76,18 @@ class NotificationManagerService {
 
       if (settings.authorizationStatus == AuthorizationStatus.authorized ||
           settings.authorizationStatus == AuthorizationStatus.provisional) {
-        print("✅ FCM permissions granted");
+        debugPrint("✅ FCM permissions granted");
 
         // Get FCM token
         final token = await _fcmService.getFcmToken();
         if (token != null) {
-          print("✅ FCM Token: $token");
+          debugPrint("✅ FCM Token: $token");
         }
       } else {
-        print("❌ FCM permissions denied");
+        debugPrint("❌ FCM permissions denied");
       }
     } catch (e) {
-      print("❌ Error initializing FCM: $e");
+      debugPrint("❌ Error initializing FCM: $e");
     }
   }
 
@@ -114,12 +114,12 @@ class NotificationManagerService {
   }
 
   void _handleForegroundMessage(RemoteMessage message) {
-    print("📱 Received foreground message: ${message.messageId}");
+    debugPrint("📱 Received foreground message: ${message.messageId}");
 
     // Check if this message was already shown to prevent duplicates
     if (message.messageId != null &&
         _recentlyShownMessageIds.contains(message.messageId)) {
-      print(
+      debugPrint(
           "⚠️ Duplicate notification detected, skipping: ${message.messageId}");
       return;
     }
@@ -148,12 +148,12 @@ class NotificationManagerService {
   }
 
   void _handleBackgroundMessage(RemoteMessage message) {
-    print("📱 Received background message: ${message.messageId}");
+    debugPrint("📱 Received background message: ${message.messageId}");
     // Handle background message logic here
   }
 
   void _handleInitialMessage(RemoteMessage message) {
-    print("📱 Received initial message: ${message.messageId}");
+    debugPrint("📱 Received initial message: ${message.messageId}");
     // Handle initial message when app is opened from notification
     if (_context != null) {
       _navigateFromNotification(message);
@@ -288,42 +288,42 @@ class NotificationManagerService {
   // Notification preferences management
   void setNotificationsEnabled(bool enabled) {
     _notificationsEnabled = enabled;
-    print("📱 Notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("📱 Notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setSoundEnabled(bool enabled) {
     _soundEnabled = enabled;
-    print("🔊 Sound ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("🔊 Sound ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setVibrationEnabled(bool enabled) {
     _vibrationEnabled = enabled;
-    print("📳 Vibration ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("📳 Vibration ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setBookingNotifications(bool enabled) {
     _bookingNotifications = enabled;
-    print("📅 Booking notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("📅 Booking notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setReminderNotifications(bool enabled) {
     _reminderNotifications = enabled;
-    print("⏰ Reminder notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("⏰ Reminder notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setPromotionNotifications(bool enabled) {
     _promotionNotifications = enabled;
-    print("🎉 Promotion notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("🎉 Promotion notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setOrderNotifications(bool enabled) {
     _orderNotifications = enabled;
-    print("📦 Order notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("📦 Order notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   void setSystemNotifications(bool enabled) {
     _systemNotifications = enabled;
-    print("⚙️ System notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint("⚙️ System notifications ${enabled ? 'enabled' : 'disabled'}");
   }
 
   // Convenience methods for specific notification types
@@ -453,6 +453,6 @@ class NotificationManagerService {
     _backgroundSubscription?.cancel();
     _recentlyShownMessageIds.clear();
     _isInitialized = false;
-    print("✅ Notification Manager disposed");
+    debugPrint("✅ Notification Manager disposed");
   }
 }

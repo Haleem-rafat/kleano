@@ -13,8 +13,6 @@ import 'package:thewasher/modules/profile/data/models/profile_user.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/change_personal_information/change_personal_info.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/edit_phone_number/edit_phone_screen.dart';
 import 'package:thewasher/modules/profile/widgets/edit_profile/info_user_profile.dart';
-import 'package:thewasher/modules/profile/widgets/phone_number.dart';
-import 'package:thewasher/modules/profile/widgets/shared_widget/container_edit.dart';
 import 'package:thewasher/modules/profile/widgets/upload_user_photo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 import 'package:thewasher/shared/components/app_bar.dart';
@@ -61,7 +59,7 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
               user = state.userProfile.data!;
               if ((user.phone ?? '').isNotEmpty) {
                 final PhoneNumber phoneNumber =
-                    await PhoneNumber.parse(user.phone!);
+                    PhoneNumber.parse(user.phone!);
                 setState(() {
                   countryCode = '+${phoneNumber.countryCode}';
                   phoneNumberText = phoneNumber.international;
@@ -149,7 +147,7 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
                             padding: EdgeInsets.symmetric(
                                 vertical: 12.h, horizontal: 24.w),
                             decoration: BoxDecoration(
-                              color: ColorManager.red.withOpacity(0.08),
+                              color: ColorManager.red.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: Text(
@@ -225,7 +223,7 @@ class SectionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),

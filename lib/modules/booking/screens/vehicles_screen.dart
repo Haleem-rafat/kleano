@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
@@ -19,7 +18,7 @@ import 'package:thewasher/shared/widget/vehicle_shared.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class VehiclesBookingScreen extends StatefulWidget {
-  const VehiclesBookingScreen({Key? key}) : super(key: key);
+  const VehiclesBookingScreen({super.key});
 
   @override
   State<VehiclesBookingScreen> createState() => _VehiclesBookingScreenState();

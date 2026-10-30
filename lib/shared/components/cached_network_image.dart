@@ -1,9 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/shimmering/main_shimmering_widget.dart';
 
 class ImageShared extends StatelessWidget {
@@ -23,8 +21,7 @@ class ImageShared extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return image != null
-        ? CachedNetworkImage(
+    return CachedNetworkImage(
             imageUrl: image,
             height: height,
             width: width,
@@ -44,10 +41,10 @@ class ImageShared extends StatelessWidget {
                 ),
               );
             },
-            placeholder: (_, __) {
+            placeholder: (_, _) {
               return ShimmeringWidget(
                 child: Container(
-                  color: ColorManager.primary.withOpacity(0.1),
+                  color: ColorManager.primary.withValues(alpha: 0.1),
                   width: width,
                   height: height,
                 ),
@@ -55,7 +52,6 @@ class ImageShared extends StatelessWidget {
             },
             errorWidget: (context, url, dynamic error) =>
                 Image.asset(AssetsManager.logoN),
-          )
-        : const CircularProgressIndicator();
+          );
   }
 }

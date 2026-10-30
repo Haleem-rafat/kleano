@@ -10,7 +10,7 @@ import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-selectActionNotificationType(Notifications notification, BuildContext buildContext) {
+void selectActionNotificationType(Notifications notification, BuildContext buildContext) {
   switch (notification.type) {
     case AppConstants.promoCodeBased:
       pushPage(

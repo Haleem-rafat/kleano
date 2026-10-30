@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/tracking_order/data/models/accepted_biker_model.dart';
 import 'package:thewasher/modules/tracking_order/screens/widgets/contact_biker.dart';
-import 'package:thewasher/modules/tracking_order/screens/widgets/state_of_status_order.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 
 class BikerInformation extends StatelessWidget {

@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewasher/api/shared.dart';
@@ -13,8 +13,8 @@ import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
@@ -71,8 +71,10 @@ class _HomeScreenState extends State<HomeScreen>
   bool enabledAddress = false;
 
   static const LatLng _initialLatLng = LatLng(31.2001, 29.9187);
-  static const CameraPosition _initialCameraPosition =
-      CameraPosition(target: _initialLatLng, zoom: 14.4746);
+  static const CameraPosition _initialCameraPosition = CameraPosition(
+    target: _initialLatLng,
+    zoom: 14.4746,
+  );
 
   @override
   void dispose() {
@@ -98,7 +100,10 @@ class _HomeScreenState extends State<HomeScreen>
 
     try {
       var pos = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
 
       if (mounted) {
         setState(() {
@@ -110,14 +115,18 @@ class _HomeScreenState extends State<HomeScreen>
       if (_controller.isCompleted) {
         try {
           final GoogleMapController controller = await _controller.future;
-          await controller.animateCamera(CameraUpdate.newCameraPosition(
-            CameraPosition(
-              bearing: 0,
-              target:
-                  LatLng(currentPosition.latitude, currentPosition.longitude),
-              zoom: zoom,
+          await controller.animateCamera(
+            CameraUpdate.newCameraPosition(
+              CameraPosition(
+                bearing: 0,
+                target: LatLng(
+                  currentPosition.latitude,
+                  currentPosition.longitude,
+                ),
+                zoom: zoom,
+              ),
             ),
-          ));
+          );
         } catch (e) {
           debugPrint("Camera animation error: $e");
         }
@@ -163,7 +172,9 @@ class _HomeScreenState extends State<HomeScreen>
 
     try {
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
       final GoogleMapController controller = await _controller.future;
@@ -207,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen>
                     SizedBox(
                       height: keyboardHeight > 0
                           ? availableHeight *
-                              0.4 // Smaller when keyboard is open
+                                0.4 // Smaller when keyboard is open
                           : availableHeight * 0.6, // Normal size
                       child: Stack(
                         children: [
@@ -223,16 +234,18 @@ class _HomeScreenState extends State<HomeScreen>
                                     currentPosition.longitude != 0) {
                                   controller
                                       .animateCamera(
-                                    CameraUpdate.newCameraPosition(
-                                      CameraPosition(
-                                        target: currentPosition,
-                                        zoom: zoom,
-                                      ),
-                                    ),
-                                  )
+                                        CameraUpdate.newCameraPosition(
+                                          CameraPosition(
+                                            target: currentPosition,
+                                            zoom: zoom,
+                                          ),
+                                        ),
+                                      )
                                       .catchError((e) {
-                                    debugPrint("Initial animation error: $e");
-                                  });
+                                        debugPrint(
+                                          "Initial animation error: $e",
+                                        );
+                                      });
                                 }
                               }
                             },
@@ -245,8 +258,10 @@ class _HomeScreenState extends State<HomeScreen>
                             buildingsEnabled: true,
                             indoorViewEnabled: false,
                             trafficEnabled: false,
-                            minMaxZoomPreference:
-                                const MinMaxZoomPreference(3, 20),
+                            minMaxZoomPreference: const MinMaxZoomPreference(
+                              3,
+                              20,
+                            ),
                             initialCameraPosition: _initialCameraPosition,
                             onCameraMove: (CameraPosition cameraPosition) {
                               _cameraTarget = cameraPosition.target;
@@ -261,23 +276,25 @@ class _HomeScreenState extends State<HomeScreen>
                               try {
                                 final placemarks =
                                     await placemarkFromCoordinates(
-                                  _cameraTarget.latitude,
-                                  _cameraTarget.longitude,
-                                );
+                                      _cameraTarget.latitude,
+                                      _cameraTarget.longitude,
+                                    );
 
                                 if (!mounted) return;
 
                                 country = placemarks.first.country ?? "";
                                 administrativeArea =
                                     placemarks.first.subAdministrativeArea ??
-                                        "";
+                                    "";
                                 currentAddress = placemarks.first.street ?? '';
 
-                                sl<OffersBloc>().add(GetServices(
-                                  lat: _cameraTarget.latitude,
-                                  lng: _cameraTarget.longitude,
-                                  country: "saudi arabia",
-                                ));
+                                sl<OffersBloc>().add(
+                                  GetServices(
+                                    lat: _cameraTarget.latitude,
+                                    lng: _cameraTarget.longitude,
+                                    country: "saudi arabia",
+                                  ),
+                                );
                               } catch (e) {
                                 debugPrint("Reverse geocoding failed: $e");
                               }
@@ -314,47 +331,54 @@ class _HomeScreenState extends State<HomeScreen>
 
                           // Right Side Controls
                           Positioned(
-                            top: 180.h,
+                            top: MediaQuery.paddingOf(context).top + 130,
                             right: 16.w,
                             child: Column(
                               children: <Widget>[
                                 _buildMapControl(
                                   icon: CupertinoIcons.restart,
+                                  sfSymbol: 'arrow.clockwise',
                                   onTap: _restartMap,
                                 ),
                                 12.verticalSpace,
                                 _buildMapControl(
                                   icon: Icons.my_location,
+                                  sfSymbol: 'location.fill',
                                   onTap: () {
                                     if (!mounted) return;
                                     setState(() {
                                       locationMap.markers.clear();
                                     });
-                                    context.read<OffersBloc>().add(GetServices(
-                                          lat: currentPosition.latitude,
-                                          lng: currentPosition.longitude,
-                                          country: "saudi arabia",
-                                        ));
+                                    context.read<OffersBloc>().add(
+                                      GetServices(
+                                        lat: currentPosition.latitude,
+                                        lng: currentPosition.longitude,
+                                        country: "saudi arabia",
+                                      ),
+                                    );
                                     _currentLocation();
                                   },
                                 ),
                                 12.verticalSpace,
                                 _buildMapControl(
                                   icon: Icons.add,
+                                  sfSymbol: 'plus',
                                   onTap: () async {
                                     if (!_controller.isCompleted) return;
                                     try {
                                       final GoogleMapController controller =
                                           await _controller.future;
-                                      var currentZoomLevel =
-                                          await controller.getZoomLevel();
+                                      var currentZoomLevel = await controller
+                                          .getZoomLevel();
                                       currentZoomLevel = currentZoomLevel + 2;
-                                      if (currentZoomLevel > 20)
+                                      if (currentZoomLevel > 20) {
                                         currentZoomLevel = 20;
+                                      }
                                       await controller.animateCamera(
                                         CameraUpdate.newCameraPosition(
                                           CameraPosition(
-                                            target: locationMap.newLocation ==
+                                            target:
+                                                locationMap.newLocation ==
                                                     const LatLng(0, 0)
                                                 ? currentPosition
                                                 : locationMap.newLocation,
@@ -370,20 +394,23 @@ class _HomeScreenState extends State<HomeScreen>
                                 12.verticalSpace,
                                 _buildMapControl(
                                   icon: Icons.remove,
+                                  sfSymbol: 'minus',
                                   onTap: () async {
                                     if (!_controller.isCompleted) return;
                                     try {
                                       final GoogleMapController controller =
                                           await _controller.future;
-                                      var currentZoomLevel =
-                                          await controller.getZoomLevel();
+                                      var currentZoomLevel = await controller
+                                          .getZoomLevel();
                                       currentZoomLevel = currentZoomLevel - 2;
-                                      if (currentZoomLevel < 0)
+                                      if (currentZoomLevel < 0) {
                                         currentZoomLevel = 0;
+                                      }
                                       await controller.animateCamera(
                                         CameraUpdate.newCameraPosition(
                                           CameraPosition(
-                                            target: locationMap.newLocation ==
+                                            target:
+                                                locationMap.newLocation ==
                                                     const LatLng(0, 0)
                                                 ? currentPosition
                                                 : locationMap.newLocation,
@@ -402,25 +429,13 @@ class _HomeScreenState extends State<HomeScreen>
 
                           // Search Model Overlay
                           Positioned(
-                            top: 140.h,
+                            top: MediaQuery.paddingOf(context).top + 62 + 58.h,
                             left: 16.w,
                             right: 16.w,
                             child: Visibility(
                               visible: locationMap.search,
-                              child: Container(
-                                width: 343.w,
-                                decoration: BoxDecoration(
-                                  color: ColorManager.white,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(12.r)),
-                                  boxShadow: <BoxShadow>[
-                                    BoxShadow(
-                                        color: ColorManager.black2
-                                            .withOpacity(0.08),
-                                        offset: const Offset(0, 3),
-                                        blurRadius: 10.r),
-                                  ],
-                                ),
+                              child: LiquidGlass(
+                                radius: 20.r,
                                 child: SearchModel(
                                   currentAddress: currentAddress,
                                   controller: _controller,
@@ -440,42 +455,47 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
 
-                          // Top Header Bar
-                          Container(
-                            height: 100.h,
-                            decoration: BoxDecoration(
-                                color: ColorManager.primary,
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(12.r),
-                                  bottomRight: Radius.circular(12.r),
-                                )),
-                            child: Padding(
-                              padding:
-                                  EdgeInsets.fromLTRB(16.w, 40.h, 16.w, 0.h),
+                          // Floating glass controls over the map (Apple Maps
+                          // style): back button + title capsule.
+                          Positioned(
+                            top: MediaQuery.paddingOf(context).top + 6,
+                            left: 16.w,
+                            right: 16.w,
+                            child: FoldPane(
                               child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  if (widget.isFromSignUp == false)
-                                    GestureDetector(
-                                      onTap: () => pop(context),
-                                      child: const Icon(
-                                        Icons.arrow_back,
-                                        color: ColorManager.white,
-                                      ),
+                                  if (widget.isFromSignUp == false) ...<Widget>[
+                                    GlassIconButton(
+                                      icon: Icons.arrow_back_ios_new_rounded,
+                                      sfSymbol: 'chevron.backward',
+                                      color: ColorManager.primary,
+                                      onPressed: () => pop(context),
                                     ),
+                                    const SizedBox(width: 10),
+                                  ],
                                   Expanded(
-                                    child: Text(
-                                      translate(AppStrings.setBookingLocation),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: ColorManager.white,
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
+                                    child: SizedBox(
+                                      height: 44,
+                                      child: LiquidGlass(
+                                        capsule: true,
+                                        child: Center(
+                                          child: Text(
+                                            translate(
+                                                AppStrings.setBookingLocation),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: ColorManager.black,
+                                              fontSize: 16.sp,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                  SizedBox(width: 24.w),
+                                  if (widget.isFromSignUp == false)
+                                    const SizedBox(width: 54),
                                 ],
                               ),
                             ),
@@ -483,39 +503,40 @@ class _HomeScreenState extends State<HomeScreen>
 
                           // Search Bar
                           Positioned(
-                            top: 90.h,
-                            left: 24.w,
-                            right: 24.w,
-                            child: InkWell(
+                            top: MediaQuery.paddingOf(context).top + 62,
+                            left: 16.w,
+                            right: 16.w,
+                            child: GestureDetector(
                               onTap: () => _handleSearchResult(),
-                              child: Container(
-                                height: 50.h,
-                                width: 343.w,
-                                decoration: BoxDecoration(
-                                  color: ColorManager.white,
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: AppPadding.p8),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          translate(AppStrings.searchInMap),
-                                          style: AppStyles.titleGray16Regular,
-                                        ),
-                                        SvgPicture.asset(
-                                          AssetsManager.search,
-                                          color: ColorManager.medGray,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                              child: LiquidGlass(
+                                capsule: true,
+                                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                                child: SizedBox(
+                                  height: 50.h,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            translate(AppStrings.searchInMap),
+                                            style: AppStyles.titleGray16Regular,
+                                          ),
+                                          SvgPicture.asset(
+                                            AssetsManager.search,
+                                            colorFilter: ColorFilter.mode(
+                                              ColorManager.medGray,
+                                              BlendMode.srcIn,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
@@ -536,7 +557,7 @@ class _HomeScreenState extends State<HomeScreen>
                               color: ColorManager.white,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10,
                                   offset: const Offset(0, -4),
                                 ),
@@ -556,27 +577,19 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildMapControl(
-      {required IconData icon, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        height: 40.h,
-        width: 40.w,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: ColorManager.secondary,
-        ),
-        child: Center(
-          child: Icon(
-            icon,
-            size: 24,
-            color: ColorManager.white,
-          ),
-        ),
-      ),
+  Widget _buildMapControl({
+    required IconData icon,
+    required VoidCallback onTap,
+    String? sfSymbol,
+  }) {
+    return GlassIconButton(
+      icon: icon,
+      sfSymbol: sfSymbol,
+      color: ColorManager.primary,
+      onPressed: onTap,
     );
   }
+
 
   Widget _buildOutOfServiceUI() {
     return Padding(
@@ -588,14 +601,10 @@ class _HomeScreenState extends State<HomeScreen>
             width: 80.w,
             height: 80.h,
             decoration: BoxDecoration(
-              color: ColorManager.red.withOpacity(0.1),
+              color: ColorManager.red.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.close,
-              color: ColorManager.red,
-              size: 40.sp,
-            ),
+            child: Icon(Icons.close, color: ColorManager.red, size: 40.sp),
           ),
           20.verticalSpace,
           Text(
@@ -658,8 +667,12 @@ class _HomeScreenState extends State<HomeScreen>
         FocusScope.of(context).unfocus();
       },
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(24.w, 10.w, 24.w,
-            MediaQuery.of(context).viewInsets.bottom > 0 ? 20.h : 100.h),
+        padding: EdgeInsets.fromLTRB(
+          24.w,
+          10.w,
+          24.w,
+          MediaQuery.of(context).viewInsets.bottom > 0 ? 20.h : 100.h,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -676,10 +689,7 @@ class _HomeScreenState extends State<HomeScreen>
               currentAddress.isEmpty
                   ? translate(AppStrings.selectALocation)
                   : currentAddress,
-              style: TextStyle(
-                fontSize: 14.sp,
-                color: ColorManager.darkGrey,
-              ),
+              style: TextStyle(fontSize: 14.sp, color: ColorManager.darkGrey),
             ),
             10.verticalSpace,
             TextFormShared(
@@ -713,7 +723,9 @@ class _HomeScreenState extends State<HomeScreen>
                 if (state is SaveLocationSuccess) {
                   pop(context);
                   popALlAndPushPage(
-                      context, MainNavigationScreen(selectedIndex: 0));
+                    context,
+                    MainNavigationScreen(selectedIndex: 0),
+                  );
                 }
               },
               child: SizedBox(
@@ -722,19 +734,22 @@ class _HomeScreenState extends State<HomeScreen>
                   builder: (context, state) {
                     return ButtonsShared(
                       onPressed: () {
-                        context.read<LocationBloc>().add(SaveLocation(
-                              country: country,
-                              latitude: currentPosition.latitude.toString(),
-                              longitude: currentPosition.longitude.toString(),
-                              streetName: currentAddress,
-                              subAdministrativeArea:
-                                  administrativeArea.toString(),
-                              savedName: selectedAddressType ==
-                                      translate(AppStrings.other)
-                                  ? addressController.text
-                                  : (selectedAddressType ??
+                        context.read<LocationBloc>().add(
+                          SaveLocation(
+                            country: country,
+                            latitude: currentPosition.latitude.toString(),
+                            longitude: currentPosition.longitude.toString(),
+                            streetName: currentAddress,
+                            subAdministrativeArea: administrativeArea
+                                .toString(),
+                            savedName:
+                                selectedAddressType ==
+                                    translate(AppStrings.other)
+                                ? addressController.text
+                                : (selectedAddressType ??
                                       addressController.text),
-                            ));
+                          ),
+                        );
                       },
                       text: state is SaveLocationLoading
                           ? translate(AppStrings.saving)
@@ -743,7 +758,7 @@ class _HomeScreenState extends State<HomeScreen>
                   },
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -773,15 +788,16 @@ class _HomeScreenState extends State<HomeScreen>
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-        backgroundColor:
-            isSelected ? ColorManager.primaryLight : ColorManager.lightGray,
+        backgroundColor: isSelected
+            ? ColorManager.primaryLight
+            : ColorManager.lightGray,
         side: BorderSide(
           color: isSelected ? ColorManager.primary : ColorManager.medGray,
           width: isSelected ? 2.0 : 1.5,
         ),
         elevation: isSelected ? 2.0 : 0.0,
         shadowColor: isSelected
-            ? ColorManager.primary.withOpacity(0.3)
+            ? ColorManager.primary.withValues(alpha: 0.3)
             : Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
@@ -845,9 +861,7 @@ class _HomeScreenState extends State<HomeScreen>
         Marker(
           markerId: const MarkerId('searchedLocation'),
           position: newLatLng!,
-          infoWindow: InfoWindow(
-            title: address ?? '',
-          ),
+          infoWindow: InfoWindow(title: address ?? ''),
           icon: _customMarkerIcon ?? BitmapDescriptor.defaultMarker,
         ),
       );
@@ -861,10 +875,7 @@ class _HomeScreenState extends State<HomeScreen>
         final GoogleMapController controller = await _controller.future;
         await controller.animateCamera(
           CameraUpdate.newCameraPosition(
-            CameraPosition(
-              target: newLatLng,
-              zoom: zoom,
-            ),
+            CameraPosition(target: newLatLng, zoom: zoom),
           ),
         );
       } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -41,7 +42,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         } else {
           emit(CreateOrderFailed(errorModel: response.errorModel));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(CreateOrderConnectionError());
         } else {
@@ -60,12 +61,12 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         (ClearCartOrder event, Emitter<BookingOrderState> emit) async {
       try {
         emit(ClearCartOrderLoading());
-        sl<OffersBloc>.call().cartServicesList.clear();
-        sl<OffersBloc>.call().cartAddOnsList.clear();
-        sl<OffersBloc>.call().cartServicesListString.clear();
-        sl<OffersBloc>.call().cartAddOnsListString.clear();
-        sl<OffersBloc>.call().total = 0;
-        sl<VehiclesBloc>.call().selectedVehicle = VehiclesModel();
+        sl.call<OffersBloc>.call().cartServicesList.clear();
+        sl.call<OffersBloc>.call().cartAddOnsList.clear();
+        sl.call<OffersBloc>.call().cartServicesListString.clear();
+        sl.call<OffersBloc>.call().cartAddOnsListString.clear();
+        sl.call<OffersBloc>.call().total = 0;
+        sl.call<VehiclesBloc>.call().selectedVehicle = VehiclesModel();
         GeneralSingleton().nearByDescription = '';
         isSubscribed = false;
         GeneralSingleton().orderTime = null;
@@ -89,7 +90,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         } else {
           emit(CancelOrderFailed(errormodel: response.errorModel));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(CreateOrderConnectionError());
         } else {
@@ -106,7 +107,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
     on<PlaceOrder>((PlaceOrder event, Emitter<BookingOrderState> emit) async {
       try {
         emit(PlaceOrderLoading());
-        print("place order ...");
+        debugPrint("place order ...");
 
         BaseResponseWithoutResponse response =
             await BookingOrderRepo.userPayOrder(
@@ -121,7 +122,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         } else {
           emit(PlaceOrderFailed(errormodel: response.errorModel));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(CreateOrderConnectionError());
         } else {
@@ -149,7 +150,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         } else {
           emit(OrderByIdFailed(error: response.message));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         emit(OrderByIdFailed(error: e.message));
       }
     });
@@ -169,7 +170,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
             errorModel: response.errorModel,
           ));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         emit(OrderByIdFailed(error: e.message));
       }
     });
@@ -185,7 +186,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
 
         // Validate that city and area are available
         if (cityParam.isEmpty || areaParam.isEmpty) {
-          print(
+          debugPrint(
               'Warning: cityId or areaId is empty. cityId: $cityParam, areaId: $areaParam');
           // Emit empty result if location data is not available
           emit(CalenderAvailableSuccess(calenderAvailableModel: []));
@@ -217,7 +218,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
           emit(CalenderAvailableSuccess(calenderAvailableModel: dayModels));
         } catch (e) {
           // If fetching for the day fails, emit empty model
-          print('Error fetching time slots for $dateParam: $e');
+          debugPrint('Error fetching time slots for $dateParam: $e');
           emit(CalenderAvailableSuccess(calenderAvailableModel: [
             CalenderAvailableModel(
               date: targetDate,
@@ -226,7 +227,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
             )
           ]));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         emit(CalenderAvailableFailed(error: e.message));
       } catch (e) {
         emit(CalenderAvailableFailed(error: e.toString()));
@@ -299,7 +300,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
           availableBikersCount: response.availableBikersCount ?? 0,
         ));
       } catch (e) {
-        print('Error parsing time slot: ${response.timeSlot}, error: $e');
+        debugPrint('Error parsing time slot: ${response.timeSlot}, error: $e');
       }
     }
 

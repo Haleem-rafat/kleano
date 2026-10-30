@@ -1,5 +1,4 @@
 import 'package:thewasher/core/network/status_code.dart';
-import 'package:thewasher/modules/booking/data/models/apply_promo_code_model.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
 import 'package:thewasher/responses/base_response.dart';
 

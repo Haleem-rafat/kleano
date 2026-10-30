@@ -32,7 +32,7 @@ class MyBookingShimmerLoading extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.05),
+            color: ColorManager.black.withValues(alpha: .05),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           ),

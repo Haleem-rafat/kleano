@@ -12,14 +12,14 @@ bool checkSetValue(int index) {
       return offersBloc.hasMainService ||
               (sl<PlansAndSubscriptionBloc>().state
                       is! SubscriptionByLocationLoading &&
-                  sl<GetUserProfileBloc>.call().profile.isSubscribed == true &&
-                  sl<PlansAndSubscriptionBloc>.call().message.isEmpty)
+                  sl.call<GetUserProfileBloc>.call().profile.isSubscribed == true &&
+                  sl.call<PlansAndSubscriptionBloc>.call().message.isEmpty)
           ? true
           : false;
     case 1:
       return true;
     case 2:
-      return sl<VehiclesBloc>.call().selectedVehicle.sId != null ? true : false;
+      return sl.call<VehiclesBloc>.call().selectedVehicle.sId != null ? true : false;
     case 3:
       return true;
     case 4:

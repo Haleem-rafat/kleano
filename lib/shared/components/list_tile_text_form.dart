@@ -8,7 +8,6 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/shared/components/text-form-shared.dart';
-import 'package:thewasher/utilties/validator.dart';
 
 class ListTileTextForm extends StatelessWidget {
   final String title;

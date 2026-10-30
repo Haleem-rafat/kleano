@@ -1,4 +1,4 @@
-import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:thewasher/api/api_service.dart';
 import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/modules/Auth/model/auth_model.dart';
@@ -14,7 +14,7 @@ class AuthRepository {
     await ApiService.postApi("/auth/users/register", body: {
       "userName": userName,
       "phone": phone,
-      if (email != null) "email": email,
+      "email": ?email,
       "fcmToken": fcmToken
     });
   }
@@ -26,7 +26,7 @@ class AuthRepository {
     var res = await ApiService.postApi("/auth/users/login",
         body: {"phone": phone, "fcmToken": fcmToken, "otp": otp});
     AuthModel authModel = AuthModel.fromJson(res!.data['data']);
-    print("AuthModel: $authModel");
+    debugPrint("AuthModel: $authModel");
     AppShared.setToken(authModel.accessToken);
     AppShared.setRefreshToken(authModel.refreshToken);
     return authModel;
@@ -49,7 +49,7 @@ class AuthRepository {
         body: {"phone": phone, "otp": otp},
         isAuth: false);
     AuthModel authModel = AuthModel.fromJson(res!.data['data']);
-    print("AuthModel: $authModel");
+    debugPrint("AuthModel: $authModel");
     AppShared.setToken(authModel.accessToken);
     AppShared.setRefreshToken(authModel.refreshToken);
     return authModel;

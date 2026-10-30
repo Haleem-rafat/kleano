@@ -16,7 +16,7 @@ import 'package:thewasher/utilties/navigator.dart';
 class DeleteCarAlert extends StatelessWidget {
   String sId;
   int index;
-  DeleteCarAlert({Key? key, required this.sId, required this.index}) : super(key: key);
+  DeleteCarAlert({super.key, required this.sId, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class DeleteCarAlert extends StatelessWidget {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

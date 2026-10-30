@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/strings_manager.dart';
 
 class TotalPayCard extends StatelessWidget {
   // final VoidCallback onTap;
@@ -50,7 +48,7 @@ class TotalPayCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.primary.withOpacity(0.4),
+            color: ColorManager.primary.withValues(alpha: 0.4),
             blurRadius: 10,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -86,8 +84,7 @@ class _SummaryRow extends StatelessWidget {
   const _SummaryRow({
     required this.label,
     required this.amount,
-    this.emphasize = false,
-  });
+  }) : emphasize = false;
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +96,7 @@ class _SummaryRow extends StatelessWidget {
         Text(
           label,
           style: baseStyle.copyWith(
-            color: ColorManager.white.withOpacity(emphasize ? 1 : 0.9),
+            color: ColorManager.white.withValues(alpha: emphasize ? 1 : 0.9),
             fontSize: emphasize ? 16.sp : 14.sp,
           ),
         ),
@@ -145,7 +142,7 @@ class _CurrencyValue extends StatelessWidget {
           AssetsManager.saudiRiyalSymbol,
           width: emphasize ? 18.w : 16.w,
           height: emphasize ? 18.w : 16.w,
-          color: ColorManager.white,
+          colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
         ),
       ],
     );

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 
 class TabBarSharedWidget extends StatefulWidget {
   final TabController tabController;
@@ -10,12 +9,12 @@ class TabBarSharedWidget extends StatefulWidget {
   final List<Widget> tabWidget;
   final Function(int index) onTab;
   const TabBarSharedWidget({
-    Key? key,
+    super.key,
     required this.tabController,
     required this.currentTabIndex,
     required this.tabWidget,
     required this.onTab,
-  }) : super(key: key);
+  });
 
   @override
   State<TabBarSharedWidget> createState() => _TabBarSharedWidgetState();

@@ -15,19 +15,18 @@ import 'package:thewasher/shared/components/alert_helper/payment_add_card_succes
 import 'package:thewasher/shared/components/alert_helper/phone_already_exist.dart';
 import 'package:thewasher/shared/components/alert_helper/point_alert.dart';
 import 'package:thewasher/shared/components/alert_helper/rating_alert.dart';
-import 'package:thewasher/shared/components/alert_helper/saved_alert.dart';
 import 'package:thewasher/shared/components/alert_helper/success_save_location.dart';
 import 'package:thewasher/shared/components/alert_helper/update_car_alert.dart';
 import 'package:thewasher/shared/components/alert_helper/verification_code_done.dart';
 import 'package:thewasher/shared/components/alert_helper/wallet_topup_success.dart';
 
 class AlertHelper {
-  static verificationCodeDone(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> verificationCodeDone(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => const VerificationCodeDone());
 
-  static guestAlert(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> guestAlert(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) => const GuestAlert());
@@ -43,32 +42,32 @@ class AlertHelper {
   //             recent: recent,
   //             index: index));
 
-  static updateCarAlert(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> updateCarAlert(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => const UpdateCarAlert());
 
-  static deleteCarAlert(BuildContext context, String sId, int index) async =>
+  static Future<Future<dynamic>> deleteCarAlert(BuildContext context, String sId, int index) async =>
       showDialog(
           context: context,
           builder: (BuildContext context) =>
               DeleteCarAlert(sId: sId, index: index));
 
-  static clearPlaceAlert(
+  static Future<Future<dynamic>> clearPlaceAlert(
           BuildContext context, Function() delete, String title) async =>
       showDialog(
           context: context,
           builder: (BuildContext context) =>
               ClearPlaceAlert(delete: delete, name: title));
 
-  static pointAlert(
+  static Future<Future<dynamic>> pointAlert(
     BuildContext context,
   ) async =>
       showDialog(
           context: context,
           builder: (BuildContext context) => const PointAlert());
 
-  static confirmPhoneNumber({
+  static Future<Future<dynamic>> confirmPhoneNumber({
     required BuildContext context,
     required String phoneNumber,
     String? userName,
@@ -85,11 +84,11 @@ class AlertHelper {
                 comeFromSignUpScreen: comeFromSignUp,
               ));
 
-  static deleteUserAccount(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> deleteUserAccount(BuildContext context) async => showDialog(
       context: context,
       builder: (BuildContext context) => const DeleteUserAccount());
 
-  static phoneAlreadyExist(BuildContext context, String phone) async =>
+  static Future<Future<dynamic>> phoneAlreadyExist(BuildContext context, String phone) async =>
       showDialog(
           context: context,
           barrierDismissible: false,
@@ -97,7 +96,7 @@ class AlertHelper {
                 phoneNumber: phone,
               ));
 
-  static createSubscription(
+  static Future<Future<dynamic>> createSubscription(
           {required BuildContext context,
           required String planType,
           required double price,
@@ -112,15 +111,15 @@ class AlertHelper {
                 planId: planId,
               ));
 
-  static locationConfirmation(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> locationConfirmation(BuildContext context) async => showDialog(
       context: context,
       builder: (BuildContext context) => const LocationConfirmation());
 
-  static paymentAddCardSuccess(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> paymentAddCardSuccess(BuildContext context) async => showDialog(
       context: context,
       builder: (BuildContext context) => const PaymentAddCardSuccess());
 
-  static cancelBooking(BuildContext context, String orderId,
+  static Future<Future<dynamic>> cancelBooking(BuildContext context, String orderId,
           bool? comeFromWashDetails) async =>
       showDialog(
           context: context,
@@ -129,29 +128,29 @@ class AlertHelper {
                 comeFromWashDetails: comeFromWashDetails,
               ));
 
-  static userRatingOrder(BuildContext context, String orderId) async =>
+  static Future<Future<dynamic>> userRatingOrder(BuildContext context, String orderId) async =>
       showDialog(
           context: context,
           builder: (BuildContext context) => RatingOrderAlert(
                 orderId: orderId,
               ));
 
-  static feedbackSuccess(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> feedbackSuccess(BuildContext context) async => showDialog(
         context: context,
         barrierDismissible: false,
         builder: (BuildContext context) => const FeedbackSuccessSubmit(),
       );
-  static payWithWalletNotEnoughAmount(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> payWithWalletNotEnoughAmount(BuildContext context) async => showDialog(
         context: context,
         builder: (BuildContext context) => const PayWithWalletNotEnoughAmount(),
       );
 
-  static createOrderSuccess(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> createOrderSuccess(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => const OrderSuccess());
 
-  static successSavedLocation(BuildContext context,
+  static Future<Future<dynamic>> successSavedLocation(BuildContext context,
           {required String message}) async =>
       showDialog(
           context: context,
@@ -160,7 +159,7 @@ class AlertHelper {
                 message: message,
               ));
 
-  static walletTopupSuccess(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> walletTopupSuccess(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => const WalletTopupSuccess());

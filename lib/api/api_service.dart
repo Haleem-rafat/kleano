@@ -5,8 +5,8 @@ import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:thewasher/api/Interceptor.dart';
-import 'package:thewasher/api/api_path.dart';
 import 'package:thewasher/api/app_config.dart';
+import 'package:thewasher/flavors.dart';
 
 class ApiService {
   static final Dio _dio = _createDio();
@@ -15,10 +15,17 @@ class ApiService {
     final dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.getAppBaseUrl(),
+        // The backend can cold-start (Render), so allow a slow first response.
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 60),
       ),
     );
 
-    dio.interceptors.add(ChuckerDioInterceptor());
+    // HTTP inspector stores full requests (tokens, payments) on device:
+    // dev flavor only.
+    if (F.appFlavor == Flavor.DEV) {
+      dio.interceptors.add(ChuckerDioInterceptor());
+    }
 
     if (kDebugMode) {
       dio.interceptors.add(
@@ -58,21 +65,6 @@ class ApiService {
         contentType: isJson ? 'application/json' : 'multipart/form-data',
       ),
     );
-  }
-
-  static Future<Response> refreshToken(String refreshToken) async {
-    log('----------refresh Token called -------------');
-    var response = await _dio.post(
-      ApiPaths.refreshTokens,
-      options: Options(
-        extra: {"requiresAuth": false},
-        headers: {
-          "Authorization": 'Bearer $refreshToken',
-        },
-      ),
-    );
-
-    return response;
   }
 
   static Future<Response<T>?> deleteApi<T>(
@@ -135,9 +127,9 @@ class ApiService {
     final FormData formData = FormData();
     body.forEach((String key, dynamic value) {
       if (value is List) {
-        value.forEach((e) {
+        for (var e in value) {
           formData.fields.add(MapEntry<String, String>(key, e.toString()));
-        });
+        }
       } else {
         formData.fields.add(
           MapEntry<String, String>(key, value.toString()),
@@ -150,9 +142,9 @@ class ApiService {
         final String fileName = files[i].path.split('/').last;
         formData.files.add(
           MapEntry<String, MultipartFile>(
-            filesName![i] ?? fileName,
+            filesName?[i] ?? fileName,
             MultipartFile.fromFileSync(files[i].path,
-                filename: filesName[i] ?? fileName),
+                filename: filesName?[i] ?? fileName),
           ),
         );
       }
@@ -161,10 +153,8 @@ class ApiService {
     return await _dio.put<T>(
       path,
       data: formData,
-      options: Options(
-        extra: {"requiresAuth": isAuth},
-        contentType: isJson ? 'application/json' : 'multipart/form-data',
-      ),
+      // Dio sets multipart/form-data with the boundary for FormData bodies.
+      options: Options(extra: {"requiresAuth": isAuth}),
     );
   }
 
@@ -179,9 +169,9 @@ class ApiService {
     final FormData formData = FormData();
     body.forEach((String key, dynamic value) {
       if (value is List) {
-        value.forEach((e) {
+        for (var e in value) {
           formData.fields.add(MapEntry<String, String>(key, e.toString()));
-        });
+        }
       } else {
         formData.fields.add(
           MapEntry<String, String>(key, value.toString()),
@@ -194,9 +184,9 @@ class ApiService {
         final String fileName = files[i].path.split('/').last;
         formData.files.add(
           MapEntry<String, MultipartFile>(
-            filesName![i] ?? fileName,
+            filesName?[i] ?? fileName,
             MultipartFile.fromFileSync(files[i].path,
-                filename: filesName[i] ?? fileName),
+                filename: filesName?[i] ?? fileName),
           ),
         );
       }
@@ -205,10 +195,8 @@ class ApiService {
     return await _dio.post<T>(
       path,
       data: formData,
-      options: Options(
-        extra: {"requiresAuth": isAuth},
-        contentType: isJson ? 'application/json' : 'multipart/form-data',
-      ),
+      // Dio sets multipart/form-data with the boundary for FormData bodies.
+      options: Options(extra: {"requiresAuth": isAuth}),
     );
   }
 }

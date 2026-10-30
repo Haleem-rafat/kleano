@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
@@ -19,7 +20,7 @@ class VehiclesRepo {
         return VehiclesResponse(json: response.data, isList: true);
       }
     } catch (e) {
-      print('Error fetching vehicles: $e');
+      debugPrint('Error fetching vehicles: $e');
     }
     return null;
   }
@@ -36,7 +37,7 @@ class VehiclesRepo {
             .toList();
       }
     } catch (e) {
-      print('Error fetching car models: $e');
+      debugPrint('Error fetching car models: $e');
     }
     return <String>[];
   }
@@ -77,7 +78,7 @@ class VehiclesRepo {
         return Left(errorModel);
       }
     } catch (e) {
-      print('Error creating new car: $e');
+      debugPrint('Error creating new car: $e');
       // Handle DioException to extract error message from response
       if (e is DioException && e.response != null && e.response!.data != null) {
         final responseData = e.response!.data;
@@ -88,7 +89,7 @@ class VehiclesRepo {
                 ErrorModel.fromJson(responseData['message']);
             return Left(errorModel);
           } catch (parseError) {
-            print('Error parsing error message: $parseError');
+            debugPrint('Error parsing error message: $parseError');
           }
         }
       }
@@ -133,7 +134,7 @@ class VehiclesRepo {
         return Left(errorModel);
       }
     } catch (e) {
-      print('Error updating car: $e');
+      debugPrint('Error updating car: $e');
       // Handle DioException to extract error message from response
       if (e is DioException && e.response != null && e.response!.data != null) {
         final responseData = e.response!.data;
@@ -144,7 +145,7 @@ class VehiclesRepo {
                 ErrorModel.fromJson(responseData['message']);
             return Left(errorModel);
           } catch (parseError) {
-            print('Error parsing error message: $parseError');
+            debugPrint('Error parsing error message: $parseError');
           }
         }
       }
@@ -162,7 +163,7 @@ class VehiclesRepo {
         return true;
       }
     } catch (e) {
-      print('Error deleting car: $e');
+      debugPrint('Error deleting car: $e');
     }
     return false;
   }
@@ -179,7 +180,7 @@ class VehiclesRepo {
             .toList();
       }
     } catch (e) {
-      print('Error fetching car brands: $e');
+      debugPrint('Error fetching car brands: $e');
     }
     return <CarBrandsModel>[];
   }

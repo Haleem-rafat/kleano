@@ -14,7 +14,7 @@ class PlansAndSubscriptionRepo {
     required String country,
   }) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      '${AppShared.token.isNotEmpty ? ApiPaths.plansUserAll : ApiPaths.plansGuestAll}?latitude=$latitude&longitude=$longitude&country=$country',
+      '${AppShared.token.isNotEmpty ? ApiPaths.plansUserAll : ApiPaths.plansGuestAll}?latitude=${latitude.toStringAsFixed(6)}&longitude=${longitude.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}',
       isAuth: AppShared.token.isNotEmpty ? true : false,
     );
     return PlansResponse(
@@ -54,10 +54,9 @@ class PlansAndSubscriptionRepo {
         ApiPaths.paySubscription,
         isAuth: true,
         body: {
-          if (applePayId != null) "applePayId": applePayId,
+          "applePayId": ?applePayId,
           'subscription': subscriptionId,
-          if (paymentDetailsRequest != null)
-            'paymentDetails': paymentDetailsRequest,
+          'paymentDetails': ?paymentDetailsRequest,
         });
     return BaseResponseWithoutResponse(
       statusCode: response!.statusCode!,
@@ -71,7 +70,7 @@ class PlansAndSubscriptionRepo {
     required String country,
   }) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      '${ApiPaths.subscriptionsUserLocation}?latitude=$latitude&longitude=$longitude&country=$country',
+      '${ApiPaths.subscriptionsUserLocation}?latitude=${latitude.toStringAsFixed(6)}&longitude=${longitude.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}',
       isAuth: true,
     );
     return SubscriptionResponse(

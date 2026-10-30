@@ -1,9 +1,7 @@
-import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
-import 'package:meta/meta.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/vehicles_model.dart';
 import 'package:thewasher/modules/my_vehicles/data/response/vehicles_response.dart';
 import 'package:thewasher/repository/vehicles_repo.dart';
@@ -19,7 +17,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
   VehiclesBloc() : super(VehiclesInitial()) {
     on<GetVehicles>((GetVehicles event, Emitter<VehiclesState> emit) async {
       try {
-        print("Get All Vehicles");
+        debugPrint("Get All Vehicles");
         emit(GetVehiclesLoading());
         final VehiclesResponse? response = await VehiclesRepo.getVehicles();
         if (response!.success) {
@@ -41,7 +39,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
 
     on<CreateNewCar>((CreateNewCar event, Emitter<VehiclesState> emit) async {
       try {
-        print("Create Car ");
+        debugPrint("Create Car ");
         emit(CreateNewCarLoading());
         final Either<ErrorModel, bool> response =
             await VehiclesRepo.createNewCar(event.brand, event.model,
@@ -60,7 +58,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
 
     on<UpdateCar>((UpdateCar event, Emitter<VehiclesState> emit) async {
       try {
-        print("Update Car ");
+        debugPrint("Update Car ");
         emit(UpdateCarLoading());
         final Either<ErrorModel, bool> response = await VehiclesRepo.updateCar(
             event.id,
@@ -84,7 +82,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
 
     on<DeleteCar>((DeleteCar event, Emitter<VehiclesState> emit) async {
       try {
-        print("Delete Car ");
+        debugPrint("Delete Car ");
         emit(DeleteCarLoading());
         final bool response = await VehiclesRepo.deleteCar(
           event.id,
@@ -106,7 +104,7 @@ class VehiclesBloc extends Bloc<VehiclesEvent, VehiclesState> {
 
     on<SelectCar>((SelectCar event, Emitter<VehiclesState> emit) async {
       try {
-        print("Select Car ");
+        debugPrint("Select Car ");
         emit(SelectCarLoading());
         selectedVehicle = event.vehicle;
         emit(SelectCarSuccess());

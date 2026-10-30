@@ -5,9 +5,7 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/layout/component/circle_image.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/screens/user_profile_screen.dart';
-import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
-import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class AppBarUserPhoto extends StatelessWidget {

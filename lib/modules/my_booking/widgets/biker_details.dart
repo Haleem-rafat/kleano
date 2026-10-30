@@ -32,7 +32,7 @@ class BikerDetails extends StatelessWidget {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -47,7 +47,7 @@ class BikerDetails extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.w),
                 decoration: BoxDecoration(
-                  color: ColorManager.primary.withOpacity(0.1),
+                  color: ColorManager.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8.r),
                 ),
                 child: Icon(
@@ -74,12 +74,12 @@ class BikerDetails extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: ColorManager.primary.withOpacity(0.3),
+                    color: ColorManager.primary.withValues(alpha: 0.3),
                     width: 2,
                   ),
                   // boxShadow: [
                   //   BoxShadow(
-                  //     color: ColorManager.primary.withOpacity(0.2),
+                  //     color: ColorManager.primary.withValues(alpha: 0.2),
                   //     blurRadius: 8,
                   //     offset: const Offset(0, 2),
                   //   ),
@@ -172,10 +172,10 @@ class BikerDetails extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: ColorManager.primary.withOpacity(0.05),
+                color: ColorManager.primary.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: ColorManager.primary.withOpacity(0.2),
+                  color: ColorManager.primary.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -184,7 +184,7 @@ class BikerDetails extends StatelessWidget {
                   Container(
                     padding: EdgeInsets.all(8.w),
                     decoration: BoxDecoration(
-                      color: ColorManager.primary.withOpacity(0.1),
+                      color: ColorManager.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8.r),
                     ),
                     child: Icon(
@@ -300,15 +300,15 @@ class BikerDetails extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: 16.w),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
           border: Border.all(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             width: 1.5,
           ),
           // boxShadow: [
           //   BoxShadow(
-          //     color: color.withOpacity(0.1),
+          //     color: color.withValues(alpha: 0.1),
           //     blurRadius: 8,
           //     offset: const Offset(0, 2),
           //   ),
@@ -322,7 +322,7 @@ class BikerDetails extends StatelessWidget {
                 AssetsManager.whatsappIcon,
                 height: 20.h,
                 width: 20.w,
-                color: color,
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
               )
             else
               Icon(

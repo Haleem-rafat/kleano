@@ -8,14 +8,13 @@ import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
 import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class UpdateCarAlert extends StatelessWidget {
-  const UpdateCarAlert({Key? key}) : super(key: key);
+  const UpdateCarAlert({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +29,7 @@ class UpdateCarAlert extends StatelessWidget {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

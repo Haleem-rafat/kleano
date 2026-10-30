@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
@@ -89,16 +90,15 @@ class AppShared {
   }
 
   static bool isTokenExpired(String token) {
-    print(token);
-    var expDate = JwtDecoder.getExpirationDate(token);
-
-    bool isExpired =
-        expDate.isBefore(DateTime.now().add(const Duration(minutes: 1)))
-            ? true
-            : false;
-
-    return isExpired;
+    // Treat unreadable tokens as expired so they get refreshed, not crash.
+    try {
+      return JwtDecoder.getExpirationDate(token)
+          .isBefore(DateTime.now().add(const Duration(minutes: 1)));
+    } catch (_) {
+      return true;
+    }
   }
+
 
   static Future<void> setCountry(String newLang) async {
     AppShared.country = newLang;
@@ -110,6 +110,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesCountry);
     if (result != null) country = result;
+    return result;
   }
 
   /// Clears all local storage data and resets app state.
@@ -185,7 +186,7 @@ class AppShared {
       sl<MyBookingBloc>();
     } catch (e) {
       // Handle any errors when resetting BLoC states
-      print('Error resetting BLoC states: $e');
+      debugPrint('Error resetting BLoC states: $e');
     }
   }
 
@@ -195,7 +196,7 @@ class AppShared {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.remove('selected_locale');
     } catch (e) {
-      print('Error clearing localization preferences: $e');
+      debugPrint('Error clearing localization preferences: $e');
     }
   }
 }

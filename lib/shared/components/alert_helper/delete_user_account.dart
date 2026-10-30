@@ -10,7 +10,6 @@ import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/on_boarding/choose_register.dart';
 import 'package:thewasher/modules/profile/blocs/delete_user_account/delete_user_account_bloc.dart';
 import 'package:thewasher/shared/components/buttons.dart';
@@ -20,7 +19,7 @@ import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class DeleteUserAccount extends StatefulWidget {
-  const DeleteUserAccount({Key? key}) : super(key: key);
+  const DeleteUserAccount({super.key});
 
   @override
   State<DeleteUserAccount> createState() => _DeleteUserAccountState();
@@ -47,7 +46,7 @@ class _DeleteUserAccountState extends State<DeleteUserAccount> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

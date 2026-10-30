@@ -11,9 +11,9 @@ import 'package:thewasher/utilties/navigator.dart';
 class PhoneAlreadyExist extends StatefulWidget {
   final String phoneNumber;
   const PhoneAlreadyExist({
-    Key? key,
+    super.key,
     required this.phoneNumber,
-  }) : super(key: key);
+  });
 
   @override
   State<PhoneAlreadyExist> createState() => _PhoneAlreadyExistState();
@@ -33,7 +33,7 @@ class _PhoneAlreadyExistState extends State<PhoneAlreadyExist> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

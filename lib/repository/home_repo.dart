@@ -1,10 +1,8 @@
-import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:thewasher/api/api_path.dart';
 import 'package:thewasher/api/api_service.dart';
 import 'package:thewasher/modules/Home/data/response/add_ons_response.dart';
 import 'package:thewasher/modules/Home/data/response/banner_response.dart';
-import 'package:thewasher/modules/Home/data/response/recent_location_response.dart';
 import 'package:thewasher/modules/Home/data/response/saved_location_response.dart';
 import 'package:thewasher/modules/Home/data/response/services_response.dart';
 
@@ -86,7 +84,7 @@ class HomeRepo {
   static Future<ServicesResponse> getServices(
       double lat, double lng, String country, String? serviceType) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      "${ApiPaths.washingServices}/all?latitude=$lat&longitude=$lng&country=$country&type=$serviceType",
+      "${ApiPaths.washingServices}/all?latitude=${lat.toStringAsFixed(6)}&longitude=${lng.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}${serviceType != null ? '&type=$serviceType' : ''}",
       isAuth: true,
     );
 
@@ -99,7 +97,7 @@ class HomeRepo {
   static Future<AddOnsResponse> getAddOns(
       double lat, double lng, String country) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      "${ApiPaths.washingAddOns}/all?latitude=$lat&longitude=$lng&country=$country",
+      "${ApiPaths.washingAddOns}/all?latitude=${lat.toStringAsFixed(6)}&longitude=${lng.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}",
       isAuth: true,
     );
 
@@ -112,7 +110,8 @@ class HomeRepo {
   static Future<ServicesResponse> getGuestServices(
       double lat, double lng, String country) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      "${ApiPaths.washingGuestServices}/all?latitude=$lat&longitude=$lng&country=$country",
+      "${ApiPaths.washingGuestServices}/all?latitude=${lat.toStringAsFixed(6)}&longitude=${lng.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}",
+      isAuth: false,
     );
 
     return ServicesResponse(
@@ -124,7 +123,8 @@ class HomeRepo {
   static Future<AddOnsResponse> getGuestAddOns(
       double lat, double lng, String country) async {
     final Response<dynamic>? response = await ApiService.getApi(
-      "${ApiPaths.washingGuestAddOns}/all?latitude=$lat&longitude=$lng&country=$country",
+      "${ApiPaths.washingGuestAddOns}/all?latitude=${lat.toStringAsFixed(6)}&longitude=${lng.toStringAsFixed(6)}&country=${Uri.encodeQueryComponent(country)}",
+      isAuth: false,
     );
 
     return AddOnsResponse(

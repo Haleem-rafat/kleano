@@ -18,7 +18,7 @@ import 'package:thewasher/utilties/navigator.dart';
 
 class ChooseRegisterView extends StatefulWidget {
   // bool comeFromMain;
-  ChooseRegisterView({super.key,});
+  const ChooseRegisterView({super.key,});
 
   @override
   State<ChooseRegisterView> createState() => _ChooseRegisterViewState();
@@ -47,8 +47,8 @@ class _ChooseRegisterViewState extends State<ChooseRegisterView> {
           children: <Widget>[
             Image.asset(
               AssetsManager.onBoardingFour,
-              height: AppSize.s812.h,
-              width: AppSize.s375.w,
+              height: 1.sh,
+              width: 1.sw,
               gaplessPlayback: true,
               fit: BoxFit.cover,
             ),
@@ -101,7 +101,7 @@ class _ChooseRegisterViewState extends State<ChooseRegisterView> {
                     },
                     text: translate(AppStrings.login),
                     colorBorder: ColorManager.secondary,
-                    colorButton: ColorManager.secondary.withOpacity(.050),
+                    colorButton: ColorManager.secondary.withValues(alpha: .050),
                     colorText: ColorManager.white,
                     showShadow: false,
                   ),

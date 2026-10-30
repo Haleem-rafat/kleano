@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
@@ -10,7 +9,6 @@ import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/points/bloc/point_bloc.dart';
 import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/toggle_shared.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
 class UsingPoints extends StatefulWidget {
@@ -56,8 +54,8 @@ class _UsingPointsState extends State<UsingPoints> {
         if (state is PointLoading) {
           return const LoadingWidget();
         } else if (state is PointLoaded) {
-          checkPoints = sl<PointBloc>.call().pointResponse.points! >=
-              sl<PointBloc>.call().pointResponse.redeemLimit!;
+          checkPoints = sl.call<PointBloc>.call().pointResponse.points! >=
+              sl.call<PointBloc>.call().pointResponse.redeemLimit!;
           return checkPoints
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,7 +76,7 @@ class _UsingPointsState extends State<UsingPoints> {
                               .copyWith(color: ColorManager.darkGrey),
                         ),
                         Text(
-                          '${sl<PointBloc>.call().pointResponse.points!} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
+                          '${sl.call<PointBloc>.call().pointResponse.points!} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
                           style: AppStyles.body14Medium
                               .copyWith(color: ColorManager.darkGrey),
                         ),
@@ -87,13 +85,13 @@ class _UsingPointsState extends State<UsingPoints> {
                           ignoring: checkPoints ? false : true,
                           child: CupertinoSwitch(
                             value: toggleSelected,
-                            activeColor: ColorManager.secondary,
+                            activeTrackColor: ColorManager.secondary,
                             onChanged: (bool value) {
                               setState(() {
                                 toggleSelected = value;
                               });
                               if (value == true) {
-                                sl<PointBloc>.call().add(ApplyPoints(
+                                sl.call<PointBloc>.call().add(ApplyPoints(
                                   orderId: widget.orderId,
                                 ));
                               }
@@ -137,13 +135,13 @@ class _UsingPointsState extends State<UsingPoints> {
                         ignoring: checkPoints ? true : false,
                         child: CupertinoSwitch(
                           value: toggleSelected,
-                          activeColor: ColorManager.secondary,
+                          activeTrackColor: ColorManager.secondary,
                           onChanged: (bool value) {
                             setState(() {
                               toggleSelected = value;
                             });
                             if (value == true) {
-                              sl<PointBloc>.call().add(ApplyPoints(
+                              sl.call<PointBloc>.call().add(ApplyPoints(
                                 orderId: widget.orderId,
                               ));
                             }

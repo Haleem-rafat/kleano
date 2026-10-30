@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
@@ -73,7 +72,7 @@ class _TrackingOrderMainScreenState extends State<TrackingOrderMainScreen> {
             parallaxOffset: .3,
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: ColorManager.black.withOpacity(.12),
+                color: ColorManager.black.withValues(alpha: .12),
                 blurRadius: 2.r,
                 offset: const Offset(0, 0),
               )
@@ -94,7 +93,7 @@ class _TrackingOrderMainScreenState extends State<TrackingOrderMainScreen> {
                       widget.orderModel!.biker!.longitude ?? 0.0,
                     ),
               orderLocation: widget.orderModel!.location ??
-                  sl<BookingOrderBloc>.call().orderLocation,
+                  sl.call<BookingOrderBloc>.call().orderLocation,
             ),
             borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20.w),

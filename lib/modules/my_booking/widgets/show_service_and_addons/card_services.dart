@@ -122,7 +122,7 @@ class _CardServicesState extends State<CardServices>
                     children: <Widget>[
                       SvgPicture.asset(
                         AssetsManager.timeIconLogo,
-                        color: ColorManager.black,
+                        colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
                       ),
                       AppPadding.p12.pw,
                       Text(
@@ -137,7 +137,7 @@ class _CardServicesState extends State<CardServices>
                     children: <Widget>[
                       SvgPicture.asset(
                         AssetsManager.serviceCoinSvg,
-                        color: ColorManager.black,
+                        colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
                       ),
                       AppPadding.p12.pw,
                       Row(

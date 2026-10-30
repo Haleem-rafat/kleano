@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:moyasar/moyasar.dart';
 import 'package:thewasher/core/config/api_keys.dart';
-import 'package:thewasher/core/services/moyasar_services.dart';
-import 'package:thewasher/flavors.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
@@ -60,16 +58,16 @@ class ApplePayService {
               ),
             ),
             onPaymentResult: (result) async {
-              print("Apple Pay Result: $result");
+              debugPrint("Apple Pay Result: $result");
 
               if (result is UnprocessableTokenError) {
-                print("Apple Pay Error: ${result.message}");
+                debugPrint("Apple Pay Error: ${result.message}");
                 onPaymentError(result.message);
               } else if (result is PaymentResponse) {
-                print("Apple Pay Success: ${result.id}");
+                debugPrint("Apple Pay Success: ${result.id}");
                 onPaymentSuccess(result.id);
               } else {
-                print("Apple Pay Cancelled or Failed");
+                debugPrint("Apple Pay Cancelled or Failed");
                 onPaymentError('Payment was cancelled or failed');
               }
             },

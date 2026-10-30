@@ -36,8 +36,9 @@ class CardValidator {
 
   static String? validateCVC(String? input) {
     if (input == null || input.isEmpty) return 'CVC is required';
-    if (input.length < 3 || input.length > 4)
+    if (input.length < 3 || input.length > 4) {
       return 'CVC must be 3 or 4 digits';
+    }
     return null;
   }
 

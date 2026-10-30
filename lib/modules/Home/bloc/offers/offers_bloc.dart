@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:thewasher/modules/Home/data/model/add_ons_model.dart';
@@ -35,7 +36,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
   OffersBloc() : super(OffersInitial()) {
     // on<GetServices>((GetServices event, Emitter<OffersState> emit) async {
     //   try {
-    //     print("get User Services ...");
+    //     debugPrint("get User Services ...");
     //     emit(GetServicesLoading());
     //     final ServicesResponse response = await HomeRepo.getServices(
     //       event.lat,
@@ -80,7 +81,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
       emit(GetServicesLoading());
 
       try {
-        print("get User Services ...");
+        debugPrint("get User Services ...");
         final ServicesResponse response = await HomeRepo.getServices(
           event.lat,
           event.lng,
@@ -117,7 +118,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     });
     on<GetAddOns>((GetAddOns event, Emitter<OffersState> emit) async {
       try {
-        print("get User Add Ons ...");
+        debugPrint("get User Add Ons ...");
         emit(GetAddOnsLoading());
         final AddOnsResponse response = await HomeRepo.getAddOns(
           event.lat,
@@ -175,7 +176,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     });
     on<AddExtraCart>((AddExtraCart event, Emitter<OffersState> emit) async {
       try {
-        print("Add Extra to  Cart ...");
+        debugPrint("Add Extra to  Cart ...");
         emit(AddExtraCartLoading());
         cartAddOnsList.add(event.extra);
         cartAddOnsListString.add(event.extra.sId!);
@@ -189,7 +190,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     on<DeleteServiceCart>(
         (DeleteServiceCart event, Emitter<OffersState> emit) async {
       try {
-        print("Delete Service from Cart ...");
+        debugPrint("Delete Service from Cart ...");
         emit(DeleteServiceCartLoading());
         cartServicesList.removeAt(event.index);
         cartServicesListString.removeAt(event.index);
@@ -203,7 +204,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     on<DeleteExtraCart>(
         (DeleteExtraCart event, Emitter<OffersState> emit) async {
       try {
-        print("Delete Extra from Cart ...");
+        debugPrint("Delete Extra from Cart ...");
         emit(DeleteExtraCartLoading());
         cartAddOnsList.removeAt(event.index);
         cartAddOnsListString.removeAt(event.index);
@@ -216,7 +217,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
 
     on<ClearCart>((ClearCart event, Emitter<OffersState> emit) async {
       try {
-        print("Clere Cart ...");
+        debugPrint("Clere Cart ...");
         emit(ClearCartLoading());
         cartServicesList.clear();
         cartAddOnsList.clear();
@@ -232,7 +233,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     on<ClearAllSelectedServices>(
         (ClearAllSelectedServices event, Emitter<OffersState> emit) async {
       try {
-        print("Clear All Selected Services ...");
+        debugPrint("Clear All Selected Services ...");
         emit(ClearAllSelectedServicesLoading());
         cartServicesList.clear();
         cartServicesListString.clear();
@@ -248,7 +249,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
     on<GetGuestServices>(
         (GetGuestServices event, Emitter<OffersState> emit) async {
       try {
-        print("get Guest Services ...");
+        debugPrint("get Guest Services ...");
         emit(GetGuestServicesLoading());
         final ServicesResponse response = await HomeRepo.getGuestServices(
           event.lat,
@@ -286,7 +287,7 @@ class OffersBloc extends Bloc<OffersEvent, OffersState> {
 
     on<GetGuestAddOns>((GetGuestAddOns event, Emitter<OffersState> emit) async {
       try {
-        print("get Guest Add Ons ...");
+        debugPrint("get Guest Add Ons ...");
         emit(GetGuestAddOnsLoading());
         final AddOnsResponse response = await HomeRepo.getGuestAddOns(
           event.lat,

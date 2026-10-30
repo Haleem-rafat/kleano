@@ -2,19 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:thewasher/modules/Home/screens/saved_screen.dart';
-import 'package:thewasher/shared/services/service_locator.dart';
-import 'package:thewasher/utilties/navigator.dart';
 
 class SearchModel extends StatelessWidget {
   String currentAddress;
@@ -25,7 +17,7 @@ class SearchModel extends StatelessWidget {
   String subAdministrativeArea;
   String country;
   SearchModel({
-    Key? key,
+    super.key,
     required this.currentAddress,
     required this.controller,
     required this.onTap,
@@ -33,7 +25,7 @@ class SearchModel extends StatelessWidget {
     required this.currentPosition,
     required this.subAdministrativeArea,
     required this.country,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +34,7 @@ class SearchModel extends StatelessWidget {
         // Container(
         //   width: 343.w,
         //   decoration: BoxDecoration(
-        //       color: ColorManager.divider.withOpacity(0.23),
+        //       color: ColorManager.divider.withValues(alpha: 0.23),
         //       borderRadius: BorderRadius.only(
         //         topLeft: Radius.circular(12.r),
         //         topRight: Radius.circular(12.r),
@@ -172,7 +164,7 @@ class SearchModel extends StatelessWidget {
           child: Container(
             width: 343.w,
             decoration: BoxDecoration(
-              color: ColorManager.divider.withOpacity(0.23),
+              color: ColorManager.divider.withValues(alpha: 0.23),
             ),
             padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 9.h),
             child: Row(

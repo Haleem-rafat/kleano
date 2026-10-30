@@ -27,7 +27,7 @@ class SetBookingLocationScreen extends StatefulWidget {
 
 class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
   GoogleMapController? _mapController;
-  Set<Marker> _markers = {};
+  final Set<Marker> _markers = {};
   LatLng _selectedLocation =
       const LatLng(24.7136, 46.6753); // Default Riyadh coordinates
   AddressModel? _selectedAddress;
@@ -160,7 +160,7 @@ class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
               borderRadius: BorderRadius.circular(12.r),
               boxShadow: [
                 BoxShadow(
-                  color: ColorManager.black.withOpacity(0.1),
+                  color: ColorManager.black.withValues(alpha: 0.1),
                   blurRadius: 8.r,
                   offset: const Offset(0, 2),
                 ),
@@ -215,7 +215,7 @@ class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
             decoration: BoxDecoration(
               color: ColorManager.white,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: ColorManager.darkGrey.withOpacity(0.3)),
+              border: Border.all(color: ColorManager.darkGrey.withValues(alpha: 0.3)),
             ),
             child: Row(
               children: [
@@ -324,9 +324,9 @@ class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
       width: 100.w,
       margin: EdgeInsets.only(right: AppPadding.p12.w),
       decoration: BoxDecoration(
-        color: ColorManager.primary.withOpacity(0.1),
+        color: ColorManager.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: ColorManager.primary.withOpacity(0.3)),
+        border: Border.all(color: ColorManager.primary.withValues(alpha: 0.3)),
       ),
       child: Material(
         color: Colors.transparent,
@@ -369,9 +369,9 @@ class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
       decoration: BoxDecoration(
         color: location.isDefault == true
             ? ColorManager.primary
-            : ColorManager.darkGrey.withOpacity(0.1),
+            : ColorManager.darkGrey.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: ColorManager.darkGrey.withOpacity(0.3)),
+        border: Border.all(color: ColorManager.darkGrey.withValues(alpha: 0.3)),
       ),
       child: Material(
         color: Colors.transparent,

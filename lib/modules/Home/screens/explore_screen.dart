@@ -22,7 +22,7 @@ import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({Key? key}) : super(key: key);
+  const ExploreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class ExploreScreen extends StatelessWidget {
                 height: 152.h,
                 width: 334.w,
                 decoration: BoxDecoration(
-                  color: ColorManager.primary.withOpacity(0.3),
+                  color: ColorManager.primary.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Stack(
@@ -80,7 +80,7 @@ class ExploreScreen extends StatelessWidget {
                                     pushPage(
                                       context,
                                       PlansAndSubscriptionScreen(
-                                        profile: sl<GetUserProfileBloc>.call()
+                                        profile: sl.call<GetUserProfileBloc>.call()
                                             .profile,
                                       ),
                                     );
@@ -154,7 +154,7 @@ class ExploreScreen extends StatelessWidget {
             AppPadding.p12.ph,
             SizedBox(
               height: 185.h,
-              width: 375.w,
+              width: 1.sw,
               child: const ServicesWidget(),
             ),
             AppPadding.p24.ph,
@@ -169,7 +169,7 @@ class ExploreScreen extends StatelessWidget {
             AppPadding.p12.ph,
             SizedBox(
               height: 182.h,
-              width: 375.w,
+              width: 1.sw,
               child: BlocConsumer<OffersBloc, OffersState>(
                 bloc: sl<OffersBloc>(),
                 listener: (context, state) {},
@@ -199,7 +199,7 @@ class ExploreScreen extends StatelessWidget {
                                       : ColorManager.white),
                               boxShadow: <BoxShadow>[
                                 BoxShadow(
-                                    color: ColorManager.black.withOpacity(.12),
+                                    color: ColorManager.black.withValues(alpha: .12),
                                     blurRadius: 2.r,
                                     offset: const Offset(0, 0))
                               ]),
@@ -335,12 +335,12 @@ class ExploreScreen extends StatelessWidget {
           ? null
           : Container(
               height: 104.h,
-              width: 375.w,
+              width: 1.sw,
               decoration: BoxDecoration(
                   color: ColorManager.white,
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                        color: ColorManager.black.withOpacity(.16),
+                        color: ColorManager.black.withValues(alpha: .16),
                         blurRadius: 10.r,
                         offset: const Offset(0, 3))
                   ]),

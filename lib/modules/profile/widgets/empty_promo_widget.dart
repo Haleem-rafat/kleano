@@ -9,7 +9,7 @@ import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 
 class EmptyPromoWidget extends StatelessWidget {
-  const EmptyPromoWidget({Key? key}) : super(key: key);
+  const EmptyPromoWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,7 @@ class EmptyPromoWidget extends StatelessWidget {
         children: <Widget>[
           SvgPicture.asset(
             AssetsManager.emptyPromo,
-            color: ColorManager.black,
+            colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
           ),
           AppPadding.p30.ph,
           Text(

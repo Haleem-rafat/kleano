@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
-updateUserLocation({
+void updateUserLocation({
   required String latitude,
   required String longitude,
   required String streetName,

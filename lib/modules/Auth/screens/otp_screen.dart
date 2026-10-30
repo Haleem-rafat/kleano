@@ -58,7 +58,7 @@ class _OtpScreenState extends State<OtpScreen> {
     _timerCounter();
   }
 
-  _timerCounter() {
+  void _timerCounter() {
     countdownTimerController = CountdownTimerController(
       endTime: DateTime.now()
           .add(const Duration(seconds: 120))
@@ -89,9 +89,8 @@ class _OtpScreenState extends State<OtpScreen> {
             ? const ArrowBackShared()
             : null,
       ),
-      body: WillPopScope(
-        onWillPop:
-            countdownTimerController.isRunning ? () async => false : null,
+      body: PopScope(
+        canPop: !countdownTimerController.isRunning,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,

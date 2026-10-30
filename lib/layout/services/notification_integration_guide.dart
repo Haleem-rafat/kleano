@@ -58,7 +58,7 @@ class NotificationIntegrationGuide {
     final notificationManager = NotificationManagerService();
     final pendingNotifications =
         await notificationManager.getPendingNotifications();
-    print('Pending notifications: ${pendingNotifications.length}');
+    debugPrint('Pending notifications: ${pendingNotifications.length}');
   }
 
   // Example 8: Integration in booking flow

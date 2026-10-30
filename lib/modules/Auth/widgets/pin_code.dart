@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -8,60 +7,62 @@ import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 
-class PinCodeWidget extends StatelessWidget {
+class PinCodeWidget extends StatefulWidget {
   final TextEditingController codeController;
   final Function(String) onCompleted;
   const PinCodeWidget({
     super.key,
     required this.codeController,
     required this.onCompleted,
-    });
+  });
+
+  @override
+  State<PinCodeWidget> createState() => _PinCodeWidgetState();
+}
+
+class _PinCodeWidgetState extends State<PinCodeWidget> {
+  late final PinInputController _pinController =
+      PinInputController(textController: widget.codeController);
+
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
-             textDirection: TextDirection.ltr,
-             child: PinCodeTextField(
-               appContext: context,
-               length: 6,
-               obscuringCharacter: '*',
-               animationType: AnimationType.fade,
-               validator: (String? v) {
-                 if (v!.length < 6) {
-                   return translate(AppStrings.pinCode);
-                 } else {
-                   return null;
-                 }
-               },
-               pinTheme: PinTheme(
-                   shape: PinCodeFieldShape.box,
-                   borderRadius: BorderRadius.circular(10.r),
-                   fieldHeight: 60.h,
-                   fieldWidth: 50.w,
-                   selectedColor: ColorManager.primary,
-                   activeColor: ColorManager.primaryLight,
-                   activeFillColor: ColorManager.primaryLight,
-                   inactiveFillColor: ColorManager.white,
-                   selectedFillColor: ColorManager.white,
-                   inactiveColor: ColorManager.primaryLight),
-               cursorColor: Colors.black,
-               animationDuration:
-                   const Duration(milliseconds: 300),
-               hintCharacter: "_",
-               textStyle: AppStyles.headlines24Regular,
-               enableActiveFill: true,
-               controller: codeController,
-               keyboardType: TextInputType.number,
-               inputFormatters: <TextInputFormatter>[
-                 FilteringTextInputFormatter.allow(
-                     RegExp(r'[0-9]')),
-               ],
-               onCompleted: onCompleted,
-               onChanged: (String value) {},
-               beforeTextPaste: (String? text) {
-                 return true;
-               },
-             ),
-       );
+      textDirection: TextDirection.ltr,
+      child: MaterialPinFormField(
+        length: 6,
+        pinController: _pinController,
+        keyboardType: TextInputType.number,
+        enableAutofill: true,
+        autofillHints: const <String>[AutofillHints.oneTimeCode],
+        hintCharacter: '_',
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.digitsOnly,
+        ],
+        validator: (String? v) =>
+            (v ?? '').length < 6 ? translate(AppStrings.pinCode) : null,
+        onCompleted: widget.onCompleted,
+        theme: MaterialPinTheme(
+          shape: MaterialPinShape.outlined,
+          cellSize: Size(40.w, 45.h),
+          borderRadius: BorderRadius.circular(10.r),
+          fillColor: ColorManager.white,
+          focusedFillColor: ColorManager.white,
+          filledFillColor: ColorManager.primaryLight,
+          borderColor: ColorManager.primaryLight,
+          focusedBorderColor: ColorManager.primary,
+          filledBorderColor: ColorManager.primaryLight,
+          textStyle: AppStyles.headlines24Regular,
+          cursorColor: Colors.black,
+          entryAnimation: MaterialPinAnimation.fade,
+          animationDuration: const Duration(milliseconds: 300),
+        ),
+      ),
+    );
   }
 }

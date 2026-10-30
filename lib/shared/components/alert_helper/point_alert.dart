@@ -8,7 +8,6 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/fonts_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/points/screens/point_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class PointAlert extends StatelessWidget {
@@ -30,7 +29,7 @@ class PointAlert extends StatelessWidget {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

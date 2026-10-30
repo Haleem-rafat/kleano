@@ -3,7 +3,6 @@ import 'package:thewasher/api/api_path.dart';
 import 'package:thewasher/api/api_service.dart';
 import 'package:thewasher/modules/booking/data/models/apply_promo_code_model.dart';
 import 'package:thewasher/modules/booking/data/response/apply_promo_code_response.dart';
-import 'package:thewasher/modules/booking/data/response/create_order_response.dart';
 import 'package:thewasher/modules/profile/data/responses/promo_code_response.dart';
 
 class PromoCodesRepo {

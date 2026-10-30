@@ -1,7 +1,7 @@
-import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:thewasher/core/design/adaptive_screen.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
@@ -31,6 +31,8 @@ import 'package:thewasher/layout/services/notification_manager_service.dart';
 final GlobalKey<NavigatorState> navigatorKeyAlice = GlobalKey<NavigatorState>();
 
 class App extends StatefulWidget {
+  const App({super.key});
+
   @override
   State<App> createState() => _AppState();
 }
@@ -54,9 +56,6 @@ class _AppState extends State<App> {
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthCubit>(
           create: (_) => AuthCubit(),
-        ),
-        BlocProvider<VehiclesBloc>(
-          create: (_) => VehiclesBloc(),
         ),
         BlocProvider<DeleteUserAccountBloc>(
           create: (BuildContext context) => DeleteUserAccountBloc(),
@@ -106,19 +105,24 @@ class _AppState extends State<App> {
       ],
       child: LocalizationProvider(
         state: LocalizationProvider.of(context).state,
-        child: ScreenUtilInit(
-            designSize: const Size(375, 812),
-            builder: (_, __) {
+        child: AdaptiveScreenUtil(
+            builder: (_) {
               return MaterialApp(
-                builder: (BuildContext context, Widget? novigator) {
+                navigatorKey: navigatorKeyAlice,
+                builder: (BuildContext context, Widget? navigator) {
                   return Theme(
-                    data: _buildAppTheme(context),
-                    child: novigator!,
+                    data: LiquidGlassTheme.apply(
+                      _buildAppTheme(context),
+                      primary: ColorManager.primary,
+                    ),
+                    child: BackdropGroup(
+                      child: LiquidGlassTheme.clampTextScale(
+                          context, FoldScope(child: SystemBarInset(child: navigator!))),
+                    ),
                   );
                 },
                 debugShowCheckedModeBanner: false,
                 title: F.title,
-                navigatorObservers: [ChuckerFlutter.navigatorObserver],
                 home: const SplashTwoScreen(),
                 localizationsDelegates: [
                   GlobalMaterialLocalizations.delegate,
@@ -140,7 +144,11 @@ class _AppState extends State<App> {
     String fontFamily = lang == 'ar' ? 'Cairo' : 'Roboto';
 
     return ThemeData(
-      primarySwatch: Colors.cyan,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: ColorManager.primary,
+        primary: ColorManager.primary,
+        surface: ColorManager.white,
+      ),
       primaryColor: ColorManager.primary,
       scaffoldBackgroundColor: ColorManager.white,
       fontFamily: fontFamily,
@@ -154,11 +162,6 @@ class _AppState extends State<App> {
         backgroundColor: ColorManager.white,
         headerBackgroundColor: ColorManager.white,
         todayBackgroundColor: WidgetStateProperty.all(ColorManager.primary),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: ColorManager.white,
-        surfaceTintColor: ColorManager.white,
-        modalBackgroundColor: ColorManager.white,
       ),
     );
   }

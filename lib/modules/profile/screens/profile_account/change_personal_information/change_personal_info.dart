@@ -150,7 +150,7 @@ class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
     );
   }
 
-  validationSaveButton() {
+  void validationSaveButton() {
     if (widget.user.gender == null || widget.user.gender == '---') {
       if (_signUpFormKey.currentState!.validate()) {
         if (((nameText.trim().isNotEmpty) || (emailText.trim().isNotEmpty)) &&

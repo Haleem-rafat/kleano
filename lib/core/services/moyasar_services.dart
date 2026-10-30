@@ -76,7 +76,7 @@ class MoyasarService {
         'type': 'applepay',
         'token': paymentToken,
       },
-      if (metadata != null) 'metadata': metadata,
+      'metadata': ?metadata,
     };
 
     final response = await http.post(

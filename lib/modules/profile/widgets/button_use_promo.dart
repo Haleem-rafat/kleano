@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/fonts_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/profile/blocs/promo_code/promo_bloc.dart';
 import 'package:thewasher/modules/profile/data/models/promo_code_model.dart';
@@ -35,7 +34,7 @@ class ButtonUsePromoCode extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             myState(() {
-              sl<PromoBloc>.call().code = promoCodeModel.code!;
+              sl.call<PromoBloc>.call().code = promoCodeModel.code!;
               copiedPromoCode = CopyPromoCode(
                   promoCode: promoCodeModel.code!, id: promoCodeModel.sId!);
               HapticFeedback.heavyImpact();

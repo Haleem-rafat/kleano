@@ -42,7 +42,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         } else {
           emit(NotificationsFailed(error: response.message));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(NotificationsConnectionError());
         } else {
@@ -73,7 +73,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         } else {
           emit(NotificationsSuccess(notifications: <Notifications>[]));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(NotificationsConnectionError());
         } else {

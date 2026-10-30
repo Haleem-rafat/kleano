@@ -78,8 +78,8 @@ class _SplashScreenState extends State<SplashScreen>
         body: Stack(
           children: [
             SizedBox(
-              height: AppSize.s812.h,
-              width: AppSize.s375.w,
+              height: 1.sh,
+              width: 1.sw,
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 500),
                 switchInCurve: Curves.easeInOut,

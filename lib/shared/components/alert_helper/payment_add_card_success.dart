@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -10,19 +9,10 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/layout/main_navigation_screen.dart';
-import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
-import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
-import 'package:thewasher/modules/Home/data/model/piked_model.dart';
-import 'package:thewasher/modules/booking/screens/booking_main_screen.dart';
-import 'package:thewasher/modules/plans_and_subscription/bloc/plans_and_subscription/plans_and_subscription_bloc.dart';
-import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/utilties/navigator.dart';
-import 'package:thewasher/shared/services/service_locator.dart';
 
 class PaymentAddCardSuccess extends StatefulWidget {
-  const PaymentAddCardSuccess({Key? key}) : super(key: key);
+  const PaymentAddCardSuccess({super.key});
 
   @override
   State<PaymentAddCardSuccess> createState() => _PaymentAddCardSuccessState();
@@ -48,7 +38,7 @@ class _PaymentAddCardSuccessState extends State<PaymentAddCardSuccess> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     // PickedLocationModel location = sl<LocationBloc>.call().pickedLocationModel;
 
     return StatefulBuilder(
@@ -112,7 +102,7 @@ class _PaymentAddCardSuccessState extends State<PaymentAddCardSuccess> {
                   //     }
                   //     return ButtonsShared(
                   //       onPressed: () {
-                  //         print(
+                  //         debugPrint(
                   //             'isSubscribed!!!!!!!: ${profileState.userProfile.data!.isSubscribed}');
                   //         if (profileState.userProfile.data!.isSubscribed!) {
                   //           sl<PlansAndSubscriptionBloc>.call()
@@ -218,7 +208,7 @@ class _PaymentAddCardSuccessState extends State<PaymentAddCardSuccess> {
     //                         }
     //                         return ButtonsShared(
     //                           onPressed: () {
-    //                             print(
+    //                             debugPrint(
     //                                 'isSubscribed!!!!!!!: ${profileState.userProfile.data!.isSubscribed}');
     //                             if (profileState
     //                                 .userProfile.data!.isSubscribed!) {

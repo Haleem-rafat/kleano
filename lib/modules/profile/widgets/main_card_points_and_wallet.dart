@@ -32,7 +32,7 @@ class MainCardPointsAndWallet extends StatelessWidget {
               borderRadius: BorderRadius.circular(15.r),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                    color: ColorManager.black.withOpacity(.05),
+                    color: ColorManager.black.withValues(alpha: .05),
                     blurRadius: 3.r,
                     offset: const Offset(0, 3))
               ]),
@@ -44,7 +44,7 @@ class MainCardPointsAndWallet extends StatelessWidget {
                   children: <Widget>[
                     SvgPicture.asset(
                       image,
-                      color: ColorManager.secondary,
+                      colorFilter: ColorFilter.mode(ColorManager.secondary, BlendMode.srcIn),
                       height: AppSize.s20.h,
                       width: AppSize.s20.w,
                     ),

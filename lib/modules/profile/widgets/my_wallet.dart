@@ -77,20 +77,20 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
               end: Alignment.bottomRight,
               colors: [
                 ColorManager.primary2,
-                ColorManager.primary2.withOpacity(0.85),
-                ColorManager.secondary.withOpacity(0.7),
+                ColorManager.primary2.withValues(alpha: 0.85),
+                ColorManager.secondary.withValues(alpha: 0.7),
               ],
             ),
             borderRadius: BorderRadius.circular(24.r),
             boxShadow: [
               BoxShadow(
-                color: ColorManager.primary2.withOpacity(0.4),
+                color: ColorManager.primary2.withValues(alpha: 0.4),
                 blurRadius: 20.r,
                 offset: Offset(0, 8.h),
                 spreadRadius: 0,
               ),
               BoxShadow(
-                color: ColorManager.black.withOpacity(0.1),
+                color: ColorManager.black.withValues(alpha: 0.1),
                 blurRadius: 10.r,
                 offset: Offset(0, 4.h),
                 spreadRadius: 0,
@@ -108,7 +108,7 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                   height: 70.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: ColorManager.white.withOpacity(0.1),
+                    color: ColorManager.white.withValues(alpha: 0.1),
                   ),
                 ),
               ),
@@ -120,7 +120,7 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                   height: 50.h,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: ColorManager.white.withOpacity(0.08),
+                    color: ColorManager.white.withValues(alpha: 0.08),
                   ),
                 ),
               ),
@@ -139,12 +139,12 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                         Container(
                           padding: EdgeInsets.all(8.r),
                           decoration: BoxDecoration(
-                            color: ColorManager.white.withOpacity(0.25),
+                            color: ColorManager.white.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: SvgPicture.asset(
                             AssetsManager.wallet,
-                            color: ColorManager.white,
+                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
                             height: 20.h,
                             width: 20.w,
                           ),
@@ -158,7 +158,7 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                         Text(
                           translate(AppStrings.wallet),
                           style: AppStyles.subtext14Regular.copyWith(
-                            color: ColorManager.white.withOpacity(0.9),
+                            color: ColorManager.white.withValues(alpha: 0.9),
                             fontSize: 11.sp,
                             fontWeight: FontWeight.w500,
                           ),
@@ -190,7 +190,7 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                                 AssetsManager.saudiRiyalSymbol,
                                 height: 15.h,
                                 width: 15.w,
-                                color: ColorManager.white,
+                                colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
                               ),
                             ),
                           ],

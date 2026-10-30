@@ -141,9 +141,9 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                       buildContext: webviewContext,
                       message:
                           Localizations.localeOf(webviewContext).languageCode ==
-                                  'en'
-                              ? "Payment failed. Please try again"
-                              : "فشل الدفع. الرجاء المحاولة مرة أخرى",
+                              'en'
+                          ? "Payment failed. Please try again"
+                          : "فشل الدفع. الرجاء المحاولة مرة أخرى",
                       backgroundColor: ColorManager.red,
                     );
                   }
@@ -156,8 +156,8 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
             buildContext: context,
             message: Localizations.localeOf(context).languageCode == 'en'
                 ? response.message.isNotEmpty
-                    ? response.message
-                    : "Failed to top up wallet. Please try again"
+                      ? response.message
+                      : "Failed to top up wallet. Please try again"
                 : "فشل شحن المحفظة. الرجاء المحاولة مرة أخرى",
             backgroundColor: ColorManager.red,
           );
@@ -314,15 +314,18 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                             TextFormField(
                               controller: _amountController,
                               keyboardType: TextInputType.numberWithOptions(
-                                  decimal: true),
+                                decimal: true,
+                              ),
                               validator: _validateAmount,
                               inputFormatters: [
                                 FilteringTextInputFormatter.allow(
-                                    RegExp(r'^\d+\.?\d{0,2}')),
+                                  RegExp(r'^\d+\.?\d{0,2}'),
+                                ),
                               ],
                               decoration: InputDecoration(
-                                hintText:
-                                    isEnglish ? 'Enter amount' : 'أدخل المبلغ',
+                                hintText: isEnglish
+                                    ? 'Enter amount'
+                                    : 'أدخل المبلغ',
                                 prefixIcon: Padding(
                                   padding: EdgeInsets.all(12.w),
                                   child: SvgPicture.asset(
@@ -334,18 +337,24 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.r),
                                   borderSide: BorderSide(
-                                      color: ColorManager.medGray
-                                          .withOpacity(0.3)),
+                                    color: ColorManager.medGray.withValues(alpha: 
+                                      0.3,
+                                    ),
+                                  ),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.r),
                                   borderSide: const BorderSide(
-                                      color: ColorManager.primary, width: 2),
+                                    color: ColorManager.primary,
+                                    width: 2,
+                                  ),
                                 ),
                                 errorBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12.r),
                                   borderSide: const BorderSide(
-                                      color: ColorManager.red, width: 1),
+                                    color: ColorManager.red,
+                                    width: 1,
+                                  ),
                                 ),
                               ),
                             ),
@@ -370,24 +379,27 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                           padding: EdgeInsets.all(16.w),
                           decoration: BoxDecoration(
                             color: _selectedPaymentMethod == 1
-                                ? ColorManager.primary.withOpacity(0.1)
+                                ? ColorManager.primary.withValues(alpha: 0.1)
                                 : ColorManager.white,
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
                               color: _selectedPaymentMethod == 1
                                   ? ColorManager.primary
-                                  : ColorManager.medGray.withOpacity(0.3),
+                                  : ColorManager.medGray.withValues(alpha: 0.3),
                               width: _selectedPaymentMethod == 1 ? 2 : 1,
                             ),
                           ),
                           child: Row(
                             children: [
-                              Radio<int>(
-                                value: 1,
+                              RadioGroup<int>(
                                 groupValue: _selectedPaymentMethod,
                                 onChanged: (value) => setState(
-                                    () => _selectedPaymentMethod = value!),
-                                activeColor: ColorManager.primary,
+                                  () => _selectedPaymentMethod = value!,
+                                ),
+                                child: Radio<int>(
+                                  value: 1,
+                                  activeColor: ColorManager.primary,
+                                ),
                               ),
                               SizedBox(width: 8.w),
                               Text(
@@ -411,24 +423,27 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                             padding: EdgeInsets.all(16.w),
                             decoration: BoxDecoration(
                               color: _selectedPaymentMethod == 2
-                                  ? ColorManager.primary.withOpacity(0.1)
+                                  ? ColorManager.primary.withValues(alpha: 0.1)
                                   : ColorManager.white,
                               borderRadius: BorderRadius.circular(12.r),
                               border: Border.all(
                                 color: _selectedPaymentMethod == 2
                                     ? ColorManager.primary
-                                    : ColorManager.medGray.withOpacity(0.3),
+                                    : ColorManager.medGray.withValues(alpha: 0.3),
                                 width: _selectedPaymentMethod == 2 ? 2 : 1,
                               ),
                             ),
                             child: Row(
                               children: [
-                                Radio<int>(
-                                  value: 2,
+                                RadioGroup<int>(
                                   groupValue: _selectedPaymentMethod,
                                   onChanged: (value) => setState(
-                                      () => _selectedPaymentMethod = value!),
-                                  activeColor: ColorManager.primary,
+                                    () => _selectedPaymentMethod = value!,
+                                  ),
+                                  child: Radio<int>(
+                                    value: 2,
+                                    activeColor: ColorManager.primary,
+                                  ),
                                 ),
                                 SizedBox(width: 8.w),
                                 Text(

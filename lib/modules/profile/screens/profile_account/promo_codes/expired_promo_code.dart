@@ -14,11 +14,11 @@ class ExpiredPromoCode extends StatefulWidget {
   final String? highlightPromoId;
   final ValueChanged<PromoCodeTypes>? onPromoLocated;
   const ExpiredPromoCode({
-    Key? key,
+    super.key,
     required this.isVisible,
     this.highlightPromoId,
     this.onPromoLocated,
-  }) : super(key: key);
+  });
 
   @override
   State<ExpiredPromoCode> createState() => _ExpiredPromoCodeState();

@@ -13,7 +13,7 @@ import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class GuestAlert extends StatelessWidget {
-  const GuestAlert({Key? key}) : super(key: key);
+  const GuestAlert({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class GuestAlert extends StatelessWidget {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

@@ -109,7 +109,7 @@ class _AddressCheckScreenState extends State<AddressCheckScreen>
                         width: 160,
                         height: 160,
                         decoration: BoxDecoration(
-                          color: ColorManager.primary.withOpacity(0.1),
+                          color: ColorManager.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Center(
@@ -117,7 +117,7 @@ class _AddressCheckScreenState extends State<AddressCheckScreen>
                             width: 120,
                             height: 120,
                             decoration: BoxDecoration(
-                              color: ColorManager.primary.withOpacity(0.15),
+                              color: ColorManager.primary.withValues(alpha: 0.15),
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(

@@ -195,7 +195,7 @@
 //         if (state is PlaceOrderFailed) {
 //           _showErrorSnackBar(state.errormodel);
 //         } else if (state is PlaceOrderSuccess) {
-//           print("sassasa");
+//           debugPrint("sassasa");
 //           state.paymentUrl != null
 //               ? _onOrderSuccess(context, transactionUrl: state.paymentUrl)
 //               : popALlAndPushPage(
@@ -264,12 +264,12 @@
 
 //   void actionPlaceOrder(String orderId, {bool? payOrder = true}) {
 //     if (orderId.isNotEmpty) {
-//       print('kkkskkskskksk: $orderId');
-//       print('kkkskkskskksk: ${sl<OffersBloc>().cardHolderName}');
-//       print('kkkskkskskksk: ${sl<OffersBloc>().cardNumber}');
-//       print('kkkskkskskksk: ${sl<OffersBloc>().cardCvv}');
-//       print('kkkskkskskksk: ${sl<OffersBloc>().expiryMonth}');
-//       print('kkkskkskskksk: ${sl<OffersBloc>().expiryYear}');
+//       debugPrint('kkkskkskskksk: $orderId');
+//       debugPrint('kkkskkskskksk: ${sl<OffersBloc>().cardHolderName}');
+//       debugPrint('kkkskkskskksk: ${sl<OffersBloc>().cardNumber}');
+//       debugPrint('kkkskkskskksk: ${sl<OffersBloc>().cardCvv}');
+//       debugPrint('kkkskkskskksk: ${sl<OffersBloc>().expiryMonth}');
+//       debugPrint('kkkskkskskksk: ${sl<OffersBloc>().expiryYear}');
 //     }
 //   }
 // }

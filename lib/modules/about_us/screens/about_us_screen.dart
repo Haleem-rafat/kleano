@@ -3,7 +3,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/Home/widget/offer_widget.dart';
 import 'package:thewasher/modules/about_us/screens/contact_us_screen.dart';
 import 'package:thewasher/modules/about_us/screens/terms_and_conditions.dart';
 import 'package:thewasher/modules/profile/widgets/container_shadow.dart';

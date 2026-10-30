@@ -174,20 +174,20 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
         end: Alignment.bottomRight,
         colors: [
           ColorManager.backGround,
-          ColorManager.backGround.withOpacity(0.98),
+          ColorManager.backGround.withValues(alpha: 0.98),
         ],
       ),
       boxShadow: [
         BoxShadow(
           color: highlight
-              ? _planColor.withOpacity(0.35)
-              : _planColor.withOpacity(0.1),
+              ? _planColor.withValues(alpha: 0.35)
+              : _planColor.withValues(alpha: 0.1),
           blurRadius: highlight ? 28.r : 20.r,
           offset: Offset(0, highlight ? 14.h : 10.h),
           spreadRadius: highlight ? 2.r : -5.r,
         ),
         BoxShadow(
-          color: Colors.black.withOpacity(0.04),
+          color: Colors.black.withValues(alpha: 0.04),
           blurRadius: 10.r,
           offset: Offset(0, 4.h),
           spreadRadius: 0,
@@ -197,8 +197,8 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
         color: highlight
             ? _planColor
             : _isSubscribed
-                ? _planColor.withOpacity(0.3)
-                : Colors.grey.withOpacity(0.1),
+                ? _planColor.withValues(alpha: 0.3)
+                : Colors.grey.withValues(alpha: 0.1),
         width: highlight
             ? 3.w
             : _isSubscribed
@@ -233,13 +233,13 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              _planColor.withOpacity(0.1),
-              _planColor.withOpacity(0.05),
+              _planColor.withValues(alpha: 0.1),
+              _planColor.withValues(alpha: 0.05),
             ],
           ),
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: _planColor.withOpacity(0.2),
+            color: _planColor.withValues(alpha: 0.2),
             width: 1.w,
           ),
         ),
@@ -256,7 +256,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
         widget.plan.icon!.iconLink!.isNotEmpty) {
       return Container(
         decoration: BoxDecoration(
-          color: _planColor.withOpacity(0.1),
+          color: _planColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(99.r),
         ),
         child: ClipRRect(
@@ -279,7 +279,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
       AssetsManager.planColor,
       width: 32.r,
       height: 32.r,
-      color: _planColor,
+      colorFilter: ColorFilter.mode(_planColor, BlendMode.srcIn),
     );
   }
 
@@ -303,7 +303,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: _planColor.withOpacity(0.1),
+                  color: _planColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Row(
@@ -332,7 +332,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                  color: _planColor.withOpacity(0.1),
+                  color: _planColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 child: Text(
@@ -357,7 +357,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
         width: 40.r,
         height: 40.r,
         decoration: BoxDecoration(
-          color: _planColor.withOpacity(0.1),
+          color: _planColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Center(
@@ -386,7 +386,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Divider(
-                color: Colors.grey.withOpacity(0.2),
+                color: Colors.grey.withValues(alpha: 0.2),
                 thickness: 1.h,
                 height: 1.h,
               ),
@@ -428,10 +428,10 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
     return Container(
       padding: EdgeInsets.all(16.r),
       decoration: BoxDecoration(
-        color: _planColor.withOpacity(0.05),
+        color: _planColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
-          color: _planColor.withOpacity(0.1),
+          color: _planColor.withValues(alpha: 0.1),
           width: 1.w,
         ),
       ),
@@ -441,7 +441,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
             width: 36.r,
             height: 36.r,
             decoration: BoxDecoration(
-              color: _planColor.withOpacity(0.15),
+              color: _planColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Center(
@@ -449,7 +449,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
               AssetsManager.carWash,
               width: 24.w,
               height: 24.h,
-              color: _planColor,
+              colorFilter: ColorFilter.mode(_planColor, BlendMode.srcIn),
             )),
           ),
           12.pw,
@@ -499,7 +499,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
                         width: 20.r,
                         height: 20.r,
                         decoration: BoxDecoration(
-                          color: _planColor.withOpacity(0.1),
+                          color: _planColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Center(
@@ -527,7 +527,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }
@@ -564,7 +564,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
                         width: 20.r,
                         height: 20.r,
                         decoration: BoxDecoration(
-                          color: _planColor.withOpacity(0.1),
+                          color: _planColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(6.r),
                         ),
                         child: Center(
@@ -591,7 +591,7 @@ class _CardOfPlanState extends State<CardOfPlan> with TickerProviderStateMixin {
               ),
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

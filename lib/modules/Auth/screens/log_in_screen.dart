@@ -1,13 +1,13 @@
 import 'dart:math' as math;
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:thewasher/core/services/appsflyer_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:thewasher/core/services/fcm_token.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/core/enums/status.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
@@ -15,12 +15,9 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_cubit.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_state.dart';
 import 'package:thewasher/modules/Auth/screens/otp_screen.dart';
-import 'package:thewasher/modules/Home/widget/offer_widget.dart';
-import 'package:thewasher/modules/splash/address_check_screen.dart';
 import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/components/list_tile_text_form.dart';
@@ -54,51 +51,8 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   Future<void> _initializeFCM() async {
-    try {
-      await FirebaseMessaging.instance.requestPermission();
-
-      // Try to get FCM token directly first
-      fcmToken = await FirebaseMessaging.instance.getToken();
-      if (fcmToken != null) {
-        print("✅ FCM Token: $fcmToken");
-        return;
-      }
-
-      // If direct token fetch fails, try with APNs token
-      String? apnsToken;
-      int retries = 0;
-
-      while (apnsToken == null && retries < 10) {
-        await Future.delayed(const Duration(seconds: 1));
-        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        retries++;
-      }
-
-      if (apnsToken != null) {
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        print("✅ FCM Token (after APNs): $fcmToken");
-      } else {
-        print("❌ Failed to get APNs token after $retries seconds.");
-        // Try one more time to get FCM token without APNs
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          print("✅ FCM Token (fallback): $fcmToken");
-        } else {
-          print("❌ Failed to get FCM token completely.");
-        }
-      }
-    } catch (e) {
-      print("🔥 Error initializing FCM: $e");
-      // Try one final attempt to get token
-      try {
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          print("✅ FCM Token (error recovery): $fcmToken");
-        }
-      } catch (e2) {
-        print("🔥 Final FCM token attempt failed: $e2");
-      }
-    }
+    await FirebaseMessaging.instance.requestPermission();
+    fcmToken = await FcmToken.get();
   }
 
   @override
@@ -257,20 +211,7 @@ class _LogInScreenState extends State<LogInScreen> {
                               islLoading = false;
                             });
 
-                            try {
-                              final AppsFlyerOptions options = AppsFlyerOptions(
-                                afDevKey: "vTBNf24bS4fxnsgxuRE7nK",
-                                appId: "6744847373",
-                                showDebug: true,
-                              );
-                              final AppsflyerSdk appsFlyerSdk =
-                                  AppsflyerSdk(options);
-                              await appsFlyerSdk.initSdk();
-                              await appsFlyerSdk.logEvent('af_login', {});
-                              print("✅ af_login event sent to AppsFlyer");
-                            } catch (e) {
-                              print("❌ Error sending af_login event: $e");
-                            }
+                            AppsFlyerService.logEvent('af_login');
 
                             // Navigate to OTP screen and replace the login screen to avoid duplicate pushes
                             Navigator.of(context).pushReplacement(

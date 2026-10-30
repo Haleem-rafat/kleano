@@ -42,7 +42,7 @@ class _WalletTopupSuccessState extends State<WalletTopupSuccess> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     final isEnglish = Localizations.localeOf(context).languageCode == 'en';
 
     return StatefulBuilder(
@@ -69,7 +69,7 @@ class _WalletTopupSuccessState extends State<WalletTopupSuccess> {
                   child: SvgPicture.asset(
                     AssetsManager.wallet,
                     fit: BoxFit.contain,
-                    color: ColorManager.primary,
+                    colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
                   ),
                 ),
                 AppPadding.p16.ph,

@@ -6,7 +6,6 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/booking/widgets/add_services/change_location_button.dart';
-import 'package:thewasher/modules/plans_and_subscription/widgets/subscribe_button.dart';
 
 class SubscriptionNotAvalibleLocation extends StatelessWidget {
   const SubscriptionNotAvalibleLocation({super.key});
@@ -17,7 +16,7 @@ class SubscriptionNotAvalibleLocation extends StatelessWidget {
       padding: EdgeInsets.fromLTRB(20.w, 25.h, 20.w, 25.h),
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16.r),
-          color: ColorManager.red.withOpacity(.07)),
+          color: ColorManager.red.withValues(alpha: .07)),
       child: Column(
         children: <Widget>[
           SizedBox(

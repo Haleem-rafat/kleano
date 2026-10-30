@@ -11,7 +11,6 @@ import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/promo_codes/pormo_codes_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
-import 'package:timezone/timezone.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OfferWidget extends StatefulWidget {
@@ -167,7 +166,7 @@ class _OfferWidgetState extends State<OfferWidget> {
   Future<void> _handleBannerTap(
       BuildContext context, BannerModel banner) async {
     final launched = await _launchExternalLink(banner.externalLink);
-    if (launched) return;
+    if (launched || !context.mounted) return;
 
     switch (banner.resource?.toUpperCase()) {
       case 'PROMO_CODE':

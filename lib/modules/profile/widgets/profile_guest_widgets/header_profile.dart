@@ -13,20 +13,20 @@ class HeaderProfileGuestWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         height: 180.h,
-        width: 375.w,
+        width: 1.sw,
         color: Colors.transparent,
         child: Stack(
           children: <Widget>[
             Container(
               height: 110.h,
-              width: 375.w,
+              width: 1.sw,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(12),
                 ),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                      color: ColorManager.black.withOpacity(.05),
+                      color: ColorManager.black.withValues(alpha: .05),
                       blurRadius: 3.r,
                       offset: const Offset(0, 6))
                 ],

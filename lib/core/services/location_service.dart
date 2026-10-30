@@ -1,7 +1,6 @@
-import 'package:geocoding/geocoding.dart';
+import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:thewasher/modules/Home/data/model/address_model.dart';
 import 'package:thewasher/modules/Home/data/model/location_model.dart';
 
 class LocationService {
@@ -21,7 +20,7 @@ class LocationService {
     }
 
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
   }
 
   Future<LocationAddressModel> getAddressFromLatLng(LatLng position) async {

@@ -64,9 +64,8 @@ class BookingOrderRepo {
       required String? applePayId}) async {
     final body = <String, dynamic>{
       'order': orderId,
-      if (applePayId != null) 'applePaymentId': applePayId,
-      if (paymentDetailsRequest != null)
-        'paymentDetails': paymentDetailsRequest,
+      'applePaymentId': ?applePayId,
+      'paymentDetails': ?paymentDetailsRequest,
     };
     final Response<dynamic>? response = await ApiService.patchApi(
       ApiPaths.payOrder,

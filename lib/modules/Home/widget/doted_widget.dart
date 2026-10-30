@@ -10,11 +10,11 @@ class DotedWidget extends StatefulWidget {
   final Color? color;
   final double? height, width;
   const DotedWidget({
-    Key? key,
+    super.key,
     this.color = ColorManager.white,
     this.height = 5,
     this.width = 5,
-  }) : super(key: key);
+  });
 
   @override
   State<DotedWidget> createState() => _DotedWidgetState();
@@ -114,11 +114,11 @@ class Circle extends StatelessWidget {
   final Color? color;
   final double? height, width;
   const Circle({
-    Key? key,
+    super.key,
     this.color = ColorManager.white,
     this.height = 5,
     this.width = 5,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

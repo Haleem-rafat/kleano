@@ -19,7 +19,7 @@ class PriceAndPoints extends StatelessWidget {
     required this.duration,
   });
 
-  getMonth(int duration) {
+  String getMonth(int duration) {
     if (duration == 1) {
       return translate(AppStrings.month);
     } else if (duration == 2) {

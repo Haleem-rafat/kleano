@@ -15,11 +15,11 @@ class VehiclesCard extends StatelessWidget {
   final double? cardWidth;
 
   const VehiclesCard({
-    Key? key,
+    super.key,
     required this.index,
     required this.selectedColor,
     this.cardWidth,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class VehiclesCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.black2.withOpacity(0.1),
+            color: ColorManager.black2.withValues(alpha: 0.1),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),
@@ -51,7 +51,7 @@ class VehiclesCard extends StatelessWidget {
             // Background Image
             vehicle.imageLink!.isEmpty
                 ? Container(
-                    color: ColorManager.black2.withOpacity(0.1),
+                    color: ColorManager.black2.withValues(alpha: 0.1),
                     child: const Center(
                       child: Icon(Icons.directions_car,
                           size: 50, color: Colors.grey),
@@ -71,8 +71,8 @@ class VehiclesCard extends StatelessWidget {
                   begin: Alignment.bottomCenter,
                   end: Alignment.center,
                   colors: [
-                    Colors.black.withOpacity(0.7),
-                    Colors.black.withOpacity(0.0),
+                    Colors.black.withValues(alpha: 0.7),
+                    Colors.black.withValues(alpha: 0.0),
                   ],
                 ),
               ),

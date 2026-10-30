@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/car_model.dart';
@@ -10,8 +11,8 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
   CarsBloc() : super(CarsInitial()) {
     on<GetCarModel>((GetCarModel event, Emitter<CarsState> emit) async {
       try {
-        print("done1");
-        print("Get Car Model");
+        debugPrint("done1");
+        debugPrint("Get Car Model");
         emit(GetCarModelLoading());
         final List<String> response = await VehiclesRepo.getCarModel();
         if (response.isNotEmpty) {
@@ -25,8 +26,8 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
     });
     on<GetCarBrands>((GetCarBrands event, Emitter<CarsState> emit) async {
       try {
-        print("done2");
-        print("Get Car Brands");
+        debugPrint("done2");
+        debugPrint("Get Car Brands");
         emit(GetCarBrandsLoading());
         final List<CarBrandsModel> response = await VehiclesRepo.getCarBrands();
         if (response.isNotEmpty) {
@@ -45,7 +46,7 @@ class CarsBloc extends Bloc<CarsEvent, CarsState> {
         emit(GetCarModelByBrandIdloading());
         final List<String> response =
             await VehiclesRepo.getCarModelsByBrandId(brandId: event.brandId);
-        print("done3${response}");
+        debugPrint("done3$response");
         emit(GetCarModelByBrandIdSuccess(carModels: response));
         if (response.isNotEmpty) {}
       } catch (e) {

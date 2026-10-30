@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:thewasher/core/network/status_code.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';

@@ -12,8 +12,7 @@ import 'package:thewasher/shared/components/buttons.dart';
 
 class EmptyVehiclesScreen extends StatelessWidget {
   final VoidCallback onPressed;
-  const EmptyVehiclesScreen({Key? key, required this.onPressed})
-      : super(key: key);
+  const EmptyVehiclesScreen({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class EmptyVehiclesScreen extends StatelessWidget {
             Center(
               child: SvgPicture.asset(
                 AssetsManager.emptyCarSVG,
-                color: ColorManager.black,
+                colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
               ),
             ),
             148.ph,

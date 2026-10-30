@@ -11,14 +11,14 @@ class SmartRefresherCustomWidget extends StatelessWidget {
   final bool? enablePullUp;
   final bool? enablePullDown;
   const SmartRefresherCustomWidget({
-    Key? key,
+    super.key,
     this.refreshController,
     this.onRefresh,
     this.onLoading,
     this.child,
     this.enablePullUp = true,
     this.enablePullDown = true,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

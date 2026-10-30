@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -9,15 +8,8 @@ import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/booking/screens/payment_screen.dart';
 import 'package:thewasher/modules/booking/screens/payment_type.dart';
-import 'package:thewasher/modules/plans_and_subscription/bloc/plans_and_subscription/plans_and_subscription_bloc.dart';
-import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
-import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
-import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class CreateSubscription extends StatefulWidget {
@@ -26,12 +18,12 @@ class CreateSubscription extends StatefulWidget {
   final String planId;
   final String createdAt;
   const CreateSubscription({
-    Key? key,
+    super.key,
     required this.price,
     required this.planType,
     required this.createdAt,
     required this.planId,
-  }) : super(key: key);
+  });
 
   @override
   State<CreateSubscription> createState() => _CreateSubscriptionState();
@@ -51,7 +43,7 @@ class _CreateSubscriptionState extends State<CreateSubscription> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -126,7 +118,7 @@ class _CreateSubscriptionState extends State<CreateSubscription> {
                   //                   ? state.errorModel!.ar!
                   //                   : state.errorModel!.en!);
                   //     } else if (state is CreateSubscriptionSuccess) {
-                  //       print('^^^^^^^${state.subscriptionId}');
+                  //       debugPrint('^^^^^^^${state.subscriptionId}');
                   //       pop(context);
                   //       AlertHelper.paymentAddCardSuccess(context);
                   //     }

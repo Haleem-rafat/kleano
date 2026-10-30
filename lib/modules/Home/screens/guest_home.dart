@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:lottie/lottie.dart';
@@ -29,7 +29,7 @@ import 'package:thewasher/utilties/navigator.dart';
 
 class GuestHome extends StatefulWidget {
   void Function() onPressed;
-  GuestHome({Key? key, required this.onPressed}) : super(key: key);
+  GuestHome({super.key, required this.onPressed});
 
   @override
   State<GuestHome> createState() => _GuestHomeState();
@@ -37,7 +37,7 @@ class GuestHome extends StatefulWidget {
 
 class _GuestHomeState extends State<GuestHome> {
   LatLng currentPosition = const LatLng(0, 0);
-  Completer<GoogleMapController> _controller = Completer();
+  final Completer<GoogleMapController> _controller = Completer();
   String currentAddress = "";
   String administrativeArea = "";
   double zoom = 14.4746;
@@ -69,7 +69,7 @@ class _GuestHomeState extends State<GuestHome> {
     }
     if (permission == LocationPermission.deniedForever) {}
     var position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
 
     setState(() {
       currentPosition = LatLng(position.latitude, position.longitude);
@@ -92,7 +92,7 @@ class _GuestHomeState extends State<GuestHome> {
           Column(
             children: [
               SizedBox(
-                height: 812.h,
+                height: 1.sh,
                 child: currentPosition.latitude == 0
                     ? const LoadingWidget()
                     : GoogleMap(
@@ -135,7 +135,7 @@ class _GuestHomeState extends State<GuestHome> {
             top: 150.h,
             child: SizedBox(
                 height: 182.h,
-                width: 375.w,
+                width: 1.sw,
                 child: guestHomeTapIndex == 0
                     ? const OfferWidget()
                     : guestHomeTapIndex == 1
@@ -207,7 +207,7 @@ class _GuestHomeState extends State<GuestHome> {
                                 boxShadow: <BoxShadow>[
                                   BoxShadow(
                                       color:
-                                          ColorManager.black.withOpacity(.08),
+                                          ColorManager.black.withValues(alpha: .08),
                                       blurRadius: 6.r,
                                       offset: const Offset(0, 3))
                                 ],
@@ -298,7 +298,7 @@ class _GuestHomeState extends State<GuestHome> {
                     width: 40.w,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: ColorManager.primary.withOpacity(0.7)),
+                        color: ColorManager.primary.withValues(alpha: 0.7)),
                     child: const Center(
                       child: Icon(
                         Icons.my_location,
@@ -329,7 +329,7 @@ class _GuestHomeState extends State<GuestHome> {
                     width: 40.w,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: ColorManager.primary.withOpacity(0.7)),
+                        color: ColorManager.primary.withValues(alpha: 0.7)),
                     child: const Center(
                       child: Icon(
                         Icons.add,
@@ -360,7 +360,7 @@ class _GuestHomeState extends State<GuestHome> {
                     width: 40.w,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: ColorManager.primary.withOpacity(0.7)),
+                        color: ColorManager.primary.withValues(alpha: 0.7)),
                     child: const Center(
                       child: Icon(
                         Icons.remove,
@@ -403,7 +403,7 @@ class _GuestHomeState extends State<GuestHome> {
                             height: 24.h,
                             width: 24.w,
                             decoration: BoxDecoration(
-                              color: ColorManager.white.withOpacity(0.5),
+                              color: ColorManager.white.withValues(alpha: 0.5),
                               borderRadius: BorderRadius.circular(15.r),
                             ),
                             child: SvgPicture.asset(

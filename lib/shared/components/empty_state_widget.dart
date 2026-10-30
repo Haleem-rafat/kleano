@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:lottie/lottie.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
@@ -35,7 +34,7 @@ class EmptyStateWidget extends StatelessWidget {
             Icon(
               Icons.inbox_outlined,
               size: 120.w,
-              color: ColorManager.medGray.withOpacity(0.5),
+              color: ColorManager.medGray.withValues(alpha: 0.5),
             ),
 
             SizedBox(height: 24.h),

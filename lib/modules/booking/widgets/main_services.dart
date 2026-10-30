@@ -39,23 +39,13 @@ class _MainServicesState extends State<MainServices> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SvgPicture.asset(
-          icon,
-          height: 14.h,
-          width: 14.w,
-          color: color,
-        ),
+        SvgPicture.asset(icon, height: 14.h, width: 14.w, colorFilter: color == null ? null : ColorFilter.mode(color, BlendMode.srcIn)),
         SizedBox(width: 6.w),
         Text(
           text,
-          style: AppStyles.caption12Medium.copyWith(
-            color: ColorManager.black,
-          ),
+          style: AppStyles.caption12Medium.copyWith(color: ColorManager.black),
         ),
-        if (suffix != null) ...[
-          SizedBox(width: 2.w),
-          suffix,
-        ],
+        if (suffix != null) ...[SizedBox(width: 2.w), suffix],
       ],
     );
   }
@@ -119,7 +109,7 @@ class _MainServicesState extends State<MainServices> {
 
         return ListView.builder(
           padding: EdgeInsets.zero,
-        shrinkWrap: true,
+          shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: widget.mainServices.length,
           itemBuilder: (context, index) {
@@ -127,8 +117,9 @@ class _MainServicesState extends State<MainServices> {
             if (service.name == "1") {
               return const SizedBox.shrink();
             }
-            final bool isSelected =
-                offersBloc.cartServicesList.contains(service);
+            final bool isSelected = offersBloc.cartServicesList.contains(
+              service,
+            );
             final List<dynamic>? description =
                 service.description as List<dynamic>?;
 
@@ -142,17 +133,19 @@ class _MainServicesState extends State<MainServices> {
                 },
                 onTap: () {
                   if (isSelected) {
-                    int deleteIndex =
-                        offersBloc.cartServicesList.indexOf(service);
-                    offersBloc.add(DeleteServiceCart(
-                      index: deleteIndex,
-                      service: service,
-                    ));
+                    int deleteIndex = offersBloc.cartServicesList.indexOf(
+                      service,
+                    );
+                    offersBloc.add(
+                      DeleteServiceCart(index: deleteIndex, service: service),
+                    );
                   } else {
-                    offersBloc.add(AddServiceCart(
-                      service: service,
-                      selectedMainServiceIndex: index,
-                    ));
+                    offersBloc.add(
+                      AddServiceCart(
+                        service: service,
+                        selectedMainServiceIndex: index,
+                      ),
+                    );
                   }
                   widget.addOrRemoveMainServices?.call(index);
                 },
@@ -161,21 +154,24 @@ class _MainServicesState extends State<MainServices> {
                   margin: EdgeInsets.symmetric(vertical: AppMargin.m8.h),
                   padding: EdgeInsets.all(16.w),
                   decoration: BoxDecoration(
-                      border: Border.all(
-                          color: isSelected
-                              ? ColorManager.secondary
-                              : ColorManager.lightGray,
-                          width: isSelected ? 2.w : 1.w),
-                      borderRadius: BorderRadius.circular(16.r),
-                      color: ColorManager.white,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: isSelected
-                                ? ColorManager.secondary.withOpacity(0.15)
-                                : ColorManager.black.withOpacity(0.08),
-                            blurRadius: isSelected ? 8.r : 4.r,
-                            offset: Offset(0, isSelected ? 4.h : 2.h))
-                      ]),
+                    border: Border.all(
+                      color: isSelected
+                          ? ColorManager.secondary
+                          : ColorManager.lightGray,
+                      width: isSelected ? 2.w : 1.w,
+                    ),
+                    borderRadius: BorderRadius.circular(16.r),
+                    color: ColorManager.white,
+                    boxShadow: <BoxShadow>[
+                      BoxShadow(
+                        color: isSelected
+                            ? ColorManager.secondary.withValues(alpha: 0.15)
+                            : ColorManager.black.withValues(alpha: 0.08),
+                        blurRadius: isSelected ? 8.r : 4.r,
+                        offset: Offset(0, isSelected ? 4.h : 2.h),
+                      ),
+                    ],
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -187,8 +183,7 @@ class _MainServicesState extends State<MainServices> {
                             child: SizedBox(
                               height: AppSize.s20.h,
                               width: AppSize.s20.w,
-                              child: Radio<int>(
-                                value: index,
+                              child: RadioGroup<int>(
                                 groupValue: isSelected ? index : null,
                                 onChanged: (int? value) {
                                   if (value != null) {
@@ -196,22 +191,29 @@ class _MainServicesState extends State<MainServices> {
                                       int deleteIndex = offersBloc
                                           .cartServicesList
                                           .indexOf(service);
-                                      offersBloc.add(DeleteServiceCart(
-                                        index: deleteIndex,
-                                        service: service,
-                                      ));
+                                      offersBloc.add(
+                                        DeleteServiceCart(
+                                          index: deleteIndex,
+                                          service: service,
+                                        ),
+                                      );
                                     } else {
-                                      offersBloc.add(AddServiceCart(
-                                        service: service,
-                                        selectedMainServiceIndex: index,
-                                      ));
+                                      offersBloc.add(
+                                        AddServiceCart(
+                                          service: service,
+                                          selectedMainServiceIndex: index,
+                                        ),
+                                      );
                                     }
                                     widget.addOrRemoveMainServices?.call(index);
                                   }
                                 },
-                                activeColor: ColorManager.primary,
-                                materialTapTargetSize:
-                                    MaterialTapTargetSize.shrinkWrap,
+                                child: Radio<int>(
+                                  value: index,
+                                  activeColor: ColorManager.primary,
+                                  materialTapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap,
+                                ),
                               ),
                             ),
                           ),
@@ -221,12 +223,13 @@ class _MainServicesState extends State<MainServices> {
                           Container(
                             padding: EdgeInsets.all(12.r),
                             decoration: BoxDecoration(
-                                color: ColorManager.gray,
-                                borderRadius: BorderRadius.circular(12.r),
-                                border: Border.all(
-                                  color: ColorManager.lightGray,
-                                  width: 1.w,
-                                )),
+                              color: ColorManager.gray,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: ColorManager.lightGray,
+                                width: 1.w,
+                              ),
+                            ),
                             child: ImageShared(
                               image: service.icon?.iconLink ?? '',
                               height: 48.h,
@@ -289,7 +292,7 @@ class _MainServicesState extends State<MainServices> {
                                 ),
                               ],
                             ),
-                          )
+                          ),
                         ],
                       ),
                       // Description Section with Enhanced Design
@@ -298,7 +301,7 @@ class _MainServicesState extends State<MainServices> {
                           margin: EdgeInsets.only(top: 12.h),
                           padding: EdgeInsets.all(12.w),
                           decoration: BoxDecoration(
-                            color: ColorManager.gray.withOpacity(0.3),
+                            color: ColorManager.gray.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
                               color: ColorManager.lightGray,
@@ -359,10 +362,13 @@ class _MainServicesState extends State<MainServices> {
                                   },
                                   child: Container(
                                     padding: EdgeInsets.symmetric(
-                                        vertical: 4.h, horizontal: 8.w),
+                                      vertical: 4.h,
+                                      horizontal: 8.w,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color:
-                                          ColorManager.primary.withOpacity(0.1),
+                                      color: ColorManager.primary.withValues(alpha: 
+                                        0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(6.r),
                                     ),
                                     child: Row(
@@ -374,9 +380,9 @@ class _MainServicesState extends State<MainServices> {
                                               : translate('seeMore'),
                                           style: AppStyles.caption12Medium
                                               .copyWith(
-                                            color: ColorManager.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                                color: ColorManager.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                         ),
                                         SizedBox(width: 4.w),
                                         Icon(
@@ -390,7 +396,7 @@ class _MainServicesState extends State<MainServices> {
                                     ),
                                   ),
                                 ),
-                              ]
+                              ],
                             ],
                           ),
                         ),

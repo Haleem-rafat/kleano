@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/data/model/add_ons_model.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
@@ -25,7 +23,7 @@ class CardAddOns extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-              color: ColorManager.black.withOpacity(.05),
+              color: ColorManager.black.withValues(alpha: .05),
               blurRadius: 6.r,
               offset: const Offset(0, 3))
         ],

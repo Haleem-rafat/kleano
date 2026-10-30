@@ -269,7 +269,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                       borderRadius: BorderRadius.circular(16.r),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.black.withOpacity(0.05),
+                                          color: Colors.black.withValues(alpha: 0.05),
                                           blurRadius: 8,
                                           offset: const Offset(0, 2),
                                         ),
@@ -284,7 +284,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                             padding: EdgeInsets.all(8.w),
                                             decoration: BoxDecoration(
                                               color: ColorManager.primary
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(12.r),
                                             ),
@@ -428,11 +428,11 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                     padding: EdgeInsets.all(16.w),
                                     decoration: BoxDecoration(
                                       color:
-                                          ColorManager.primary.withOpacity(0.1),
+                                          ColorManager.primary.withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(12.r),
                                       border: Border.all(
                                         color: ColorManager.primary
-                                            .withOpacity(0.3),
+                                            .withValues(alpha: 0.3),
                                         width: 1,
                                       ),
                                     ),
@@ -481,7 +481,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                                       .saudiRiyalSymbol,
                                                   height: 14.h,
                                                   width: 14.w,
-                                                  color: ColorManager.primary,
+                                                  colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
                                                 ),
                                               ],
                                             ),
@@ -514,7 +514,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                                       .saudiRiyalSymbol,
                                                   height: 14.h,
                                                   width: 14.w,
-                                                  color: ColorManager.green,
+                                                  colorFilter: ColorFilter.mode(ColorManager.green, BlendMode.srcIn),
                                                 ),
                                               ],
                                             ),
@@ -546,7 +546,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                                       .saudiRiyalSymbol,
                                                   height: 16.h,
                                                   width: 16.w,
-                                                  color: ColorManager.primary,
+                                                  colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
                                                 ),
                                               ],
                                             ),
@@ -560,7 +560,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                                     margin: EdgeInsets.only(top: 16.h),
                                     padding: EdgeInsets.all(16.w),
                                     decoration: BoxDecoration(
-                                      color: ColorManager.gray.withOpacity(0.5),
+                                      color: ColorManager.gray.withValues(alpha: 0.5),
                                       borderRadius: BorderRadius.circular(12.r),
                                     ),
                                     child: Row(
@@ -677,7 +677,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         gradient: LinearGradient(
           colors: [
             ColorManager.primary,
-            ColorManager.primary.withOpacity(0.8),
+            ColorManager.primary.withValues(alpha: 0.8),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -685,7 +685,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         borderRadius: BorderRadius.circular(20.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -758,7 +758,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                             AssetsManager.saudiRiyalSymbol,
                             height: 20.h,
                             width: 20.w,
-                            color: ColorManager.white,
+                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
                           ),
                         ],
                       ),
@@ -778,7 +778,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                             AssetsManager.saudiRiyalSymbol,
                             height: 28.h,
                             width: 28.w,
-                            color: ColorManager.white,
+                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
                           ),
                         ],
                       ),
@@ -798,7 +798,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                             AssetsManager.saudiRiyalSymbol,
                             height: 28.h,
                             width: 28.w,
-                            color: ColorManager.white,
+                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
                           ),
                         ],
                       ),
@@ -822,7 +822,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
+          color: Colors.white.withValues(alpha: 0.15),
           borderRadius: BorderRadius.circular(12.r),
         ),
         child: Text(
@@ -848,7 +848,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Text(
@@ -863,7 +863,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Text(
@@ -887,9 +887,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         child: Container(
           padding: EdgeInsets.all(16.w),
           decoration: BoxDecoration(
-            color: Colors.orange.withOpacity(0.1),
+            color: Colors.orange.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.orange.withOpacity(0.3)),
+            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
           ),
           child: Row(
             children: [
@@ -918,7 +918,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
               borderRadius: BorderRadius.circular(16.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -974,7 +974,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
               borderRadius: BorderRadius.circular(16.r),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -1045,7 +1045,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: ColorManager.primary.withOpacity(0.1),
+              color: ColorManager.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Row(
@@ -1160,10 +1160,10 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: ColorManager.primary.withOpacity(0.1),
+                color: ColorManager.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
                 border: Border.all(
-                  color: ColorManager.primary.withOpacity(0.3),
+                  color: ColorManager.primary.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -1200,7 +1200,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                       Row(
                         children: [
                           Text(
-                            "-${_pointsDiscountAmount} ",
+                            "-$_pointsDiscountAmount ",
                             style: AppStyles.title16Bold.copyWith(
                               color: ColorManager.green,
                               fontSize: 14.sp,
@@ -1210,7 +1210,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                             AssetsManager.saudiRiyalSymbol,
                             height: 14.h,
                             width: 14.w,
-                            color: ColorManager.green,
+                            colorFilter: ColorFilter.mode(ColorManager.green, BlendMode.srcIn),
                           ),
                         ],
                       ),
@@ -1225,7 +1225,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
             Container(
               padding: EdgeInsets.all(16.w),
               decoration: BoxDecoration(
-                color: ColorManager.gray.withOpacity(0.5),
+                color: ColorManager.gray.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               child: Row(
@@ -1297,6 +1297,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           await PointRepo.calculatePointsDiscount(points: points);
 
       // Calculate new total with points discount
+      if (!mounted) return;
       final promoState = context.read<PromoBloc>().state;
       double baseTotal =
           generalSingleton.totalPay?.toDouble() ?? offersBloc.total.toDouble();
@@ -1324,6 +1325,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         _applePayTotal = finalTotal;
       });
 
+      if (!mounted) return;
       showSnackBar(
         buildContext: context,
         message: translate(AppStrings.pointsAppliedSuccessfully)
@@ -1333,6 +1335,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       setState(() {
         _isPointsLoading = false;
       });
+      if (!mounted) return;
       showSnackBar(
         buildContext: context,
         message: translate(AppStrings.failedToApplyPoints),
@@ -1501,7 +1504,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         borderRadius: BorderRadius.circular(24.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 3),
           ),
@@ -1517,7 +1520,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                 Container(
                   padding: EdgeInsets.all(10.w),
                   decoration: BoxDecoration(
-                    color: ColorManager.primary.withOpacity(0.1),
+                    color: ColorManager.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(16.r),
                   ),
                   child: Icon(icon, color: ColorManager.primary, size: 22.w),
@@ -1612,7 +1615,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   Widget _buildApplePayWidget(double calculatedAmount) {
-    print("asddsaasddsasaddsaadsasdadsads: ${ApiKeys.publishApiKey}");
+    debugPrint("asddsaasddsasaddsaadsasdadsads: ${ApiKeys.publishApiKey}");
 
     // Ensure orderId exists before showing Apple Pay button
     final String currentOrderId = generalSingleton.orderId ?? orderIdd ?? "";
@@ -1677,13 +1680,13 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   Future<void> _handleApplePayResult(dynamic result) async {
-    print("Apple Pay Result: $result");
+    debugPrint("Apple Pay Result: $result");
 
     // Prevent multiple processing
     if (_isProcessingPayment) return;
 
     if (result is UnprocessableTokenError) {
-      print("Apple Pay Error: ${result.message}");
+      debugPrint("Apple Pay Error: ${result.message}");
       _showPaymentErrorBottomSheet(
         title: Localizations.localeOf(context).languageCode == 'en'
             ? 'Payment Error'
@@ -1750,7 +1753,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         _resetPaymentState();
       }
     } else {
-      print("Apple Pay cancelled or failed");
+      debugPrint("Apple Pay cancelled or failed");
       _resetPaymentState();
     }
   }
@@ -1792,8 +1795,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                 height: 60.h,
                 decoration: BoxDecoration(
                   color: isError
-                      ? Colors.red.withOpacity(0.1)
-                      : Colors.orange.withOpacity(0.1),
+                      ? Colors.red.withValues(alpha: 0.1)
+                      : Colors.orange.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -1973,6 +1976,10 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
             orderIdd = generalSingleton.orderId;
             completer.complete(true);
           } else if (state is CreateOrderFailed) {
+            if (!mounted) {
+              completer.complete(false);
+              return;
+            }
             _showPaymentErrorBottomSheet(
               title: Localizations.localeOf(context).languageCode == 'en'
                   ? 'Error'
@@ -1997,6 +2004,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         const Duration(seconds: 30),
         onTimeout: () {
           if (!completer.isCompleted) {
+            if (!mounted) return false;
             _showPaymentErrorBottomSheet(
               title: Localizations.localeOf(context).languageCode == 'en'
                   ? 'Error'
@@ -2015,6 +2023,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       return success;
     } catch (e) {
       if (!completer.isCompleted) {
+        if (!mounted) return false;
         _showPaymentErrorBottomSheet(
           title: Localizations.localeOf(context).languageCode == 'en'
               ? 'Error'
@@ -2081,12 +2090,14 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
 
       // Place order with wallet payment (no payment details needed)
       // The server will process wallet payment based on the payment type set during order creation
+      if (!mounted) return;
       context.read<BookingOrderBloc>().add(
             PlaceOrder(
               orderId: generalSingleton.orderId!,
             ),
           );
     } catch (e) {
+      if (!mounted) return;
       _showPaymentErrorBottomSheet(
         title: Localizations.localeOf(context).languageCode == 'en'
             ? 'Error'
@@ -2161,7 +2172,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     final double totalAmount = _calculateTotalAmount(promoState);
 
     // Validate required fields before proceeding
-    print("sadashbsajb: $paymentType");
+    debugPrint("sadashbsajb: $paymentType");
     if (!_validateOrderDetails()) {
       return;
     }
@@ -2182,6 +2193,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
               _isProcessingPayment = false;
             });
           }
+          if (!mounted) return;
           AlertHelper.createOrderSuccess(context);
         } else {
           _resetPaymentState();
@@ -2212,6 +2224,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           }
       }
     } catch (e) {
+      if (!mounted) return;
       _showPaymentErrorBottomSheet(
         title: Localizations.localeOf(context).languageCode == 'en'
             ? 'Error'
@@ -2249,7 +2262,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     // Don't clear cart data here - only clear when returning to main nav
     // context.read<BookingOrderBloc>().add(ClearCartOrder());
     // sl<PromoBloc>().totalPayModel = TotalPayModel();
-    print("📝 Order success - cart data preserved for main nav clearing");
+    debugPrint("📝 Order success - cart data preserved for main nav clearing");
 
     if (transactionUrl != null && transactionUrl.isNotEmpty) {
       // Check if we're already in a webview to prevent multiple openings
@@ -2397,7 +2410,7 @@ class _CreditCardPaymentBottomSheetState
       bloc.cardHolderName = _nameController.text;
       bloc.expiryYear = '20${expiryParts[1].trim()}';
 
-      print("🚀 Starting Credit Card payment process...");
+      debugPrint("🚀 Starting Credit Card payment process...");
 
       // Credit Card: Create new order, wait, then process payment
       _createNewOrderForCreditCard();
@@ -2420,7 +2433,7 @@ class _CreditCardPaymentBottomSheetState
 
       // Check location data (blcoPosition is non-nullable, so just verify coordinates are valid)
       if (blcoPosition.latitude == 0 || blcoPosition.longitude == 0) {
-        print("❌ Location data is missing");
+        debugPrint("❌ Location data is missing");
         showSnackBar(
           buildContext: context,
           message: "بيانات الموقع غير مكتملة. الرجاء المحاولة مرة أخرى",
@@ -2431,15 +2444,15 @@ class _CreditCardPaymentBottomSheetState
       // Check vehicle data
       if (vehicleBloc.selectedVehicle.sId == null ||
           vehicleBloc.selectedVehicle.sId!.isEmpty) {
-        print("❌ Vehicle data is missing");
-        print("🔍 Vehicle details: ${vehicleBloc.selectedVehicle.toString()}");
-        print("🔍 Vehicles list length: ${vehicleBloc.vehiclesList.length}");
+        debugPrint("❌ Vehicle data is missing");
+        debugPrint("🔍 Vehicle details: ${vehicleBloc.selectedVehicle.toString()}");
+        debugPrint("🔍 Vehicles list length: ${vehicleBloc.vehiclesList.length}");
 
         // Try to get the first vehicle if none is selected
         if (vehicleBloc.vehiclesList.isNotEmpty) {
-          print("🔄 Attempting to use first available vehicle");
+          debugPrint("🔄 Attempting to use first available vehicle");
           vehicleBloc.selectedVehicle = vehicleBloc.vehiclesList.first;
-          print("✅ Using vehicle: ${vehicleBloc.selectedVehicle.sId}");
+          debugPrint("✅ Using vehicle: ${vehicleBloc.selectedVehicle.sId}");
         } else {
           showSnackBar(
             buildContext: context,
@@ -2452,7 +2465,7 @@ class _CreditCardPaymentBottomSheetState
       // Check services or subscription
       if (offersBloc.cartServicesList.isEmpty &&
           userProfileBloc.profile.isSubscribed != true) {
-        print("❌ No services selected and no active subscription");
+        debugPrint("❌ No services selected and no active subscription");
         showSnackBar(
           buildContext: context,
           message: "الرجاء اختيار خدمة واحدة على الأقل",
@@ -2463,7 +2476,7 @@ class _CreditCardPaymentBottomSheetState
       // Final check to ensure vehicle is still valid
       if (vehicleBloc.selectedVehicle.sId == null ||
           vehicleBloc.selectedVehicle.sId!.isEmpty) {
-        print("❌ Vehicle validation failed after auto-selection");
+        debugPrint("❌ Vehicle validation failed after auto-selection");
         showSnackBar(
           buildContext: context,
           message: "فشل في تحديد المركبة. الرجاء المحاولة مرة أخرى",
@@ -2471,11 +2484,11 @@ class _CreditCardPaymentBottomSheetState
         return false;
       }
 
-      print("✅ Order data validation passed");
-      print("🚗 Final vehicle ID: ${vehicleBloc.selectedVehicle.sId}");
+      debugPrint("✅ Order data validation passed");
+      debugPrint("🚗 Final vehicle ID: ${vehicleBloc.selectedVehicle.sId}");
       return true;
     } catch (e) {
-      print("❌ Error validating order data: $e");
+      debugPrint("❌ Error validating order data: $e");
       showSnackBar(
         buildContext: context,
         message: "حدث خطأ في التحقق من بيانات الطلب. الرجاء المحاولة مرة أخرى",
@@ -2491,7 +2504,7 @@ class _CreditCardPaymentBottomSheetState
       GeneralSingleton().orderId = null;
       orderIdd = null;
 
-      print("🔄 Creating new order for Credit Card payment...");
+      debugPrint("🔄 Creating new order for Credit Card payment...");
 
       // Validate required data before creating order
       if (!_validateOrderDataForCreation()) {
@@ -2505,12 +2518,12 @@ class _CreditCardPaymentBottomSheetState
       final vehicleBloc = sl<VehiclesBloc>();
       if (vehicleBloc.selectedVehicle.sId == null ||
           vehicleBloc.selectedVehicle.sId!.isEmpty) {
-        print("❌ Vehicle lost before order creation - attempting recovery");
+        debugPrint("❌ Vehicle lost before order creation - attempting recovery");
         if (vehicleBloc.vehiclesList.isNotEmpty) {
           vehicleBloc.selectedVehicle = vehicleBloc.vehiclesList.first;
-          print("🔄 Vehicle recovered: ${vehicleBloc.selectedVehicle.sId}");
+          debugPrint("🔄 Vehicle recovered: ${vehicleBloc.selectedVehicle.sId}");
         } else {
-          print("❌ No vehicles available for recovery");
+          debugPrint("❌ No vehicles available for recovery");
           _resetCreditCardState();
           // Pop the credit card bottom sheet
           Navigator.pop(context);
@@ -2526,7 +2539,7 @@ class _CreditCardPaymentBottomSheetState
       CreateOrderFunction().createOrderDataRequest();
 
       // Wait for order creation and listen for the result
-      print("⏳ Waiting for order creation...");
+      debugPrint("⏳ Waiting for order creation...");
 
       // Listen for order creation result
       final completer = Completer<String?>();
@@ -2542,16 +2555,16 @@ class _CreditCardPaymentBottomSheetState
               final newOrderId = state.reviewOrderModel.data!.sId!;
               GeneralSingleton().orderId = newOrderId;
               orderIdd = newOrderId;
-              print("📝 Order ID assigned: $newOrderId");
+              debugPrint("📝 Order ID assigned: $newOrderId");
               completer.complete(newOrderId);
             } else {
-              print("❌ Order created but no ID received");
+              debugPrint("❌ Order created but no ID received");
               completer.complete(null);
             }
           } else if (state is CreateOrderFailed) {
             errorMessageEn = state.errorModel?.en ?? state.error;
             errorMessageAr = state.errorModel?.ar ?? state.error;
-            print("❌ Order creation failed: $errorMessageAr");
+            debugPrint("❌ Order creation failed: $errorMessageAr");
             completer.complete(null);
           }
         }
@@ -2572,14 +2585,16 @@ class _CreditCardPaymentBottomSheetState
 
       // Check if order was created successfully
       if (orderId != null && orderId.isNotEmpty) {
-        print("✅ Order created successfully: $orderId");
+        debugPrint("✅ Order created successfully: $orderId");
         // Then process payment
         _processCreditCardPayment();
       } else {
-        print("❌ Failed to create order");
+        debugPrint("❌ Failed to create order");
         setState(() => _isLoading = false);
         // Pop the credit card bottom sheet
+        if (!mounted) return;
         Navigator.pop(context);
+        if (!mounted) return;
         showSnackBar(
           buildContext: context,
           message: Localizations.localeOf(context).languageCode == 'en'
@@ -2589,10 +2604,12 @@ class _CreditCardPaymentBottomSheetState
         );
       }
     } catch (e) {
-      print("❌ Error in _createNewOrderForCreditCard: $e");
+      debugPrint("❌ Error in _createNewOrderForCreditCard: $e");
       setState(() => _isLoading = false);
       // Pop the credit card bottom sheet
+      if (!mounted) return;
       Navigator.pop(context);
+      if (!mounted) return;
       showSnackBar(
         buildContext: context,
         message: "حدث خطأ أثناء إنشاء الطلب. الرجاء المحاولة مرة أخرى",
@@ -2604,7 +2621,7 @@ class _CreditCardPaymentBottomSheetState
     try {
       // Enhanced null checking
       if (orderIdd == null || orderIdd!.isEmpty) {
-        print("❌ No valid order ID available for payment");
+        debugPrint("❌ No valid order ID available for payment");
         _resetCreditCardState();
         // Pop the credit card bottom sheet
         Navigator.pop(context);
@@ -2618,7 +2635,7 @@ class _CreditCardPaymentBottomSheetState
       // Additional safety check
       if (GeneralSingleton().orderId == null ||
           GeneralSingleton().orderId!.isEmpty) {
-        print("❌ GeneralSingleton order ID is null");
+        debugPrint("❌ GeneralSingleton order ID is null");
         _resetCreditCardState();
         // Pop the credit card bottom sheet
         Navigator.pop(context);
@@ -2629,7 +2646,7 @@ class _CreditCardPaymentBottomSheetState
         return;
       }
 
-      print("💳 Processing Credit Card payment for order: $orderIdd");
+      debugPrint("💳 Processing Credit Card payment for order: $orderIdd");
 
       // Listen for place order result
       final completer = Completer<String?>();
@@ -2640,15 +2657,15 @@ class _CreditCardPaymentBottomSheetState
           if (state is PlaceOrderSuccess) {
             // Safe null checking for payment URL
             if (state.paymentUrl != null && state.paymentUrl!.isNotEmpty) {
-              print(
+              debugPrint(
                   "✅ Place order successful, payment URL: ${state.paymentUrl}");
               completer.complete(state.paymentUrl);
             } else {
-              print("❌ Place order successful but no payment URL received");
+              debugPrint("❌ Place order successful but no payment URL received");
               completer.complete(null);
             }
           } else if (state is PlaceOrderFailed) {
-            print(
+            debugPrint(
                 "❌ Place order failed: ${state.errormodel?.ar ?? state.error}");
             completer.complete(null);
           }
@@ -2659,7 +2676,7 @@ class _CreditCardPaymentBottomSheetState
       final offersBloc = sl<OffersBloc>();
 
       // Payment details should already be validated in the form
-      print("💳 Payment details validated, proceeding with place order");
+      debugPrint("💳 Payment details validated, proceeding with place order");
 
       context.read<BookingOrderBloc>().add(
             PlaceOrder(
@@ -2689,27 +2706,33 @@ class _CreditCardPaymentBottomSheetState
 
       // Handle the result
       if (paymentUrl != null && paymentUrl != "free" && paymentUrl.isNotEmpty) {
-        print("🌐 Opening webview with URL: $paymentUrl");
+        debugPrint("🌐 Opening webview with URL: $paymentUrl");
         // Close the bottom sheet before opening webview
+        if (!mounted) return;
         Navigator.pop(context);
         _openPaymentWebview(paymentUrl);
       } else if (paymentUrl == "free") {
+        if (!mounted) return;
         AlertHelper.createOrderSuccess(context);
       } else {
-        print("❌ No payment URL received");
+        debugPrint("❌ No payment URL received");
         _resetCreditCardState();
 
+        if (!mounted) return;
         Navigator.pop(context);
+        if (!mounted) return;
         showSnackBar(
           buildContext: context,
           message: "فشل في الحصول على رابط الدفع. الرجاء المحاولة مرة أخرى",
         );
       }
     } catch (e) {
-      print("❌ Error in _processCreditCardPayment: $e");
+      debugPrint("❌ Error in _processCreditCardPayment: $e");
       _resetCreditCardState();
       // Pop the credit card bottom sheet
+      if (!mounted) return;
       Navigator.pop(context);
+      if (!mounted) return;
       showSnackBar(
         buildContext: context,
         message: "حدث خطأ أثناء معالجة الدفع. الرجاء المحاولة مرة أخرى",
@@ -2720,7 +2743,7 @@ class _CreditCardPaymentBottomSheetState
   // Open payment webview for Credit Card
   void _openPaymentWebview(String paymentUrl) async {
     try {
-      print("🌐 Opening payment webview...");
+      debugPrint("🌐 Opening payment webview...");
 
       await Navigator.push(
         context,
@@ -2729,11 +2752,11 @@ class _CreditCardPaymentBottomSheetState
             transactionUrl: paymentUrl,
             onPaymentComplete: (status) {
               if (status == 'Payment success') {
-                print("✅ Payment completed successfully");
+                debugPrint("✅ Payment completed successfully");
                 Navigator.pop(context, true);
                 AlertHelper.createOrderSuccess(context);
               } else {
-                print("❌ Payment failed: $status");
+                debugPrint("❌ Payment failed: $status");
                 showSnackBar(
                   buildContext: context,
                   message: translate('paymentFailed'),
@@ -2747,8 +2770,9 @@ class _CreditCardPaymentBottomSheetState
       // Reset state after webview closes (whether successful or cancelled)
       _resetCreditCardState();
     } catch (e) {
-      print("❌ Error opening webview: $e");
+      debugPrint("❌ Error opening webview: $e");
       _resetCreditCardState();
+      if (!mounted) return;
       showSnackBar(
         buildContext: context,
         message: translate('somethingWentWrong'),
@@ -2766,10 +2790,10 @@ class _CreditCardPaymentBottomSheetState
 
     // Don't clear cart data - only reset loading state and order IDs
     // Cart data will be cleared only when returning to main navigation bar
-    print("🔄 Credit Card state reset - ready for new order creation");
-    print(
+    debugPrint("🔄 Credit Card state reset - ready for new order creation");
+    debugPrint(
         "📝 Order IDs cleared: GeneralSingleton().orderId = null, orderIdd = null");
-    print(
+    debugPrint(
         "📝 Cart data preserved - will be cleared only when returning to main nav");
   }
 
@@ -2874,7 +2898,7 @@ class _CreditCardPaymentBottomSheetState
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
                       borderSide: BorderSide(
-                          color: ColorManager.medGray.withOpacity(0.3)),
+                          color: ColorManager.medGray.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
@@ -2922,7 +2946,7 @@ class _CreditCardPaymentBottomSheetState
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
                       borderSide: BorderSide(
-                          color: ColorManager.medGray.withOpacity(0.3)),
+                          color: ColorManager.medGray.withValues(alpha: 0.3)),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12.r),
@@ -2965,7 +2989,7 @@ class _CreditCardPaymentBottomSheetState
                                 borderRadius: BorderRadius.circular(12.r),
                                 borderSide: BorderSide(
                                     color:
-                                        ColorManager.medGray.withOpacity(0.3)),
+                                        ColorManager.medGray.withValues(alpha: 0.3)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
@@ -3018,7 +3042,7 @@ class _CreditCardPaymentBottomSheetState
                                 borderRadius: BorderRadius.circular(12.r),
                                 borderSide: BorderSide(
                                     color:
-                                        ColorManager.medGray.withOpacity(0.3)),
+                                        ColorManager.medGray.withValues(alpha: 0.3)),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12.r),
@@ -3046,7 +3070,7 @@ class _CreditCardPaymentBottomSheetState
                     onPressed: _isLoading
                         ? null
                         : () {
-                            print("sadsadsassdadsdas ${widget.orderId}");
+                            debugPrint("sadsadsassdadsdas ${widget.orderId}");
                             _submitPayment(orderId: widget.orderId);
                           },
                     style: ElevatedButton.styleFrom(

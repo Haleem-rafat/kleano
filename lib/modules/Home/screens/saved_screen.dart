@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
 // import 'package:flutter_google_places/flutter_google_places.dart';
@@ -13,16 +12,14 @@ import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/widget/recent_places_tab.dart';
 import 'package:thewasher/modules/Home/widget/saved_places_tab.dart';
-import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 import 'package:thewasher/shared/components/tab_bar/tab_bar_shared.dart';
 import 'package:thewasher/utilties/navigator.dart';
 // import 'package:google_maps_webservice/places.dart';
 // import 'package:google_api_headers/google_api_headers.dart';
-import 'package:thewasher/api/app_config.dart';
 
 class SavedScreen extends StatefulWidget {
   Completer<GoogleMapController> myController;
-  SavedScreen({Key? key, required this.myController}) : super(key: key);
+  SavedScreen({super.key, required this.myController});
 
   @override
   State<SavedScreen> createState() => _SavedScreenState();
@@ -90,7 +87,7 @@ class _SavedScreenState extends State<SavedScreen>
                     ),
                   ),
                   Container(
-                    height: 812.h - 110.h,
+                    height: 1.sh - 110.h,
                     color: ColorManager.white,
                     child: Column(
                       children: <Widget>[
@@ -145,7 +142,7 @@ class _SavedScreenState extends State<SavedScreen>
                       borderRadius: BorderRadius.circular(12.r),
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                            color: ColorManager.black2.withOpacity(0.18),
+                            color: ColorManager.black2.withValues(alpha: 0.18),
                             offset: const Offset(0, 3),
                             blurRadius: 6.r),
                       ],
@@ -174,9 +171,9 @@ class _SavedScreenState extends State<SavedScreen>
   //     language: Localizations.localeOf(context).languageCode,
   //     types: [""],
   //     onError: (value) {
-  //       print(value.predictions);
-  //       print(value.status);
-  //       print(value.errorMessage);
+  //       debugPrint(value.predictions);
+  //       debugPrint(value.status);
+  //       debugPrint(value.errorMessage);
   //     },
   //     strictbounds: false,
   //     decoration: InputDecoration(

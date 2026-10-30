@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:badges/badges.dart' as badge;
-import 'package:geocoding/geocoding.dart';
+import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -74,8 +75,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   Future<void> _checkAuthenticationStatus() async {
     await AppShared.getToken();
     final bool guestStatus = AppShared.token.isEmpty || isGuestUser;
-    print(
-        "Checking authentication: Token empty=${AppShared.token.isEmpty}, isGuestUser=$isGuestUser, _isGuest=$guestStatus");
+    debugPrint(
+      "Checking authentication: Token empty=${AppShared.token.isEmpty}, isGuestUser=$isGuestUser, _isGuest=$guestStatus",
+    );
     setState(() {
       _isGuest = guestStatus;
     });
@@ -83,37 +85,40 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
 
   Future<void> _getUserLocation() async {
     try {
-      print("Guest user: Checking location services...");
+      debugPrint("Guest user: Checking location services...");
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        print("Guest user: Location services are disabled");
+        debugPrint("Guest user: Location services are disabled");
         await Geolocator.openLocationSettings();
         return;
       }
 
-      print("Guest user: Checking location permissions...");
+      debugPrint("Guest user: Checking location permissions...");
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        print("Guest user: Requesting location permission...");
+        debugPrint("Guest user: Requesting location permission...");
         permission = await Geolocator.requestPermission();
         if (permission == LocationPermission.denied) {
-          print("Guest user: Location permission denied");
+          debugPrint("Guest user: Location permission denied");
           return;
         }
       }
 
       if (permission == LocationPermission.deniedForever) {
-        print("Guest user: Location permission denied forever");
+        debugPrint("Guest user: Location permission denied forever");
         return;
       }
 
-      print("Guest user: Getting current position...");
+      debugPrint("Guest user: Getting current position...");
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
       );
 
-      print(
-          "Guest user: Position obtained - lat: ${position.latitude}, lng: ${position.longitude}");
+      debugPrint(
+        "Guest user: Position obtained - lat: ${position.latitude}, lng: ${position.longitude}",
+      );
 
       List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
@@ -121,19 +126,21 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
       );
 
       final country = placemarks.first.country ?? "saudi arabia";
-      print("Guest user: Country detected - $country");
+      debugPrint("Guest user: Country detected - $country");
 
       setState(() {
         _currentPosition = position;
         _currentCountry = country;
-        GeneralSingleton().currentPositionGuest =
-            LatLng(position.latitude, position.longitude);
+        GeneralSingleton().currentPositionGuest = LatLng(
+          position.latitude,
+          position.longitude,
+        );
         GeneralSingleton().country = placemarks.first.country;
       });
 
-      print("Guest user: Location successfully stored");
+      debugPrint("Guest user: Location successfully stored");
     } catch (e) {
-      print("Guest user: Error getting location - $e");
+      debugPrint("Guest user: Error getting location - $e");
     }
   }
 
@@ -150,36 +157,47 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         return;
       }
 
-      sl<OffersBloc>().add(GetGuestServices(
-        lat: _currentPosition!.latitude,
-        lng: _currentPosition!.longitude,
-        country: "saudi arabia",
-      ));
+      sl<OffersBloc>().add(
+        GetGuestServices(
+          lat: _currentPosition!.latitude,
+          lng: _currentPosition!.longitude,
+          country: "saudi arabia",
+        ),
+      );
 
-      sl<OffersBloc>().add(GetGuestAddOns(
-        lat: _currentPosition!.latitude,
-        lng: _currentPosition!.longitude,
-        country: "saudi arabia",
-      ));
+      sl<OffersBloc>().add(
+        GetGuestAddOns(
+          lat: _currentPosition!.latitude,
+          lng: _currentPosition!.longitude,
+          country: "saudi arabia",
+        ),
+      );
     } else {
       sl<LocationBloc>().add(GetSavedLocation());
       sl<GetUserProfileBloc>().add(GetUserProfileEvent());
-      sl<PlansAndSubscriptionBloc>().add(GetSubscriptionUserByLocation(
+      sl<PlansAndSubscriptionBloc>().add(
+        GetSubscriptionUserByLocation(
           latitude: blcoPosition.latitude,
           longitude: blcoPosition.longitude,
-          country: blcoCountry));
+          country: blcoCountry,
+        ),
+      );
 
-      sl<OffersBloc>().add(GetServices(
-        lat: blcoPosition.latitude,
-        lng: blcoPosition.longitude,
-        country: "saudi arabia",
-      ));
+      sl<OffersBloc>().add(
+        GetServices(
+          lat: blcoPosition.latitude,
+          lng: blcoPosition.longitude,
+          country: "saudi arabia",
+        ),
+      );
 
-      sl<OffersBloc>().add(GetAddOns(
-        lat: blcoPosition.latitude,
-        lng: blcoPosition.longitude,
-        country: "saudi arabia",
-      ));
+      sl<OffersBloc>().add(
+        GetAddOns(
+          lat: blcoPosition.latitude,
+          lng: blcoPosition.longitude,
+          country: "saudi arabia",
+        ),
+      );
     }
 
     if (mounted) {
@@ -220,23 +238,29 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
           if (_currentPosition != null) {
             // Fetch guest services with current location
 
-            print(
-                "Fetching guest services with location: lat=${_currentPosition!.latitude}, lng=${_currentPosition!.longitude}, country=$_currentCountry");
-            sl<OffersBloc>().add(GetGuestServices(
-              lat: _currentPosition!.latitude,
-              lng: _currentPosition!.longitude,
-              country: "saudi arabia",
-            ));
+            debugPrint(
+              "Fetching guest services with location: lat=${_currentPosition!.latitude}, lng=${_currentPosition!.longitude}, country=$_currentCountry",
+            );
+            sl<OffersBloc>().add(
+              GetGuestServices(
+                lat: _currentPosition!.latitude,
+                lng: _currentPosition!.longitude,
+                country: "saudi arabia",
+              ),
+            );
 
-            print(
-                "Fetching guest add-ons with location: lat=${_currentPosition!.latitude}, lng=${_currentPosition!.longitude}, country=$_currentCountry");
-            sl<OffersBloc>().add(GetGuestAddOns(
-              lat: _currentPosition!.latitude,
-              lng: _currentPosition!.longitude,
-              country: "saudi arabia",
-            ));
+            debugPrint(
+              "Fetching guest add-ons with location: lat=${_currentPosition!.latitude}, lng=${_currentPosition!.longitude}, country=$_currentCountry",
+            );
+            sl<OffersBloc>().add(
+              GetGuestAddOns(
+                lat: _currentPosition!.latitude,
+                lng: _currentPosition!.longitude,
+                country: "saudi arabia",
+              ),
+            );
           } else {
-            print("Guest user: Unable to fetch location");
+            debugPrint("Guest user: Unable to fetch location");
             if (mounted) {
               setState(() {
                 isLoading = false;
@@ -250,22 +274,29 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         sl<GetUserProfileBloc>().add(GetUserProfileEvent());
 
         Future.delayed(const Duration(seconds: 2), () {
-          sl<PlansAndSubscriptionBloc>().add(GetSubscriptionUserByLocation(
+          sl<PlansAndSubscriptionBloc>().add(
+            GetSubscriptionUserByLocation(
               latitude: blcoPosition.latitude,
               longitude: blcoPosition.longitude,
-              country: "saudi arabia"));
+              country: "saudi arabia",
+            ),
+          );
 
-          sl<OffersBloc>().add(GetServices(
-            lat: blcoPosition.latitude,
-            lng: blcoPosition.longitude,
-            country: "saudi arabia",
-          ));
+          sl<OffersBloc>().add(
+            GetServices(
+              lat: blcoPosition.latitude,
+              lng: blcoPosition.longitude,
+              country: "saudi arabia",
+            ),
+          );
 
-          sl<OffersBloc>().add(GetAddOns(
-            lat: blcoPosition.latitude,
-            lng: blcoPosition.longitude,
-            country: "saudi arabia",
-          ));
+          sl<OffersBloc>().add(
+            GetAddOns(
+              lat: blcoPosition.latitude,
+              lng: blcoPosition.longitude,
+              country: "saudi arabia",
+            ),
+          );
         });
       }
     });
@@ -282,10 +313,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
 
   void _nextButtonSteps() {
     if (_isGuest) {
-      showSnackBar(
-        buildContext: context,
-        message: _guestAuthMessage(context),
-      );
+      showSnackBar(buildContext: context, message: _guestAuthMessage(context));
       return;
     }
 
@@ -334,8 +362,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion(
-      value: AppStyles.darkStatusBarIconsWithTransparentColorStyle
-          .copyWith(systemNavigationBarColor: Colors.transparent),
+      value: AppStyles.darkStatusBarIconsWithTransparentColorStyle.copyWith(
+        systemNavigationBarColor: Colors.transparent,
+      ),
       child: Scaffold(
         body: PopScope(
           canPop: false,
@@ -381,20 +410,24 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                     slivers: [
                       SliverAppBar(
                         automaticallyImplyLeading: false,
+                        // Safe-area aware: works with notches, the Dynamic
+                        // Island and iPhone Duo's side camera island.
                         expandedHeight: indexPage == 0
-                            ? Platform.isAndroid
-                                ? 260.h
-                                : 240.h
+                            ? MediaQuery.paddingOf(context).top +
+                                  8 +
+                                  (Platform.isAndroid ? 220.h : 200.h) +
+                                  24
                             : 70.h,
                         floating: false,
                         pinned: true,
-                        backgroundColor: ColorManager.primary,
+                        // iOS 26/27: no coloured bar; title on the content.
+                        backgroundColor: ColorManager.white,
+                        surfaceTintColor: Colors.transparent,
                         elevation: 0,
                         leading: indexPage == 0
                             ? null
-                            : IconButton(
-                                icon: const Icon(Icons.arrow_back_ios,
-                                    color: Colors.white),
+                            : GlassBackButton(
+                                color: ColorManager.primary,
                                 onPressed: _backButtonSteps,
                               ),
                         flexibleSpace: FlexibleSpaceBar(
@@ -402,9 +435,12 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                             children: [
                               Container(
                                 padding: EdgeInsets.only(
-                                  top: 40.h,
-                                  left: 16.w,
-                                  right: 16.w,
+                                  top: MediaQuery.paddingOf(context).top + 8,
+                                  left:
+                                      16.w + MediaQuery.paddingOf(context).left,
+                                  right:
+                                      16.w +
+                                      MediaQuery.paddingOf(context).right,
                                   bottom: 2.h,
                                 ),
                                 child: indexPage == 0
@@ -428,31 +464,32 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                             .titleWhite16Bold,
                                                       )
                                                     : (context
-                                                                .read<
-                                                                    GetUserProfileBloc>()
-                                                                .profile
-                                                                .userName ==
-                                                            ""
-                                                        ? const DotedWidget()
-                                                        : BlocBuilder<
-                                                            GetUserProfileBloc,
-                                                            GetUserProfileState>(
-                                                            builder: (context,
-                                                                state) {
-                                                              if (state
-                                                                  is GetUserProfileLoading) {
-                                                                return const DotedWidget();
-                                                              } else if (state
-                                                                  is GetUserProfileSuccess) {
-                                                                return Text(
-                                                                  ' ${state.userProfile.data?.userName!.split(' ').first}',
-                                                                  style: AppStyles
-                                                                      .titleWhite16Bold,
-                                                                );
-                                                              }
-                                                              return const SizedBox();
-                                                            },
-                                                          )),
+                                                                  .read<
+                                                                    GetUserProfileBloc
+                                                                  >()
+                                                                  .profile
+                                                                  .userName ==
+                                                              ""
+                                                          ? const DotedWidget()
+                                                          : BlocBuilder<
+                                                              GetUserProfileBloc,
+                                                              GetUserProfileState
+                                                            >(
+                                                              builder: (context, state) {
+                                                                if (state
+                                                                    is GetUserProfileLoading) {
+                                                                  return const DotedWidget();
+                                                                } else if (state
+                                                                    is GetUserProfileSuccess) {
+                                                                  return Text(
+                                                                    ' ${state.userProfile.data?.userName!.split(' ').first}',
+                                                                    style: AppStyles
+                                                                        .titleWhite16Bold,
+                                                                  );
+                                                                }
+                                                                return const SizedBox();
+                                                              },
+                                                            )),
                                               ],
                                             ),
                                           ),
@@ -461,17 +498,22 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                               ? GestureDetector(
                                                   onTap: () {
                                                     AlertHelper.pointAlert(
-                                                        context);
+                                                      context,
+                                                    );
                                                   },
                                                   child: Container(
                                                     height: 24.h,
                                                     width: 24.w,
                                                     decoration: BoxDecoration(
-                                                      color: ColorManager.white
-                                                          .withOpacity(0.5),
+                                                      color: ColorManager
+                                                          .primary
+                                                          .withValues(
+                                                            alpha: 0.10,
+                                                          ),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              15.r),
+                                                            15.r,
+                                                          ),
                                                     ),
                                                     child: SvgPicture.asset(
                                                       AssetsManager.walletCoin,
@@ -481,8 +523,10 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                     ),
                                                   ),
                                                 )
-                                              : BlocBuilder<GetUserProfileBloc,
-                                                  GetUserProfileState>(
+                                              : BlocBuilder<
+                                                  GetUserProfileBloc,
+                                                  GetUserProfileState
+                                                >(
                                                   builder: (context, state) {
                                                     if (state
                                                         is GetUserProfileLoading) {
@@ -491,25 +535,24 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                         is GetUserProfileSuccess) {
                                                       return InkWell(
                                                         onTap: () {
-                                                          AlertHelper
-                                                              .pointAlert(
-                                                                  context);
+                                                          AlertHelper.pointAlert(
+                                                            context,
+                                                          );
                                                         },
                                                         child: Container(
                                                           height: 23.h,
-                                                          padding: EdgeInsets
-                                                              .symmetric(
-                                                                  vertical: 3.h,
-                                                                  horizontal:
-                                                                      8.w),
-                                                          decoration:
-                                                              BoxDecoration(
+                                                          padding:
+                                                              EdgeInsets.symmetric(
+                                                                vertical: 3.h,
+                                                                horizontal: 8.w,
+                                                              ),
+                                                          decoration: BoxDecoration(
                                                             color: ColorManager
                                                                 .secondary,
                                                             borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        15.r),
+                                                                BorderRadius.circular(
+                                                                  15.r,
+                                                                ),
                                                           ),
                                                           child: Center(
                                                             child: Row(
@@ -520,8 +563,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                                   CrossAxisAlignment
                                                                       .center,
                                                               children: [
-                                                                SvgPicture
-                                                                    .asset(
+                                                                SvgPicture.asset(
                                                                   AssetsManager
                                                                       .walletCoin,
                                                                   height: 10.h,
@@ -533,8 +575,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                                   style: AppStyles
                                                                       .subtext14Regular
                                                                       .copyWith(
-                                                                          color:
-                                                                              ColorManager.white),
+                                                                        color: ColorManager
+                                                                            .white,
+                                                                      ),
                                                                 ),
                                                               ],
                                                             ),
@@ -548,50 +591,61 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                           // Notifications section
                                           SizedBox(width: 8.w),
                                           GestureDetector(
-                                              onTap: () {
-                                                if (_isGuest) {
-                                                  pushPage(context,
-                                                      const GuestNotificationScreen());
-                                                } else {
-                                                  pushPage(context,
-                                                      const NotificationsScreen());
-                                                }
-                                                if (mounted) {
-                                                  setState(() {
-                                                    generalSingleton
-                                                            .hasUnreadNotification =
-                                                        false;
-                                                  });
-                                                }
-                                              },
-                                              behavior: HitTestBehavior.opaque,
-                                              child: SizedBox(
-                                                height: AppSize.s20.h,
-                                                width: AppSize.s20.w,
-                                                child: Stack(
-                                                  alignment: Alignment.topLeft,
-                                                  children: <Widget>[
-                                                    SvgPicture.asset(
-                                                      AssetsManager
-                                                          .notification,
-                                                      fit: BoxFit.cover,
+                                            onTap: () {
+                                              if (_isGuest) {
+                                                pushPage(
+                                                  context,
+                                                  const GuestNotificationScreen(),
+                                                );
+                                              } else {
+                                                pushPage(
+                                                  context,
+                                                  const NotificationsScreen(),
+                                                );
+                                              }
+                                              if (mounted) {
+                                                setState(() {
+                                                  generalSingleton
+                                                          .hasUnreadNotification =
+                                                      false;
+                                                });
+                                              }
+                                            },
+                                            behavior: HitTestBehavior.opaque,
+                                            child: SizedBox(
+                                              height: AppSize.s20.h,
+                                              width: AppSize.s20.w,
+                                              child: Stack(
+                                                alignment: Alignment.topLeft,
+                                                children: <Widget>[
+                                                  SvgPicture.asset(
+                                                    AssetsManager.notification,
+                                                    fit: BoxFit.cover,
+                                                    colorFilter:
+                                                        const ColorFilter.mode(
+                                                          ColorManager.primary,
+                                                          BlendMode.srcIn,
+                                                        ),
+                                                  ),
+                                                  if (generalSingleton
+                                                      .hasUnreadNotification)
+                                                    SizedBox(
+                                                      height: 6.h,
+                                                      width: 6.w,
+                                                      child:
+                                                          const badge.Badge(),
                                                     ),
-                                                    if (generalSingleton
-                                                        .hasUnreadNotification)
-                                                      SizedBox(
-                                                        height: 6.h,
-                                                        width: 6.w,
-                                                        child:
-                                                            const badge.Badge(),
-                                                      ),
-                                                  ],
-                                                ),
-                                              )),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
                                           // Location chip section
                                           if (!_isGuest) ...[
                                             SizedBox(width: 8.w),
-                                            BlocBuilder<LocationBloc,
-                                                LocationState>(
+                                            BlocBuilder<
+                                              LocationBloc,
+                                              LocationState
+                                            >(
                                               builder: (context, state) {
                                                 if (state
                                                     is GetSavedLocationSuccess) {
@@ -601,23 +655,28 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                     defaultAddress = state
                                                         .savedLocation
                                                         .firstWhere(
-                                                      (address) =>
-                                                          address.isDefault ==
-                                                          true,
-                                                    );
+                                                          (address) =>
+                                                              address
+                                                                  .isDefault ==
+                                                              true,
+                                                        );
                                                   } catch (e) {
-                                                    if (state.savedLocation
+                                                    if (state
+                                                        .savedLocation
                                                         .isNotEmpty) {
                                                       defaultAddress = state
-                                                          .savedLocation.first;
+                                                          .savedLocation
+                                                          .first;
                                                     }
                                                   }
 
                                                   if (defaultAddress != null) {
                                                     return GestureDetector(
                                                       onTap: () {
-                                                        pushPage(context,
-                                                            SetBookingLocationScreen());
+                                                        pushPage(
+                                                          context,
+                                                          SetBookingLocationScreen(),
+                                                        );
                                                       },
                                                       child: Chip(
                                                         backgroundColor:
@@ -629,20 +688,21 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                                       ?.isNotEmpty ==
                                                                   true
                                                               ? defaultAddress
-                                                                  .savedName!
+                                                                    .savedName!
                                                               : defaultAddress
-                                                                      .streetName ??
-                                                                  translate(
+                                                                        .streetName ??
+                                                                    translate(
                                                                       AppStrings
-                                                                          .defaultAddress),
+                                                                          .defaultAddress,
+                                                                    ),
                                                           style: AppStyles
                                                               .title16Bold
                                                               .copyWith(
-                                                                  color:
-                                                                      ColorManager
-                                                                          .white,
-                                                                  fontSize:
-                                                                      12.sp),
+                                                                color:
+                                                                    ColorManager
+                                                                        .white,
+                                                                fontSize: 12.sp,
+                                                              ),
                                                           maxLines: 1,
                                                           overflow: TextOverflow
                                                               .ellipsis,
@@ -676,8 +736,12 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                             translate(AppStrings.bookingOrder),
                                             style: AppStyles.titleWhite16Bold
                                                 .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                                  color: ColorManager.black,
+                                                  fontSize: 22.sp,
+                                                )
+                                                .copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                           ),
                                         ],
                                       ),
@@ -694,13 +758,15 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                       SliverToBoxAdapter(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(
-                            minHeight: MediaQuery.of(context).size.height -
+                            minHeight:
+                                MediaQuery.of(context).size.height -
                                 250.h, // Account for app bar height
                           ),
                           child: isLoading
                               ? Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 24.w),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 24.w,
+                                  ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -731,20 +797,26 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                       ...List.generate(3, (index) {
                                         return Container(
                                           margin: EdgeInsets.symmetric(
-                                              vertical: 18.h),
+                                            vertical: 18.h,
+                                          ),
                                           padding: EdgeInsets.fromLTRB(
-                                              12.5.w, 11.5.h, 12.5.w, 13.5.h),
+                                            12.5.w,
+                                            11.5.h,
+                                            12.5.w,
+                                            13.5.h,
+                                          ),
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(15.r),
+                                            borderRadius: BorderRadius.circular(
+                                              15.r,
+                                            ),
                                             color: ColorManager.white,
                                             boxShadow: <BoxShadow>[
                                               BoxShadow(
                                                 color: ColorManager.black
-                                                    .withOpacity(.05),
+                                                    .withValues(alpha: .05),
                                                 blurRadius: 3.r,
                                                 offset: const Offset(0, 3),
-                                              )
+                                              ),
                                             ],
                                           ),
                                           child: Row(
@@ -804,8 +876,8 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                 )
                               : Padding(
                                   padding: EdgeInsets.only(
-                                      bottom:
-                                          100.h), // Add bottom padding for FAB
+                                    bottom: 100.h,
+                                  ), // Add bottom padding for FAB
                                   child: bookingScreen[indexPage],
                                 ),
                         ),
@@ -843,118 +915,147 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                   opacity: _isGuest ? 0.6 : 1,
                                   child: GestureDetector(
                                     onTap: _nextButtonSteps,
-                                    child: BlocConsumer<BookingOrderBloc,
-                                        BookingOrderState>(
-                                      listener: (BuildContext context,
-                                          BookingOrderState state) {
-                                        if (state is CreateOrderSuccess) {
-                                          generalSingleton.orderId =
-                                              state.reviewOrderModel.data!.sId!;
+                                    child: BlocConsumer<BookingOrderBloc, BookingOrderState>(
+                                      listener:
+                                          (
+                                            BuildContext context,
+                                            BookingOrderState state,
+                                          ) {
+                                            if (state is CreateOrderSuccess) {
+                                              generalSingleton.orderId = state
+                                                  .reviewOrderModel
+                                                  .data!
+                                                  .sId!;
 
-                                          if (state.reviewOrderModel.data!
-                                                      .totalPay ==
-                                                  0.0 ||
-                                              state.reviewOrderModel.data!
-                                                      .totalPay ==
-                                                  0) {
-                                            AlertHelper.createOrderSuccess(
-                                                context);
-                                          }
-                                        } else if (state is CreateOrderFailed) {
-                                          if (state.errorModel!.en ==
-                                                  AppStrings
-                                                      .yourWalletBalanceIsNotValid ||
-                                              state.errorModel!.ar ==
-                                                  AppStrings
-                                                      .yourWalletBalanceIsNotValid) {
-                                            AlertHelper
-                                                .payWithWalletNotEnoughAmount(
-                                                    context);
-                                          } else {
-                                            showSnackBar(
-                                                buildContext: context,
-                                                message: Localizations.localeOf(
-                                                                context)
-                                                            .languageCode ==
-                                                        'en'
-                                                    ? state.errorModel!.en!
-                                                    : state.errorModel!.ar!);
-                                          }
-                                        }
-                                      },
-                                      builder: (BuildContext context,
-                                          BookingOrderState state) {
-                                        if (state is CreateOrderLoading) {
-                                          return const LoadingWidget();
-                                        }
-
-                                        // Hide button when services are loading
-                                        return BlocBuilder<OffersBloc,
-                                            OffersState>(
-                                          builder: (context, offersState) {
-                                            if (offersState is OffersInitial ||
-                                                offersState
-                                                    is GetServicesLoading ||
-                                                offersState
-                                                    is GetAddOnsLoading ||
-                                                offersState
-                                                    is AddServiceCartLoading ||
-                                                offersState
-                                                    is DeleteServiceCartLoading ||
-                                                offersState
-                                                    is AddExtraCartLoading ||
-                                                offersState
-                                                    is DeleteExtraCartLoading ||
-                                                offersState
-                                                    is ClearCartLoading ||
-                                                offersState
-                                                    is ClearAllSelectedServicesLoading ||
-                                                offersState
-                                                    is GetGuestServicesLoading ||
-                                                offersState
-                                                    is GetGuestAddOnsLoading) {
-                                              return const SizedBox.shrink();
+                                              if (state
+                                                          .reviewOrderModel
+                                                          .data!
+                                                          .totalPay ==
+                                                      0.0 ||
+                                                  state
+                                                          .reviewOrderModel
+                                                          .data!
+                                                          .totalPay ==
+                                                      0) {
+                                                AlertHelper.createOrderSuccess(
+                                                  context,
+                                                );
+                                              }
+                                            } else if (state
+                                                is CreateOrderFailed) {
+                                              if (state.errorModel!.en ==
+                                                      AppStrings
+                                                          .yourWalletBalanceIsNotValid ||
+                                                  state.errorModel!.ar ==
+                                                      AppStrings
+                                                          .yourWalletBalanceIsNotValid) {
+                                                AlertHelper.payWithWalletNotEnoughAmount(
+                                                  context,
+                                                );
+                                              } else {
+                                                showSnackBar(
+                                                  buildContext: context,
+                                                  message:
+                                                      Localizations.localeOf(
+                                                            context,
+                                                          ).languageCode ==
+                                                          'en'
+                                                      ? state.errorModel!.en!
+                                                      : state.errorModel!.ar!,
+                                                );
+                                              }
+                                            }
+                                          },
+                                      builder:
+                                          (
+                                            BuildContext context,
+                                            BookingOrderState state,
+                                          ) {
+                                            if (state is CreateOrderLoading) {
+                                              return const LoadingWidget();
                                             }
 
-                                            final offersBloc =
-                                                context.read<OffersBloc>();
+                                            // Hide button when services are loading
+                                            return BlocBuilder<
+                                              OffersBloc,
+                                              OffersState
+                                            >(
+                                              builder: (context, offersState) {
+                                                if (offersState
+                                                        is OffersInitial ||
+                                                    offersState
+                                                        is GetServicesLoading ||
+                                                    offersState
+                                                        is GetAddOnsLoading ||
+                                                    offersState
+                                                        is AddServiceCartLoading ||
+                                                    offersState
+                                                        is DeleteServiceCartLoading ||
+                                                    offersState
+                                                        is AddExtraCartLoading ||
+                                                    offersState
+                                                        is DeleteExtraCartLoading ||
+                                                    offersState
+                                                        is ClearCartLoading ||
+                                                    offersState
+                                                        is ClearAllSelectedServicesLoading ||
+                                                    offersState
+                                                        is GetGuestServicesLoading ||
+                                                    offersState
+                                                        is GetGuestAddOnsLoading) {
+                                                  return const SizedBox.shrink();
+                                                }
 
-                                            final int servicesCount = offersBloc
-                                                .cartServicesList.length;
-                                            final int addOnsCount = offersBloc
-                                                .cartAddOnsList.length;
-                                            final num servicesTotal = offersBloc
-                                                .cartServicesList
-                                                .fold<num>(
-                                                    0,
-                                                    (sum, service) =>
-                                                        sum +
-                                                        (service.price ?? 0));
-                                            final num addOnsTotal = offersBloc
-                                                .cartAddOnsList
-                                                .fold<num>(
-                                                    0,
-                                                    (sum, addon) =>
-                                                        sum +
-                                                        (addon.price ?? 0));
-                                            final num totalPrice =
-                                                servicesTotal + addOnsTotal;
+                                                final offersBloc = context
+                                                    .read<OffersBloc>();
 
-                                            return TotalPayCard(
-                                              text: indexPage == 0
-                                                  ? translate(
-                                                      AppStrings.nextButton)
-                                                  : translate(
-                                                      AppStrings.confirmButton),
-                                              servicesCount: servicesCount,
-                                              addOnsCount: addOnsCount,
-                                              servicesTotal: servicesTotal,
-                                              addOnsTotal: addOnsTotal,
-                                              totalPrice: totalPrice,
+                                                final int servicesCount =
+                                                    offersBloc
+                                                        .cartServicesList
+                                                        .length;
+                                                final int addOnsCount =
+                                                    offersBloc
+                                                        .cartAddOnsList
+                                                        .length;
+                                                final num servicesTotal =
+                                                    offersBloc.cartServicesList
+                                                        .fold<num>(
+                                                          0,
+                                                          (sum, service) =>
+                                                              sum +
+                                                              (service.price ??
+                                                                  0),
+                                                        );
+                                                final num addOnsTotal =
+                                                    offersBloc.cartAddOnsList
+                                                        .fold<num>(
+                                                          0,
+                                                          (sum, addon) =>
+                                                              sum +
+                                                              (addon.price ??
+                                                                  0),
+                                                        );
+                                                final num totalPrice =
+                                                    servicesTotal + addOnsTotal;
+
+                                                return TotalPayCard(
+                                                  text: indexPage == 0
+                                                      ? translate(
+                                                          AppStrings.nextButton,
+                                                        )
+                                                      : translate(
+                                                          AppStrings
+                                                              .confirmButton,
+                                                        ),
+                                                  servicesCount: servicesCount,
+                                                  addOnsCount: addOnsCount,
+                                                  servicesTotal: servicesTotal,
+                                                  addOnsTotal: addOnsTotal,
+                                                  totalPrice: totalPrice,
+                                                );
+                                              },
                                             );
                                           },
-                                        );
-                                      },
                                     ),
                                   ),
                                 ),

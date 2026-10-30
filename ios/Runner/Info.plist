@@ -36,15 +36,19 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>tel</string>
+		<string>https</string>
+		<string>whatsapp</string>
+		<string>comgooglemaps</string>
+		<string>maps</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>We need access to your camera so you can take a photo of your car for service or delivery verification</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>location is required for get nearst provider for user</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is used to find washing services and bikers near you.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>location is required for get nearst provider for user</string>
+	<string>Your location is used to find washing services and bikers near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library so you can upload an existing photo of your car for service or delivery.</string>
 	<key>UIApplicationSceneManifest</key>
@@ -82,6 +86,9 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>

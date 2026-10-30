@@ -26,7 +26,7 @@ class SubscriptionAndService extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool showServicesList =
-        sl<OffersBloc>.call().cartServicesList.isNotEmpty ? true : false;
+        sl.call<OffersBloc>.call().cartServicesList.isNotEmpty ? true : false;
     return StatefulBuilder(
       builder: (context, myState) {
         return Column(

@@ -21,7 +21,7 @@ class FixedMap extends StatelessWidget {
         radius: 100,
         fillColor: ColorManager.red,
         strokeWidth: 20,
-        strokeColor: ColorManager.secondary.withOpacity(.80),
+        strokeColor: ColorManager.secondary.withValues(alpha: .80),
       ),
     };
     return SizedBox(

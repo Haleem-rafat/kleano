@@ -100,7 +100,7 @@ class _StatusOrderBottomSheetState extends State<StatusOrderBottomSheet> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     EventsStepper(
-                      status: widget.orderModel != null ? widget.orderModel!.status! : null,
+                      status: widget.orderModel?.status!,
                     ),
                     AppSize.s6.pw,
                     NameAndTimeEventsList(

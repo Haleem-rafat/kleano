@@ -139,14 +139,14 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
         borderRadius: BorderRadius.circular(15.r),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.black.withOpacity(0.05),
+            color: ColorManager.black.withValues(alpha: 0.05),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           ),
         ],
         border: location.isDefault == true
             ? Border.all(
-                color: ColorManager.primary.withOpacity(0.3),
+                color: ColorManager.primary.withValues(alpha: 0.3),
                 width: 2.w,
               )
             : null,
@@ -173,7 +173,7 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
                       width: 40.r,
                       height: 40.r,
                       decoration: BoxDecoration(
-                        color: ColorManager.primary.withOpacity(0.1),
+                        color: ColorManager.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(10.r),
                       ),
                       child: Icon(
@@ -203,7 +203,7 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
                                 vertical: 4.h,
                               ),
                               decoration: BoxDecoration(
-                                color: ColorManager.primary.withOpacity(0.1),
+                                color: ColorManager.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8.r),
                               ),
                               child: Text(
@@ -235,8 +235,8 @@ class _SavedLocationsScreenState extends State<SavedLocationsScreen> {
                         height: 32.h,
                         decoration: BoxDecoration(
                           color: location.isDefault == true
-                              ? ColorManager.medGray.withOpacity(0.1)
-                              : ColorManager.red.withOpacity(0.1),
+                              ? ColorManager.medGray.withValues(alpha: 0.1)
+                              : ColorManager.red.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8.r),
                         ),
                         child: Icon(

@@ -14,11 +14,11 @@ class ActivePromoCode extends StatefulWidget {
   final String? highlightPromoId;
   final ValueChanged<PromoCodeTypes>? onPromoLocated;
   const ActivePromoCode({
-    Key? key,
+    super.key,
     required this.isVisible,
     this.highlightPromoId,
     this.onPromoLocated,
-  }) : super(key: key);
+  });
 
   @override
   State<ActivePromoCode> createState() => _ActivePromoCodeState();

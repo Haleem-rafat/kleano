@@ -3,7 +3,7 @@ import 'package:thewasher/utilties/navigator.dart';
 
 class LoginFlow {
   static int selectedGuestIndex = 0;
-  static guestFlowRoutes(context) {
+  static void guestFlowRoutes(context) {
     switch (selectedGuestIndex) {
       case 0:
         pop(context);

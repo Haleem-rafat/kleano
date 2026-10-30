@@ -31,11 +31,11 @@ class AnimatedSnackBarContent extends StatefulWidget {
   final Color? backgroundColor;
 
   const AnimatedSnackBarContent({
-    Key? key,
+    super.key,
     required this.message,
     required this.icon,
     this.backgroundColor,
-  }) : super(key: key);
+  });
 
   @override
   State<AnimatedSnackBarContent> createState() =>

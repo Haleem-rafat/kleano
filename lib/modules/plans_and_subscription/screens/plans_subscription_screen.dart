@@ -173,10 +173,10 @@ class _PlansAndSubscriptionScreenState
                                 width: 120.w,
                                 height: 120.h,
                                 decoration: BoxDecoration(
-                                  color: ColorManager.red.withOpacity(0.1),
+                                  color: ColorManager.red.withValues(alpha: 0.1),
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: ColorManager.red.withOpacity(0.2),
+                                    color: ColorManager.red.withValues(alpha: 0.2),
                                     width: 2,
                                   ),
                                 ),
@@ -223,7 +223,7 @@ class _PlansAndSubscriptionScreenState
                             shrinkWrap: true,
                             itemCount: plans.length,
                             itemBuilder: (context, index) {
-                              print("total plans ${plans.length}");
+                              debugPrint("total plans ${plans.length}");
                               return planAnimationCard(index);
                             })
                     ],
@@ -242,7 +242,7 @@ class _PlansAndSubscriptionScreenState
                           shrinkWrap: true,
                           itemCount: plans.length,
                           itemBuilder: (context, index) {
-                            print("total plans ${plans.length}");
+                            debugPrint("total plans ${plans.length}");
                             return planAnimationCard(index);
                           })
                     ],

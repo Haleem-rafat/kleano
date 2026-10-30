@@ -31,7 +31,7 @@ class CircleImageShared extends StatelessWidget {
             return ShimmeringWidget(
               child: CircleAvatar(
                 radius: radius,
-                backgroundColor: ColorManager.primary.withOpacity(0.1),
+                backgroundColor: ColorManager.primary.withValues(alpha: 0.1),
               ),
             );
           },
@@ -39,7 +39,7 @@ class CircleImageShared extends StatelessWidget {
             return CircleAvatar(
               radius: radius,
               backgroundImage: NetworkImage(imageUrl),
-              backgroundColor: ColorManager.primary.withOpacity(0.1),
+              backgroundColor: ColorManager.primary.withValues(alpha: 0.1),
             );
           },
           errorWidget: (BuildContext context, _, Object dynamic) {

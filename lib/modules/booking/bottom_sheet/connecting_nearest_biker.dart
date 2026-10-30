@@ -48,7 +48,7 @@ class _WaitForBikerBottomSheetState extends State<WaitForBikerBottomSheet> {
   Widget build(BuildContext context) {
     return Container(
       height: 475.48.h,
-      width: 375.w,
+      width: 1.sw,
       decoration: BoxDecoration(
         color: ColorManager.white,
         borderRadius: BorderRadius.only(topRight: Radius.circular(20.r), topLeft: Radius.circular(20.r)),

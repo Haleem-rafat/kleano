@@ -19,7 +19,7 @@ import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
 class ServicesWidget extends StatelessWidget {
-  const ServicesWidget({Key? key}) : super(key: key);
+  const ServicesWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -80,7 +80,7 @@ class ServicesWidget extends StatelessWidget {
                               ? ColorManager.primary
                               : ColorManager.white),
                       boxShadow: <BoxShadow>[
-                        BoxShadow(color: ColorManager.black.withOpacity(.12), blurRadius: 2.r, offset: const Offset(0, 0))
+                        BoxShadow(color: ColorManager.black.withValues(alpha: .12), blurRadius: 2.r, offset: const Offset(0, 0))
                       ]),
                   child: Column(
                     children: <Widget>[
@@ -122,7 +122,7 @@ class ServicesWidget extends StatelessWidget {
                                                 borderRadius: BorderRadius.circular(15.r),
                                                 boxShadow: <BoxShadow>[
                                                   BoxShadow(
-                                                      color: ColorManager.black.withOpacity(.08),
+                                                      color: ColorManager.black.withValues(alpha: .08),
                                                       blurRadius: 6.r,
                                                       offset: const Offset(0, 3))
                                                 ]),

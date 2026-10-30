@@ -11,7 +11,7 @@ class GetUserProfileLoading extends GetUserProfileState {}
 class GetUserProfileSuccess extends GetUserProfileState {
   UserProfile userProfile;
   GetUserProfileSuccess({required this.userProfile}) {
-    print(userProfile.toJson());
+    debugPrint('${userProfile.toJson()}');
   }
 }
 

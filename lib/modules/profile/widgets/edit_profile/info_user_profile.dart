@@ -43,7 +43,7 @@ class PersonalInformation extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: ColorManager.gray.withOpacity(0.3),
+        color: ColorManager.gray.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12.r),
       ),
       child: Column(

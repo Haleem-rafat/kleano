@@ -21,8 +21,8 @@ import 'package:thewasher/shared/services/service_locator.dart';
 
 class LocationConfirmation extends StatefulWidget {
   const LocationConfirmation({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<LocationConfirmation> createState() => _LocationConfirmationState();
@@ -42,8 +42,8 @@ class _LocationConfirmationState extends State<LocationConfirmation> {
     );
   }
 
-  _buildChild(BuildContext context) {
-    PickedLocationModel location = sl<LocationBloc>.call().pickedLocationModel;
+  StatefulBuilder _buildChild(BuildContext context) {
+    PickedLocationModel location = sl.call<LocationBloc>.call().pickedLocationModel;
 
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
@@ -117,7 +117,7 @@ class _LocationConfirmationState extends State<LocationConfirmation> {
                       // );
                       return ButtonsShared(
                           onPressed: () {
-                            print(
+                            debugPrint(
                                 '________${context.read<GetUserProfileBloc>.call().profile.isSubscribed!}');
                             if (context.read<GetUserProfileBloc>.call()
                                 .profile

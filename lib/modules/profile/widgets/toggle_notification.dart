@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/notifications/blocs/notifications/notifications_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
@@ -36,7 +35,7 @@ class _ToggleNotificationState extends State<ToggleNotification> {
         borderRadius: BorderRadius.circular(10.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.05),
+            color: ColorManager.black.withValues(alpha: .05),
             blurRadius: 3.r,
             offset: const Offset(0, 3),
           ),

@@ -3,17 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 // import 'package:google_maps_webservice/src/places.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/text-form-shared.dart';
-import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class SavedAlert extends StatelessWidget {
@@ -23,12 +19,11 @@ class SavedAlert extends StatelessWidget {
   int? index;
 
   SavedAlert(
-      {Key? key,
+      {super.key,
       // this.detail,
       required this.nameController,
       required this.recent,
-      this.index})
-      : super(key: key);
+      this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +38,7 @@ class SavedAlert extends StatelessWidget {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -78,7 +73,7 @@ class SavedAlert extends StatelessWidget {
                                 AppStrings.yourLocationSavedSuccessfully));
                       } else if (state is SaveLocationFailed ||
                           state is SaveRecentLocationFailed) {
-                        print("sssss $state");
+                        debugPrint("sssss $state");
                       }
                     },
                     builder: (context, state) {

@@ -39,18 +39,18 @@ class _ContainerShadowState extends State<ContainerShadow> {
         ),
         decoration: BoxDecoration(
           color: _isPressed
-              ? ColorManager.darkGrey.withOpacity(0.03)
+              ? ColorManager.darkGrey.withValues(alpha: 0.03)
               : ColorManager.white,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: ColorManager.darkGrey.withOpacity(0.08),
+            color: ColorManager.darkGrey.withValues(alpha: 0.08),
             width: 1,
           ),
           boxShadow: _isPressed
               ? []
               : <BoxShadow>[
                   BoxShadow(
-                    color: ColorManager.black.withOpacity(.04),
+                    color: ColorManager.black.withValues(alpha: .04),
                     blurRadius: 8.r,
                     offset: const Offset(0, 2),
                   )
@@ -62,7 +62,7 @@ class _ContainerShadowState extends State<ContainerShadow> {
               Container(
                 padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
-                  color: ColorManager.primary.withOpacity(0.1),
+                  color: ColorManager.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10.r),
                 ),
                 child: Icon(
@@ -86,7 +86,7 @@ class _ContainerShadowState extends State<ContainerShadow> {
             Icon(
               Icons.arrow_forward_ios_rounded,
               size: 16.r,
-              color: ColorManager.darkGrey.withOpacity(0.4),
+              color: ColorManager.darkGrey.withValues(alpha: 0.4),
             )
           ],
         ),

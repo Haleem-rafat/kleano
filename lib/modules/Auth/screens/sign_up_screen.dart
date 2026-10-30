@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:thewasher/core/services/fcm_token.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -24,10 +25,10 @@ import 'package:thewasher/shared/components/list_tile_text_form.dart';
 import 'package:fl_country_code_picker/fl_country_code_picker.dart';
 import 'package:thewasher/utilties/navigator.dart';
 import 'package:thewasher/utilties/validator.dart';
-import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:thewasher/core/services/appsflyer_service.dart';
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
+  const SignUpScreen({super.key});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -45,7 +46,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   late FocusNode phoneFocusNode;
   late FocusNode nameFocusNode;
   late FocusNode emailFocusNode;
-  late AppsflyerSdk _appsflyerSdk;
   String? fcmToken;
 
   @override
@@ -55,13 +55,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
     nameFocusNode = FocusNode();
     emailFocusNode = FocusNode();
 
-    final AppsFlyerOptions options = AppsFlyerOptions(
-      afDevKey: "vTBNf24bS4fxnsgxuRE7nK",
-      appId: "6744847373",
-      showDebug: true,
-    );
-    _appsflyerSdk = AppsflyerSdk(options);
-    _appsflyerSdk.initSdk();
     _initializeFCM();
   }
 
@@ -77,48 +70,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Future<void> _initializeFCM() async {
-    try {
-      await FirebaseMessaging.instance.requestPermission();
-
-      fcmToken = await FirebaseMessaging.instance.getToken();
-      if (fcmToken != null) {
-        print("✅ FCM Token (Signup): $fcmToken");
-        return;
-      }
-
-      String? apnsToken;
-      int retries = 0;
-
-      while (apnsToken == null && retries < 10) {
-        await Future.delayed(const Duration(seconds: 1));
-        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
-        retries++;
-      }
-
-      if (apnsToken != null) {
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        print("✅ FCM Token (Signup - after APNs): $fcmToken");
-      } else {
-        print("❌ Failed to get APNs token after $retries seconds.");
-        // Try one more time to get FCM token without APNs
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          print("✅ FCM Token (Signup - fallback): $fcmToken");
-        } else {
-          print("❌ Failed to get FCM token completely.");
-        }
-      }
-    } catch (e) {
-      print("🔥 Error initializing FCM (Signup): $e");
-      try {
-        fcmToken = await FirebaseMessaging.instance.getToken();
-        if (fcmToken != null) {
-          print("✅ FCM Token (Signup - error recovery): $fcmToken");
-        }
-      } catch (e2) {
-        print("🔥 Final FCM token attempt failed (Signup): $e2");
-      }
-    }
+    await FirebaseMessaging.instance.requestPermission();
+    fcmToken = await FcmToken.get();
   }
 
   void _selectCountryCode() async {
@@ -308,7 +261,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             }
 
                             if (state.signUpStatus == RequestStatus.loaded) {
-                              await _appsflyerSdk.logEvent("af_sign_up", {});
+                              AppsFlyerService.logEvent("af_sign_up");
 
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(

@@ -5,7 +5,6 @@ import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/resources/app_bar.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/core/services/apple_pay_service.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
 import 'package:thewasher/modules/booking/data/models/payment_methods_request.dart';
@@ -21,7 +20,6 @@ import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/navigator.dart';
-import 'dart:io';
 
 class PaymentScreen extends StatefulWidget {
   final String? subscriptionId;

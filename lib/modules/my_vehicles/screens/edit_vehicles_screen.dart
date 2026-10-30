@@ -33,8 +33,7 @@ import 'package:thewasher/utilties/navigator.dart';
 class EditVehiclesScreen extends StatefulWidget {
   final bool create;
   final VehiclesModel? vehicleData;
-  EditVehiclesScreen({Key? key, required this.create, this.vehicleData})
-      : super(key: key);
+  const EditVehiclesScreen({super.key, required this.create, this.vehicleData});
 
   @override
   State<EditVehiclesScreen> createState() => _EditVehiclesScreenState();
@@ -108,7 +107,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -125,7 +124,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: 60.w,
                           height: 60.w,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.1),
+                            color: ColorManager.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(30.r),
                           ),
                           child: Icon(
@@ -156,10 +155,10 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: double.infinity,
                           height: 48.h,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.05),
+                            color: ColorManager.primary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: ColorManager.primary.withOpacity(0.2),
+                              color: ColorManager.primary.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
@@ -197,10 +196,10 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: double.infinity,
                           height: 48.h,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.05),
+                            color: ColorManager.primary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: ColorManager.darkGrey.withOpacity(0.2),
+                              color: ColorManager.darkGrey.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
@@ -260,7 +259,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                   borderRadius: BorderRadius.circular(16.r),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -277,7 +276,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: 60.w,
                           height: 60.w,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.1),
+                            color: ColorManager.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(30.r),
                           ),
                           child: Icon(
@@ -308,10 +307,10 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: double.infinity,
                           height: 48.h,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.05),
+                            color: ColorManager.primary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: ColorManager.primary.withOpacity(0.2),
+                              color: ColorManager.primary.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
@@ -349,10 +348,10 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                           width: double.infinity,
                           height: 48.h,
                           decoration: BoxDecoration(
-                            color: ColorManager.primary.withOpacity(0.05),
+                            color: ColorManager.primary.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: ColorManager.primary.withOpacity(0.2),
+                              color: ColorManager.primary.withValues(alpha: 0.2),
                               width: 1,
                             ),
                           ),
@@ -393,7 +392,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                             color: ColorManager.primary,
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(
-                              color: ColorManager.medGray.withOpacity(0.3),
+                              color: ColorManager.medGray.withValues(alpha: 0.3),
                               width: 1,
                             ),
                           ),
@@ -431,7 +430,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Hero(
@@ -457,7 +456,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
     );
   }
 
-  setControllers() {
+  void setControllers() {
     carModelController.text = widget.vehicleData!.model!;
     carPlateController.text = widget.vehicleData!.plateNumber!;
     carBrandController.text = widget.vehicleData!.brand!;
@@ -466,7 +465,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
         (element) => element.colorName == widget.vehicleData!.color!);
   }
 
-  defaultControllers() {
+  void defaultControllers() {
     selectedColor = colorList.first.id!;
     selectedColorName = colorList.first.colorName;
   }
@@ -505,11 +504,11 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
     WidgetsBinding.instance.addObserver(_KeyboardObserver(this));
   }
 
-  getCarBrandInfo() {
+  void getCarBrandInfo() {
     context.read<CarsBloc>().add(GetCarBrands());
   }
 
-  createNewCar() {
+  void createNewCar() {
     sl<VehiclesBloc>().add(CreateNewCar(
         context: context,
         brand: carBrandController.text,
@@ -519,7 +518,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
         carImage: pick != null ? pick!.path : ""));
   }
 
-  editCar() {
+  void editCar() {
     sl<VehiclesBloc>().add(UpdateCar(
         context: context,
         id: widget.vehicleData!.sId!,
@@ -579,10 +578,11 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                       }
                     },
                     child: DottedBorder(
-                      dashPattern: const [4, 3, 1, 0],
-                      borderType: BorderType.RRect,
-                      color: ColorManager.darkGrey,
-                      radius: Radius.circular(24.r),
+                      options: RoundedRectDottedBorderOptions(
+                        dashPattern: const <double>[4, 3, 1, 0],
+                        color: ColorManager.darkGrey,
+                        radius: Radius.circular(24.r),
+                      ),
                       child: Container(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(24.r),
@@ -703,7 +703,7 @@ class _EditVehiclesScreenState extends State<EditVehiclesScreen> {
                               AssetsManager.car,
                               height: 50.h,
                               width: 34.w,
-                              color: colorList[index].color,
+                              colorFilter: colorList[index].color == null ? null : ColorFilter.mode(colorList[index].color!, BlendMode.srcIn),
                             ),
                           ),
                           if (selectedColor == colorList[index].id)
@@ -906,10 +906,10 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.6),
+            color: Colors.black.withValues(alpha: 0.6),
             borderRadius: BorderRadius.circular(25.r),
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withValues(alpha: 0.2),
               width: 1,
             ),
           ),
@@ -1034,7 +1034,7 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
                         ],
                       ),
@@ -1073,10 +1073,10 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                             child: Container(
                               padding: EdgeInsets.all(12.r),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -1114,7 +1114,7 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
                         ],
                       ),

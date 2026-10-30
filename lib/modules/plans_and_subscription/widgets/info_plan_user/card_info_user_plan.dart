@@ -29,7 +29,7 @@ class CardInfoUserPlan extends StatelessWidget {
           color: ColorManager.backGround,
           boxShadow: <BoxShadow>[
             BoxShadow(
-                color: ColorManager.black.withOpacity(.05),
+                color: ColorManager.black.withValues(alpha: .05),
                 blurRadius: 3.r,
                 offset: const Offset(0, 6))
           ],

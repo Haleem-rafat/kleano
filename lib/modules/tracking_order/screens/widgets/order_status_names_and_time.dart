@@ -6,10 +6,10 @@ import 'package:thewasher/core/resources/color_manager.dart';
 
 class OrderStutesNamesAndTime extends StatelessWidget {
   const OrderStutesNamesAndTime({
-    Key? key,
+    super.key,
     required this.bikerStatesName,
     required this.estimatedTimeBikerStates,
-  }) : super(key: key);
+  });
 
   final List<String> bikerStatesName;
   final List<String> estimatedTimeBikerStates;

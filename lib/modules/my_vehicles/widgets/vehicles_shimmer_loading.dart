@@ -62,7 +62,7 @@ class VehiclesShimmerLoading extends StatelessWidget {
         borderRadius: BorderRadius.circular(15.r),
         boxShadow: [
           BoxShadow(
-            color: ColorManager.black2.withOpacity(0.1),
+            color: ColorManager.black2.withValues(alpha: 0.1),
             offset: const Offset(0, 4),
             blurRadius: 8,
           ),

@@ -42,7 +42,7 @@ class _CarModelWidgetState extends State<CarModelWidget> {
     return BlocConsumer<CarsBloc, CarsState>(
       listener: (context, carState) {
         if (carState is GetCarModelByBrandIdSuccess) {
-          print("object");
+          debugPrint("object");
           carModels = carState.carModels
               .map((model) => getLocalizedModel(model))
               .toList();

@@ -114,14 +114,13 @@ class _CardBrandsWidgetState extends State<CardBrandsWidget> {
   }
 
   void onSelectBrand(CarBrandsModel value) {
-    if (value == null) return;
     setState(() {
       selectBrandId = value.id;
       selectBrandName = value.name;
       widget.carBrandController.text = value.name;
     });
     if (selectBrandId != null) {
-      print("sasndjiasnji");
+      debugPrint("sasndjiasnji");
       context
           .read<CarsBloc>()
           .add(GetCarModelByBrandId(brandId: selectBrandId!));

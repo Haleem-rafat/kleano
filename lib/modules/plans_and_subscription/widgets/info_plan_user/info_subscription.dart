@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/plans_and_subscription/data/models/subscription_model.dart';
 import 'package:thewasher/utilties/app_date_formatter.dart';
 
@@ -28,7 +25,7 @@ class InformationSubscription extends StatelessWidget {
       // decoration: BoxDecoration(
       //   color: Colors.white,
       //   borderRadius: BorderRadius.circular(16.r),
-      //   border: Border.all(color: ColorManager.black.withOpacity(0.3)),
+      //   border: Border.all(color: ColorManager.black.withValues(alpha: 0.3)),
       // ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +54,7 @@ class InformationSubscription extends StatelessWidget {
           Text(
             translate(AppStrings.remainingWashes),
             style: TextStyle(
-              color: ColorManager.black.withOpacity(0.6),
+              color: ColorManager.black.withValues(alpha: 0.6),
               fontSize: 12.sp,
             ),
           ),
@@ -75,7 +72,7 @@ class InformationSubscription extends StatelessWidget {
               Text(
                 ' / ${subscription.washesCount}',
                 style: TextStyle(
-                  color: ColorManager.black.withOpacity(0.5),
+                  color: ColorManager.black.withValues(alpha: 0.5),
                   fontSize: 16.sp,
                 ),
               ),
@@ -88,7 +85,7 @@ class InformationSubscription extends StatelessWidget {
           Container(
             height: 6.h,
             decoration: BoxDecoration(
-              color: ColorManager.black.withOpacity(0.2),
+              color: ColorManager.black.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(3.r),
             ),
             child: FractionallySizedBox(
@@ -109,7 +106,7 @@ class InformationSubscription extends StatelessWidget {
           Text(
             translate(AppStrings.expiryDate),
             style: TextStyle(
-              color: ColorManager.black.withOpacity(0.6),
+              color: ColorManager.black.withValues(alpha: 0.6),
               fontSize: 12.sp,
             ),
           ),

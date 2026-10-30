@@ -7,202 +7,108 @@ import 'package:thewasher/models/auth_model.dart';
 import 'package:thewasher/modules/on_boarding/choose_register.dart';
 
 class AuthInterceptor extends Interceptor {
-  Future? refreshFuture;
+  /// Shared so concurrent requests/403s trigger a single refresh call.
+  static Future<bool>? _refreshing;
+  static const String _retriedKey = 'authRetried';
+
   final Dio dio;
   AuthInterceptor({required this.dio});
 
-  @override
-  void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    print("Request [${options.method}] => PATH: ${options.path}");
+  bool _requiresAuth(RequestOptions options) =>
+      options.extra['requiresAuth'] != false &&
+      options.path != ApiPaths.refreshTokens;
 
-    if (options.extra["requiresAuth"] == false) {
-      return handler.next(options);
-    }
+  @override
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    if (!_requiresAuth(options)) return handler.next(options);
 
     await AppShared.getToken();
-
-    if (AppShared.token.isEmpty) {
-      // No token, treat as unauthenticated
-      navigatorKeyAlice.currentState?.pushReplacement(
-        MaterialPageRoute(builder: (context) => ChooseRegisterView()),
-      );
-      return handler.next(options);
-    }
+    // Guests have no token: send the request anonymously instead of
+    // redirecting, so guest browsing (services, plans, banners) keeps working.
+    if (AppShared.token.isEmpty) return handler.next(options);
 
     if (AppShared.isTokenExpired(AppShared.token)) {
-      var refreshToken = await AppShared.getRefreshToken();
-      if (refreshToken == null ||
-          refreshToken.isEmpty ||
-          AppShared.isTokenExpired(refreshToken)) {
-        navigatorKeyAlice.currentState?.pushReplacement(
-          MaterialPageRoute(builder: (context) => ChooseRegisterView()),
+      final bool refreshed = await _refreshSafely();
+      if (!refreshed) {
+        _goToRegister();
+        return handler.reject(
+          DioException(
+            requestOptions: options,
+            type: DioExceptionType.cancel,
+            error: 'Session expired',
+          ),
         );
-        return handler.next(options);
       }
-      // Try to refresh
-      if (refreshFuture == null) {
-        refreshFuture = _handleRefreshtoken(refreshToken);
-        try {
-          await refreshFuture;
-        } finally {
-          refreshFuture = null;
-        }
-      } else {
-        await refreshFuture;
-      }
-      await AppShared.getToken();
-      options.headers["Authorization"] = "Bearer ${AppShared.token}";
-    } else {
-      // Token is valid
-      options.headers["Authorization"] = "Bearer ${AppShared.token}";
     }
-
-    super.onRequest(options, handler);
+    options.headers['Authorization'] = 'Bearer ${AppShared.token}';
+    handler.next(options);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
-        "Response [${response.statusCode}] => PATH: ${response.requestOptions.path}");
-    super.onResponse(response, handler);
-  }
-
-  @override
-  void onError(err, ErrorInterceptorHandler handler) async {
-    print(
-        "Error [${err.response?.statusCode}] => PATH: ${err.requestOptions.path}");
-
-    // Handle 403 Unauthorized - retry after token refresh
-    if (err.response?.statusCode == 403) {
-      final requestOptions = err.requestOptions;
-
-      // Skip retry for refresh token endpoint to avoid infinite loop
-      if (requestOptions.path == ApiPaths.refreshTokens) {
-        return super.onError(err, handler);
-      }
-
-      // Skip retry if auth is not required
-      if (requestOptions.extra["requiresAuth"] == false) {
-        return super.onError(err, handler);
-      }
-
-      // Refresh token
-      await AppShared.getRefreshToken();
-      if (AppShared.refreshToken.isNotEmpty &&
-          !AppShared.isTokenExpired(AppShared.refreshToken)) {
-        try {
-          // Use existing refresh mechanism to avoid concurrent refreshes
-          if (refreshFuture == null) {
-            refreshFuture = _handleRefreshtoken(AppShared.refreshToken);
-            try {
-              await refreshFuture;
-            } finally {
-              refreshFuture = null;
-            }
-          } else {
-            await refreshFuture;
-          }
-
-          // Retry the original request with new token
-          final retryResponse = await _retryRequest(requestOptions);
-          return handler.resolve(retryResponse);
-        } catch (e) {
-          // If refresh fails, proceed with original error
-          print("Token refresh failed: $e");
-        }
-      } else {
-        // Refresh token invalid, redirect to login
-        navigatorKeyAlice.currentState?.pushReplacement(
-          MaterialPageRoute(builder: (context) => ChooseRegisterView()),
-        );
-      }
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
+    final RequestOptions options = err.requestOptions;
+    // The backend answers 403 (not 401) for missing/expired credentials.
+    if (err.response?.statusCode != 403 ||
+        !_requiresAuth(options) ||
+        AppShared.token.isEmpty ||
+        options.extra[_retriedKey] == true) {
+      return handler.next(err);
     }
 
-    super.onError(err, handler);
-  }
+    if (!await _refreshSafely()) {
+      _goToRegister();
+      return handler.next(err);
+    }
 
-  /// Retries a request with the same method, path, params, and body
-  Future<Response> _retryRequest(RequestOptions requestOptions) async {
-    await AppShared.getToken();
-
-    // Update authorization header with new token
-    requestOptions.headers["Authorization"] = "Bearer ${AppShared.token}";
-
-    // Retry based on HTTP method
-    switch (requestOptions.method.toUpperCase()) {
-      case 'GET':
-        return await dio.get(
-          requestOptions.path,
-          queryParameters: requestOptions.queryParameters,
-          options: Options(
-            headers: requestOptions.headers,
-            extra: requestOptions.extra,
-            validateStatus: requestOptions.validateStatus,
-          ),
-        );
-      case 'POST':
-        return await dio.post(
-          requestOptions.path,
-          data: requestOptions.data,
-          queryParameters: requestOptions.queryParameters,
-          options: Options(
-            headers: requestOptions.headers,
-            extra: requestOptions.extra,
-            contentType: requestOptions.contentType,
-            validateStatus: requestOptions.validateStatus,
-          ),
-        );
-      case 'PUT':
-        return await dio.put(
-          requestOptions.path,
-          data: requestOptions.data,
-          queryParameters: requestOptions.queryParameters,
-          options: Options(
-            headers: requestOptions.headers,
-            extra: requestOptions.extra,
-            contentType: requestOptions.contentType,
-            validateStatus: requestOptions.validateStatus,
-          ),
-        );
-      case 'PATCH':
-        return await dio.patch(
-          requestOptions.path,
-          data: requestOptions.data,
-          queryParameters: requestOptions.queryParameters,
-          options: Options(
-            headers: requestOptions.headers,
-            extra: requestOptions.extra,
-            contentType: requestOptions.contentType,
-            validateStatus: requestOptions.validateStatus,
-          ),
-        );
-      case 'DELETE':
-        return await dio.delete(
-          requestOptions.path,
-          data: requestOptions.data,
-          queryParameters: requestOptions.queryParameters,
-          options: Options(
-            headers: requestOptions.headers,
-            extra: requestOptions.extra,
-            contentType: requestOptions.contentType,
-            validateStatus: requestOptions.validateStatus,
-          ),
-        );
-      default:
-        throw Exception('Unsupported HTTP method: ${requestOptions.method}');
+    try {
+      options.extra[_retriedKey] = true;
+      options.headers['Authorization'] = 'Bearer ${AppShared.token}';
+      handler.resolve(await dio.fetch<dynamic>(options));
+    } on DioException catch (e) {
+      handler.next(e);
     }
   }
 
-  Future<void> _handleRefreshtoken(String refreshToken) async {
-    var response = await dio.post(
-      ApiPaths.refreshTokens,
-      data: {"refresh_token": refreshToken},
-      options: Options(extra: {"requiresAuth": false}),
+  /// Returns false only when the backend rejects the refresh token. Network
+  /// failures keep the session (the request just fails and can be retried).
+  Future<bool> _refreshSafely() {
+    return _refreshing ??= _refresh().whenComplete(() => _refreshing = null);
+  }
+
+  Future<bool> _refresh() async {
+    final String? refreshToken = await AppShared.getRefreshToken();
+    if (refreshToken == null ||
+        refreshToken.isEmpty ||
+        AppShared.isTokenExpired(refreshToken)) {
+      return false;
+    }
+    try {
+      final Response<dynamic> response = await dio.post<dynamic>(
+        ApiPaths.refreshTokens,
+        data: <String, dynamic>{'refresh_token': refreshToken},
+        options: Options(extra: <String, dynamic>{'requiresAuth': false}),
+      );
+      final AuthModel auth = AuthModel.fromJson(response.data);
+      await AppShared.setToken(auth.data!.accessToken!);
+      await AppShared.setRefreshToken(auth.data!.refreshToken!);
+      return true;
+    } on DioException catch (e) {
+      final int? status = e.response?.statusCode;
+      return !(status == 401 || status == 403 || status == 404);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _goToRegister() {
+    AppShared.setToken('');
+    AppShared.setRefreshToken('');
+    navigatorKeyAlice.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+          builder: (BuildContext context) => ChooseRegisterView()),
+      (Route<dynamic> route) => false,
     );
-
-    final authResponse = AuthModel.fromJson(response.data);
-    AppShared.setToken(authResponse.data!.accessToken!);
-    AppShared.setRefreshToken(authResponse.data!.refreshToken!);
   }
 }

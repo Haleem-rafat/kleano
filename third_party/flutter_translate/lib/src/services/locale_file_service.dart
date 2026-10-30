@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:flutter_translate/src/constants/constants.dart';
 
 class LocaleFileService {
   static Future<Map<String, String>> getLocaleFiles(

@@ -16,7 +16,7 @@ import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
 class PointScreen extends StatefulWidget {
-  const PointScreen({Key? key}) : super(key: key);
+  const PointScreen({super.key});
 
   @override
   State<PointScreen> createState() => _PointScreenState();
@@ -61,7 +61,7 @@ class _PointScreenState extends State<PointScreen> {
                       borderRadius: BorderRadius.circular(15.r),
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                            color: ColorManager.black.withOpacity(.08),
+                            color: ColorManager.black.withValues(alpha: .08),
                             blurRadius: 6.r,
                             offset: const Offset(0, 3))
                       ],
@@ -269,7 +269,7 @@ class _PointScreenState extends State<PointScreen> {
               ],
             );
           } else {
-            print("nnnn");
+            debugPrint("nnnn");
             return const Center(
               child: LoadingWidget(),
             );

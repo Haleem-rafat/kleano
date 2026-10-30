@@ -56,7 +56,7 @@ Widget editTextForm(
           ),
           shadow: <BoxShadow>[
             BoxShadow(
-                color: ColorManager.black2.withOpacity(0.1), blurRadius: 6.r)
+                color: ColorManager.black2.withValues(alpha: 0.1), blurRadius: 6.r)
           ],
         ),
         prefixIconConstraints: BoxConstraints(

@@ -92,7 +92,7 @@ class _ServicesListState extends State<ServicesList> {
           icon,
           height: 14.h,
           width: 14.w,
-          color: color,
+          colorFilter: color == null ? null : ColorFilter.mode(color, BlendMode.srcIn),
         ),
         SizedBox(width: 6.w),
         Text(
@@ -174,7 +174,7 @@ class _ServicesListState extends State<ServicesList> {
               color: ColorManager.white,
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: ColorManager.black.withOpacity(.05),
+                  color: ColorManager.black.withValues(alpha: .05),
                   blurRadius: 3.r,
                   offset: const Offset(0, 3),
                 )
@@ -381,8 +381,8 @@ class _ServicesListState extends State<ServicesList> {
                             boxShadow: <BoxShadow>[
                               BoxShadow(
                                 color: isSelected
-                                    ? ColorManager.secondary.withOpacity(0.15)
-                                    : ColorManager.black.withOpacity(0.08),
+                                    ? ColorManager.secondary.withValues(alpha: 0.15)
+                                    : ColorManager.black.withValues(alpha: 0.08),
                                 blurRadius: isSelected ? 8.r : 4.r,
                                 offset: Offset(0, isSelected ? 4.h : 2.h),
                               )
@@ -506,7 +506,7 @@ class _ServicesListState extends State<ServicesList> {
                                   margin: EdgeInsets.only(top: 12.h),
                                   padding: EdgeInsets.all(12.w),
                                   decoration: BoxDecoration(
-                                    color: ColorManager.gray.withOpacity(0.3),
+                                    color: ColorManager.gray.withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(12.r),
                                     border: Border.all(
                                       color: ColorManager.lightGray,
@@ -580,7 +580,7 @@ class _ServicesListState extends State<ServicesList> {
                                                 vertical: 4.h, horizontal: 8.w),
                                             decoration: BoxDecoration(
                                               color: ColorManager.primary
-                                                  .withOpacity(0.1),
+                                                  .withValues(alpha: 0.1),
                                               borderRadius:
                                                   BorderRadius.circular(6.r),
                                             ),

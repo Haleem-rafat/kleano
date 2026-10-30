@@ -17,9 +17,9 @@ import 'package:thewasher/shared/widget/vehicle_shared.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class MyVehicles extends StatefulWidget {
-  MyVehicles({
-    Key? key,
-  }) : super(key: key);
+  const MyVehicles({
+    super.key,
+  });
 
   @override
   State<MyVehicles> createState() => _MyVehiclesState();
@@ -28,7 +28,7 @@ class MyVehicles extends StatefulWidget {
 class _MyVehiclesState extends State<MyVehicles> {
   int selectedColor = 0;
 
-  deleteCar(
+  void deleteCar(
     String? sId,
     int index,
   ) {

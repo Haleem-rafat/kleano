@@ -14,11 +14,11 @@ class UsedPromoCode extends StatefulWidget {
   final String? highlightPromoId;
   final ValueChanged<PromoCodeTypes>? onPromoLocated;
   const UsedPromoCode({
-    Key? key,
+    super.key,
     required this.isVisible,
     this.highlightPromoId,
     this.onPromoLocated,
-  }) : super(key: key);
+  });
 
   @override
   State<UsedPromoCode> createState() => _UsedPromoCodeState();

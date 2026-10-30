@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
@@ -8,7 +7,7 @@ import 'package:flutter_countdown_timer/flutter_countdown_timer.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:thewasher/modules/Auth/widgets/pin_code.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
@@ -20,7 +19,6 @@ import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profil
 import 'package:thewasher/modules/profile/blocs/update_phone/update_phone_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/update_profile/update_profile_bloc.dart';
 import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
@@ -28,10 +26,10 @@ class OtpEditPhoneScreen extends StatefulWidget {
   final String phone;
   final String verificationId;
   const OtpEditPhoneScreen({
-    Key? key,
+    super.key,
     required this.phone,
     required this.verificationId,
-  }) : super(key: key);
+  });
 
   @override
   State<OtpEditPhoneScreen> createState() => _OtpEditPhoneScreenState();
@@ -65,13 +63,17 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
     updatePhoneBloc = UpdatePhoneBloc()
       ..stream.listen((UpdatePhoneState updateState) {
         if (updateState is UpdatePhoneSuccess) {
+          if (!mounted) return;
           showSnackBar(
               buildContext: context,
               message: translate(AppStrings.updatedSuccessfully));
+          if (!mounted) return;
           BlocProvider.of<GetUserProfileBloc>(context)
               .add(GetUserProfileEvent());
+          if (!mounted) return;
           pop(context);
         } else if (updateState is UpdatePhoneFailed) {
+          if (!mounted) return;
           showSnackBar(
             buildContext: context,
             message: Localizations.localeOf(context).countryCode == 'ar'
@@ -110,9 +112,8 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
               )
             : null,
       ),
-      body: WillPopScope(
-        onWillPop:
-            countdownTimerController.isRunning ? () async => false : null,
+      body: PopScope(
+        canPop: !countdownTimerController.isRunning,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -159,52 +160,14 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
                 child: Padding(
                   padding:
                       EdgeInsets.symmetric(vertical: 8.h, horizontal: 30.w),
-                  child: Directionality(
-                    textDirection: TextDirection.ltr,
-                    child: PinCodeTextField(
-                      appContext: context,
-                      length: 6,
-                      obscuringCharacter: '*',
-                      animationType: AnimationType.fade,
-                      validator: (String? v) {
-                        if (v!.length < 6) {
-                          return translate("pinCode");
-                        } else {
-                          return null;
-                        }
-                      },
-                      pinTheme: PinTheme(
-                          shape: PinCodeFieldShape.box,
-                          borderRadius: BorderRadius.circular(10.r),
-                          fieldHeight: 45.h,
-                          fieldWidth: 40.w,
-                          selectedColor: ColorManager.primary,
-                          activeColor: ColorManager.primaryLight,
-                          activeFillColor: ColorManager.primaryLight,
-                          inactiveFillColor: ColorManager.white,
-                          selectedFillColor: ColorManager.white,
-                          inactiveColor: ColorManager.primaryLight),
-                      cursorColor: Colors.black,
-                      animationDuration: const Duration(milliseconds: 300),
-                      hintCharacter: "_",
-                      textStyle: AppStyles.headlines24Regular,
-                      enableActiveFill: true,
-                      controller: textEditingController,
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
-                      ],
-                      onCompleted: (String v) {
-                        setState(() {
-                          pinComplete = true;
-                          otpCode = v;
-                        });
-                      },
-                      onChanged: (String value) {},
-                      beforeTextPaste: (String? text) {
-                        return true;
-                      },
-                    ),
+                  child: PinCodeWidget(
+                    codeController: textEditingController,
+                    onCompleted: (String v) {
+                      setState(() {
+                        pinComplete = true;
+                        otpCode = v;
+                      });
+                    },
                   ),
                 ),
               ),
@@ -252,10 +215,10 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
                     text: translate("verify"),
                     colorButton: pinComplete || login
                         ? ColorManager.primary
-                        : ColorManager.primaryLight.withOpacity(.5),
+                        : ColorManager.primaryLight.withValues(alpha: .5),
                     colorBorder: pinComplete || login
                         ? ColorManager.primary
-                        : ColorManager.primaryLight.withOpacity(.05),
+                        : ColorManager.primaryLight.withValues(alpha: .05),
                   ),
                   AppSize.s40.ph,
                   Text(

@@ -20,10 +20,10 @@ class _AddServicesState extends State<AddServices> {
       builder: (context, state) {
         // Check if user is subscribed
         final isSubscribed =
-            sl<GetUserProfileBloc>.call().profile.isSubscribed == true;
+            sl.call<GetUserProfileBloc>.call().profile.isSubscribed == true;
 
         // If user is subscribed, show subscription and services
-        print("jknsfjksn ${isSubscribed}");
+        debugPrint("jknsfjksn $isSubscribed");
         if (isSubscribed) {
           // Handle different subscription states
           if (state is SubscriptioByLocationSuccessState) {
@@ -42,8 +42,8 @@ class _AddServicesState extends State<AddServices> {
           } else {
             // Default case - use bloc's subscription data
             return SubscriptionAndService(
-              subscription: sl<PlansAndSubscriptionBloc>.call().subscription,
-              message: sl<PlansAndSubscriptionBloc>.call().message,
+              subscription: sl.call<PlansAndSubscriptionBloc>.call().subscription,
+              message: sl.call<PlansAndSubscriptionBloc>.call().message,
             );
           }
         } else {

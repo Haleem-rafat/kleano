@@ -12,11 +12,7 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/profile/blocs/update_profile/update_profile_bloc.dart';
-import 'package:thewasher/modules/profile/screens/profile_account/edit_phone_number/otp_edit_phone.dart';
-import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
-import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/components/text-form-shared.dart';
 import 'package:thewasher/utilties/navigator.dart';
 import 'package:thewasher/utilties/validator.dart';
@@ -99,7 +95,7 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
                             setState(() {
                               countryCode = code;
                             });
-                            print(countryCode!.dialCode);
+                            debugPrint(countryCode!.dialCode);
                           },
                           child: Row(
                             children: <Widget>[

@@ -8,9 +8,8 @@ class CreationStepIndicator extends StatelessWidget {
 
   CreationStepIndicator({
     required this.step,
-    Key? key,
-  })  : stepWidth = (350 - ((accountCreationStepCount - 1) * 10.5)) / accountCreationStepCount,
-        super(key: key);
+    super.key,
+  })  : stepWidth = (350 - ((accountCreationStepCount - 1) * 10.5)) / accountCreationStepCount;
 
   static const int accountCreationStepCount = 5;
 

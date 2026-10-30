@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -67,7 +66,7 @@ class ContactBiker extends StatelessWidget {
             AssetsManager.whatsappIcon,
             height: 22.h,
             width: 22.w,
-            color: const Color(0xFF25D366),
+            colorFilter: ColorFilter.mode(const Color(0xFF25D366), BlendMode.srcIn),
           ),
         ),
       ],

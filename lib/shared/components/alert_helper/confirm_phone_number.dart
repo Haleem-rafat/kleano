@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/Auth/screens/log_in_screen.dart';
-import 'package:thewasher/modules/Auth/screens/otp_screen.dart';
-import 'package:thewasher/modules/Auth/screens/sign_up_screen.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
-import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class ConfirmPhoneNumber extends StatefulWidget {
@@ -22,12 +13,12 @@ class ConfirmPhoneNumber extends StatefulWidget {
   final bool comeFromSignUpScreen;
 
   const ConfirmPhoneNumber({
-    Key? key,
+    super.key,
     required this.phoneNumber,
     required this.userName,
     this.email,
     required this.comeFromSignUpScreen,
-  }) : super(key: key);
+  });
 
   @override
   State<ConfirmPhoneNumber> createState() => _ConfirmPhoneNumberState();
@@ -55,7 +46,7 @@ class _ConfirmPhoneNumberState extends State<ConfirmPhoneNumber> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(

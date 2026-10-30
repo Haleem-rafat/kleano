@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -33,7 +34,7 @@ class GetUserProfileBloc
         } else {
           emit(GetUserProfileFailed(error: response.message));
         }
-      } on DioError catch (e) {
+      } on DioException catch (e) {
         if (e.message!.contains('SocketException')) {
           emit(GetUserProfileConnectionError());
         } else {

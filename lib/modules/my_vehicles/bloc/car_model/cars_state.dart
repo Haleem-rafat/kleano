@@ -14,13 +14,13 @@ class GetCarModelLoading extends CarsState {}
 class GetCarModelSuccess extends CarsState {
   final List<String> carModel;
 
-  GetCarModelSuccess({required this.carModel});
+  const GetCarModelSuccess({required this.carModel});
 }
 
 class GetCarModelError extends CarsState {
   final String? error;
 
-  GetCarModelError({this.error});
+  const GetCarModelError({this.error});
 }
 
 class GetCarBrandsLoading extends CarsState {}
@@ -34,7 +34,7 @@ class GetCarBrandsSuccess extends CarsState {
 class GetCarBrandsError extends CarsState {
   final String? error;
 
-  GetCarBrandsError({this.error});
+  const GetCarBrandsError({this.error});
 }
 
 class GetCarModelByBrandIdSuccess extends CarsState {
