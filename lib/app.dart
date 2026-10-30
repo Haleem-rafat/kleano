@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewasher/core/design/adaptive_screen.dart';
+import 'package:thewasher/core/design/kleano_theme.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -109,16 +110,14 @@ class _AppState extends State<App> {
             builder: (_) {
               return MaterialApp(
                 navigatorKey: navigatorKeyAlice,
+                theme: kleanoTheme(brightness: Brightness.light),
+                darkTheme: kleanoTheme(brightness: Brightness.dark),
+                // Light until every screen uses the design tokens.
+                themeMode: ThemeMode.light,
                 builder: (BuildContext context, Widget? navigator) {
-                  return Theme(
-                    data: LiquidGlassTheme.apply(
-                      _buildAppTheme(context),
-                      primary: ColorManager.primary,
-                    ),
-                    child: BackdropGroup(
-                      child: LiquidGlassTheme.clampTextScale(
-                          context, FoldScope(child: SystemBarInset(child: navigator!))),
-                    ),
+                  return BackdropGroup(
+                    child: LiquidGlassTheme.clampTextScale(context,
+                        FoldScope(child: SystemBarInset(child: navigator!))),
                   );
                 },
                 debugShowCheckedModeBanner: false,
@@ -134,34 +133,6 @@ class _AppState extends State<App> {
                 locale: localizationDelegate.currentLocale,
               );
             }),
-      ),
-    );
-  }
-
-// Refactored theme builder function
-  ThemeData _buildAppTheme(BuildContext context) {
-    String lang = Localizations.localeOf(context).languageCode;
-    String fontFamily = lang == 'ar' ? 'Cairo' : 'Roboto';
-
-    return ThemeData(
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: ColorManager.primary,
-        primary: ColorManager.primary,
-        surface: ColorManager.white,
-      ),
-      primaryColor: ColorManager.primary,
-      scaffoldBackgroundColor: ColorManager.white,
-      fontFamily: fontFamily,
-      snackBarTheme: SnackBarThemeData(
-        contentTextStyle: AppStyles.body14Medium.copyWith(
-          color: ColorManager.white,
-          fontFamily: fontFamily,
-        ),
-      ),
-      datePickerTheme: DatePickerThemeData(
-        backgroundColor: ColorManager.white,
-        headerBackgroundColor: ColorManager.white,
-        todayBackgroundColor: WidgetStateProperty.all(ColorManager.primary),
       ),
     );
   }
