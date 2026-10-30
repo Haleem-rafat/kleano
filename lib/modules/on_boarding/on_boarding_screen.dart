@@ -115,6 +115,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                               ? AppConstants.arabic
                               : AppConstants.english,
                           variant: KButtonVariant.secondary,
+                          // White label: brand purple is unreadable on glass over a dark photo.
+                          color: Colors.white,
                           expand: false,
                           onPressed: _toggleLanguage,
                         ),
@@ -123,6 +125,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                           KButton(
                             label: translate(AppStrings.skip),
                             variant: KButtonVariant.secondary,
+                            // White label: brand purple is unreadable on glass over a dark photo.
+                            color: Colors.white,
                             expand: false,
                             onPressed: () =>
                                 pushPage(context, ChooseRegisterView()),

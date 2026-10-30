@@ -175,7 +175,11 @@ final class GlassButtonPlatformView: NSObject, FlutterPlatformView {
       config.imagePadding = 6
     }
     if let fg = args["foreground"] as? NSNumber {
-      config.baseForegroundColor = UIColor(argb: fg.uint32Value)
+      let color = UIColor(argb: fg.uint32Value)
+      config.baseForegroundColor = color
+      // Glass buttons draw SF Symbols in the button's tint, not the base
+      // foreground: without this a white back chevron renders black.
+      config.imageColorTransformer = UIConfigurationColorTransformer { _ in color }
     }
     if let tint = args["tint"] as? NSNumber {
       // Prominent glass takes its colour from the tint (brand purple).

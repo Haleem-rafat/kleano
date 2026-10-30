@@ -86,6 +86,8 @@ class _ChooseRegisterViewState extends State<ChooseRegisterView> {
                     KButton(
                       label: translate(AppStrings.login),
                       variant: KButtonVariant.secondary,
+                      // White label: brand purple is unreadable on glass over a dark photo.
+                      color: Colors.white,
                       onPressed: () => pushPage(context, const LogInScreen()),
                     ),
                     const SizedBox(height: KSpace.s),
