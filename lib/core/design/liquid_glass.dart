@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -691,6 +692,12 @@ class _NativeTabBarState extends State<_NativeTabBar> {
       viewType: 'kleano/tab_bar',
       creationParams: _params(context),
       creationParamsCodec: const StandardMessageCodec(),
+      // UITabBar tracks its own touches: without claiming them at once,
+      // Flutter delays them until its gesture arena settles and the tab
+      // switch is lost.
+      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+        Factory<OneSequenceGestureRecognizer>(EagerGestureRecognizer.new),
+      },
       onPlatformViewCreated: (int id) {
         _channel = MethodChannel('kleano/tab_bar/$id')
           ..setMethodCallHandler((MethodCall call) async {
