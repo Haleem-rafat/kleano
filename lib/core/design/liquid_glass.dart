@@ -80,8 +80,9 @@ class LiquidGlass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget content =
-        padding == null ? child : Padding(padding: padding!, child: child);
+    final Widget content = padding == null
+        ? child
+        : Padding(padding: padding!, child: child);
 
     if (GlassTokens.useNative) {
       return Stack(
@@ -130,10 +131,10 @@ class _NativeGlassViewState extends State<NativeGlassView> {
   MethodChannel? _channel;
 
   Map<String, Object?> get _params => <String, Object?>{
-        'radius': widget.radius,
-        'tint': widget.tint?.toARGB32(),
-        'style': widget.style.name,
-      };
+    'radius': widget.radius,
+    'tint': widget.tint?.toARGB32(),
+    'style': widget.style.name,
+  };
 
   @override
   void didUpdateWidget(NativeGlassView oldWidget) {
@@ -183,13 +184,19 @@ class _FlutterGlass extends StatelessWidget {
     final bool opaque = GlassTokens.reduceTransparency(context);
     final Color base = tint == null
         ? GlassTokens.tintLight
-        : Color.alphaBlend(tint!.withValues(alpha: tint!.a * 0.85),
-            GlassTokens.tintLightLow);
+        : Color.alphaBlend(
+            tint!.withValues(alpha: tint!.a * 0.85),
+            GlassTokens.tintLightLow,
+          );
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints c) {
-        final double r = capsule && c.hasBoundedHeight ? c.maxHeight / 2 : radius;
-        final BorderRadius borderRadius = BorderRadius.circular(capsule ? 999 : r);
+        final double r = capsule && c.hasBoundedHeight
+            ? c.maxHeight / 2
+            : radius;
+        final BorderRadius borderRadius = BorderRadius.circular(
+          capsule ? 999 : r,
+        );
         final ShapeBorder shape = capsule
             ? const StadiumBorder()
             : RoundedSuperellipseBorder(borderRadius: borderRadius);
@@ -232,9 +239,15 @@ class _FlutterGlass extends StatelessWidget {
             shape: shape,
             shadows: const <BoxShadow>[
               BoxShadow(
-                  color: Color(0x14000000), blurRadius: 24, offset: Offset(0, 8)),
+                color: Color(0x14000000),
+                blurRadius: 24,
+                offset: Offset(0, 8),
+              ),
               BoxShadow(
-                  color: Color(0x0A000000), blurRadius: 2, offset: Offset(0, 1)),
+                color: Color(0x0A000000),
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
             ],
           ),
           child: surface,
@@ -254,7 +267,8 @@ class _SpecularEdgePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final Rect rect = Offset.zero & size;
     final BorderRadius clamped = BorderRadius.circular(
-        borderRadius.topLeft.x.clamp(0, size.shortestSide / 2).toDouble());
+      borderRadius.topLeft.x.clamp(0, size.shortestSide / 2).toDouble(),
+    );
     final Paint paint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1
@@ -314,15 +328,15 @@ class _NativeGlassButtonState extends State<NativeGlassButton> {
   MethodChannel? _channel;
 
   Map<String, Object?> get _params => <String, Object?>{
-        'title': widget.title,
-        'symbol': widget.sfSymbol,
-        'style': widget.style.name,
-        'tint': widget.tint?.toARGB32(),
-        'foreground': widget.foreground?.toARGB32(),
-        'fontSize': widget.fontSize,
-        'iconSize': widget.iconSize,
-        'enabled': widget.onPressed != null,
-      };
+    'title': widget.title,
+    'symbol': widget.sfSymbol,
+    'style': widget.style.name,
+    'tint': widget.tint?.toARGB32(),
+    'foreground': widget.foreground?.toARGB32(),
+    'fontSize': widget.fontSize,
+    'iconSize': widget.iconSize,
+    'enabled': widget.onPressed != null,
+  };
 
   @override
   void didUpdateWidget(NativeGlassButton oldWidget) {
@@ -424,11 +438,7 @@ class GlassIconButton extends StatelessWidget {
             capsule: true,
             tint: tint,
             child: Center(
-              child: Icon(
-                icon,
-                size: iconSize,
-                color: iconColor,
-              ),
+              child: Icon(icon, size: iconSize, color: iconColor),
             ),
           ),
         ),
@@ -547,8 +557,9 @@ class GlassTabBar extends StatelessWidget {
                 final double itemWidth = c.maxWidth / items.length;
                 final bool rtl =
                     Directionality.of(context) == TextDirection.rtl;
-                final int visual =
-                    rtl ? items.length - 1 - currentIndex : currentIndex;
+                final int visual = rtl
+                    ? items.length - 1 - currentIndex
+                    : currentIndex;
                 return Stack(
                   children: <Widget>[
                     AnimatedPositioned(
@@ -640,32 +651,37 @@ class _NativeTabBarState extends State<_NativeTabBar> {
     final PictureInfo info = await vg.loadPicture(SvgAssetLoader(asset), null);
     final ui.PictureRecorder recorder = ui.PictureRecorder();
     final Canvas canvas = Canvas(recorder);
-    final double factor = logical * scale /
+    final double factor =
+        logical *
+        scale /
         (info.size.longestSide == 0 ? 1 : info.size.longestSide);
     canvas.scale(factor);
     canvas.drawPicture(info.picture);
     info.picture.dispose();
     final int px = (logical * scale).round();
     final ui.Image image = await recorder.endRecording().toImage(px, px);
-    final ByteData? bytes = await image.toByteData(format: ui.ImageByteFormat.png);
+    final ByteData? bytes = await image.toByteData(
+      format: ui.ImageByteFormat.png,
+    );
     image.dispose();
     return bytes!.buffer.asUint8List();
   }
 
   Map<String, Object?> _params(BuildContext context) => <String, Object?>{
-        'items': <Map<String, Object?>>[
-          for (int i = 0; i < widget.items.length; i++)
-            <String, Object?>{'title': widget.items[i].label, 'icon': _icons![i]},
-        ],
-        'selected': widget.currentIndex,
-        'tint': widget.tint.toARGB32(),
-        'rtl': Directionality.of(context) == TextDirection.rtl,
-      };
+    'items': <Map<String, Object?>>[
+      for (int i = 0; i < widget.items.length; i++)
+        <String, Object?>{'title': widget.items[i].label, 'icon': _icons![i]},
+    ],
+    'selected': widget.currentIndex,
+    'tint': widget.tint.toARGB32(),
+    'rtl': Directionality.of(context) == TextDirection.rtl,
+  };
 
   @override
   void didUpdateWidget(_NativeTabBar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_icons != null) _channel?.invokeMethod<void>('update', _params(context));
+    if (_icons != null)
+      _channel?.invokeMethod<void>('update', _params(context));
   }
 
   @override
@@ -697,7 +713,9 @@ class _Lens extends StatelessWidget {
       decoration: ShapeDecoration(
         shape: const StadiumBorder(),
         color: Color.alphaBlend(
-            color.withValues(alpha: 0.10), const Color(0x66FFFFFF)),
+          color.withValues(alpha: 0.10),
+          const Color(0x66FFFFFF),
+        ),
       ),
     );
   }
@@ -736,14 +754,17 @@ class _TabButton extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox.square(
-                  dimension: 24, child: item.iconBuilder(selected, color)),
+                dimension: 24,
+                child: item.iconBuilder(selected, color),
+              ),
               const SizedBox(height: 2),
               Text(
                 item.label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                textScaler:
-                    MediaQuery.textScalerOf(context).clamp(maxScaleFactor: 1.2),
+                textScaler: MediaQuery.textScalerOf(
+                  context,
+                ).clamp(maxScaleFactor: 1.2),
                 style: labelStyle.copyWith(
                   color: color,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
@@ -809,10 +830,16 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
           ? null
           : DefaultTextStyle.merge(
               style: TextStyle(color: fg, fontWeight: FontWeight.w600),
-              child: IconTheme.merge(data: IconThemeData(color: fg), child: title!),
+              child: IconTheme.merge(
+                data: IconThemeData(color: fg),
+                child: title!,
+              ),
             ),
-      leading: leading ??
-          (automaticallyImplyLeading && canPop ? GlassBackButton(color: tint) : null),
+      leading:
+          leading ??
+          (automaticallyImplyLeading && canPop
+              ? GlassBackButton(color: tint)
+              : null),
       leadingWidth: leading == null && automaticallyImplyLeading && canPop
           ? 60
           : leadingWidth,
@@ -877,9 +904,9 @@ class _FoldScopeState extends State<FoldScope> {
     super.initState();
     if (GlassTokens.useNative) {
       _sub = FoldScope._channel.receiveBroadcastStream().listen(
-            _onEvent,
-            onError: (Object _) {},
-          );
+        _onEvent,
+        onError: (Object _) {},
+      );
     }
   }
 
@@ -895,7 +922,8 @@ class _FoldScopeState extends State<FoldScope> {
     final List<ui.DisplayFeature> features = <ui.DisplayFeature>[
       // Only the fold line splits the layout; camera occlusions are handled
       // by safe-area padding.
-      for (final dynamic r in (event['regions'] as List<dynamic>? ?? <dynamic>[]))
+      for (final dynamic r
+          in (event['regions'] as List<dynamic>? ?? <dynamic>[]))
         if (r is Map && r['kind'] == 'division')
           ui.DisplayFeature(
             bounds: Rect.fromLTWH(
@@ -923,7 +951,11 @@ class _FoldScopeState extends State<FoldScope> {
     final MediaQueryData mq = MediaQuery.of(context);
     return MediaQuery(
       data: mq.copyWith(
-          displayFeatures: <ui.DisplayFeature>[...mq.displayFeatures, ..._features]),
+        displayFeatures: <ui.DisplayFeature>[
+          ...mq.displayFeatures,
+          ..._features,
+        ],
+      ),
       child: widget.child,
     );
   }
@@ -940,7 +972,8 @@ class FoldPane extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool hasFold = MediaQuery.displayFeaturesOf(context).any(
       (ui.DisplayFeature f) =>
-          f.type != ui.DisplayFeatureType.cutout && f.bounds.height > f.bounds.width,
+          f.type != ui.DisplayFeatureType.cutout &&
+          f.bounds.height > f.bounds.width,
     );
     if (!hasFold) return child;
     // Same pane-picking rules Flutter uses for dialogs (leading pane first).
@@ -982,7 +1015,8 @@ class SystemBarInset extends StatelessWidget {
   Widget build(BuildContext context) {
     final MediaQueryData mq = MediaQuery.of(context);
     final EdgeInsets p = mq.padding;
-    final bool verticalBar = mq.size.width < kRegularWidth &&
+    final bool verticalBar =
+        mq.size.width < kRegularWidth &&
         (p.left >= minBarInset || p.right >= minBarInset);
     if (!verticalBar) return child;
 
@@ -991,7 +1025,9 @@ class SystemBarInset extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: p.left, right: p.right),
         child: MediaQuery(
-          data: mq.removePadding(removeLeft: true, removeRight: true).copyWith(
+          data: mq
+              .removePadding(removeLeft: true, removeRight: true)
+              .copyWith(
                 viewPadding: mq.viewPadding.copyWith(left: 0, right: 0),
                 size: Size(mq.size.width - p.left - p.right, mq.size.height),
               ),
@@ -1030,12 +1066,17 @@ class GlassSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color active = activeColor ?? Theme.of(context).colorScheme.primary;
-    final TextStyle base =
-        (labelStyle ?? const TextStyle()).copyWith(fontSize: 16, height: 1.2);
+    final TextStyle base = (labelStyle ?? const TextStyle()).copyWith(
+      fontSize: 16,
+      height: 1.2,
+    );
     return SafeArea(
       right: false,
-      minimum: const EdgeInsetsDirectional.only(start: 10, top: 10, bottom: 10)
-          .resolve(Directionality.of(context)),
+      minimum: const EdgeInsetsDirectional.only(
+        start: 10,
+        top: 10,
+        bottom: 10,
+      ).resolve(Directionality.of(context)),
       child: SizedBox(
         width: width,
         child: LiquidGlass(
@@ -1049,7 +1090,9 @@ class GlassSidebar extends StatelessWidget {
                   padding: const EdgeInsetsDirectional.fromSTEB(10, 4, 10, 14),
                   child: DefaultTextStyle.merge(
                     style: const TextStyle(
-                        fontSize: 26, fontWeight: FontWeight.w700),
+                      fontSize: 26,
+                      fontWeight: FontWeight.w700,
+                    ),
                     child: title!,
                   ),
                 ),
@@ -1104,11 +1147,16 @@ class _SidebarRow extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
           decoration: ShapeDecoration(
             shape: const StadiumBorder(),
-            color: selected ? color.withValues(alpha: 0.12) : Colors.transparent,
+            color: selected
+                ? color.withValues(alpha: 0.12)
+                : Colors.transparent,
           ),
           child: Row(
             children: <Widget>[
-              SizedBox.square(dimension: 24, child: item.iconBuilder(selected, color)),
+              SizedBox.square(
+                dimension: 24,
+                child: item.iconBuilder(selected, color),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -1136,8 +1184,9 @@ class LiquidGlassTheme {
 
   static ThemeData apply(ThemeData base, {required Color primary}) {
     const RoundedSuperellipseBorder sheetShape = RoundedSuperellipseBorder(
-      borderRadius:
-          BorderRadius.vertical(top: Radius.circular(GlassTokens.sheetRadius)),
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(GlassTokens.sheetRadius),
+      ),
     );
     final RoundedSuperellipseBorder dialogShape = RoundedSuperellipseBorder(
       borderRadius: BorderRadius.circular(GlassTokens.dialogRadius),
@@ -1209,11 +1258,13 @@ class LiquidGlassTheme {
         highlightElevation: 4,
       ),
       switchTheme: base.switchTheme.copyWith(
-        trackOutlineColor:
-            const WidgetStatePropertyAll<Color>(Colors.transparent),
+        trackOutlineColor: const WidgetStatePropertyAll<Color>(
+          Colors.transparent,
+        ),
       ),
-      progressIndicatorTheme:
-          base.progressIndicatorTheme.copyWith(color: primary),
+      progressIndicatorTheme: base.progressIndicatorTheme.copyWith(
+        color: primary,
+      ),
       cupertinoOverrideTheme: CupertinoThemeData(primaryColor: primary),
     );
   }
@@ -1223,8 +1274,10 @@ class LiquidGlassTheme {
     final MediaQueryData mq = MediaQuery.of(context);
     return MediaQuery(
       data: mq.copyWith(
-        textScaler:
-            mq.textScaler.clamp(minScaleFactor: 0.85, maxScaleFactor: 1.35),
+        textScaler: mq.textScaler.clamp(
+          minScaleFactor: 0.85,
+          maxScaleFactor: 1.35,
+        ),
       ),
       child: child,
     );

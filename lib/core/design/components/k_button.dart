@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import '../liquid_glass.dart';
 import '../tokens.dart';
 
-enum KButtonVariant { primary, secondary, text }
+enum KButtonVariant { primary, secondary, text, destructive }
 
 /// The Kleano button.
 ///
 /// iOS: Apple's real glass `UIButton` (primary = prominent glass tinted with
-/// the brand, secondary = glass, text = plain). Android: Material 3
-/// `FilledButton` / tonal `FilledButton` / `TextButton`.
+/// the brand, destructive = prominent glass tinted `error`, secondary = glass,
+/// text = plain). Android: Material 3 `FilledButton` (error-coloured when
+/// destructive) / tonal `FilledButton` / `TextButton`.
 /// While [loading], the button shows progress and ignores taps.
 class KButton extends StatelessWidget {
   const KButton({
@@ -37,7 +38,8 @@ class KButton extends StatelessWidget {
   /// SF Symbol shown on iOS instead of [icon].
   final String? sfSymbol;
 
-  /// Label colour for text buttons (e.g. white over photos). Defaults to brand.
+  /// Label colour for text and secondary glass buttons (e.g. white over
+  /// photos). Defaults to brand.
   final Color? color;
 
   static const double _iosHeight = 50;
@@ -54,7 +56,9 @@ class KButton extends StatelessWidget {
       child: SizedBox(
         width: expand
             ? double.infinity
-            : (ios && variant != KButtonVariant.text ? _hugWidth(context) : null),
+            : (ios && variant != KButtonVariant.text
+                  ? _hugWidth(context)
+                  : null),
         height: variant == KButtonVariant.text
             ? KSpace.tapTarget
             : (ios ? _iosHeight : _androidHeight),
@@ -73,11 +77,20 @@ class KButton extends StatelessWidget {
       textDirection: Directionality.of(context),
       maxLines: 1,
     )..layout();
-    final double symbol = sfSymbol == null ? 0 : KType.headline.fontSize! + KSpace.s;
+    final double symbol = sfSymbol == null
+        ? 0
+        : KType.headline.fontSize! + KSpace.s;
     final double width = painter.width + symbol + 2 * KSpace.xl;
     painter.dispose();
     return width < KSpace.tapTarget ? KSpace.tapTarget : width.ceilToDouble();
   }
+
+  bool get _prominent =>
+      variant == KButtonVariant.primary ||
+      variant == KButtonVariant.destructive;
+
+  Color _fill(KColors c) =>
+      variant == KButtonVariant.destructive ? c.error : c.brand;
 
   Widget _ios(BuildContext context) {
     final KColors c = KColors.of(context);
@@ -85,31 +98,32 @@ class KButton extends StatelessWidget {
       return CupertinoButton(
         padding: const EdgeInsets.symmetric(horizontal: KSpace.l),
         onPressed: loading ? null : onPressed,
-        child: Text(label,
-            style: KType.headline.copyWith(color: color ?? c.brand),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis),
+        child: Text(
+          label,
+          style: KType.headline.copyWith(color: color ?? c.brand),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       );
     }
     if (loading) {
       return LiquidGlass(
         capsule: true,
-        tint: variant == KButtonVariant.primary ? c.brand : null,
+        tint: _prominent ? _fill(c) : null,
         child: Center(
           child: CupertinoActivityIndicator(
-            color: variant == KButtonVariant.primary ? Colors.white : c.brand,
+            color: _prominent ? Colors.white : c.brand,
           ),
         ),
       );
     }
-    final bool primary = variant == KButtonVariant.primary;
     return NativeGlassButton(
       onPressed: onPressed,
       title: label,
       sfSymbol: sfSymbol,
-      style: primary ? GlassButtonStyle.prominent : GlassButtonStyle.glass,
-      tint: primary ? c.brand : null,
-      foreground: primary ? Colors.white : c.brand,
+      style: _prominent ? GlassButtonStyle.prominent : GlassButtonStyle.glass,
+      tint: _prominent ? _fill(c) : null,
+      foreground: _prominent ? Colors.white : (color ?? c.brand),
       fontSize: KType.headline.fontSize!,
       fallback: const SizedBox.shrink(),
     );
@@ -122,9 +136,7 @@ class KButton extends StatelessWidget {
             dimension: 22,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
-              color: variant == KButtonVariant.primary
-                  ? Colors.white
-                  : KColors.of(context).brand,
+              color: _prominent ? Colors.white : KColors.of(context).brand,
             ),
           )
         : Row(
@@ -135,13 +147,26 @@ class KButton extends StatelessWidget {
                 const SizedBox(width: KSpace.s),
               ],
               Flexible(
-                child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           );
     switch (variant) {
       case KButtonVariant.primary:
         return FilledButton(onPressed: tap, child: content);
+      case KButtonVariant.destructive:
+        return FilledButton(
+          onPressed: tap,
+          style: FilledButton.styleFrom(
+            backgroundColor: KColors.of(context).error,
+            foregroundColor: Colors.white,
+          ),
+          child: content,
+        );
       case KButtonVariant.secondary:
         return FilledButton.tonal(
           key: const ValueKey<String>('k-button-secondary'),
