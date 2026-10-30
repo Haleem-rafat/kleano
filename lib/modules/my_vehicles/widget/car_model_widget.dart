@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/components/k_picker_field.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/car_model/cars_bloc.dart';
-import 'package:thewasher/modules/my_vehicles/widget/edit_car_title.dart';
-import 'package:thewasher/shared/components/loading.dart';
-import 'package:thewasher/shared/components/search_text_field.dart';
 
 class CarModelWidget extends StatefulWidget {
   final TextEditingController carModelController;
@@ -42,7 +37,6 @@ class _CarModelWidgetState extends State<CarModelWidget> {
     return BlocConsumer<CarsBloc, CarsState>(
       listener: (context, carState) {
         if (carState is GetCarModelByBrandIdSuccess) {
-          debugPrint("object");
           carModels = carState.carModels
               .map((model) => getLocalizedModel(model))
               .toList();
@@ -51,37 +45,22 @@ class _CarModelWidgetState extends State<CarModelWidget> {
       },
       builder: (context, carState) {
         final bool notEmptyCar = selectedCarModel.isNotEmpty;
-        if (carState is GetCarModelByBrandIdloading) {
-          return const LoadingWidget();
-        }
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            16.verticalSpace,
-            editCarTitle(AppStrings.carModel),
-            AppPadding.p8.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: ColorManager.divider),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: DropdownSearchShared(
-                  hintText: notEmptyCar
-                      ? getLocalizedModel(selectedCarModel)
-                      : translate("hint2"),
-                  onChanged: (value) {
-                    setState(() {
-                      widget.carModelController.text = value;
-                      selectedCarModel = value;
-                    });
-                  },
-                  items: carModels,
-                ),
-              ),
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.only(top: KSpace.l),
+          child: KPickerField<String>(
+            label: translate(AppStrings.carModel),
+            placeholder: translate("hint2"),
+            items: carModels,
+            itemLabel: (String m) => m,
+            value: notEmptyCar ? getLocalizedModel(selectedCarModel) : null,
+            loading: carState is GetCarModelByBrandIdloading,
+            onSelected: (String value) {
+              setState(() {
+                widget.carModelController.text = value;
+                selectedCarModel = value;
+              });
+            },
+          ),
         );
       },
     );

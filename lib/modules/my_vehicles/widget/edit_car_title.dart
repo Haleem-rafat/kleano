@@ -1,5 +1,6 @@
 import 'package:control_style/control_style.dart';
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -28,12 +29,16 @@ class CarPlateFormatter extends TextInputFormatter {
   }
 }
 
+/// Field label, same as `KTextField`'s: footnote, secondary text.
 Widget editCarTitle(String title) {
-  return Padding(
-    padding: EdgeInsets.symmetric(horizontal: 16.w),
-    child: Text(
-      translate(title),
-      style: AppStyles.title16Regular.copyWith(color: ColorManager.black),
+  return Builder(
+    builder: (BuildContext context) => Padding(
+      padding: const EdgeInsetsDirectional.only(
+          start: KSpace.xs, bottom: 6, top: KSpace.l),
+      child: Text(
+        translate(title),
+        style: KType.footnote.copyWith(color: KColors.of(context).textSecondary),
+      ),
     ),
   );
 }

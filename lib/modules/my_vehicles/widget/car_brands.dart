@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/components/k_picker_field.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/car_model/cars_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/car_model.dart';
-import 'package:thewasher/modules/my_vehicles/widget/edit_car_title.dart';
-import 'package:thewasher/shared/components/search_text_field.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 
 class CardBrandsWidget extends StatefulWidget {
@@ -73,41 +69,29 @@ class _CardBrandsWidgetState extends State<CardBrandsWidget> {
             (selectBrandName != "" && carBrands.isNotEmpty);
 
         if (state is GetCarBrandsLoading) {
-          return Center(
-            child: SizedBox(
-              height: 30.h,
-              width: 30.w,
-              child: const CircularProgressIndicator(),
+          return Padding(
+            padding: const EdgeInsets.only(top: KSpace.l),
+            child: KPickerField<CarBrandsModel>(
+              label: translate(AppStrings.carBrand),
+              placeholder: translate("hint1"),
+              items: const <CarBrandsModel>[],
+              itemLabel: (CarBrandsModel b) => b.name,
+              onSelected: onSelectBrand,
+              loading: true,
             ),
           );
         }
 
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            editCarTitle(AppStrings.carBrand),
-            AppPadding.p8.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: ColorManager.divider),
-                  borderRadius: BorderRadius.circular(8.r),
-                ),
-                child: DropdownSearchShared(
-                  hintText: translate("hint1"),
-                  items: carBrands,
-                  initItem: notEmptyCarBrand ? foundSelectedCarBrand : null,
-                  onChanged: (value) {
-                    if (value != null) {
-                      onSelectBrand(value);
-                    }
-                  },
-                ),
-              ),
-            ),
-          ],
+        return Padding(
+          padding: const EdgeInsets.only(top: KSpace.l),
+          child: KPickerField<CarBrandsModel>(
+            label: translate(AppStrings.carBrand),
+            placeholder: translate("hint1"),
+            items: carBrands,
+            itemLabel: (CarBrandsModel b) => b.name,
+            value: notEmptyCarBrand ? selectBrandName : null,
+            onSelected: onSelectBrand,
+          ),
         );
       },
     );
@@ -120,7 +104,6 @@ class _CardBrandsWidgetState extends State<CardBrandsWidget> {
       widget.carBrandController.text = value.name;
     });
     if (selectBrandId != null) {
-      debugPrint("sasndjiasnji");
       context
           .read<CarsBloc>()
           .add(GetCarModelByBrandId(brandId: selectBrandId!));
