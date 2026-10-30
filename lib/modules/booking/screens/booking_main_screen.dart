@@ -913,8 +913,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                   ),
                                 Opacity(
                                   opacity: _isGuest ? 0.6 : 1,
+                                  // The button inside TotalPayCard handles the tap; a
+                                  // second handler here would fire it twice.
                                   child: GestureDetector(
-                                    onTap: _nextButtonSteps,
                                     child: BlocConsumer<BookingOrderBloc, BookingOrderState>(
                                       listener:
                                           (
@@ -1039,6 +1040,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                                                     servicesTotal + addOnsTotal;
 
                                                 return TotalPayCard(
+                                                  onTap: _nextButtonSteps,
                                                   text: indexPage == 0
                                                       ? translate(
                                                           AppStrings.nextButton,
