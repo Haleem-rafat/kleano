@@ -1,0 +1,82 @@
+PODS:
+  - appsflyer_sdk (6.17.3):
+    - appsflyer_sdk/Core (= 6.17.3)
+  - appsflyer_sdk/Core (6.17.3):
+    - AppsFlyerFramework (= 6.17.5)
+    - Flutter
+  - AppsFlyerFramework (6.17.5):
+    - AppsFlyerFramework/Main (= 6.17.5)
+  - AppsFlyerFramework/Main (6.17.5)
+  - Flutter (1.0.0)
+  - flutter_local_notifications (0.0.1):
+    - Flutter
+  - flutter_phone_direct_caller (0.0.1):
+    - Flutter
+  - geocoding_ios (1.0.5):
+    - Flutter
+  - Google-Maps-iOS-Utils (5.0.0):
+    - GoogleMaps (~> 8.0)
+  - google_maps_flutter_ios (0.0.1):
+    - Flutter
+    - Google-Maps-iOS-Utils (< 7.0, >= 5.0)
+    - GoogleMaps (< 10.0, >= 8.4)
+  - GoogleMaps (8.4.0):
+    - GoogleMaps/Maps (= 8.4.0)
+  - GoogleMaps/Base (8.4.0)
+  - GoogleMaps/Maps (8.4.0):
+    - GoogleMaps/Base
+  - moyasar (0.0.1):
+    - Flutter
+  - pay_ios (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
+  - Flutter (from `Flutter`)
+  - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
+  - flutter_phone_direct_caller (from `.symlinks/plugins/flutter_phone_direct_caller/ios`)
+  - geocoding_ios (from `.symlinks/plugins/geocoding_ios/ios`)
+  - google_maps_flutter_ios (from `.symlinks/plugins/google_maps_flutter_ios/ios`)
+  - moyasar (from `.symlinks/plugins/moyasar/ios`)
+  - pay_ios (from `.symlinks/plugins/pay_ios/ios`)
+
+SPEC REPOS:
+  trunk:
+    - AppsFlyerFramework
+    - Google-Maps-iOS-Utils
+    - GoogleMaps
+
+EXTERNAL SOURCES:
+  appsflyer_sdk:
+    :path: ".symlinks/plugins/appsflyer_sdk/ios"
+  Flutter:
+    :path: Flutter
+  flutter_local_notifications:
+    :path: ".symlinks/plugins/flutter_local_notifications/ios"
+  flutter_phone_direct_caller:
+    :path: ".symlinks/plugins/flutter_phone_direct_caller/ios"
+  geocoding_ios:
+    :path: ".symlinks/plugins/geocoding_ios/ios"
+  google_maps_flutter_ios:
+    :path: ".symlinks/plugins/google_maps_flutter_ios/ios"
+  moyasar:
+    :path: ".symlinks/plugins/moyasar/ios"
+  pay_ios:
+    :path: ".symlinks/plugins/pay_ios/ios"
+
+SPEC CHECKSUMS:
+  appsflyer_sdk: 23e08a1f2a2a0c3f5d58c91a5820dba768d738c8
+  AppsFlyerFramework: da52a40c07c9f81a7829952e0fd854b6eacf5a7d
+  Flutter: 71a624a5bc0c04062bf19101d501e466baf2fb47
+  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
+  flutter_phone_direct_caller: 7d5d72794577b96f12b4b6da13a9ef90ba438665
+  geocoding_ios: bcbdaa6bddd7d3129c9bcb8acddc5d8778689768
+  Google-Maps-iOS-Utils: 66d6de12be1ce6d3742a54661e7a79cb317a9321
+  google_maps_flutter_ios: 0291eb2aa252298a769b04d075e4a9d747ff7264
+  GoogleMaps: 8939898920281c649150e0af74aa291c60f2e77d
+  moyasar: 1fa35fd99cec4dd2a0913539ba902218e1e3deba
+  pay_ios: 2c48d76615ded0cfaff66185669501b8b1dfc55e
+
+PODFILE CHECKSUM: 57c8aed26fba39d3ec9424816221f294a07c58eb
+
+COCOAPODS: 1.17.0

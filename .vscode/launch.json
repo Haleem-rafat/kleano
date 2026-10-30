@@ -1,0 +1,68 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "kleano_dev",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main_dev.dart",
+			"args": [
+				"--flavor",
+				"dev",
+				"--target",
+				"lib/main_dev.dart"
+			]
+		},
+		{
+			"name": "kleano_pro",
+			"request": "launch",
+			"type": "dart",
+			"program": "lib/main_pro.dart",
+			"args": [
+				"--flavor",
+				"pro",
+				"--target",
+				"lib/main_pro.dart"
+			]
+		},
+		{
+			"name": "kleano_dev (profile mode)",
+			"request": "launch",
+			"type": "dart",
+			"flutterMode": "profile",
+			"program": "lib/main_dev.dart",
+			"args": [
+				"--flavor",
+				"dev",
+				"--target",
+				"lib/main_dev.dart"
+			]
+		},
+		{
+			"name": "kleano_dev (release mode)",
+			"request": "launch",
+			"type": "dart",
+			"flutterMode": "release",
+			"program": "lib/main_dev.dart",
+			"args": [
+				"--flavor",
+				"dev",
+				"--target",
+				"lib/main_dev.dart"
+			]
+		},
+		{
+			"name": "kleano_pro (release mode)",
+			"request": "launch",
+			"type": "dart",
+			"flutterMode": "release",
+			"program": "lib/main_pro.dart",
+			"args": [
+				"--flavor",
+				"pro",
+				"--target",
+				"lib/main_pro.dart"
+			]
+		}
+	]
+}

@@ -1,0 +1,2 @@
+/Users/youssef/Desktop/Kleano_flutter/android/app/.cxx/RelWithDebInfo/391k3a11/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/youssef/Desktop/Kleano_flutter/android/app/.cxx/RelWithDebInfo/391k3a11/armeabi-v7a/CMakeFiles/rebuild_cache.dir
