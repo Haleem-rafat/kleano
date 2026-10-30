@@ -99,4 +99,22 @@ void main() {
     await t.pumpAndSettle();
     expect(t.takeException(), isNull);
   });
+
+  testWidgets('list tiles inside the sheet keep visible ink (sheet is a Material)',
+      (WidgetTester t) async {
+    size(t, const Size(402, 874));
+    await t.pumpWidget(MaterialApp(
+      theme: kleanoTheme(brightness: Brightness.light),
+      home: KAuthScaffold(
+        title: 'Welcome back',
+        primaryAction: KButton(label: 'Log in', onPressed: () {}),
+        children: <Widget>[
+          SwitchListTile.adaptive(
+              title: const Text('Remember me'), value: true, onChanged: (_) {}),
+        ],
+      ),
+    ));
+    await t.pumpAndSettle();
+    expect(t.takeException(), isNull);
+  });
 }

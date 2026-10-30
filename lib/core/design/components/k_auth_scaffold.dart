@@ -126,13 +126,13 @@ class KAuthScaffold extends StatelessWidget {
               left: 0,
               right: 0,
               bottom: 0,
-              child: DecoratedBox(
-                decoration: ShapeDecoration(
-                  color: c.background,
-                  shape: const RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.vertical(
-                      top: Radius.circular(KRadius.sheet),
-                    ),
+              // A Material (not a DecoratedBox) so ink from list tiles shows.
+              child: Material(
+                color: c.background,
+                clipBehavior: Clip.antiAlias,
+                shape: const RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(KRadius.sheet),
                   ),
                 ),
                 child: Column(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:thewasher/core/design/components/k_text_field.dart';
 import 'package:thewasher/core/design/kleano_theme.dart';
@@ -46,5 +47,16 @@ void main() {
     final TextField f = t.widget(find.byType(TextField));
     expect(f.keyboardType, TextInputType.phone);
     expect(f.autofillHints, contains(AutofillHints.telephoneNumber));
+  });
+
+  testWidgets('input formatters restrict what can be typed', (WidgetTester t) async {
+    final TextEditingController c = TextEditingController();
+    await t.pumpWidget(host(KTextField(
+      label: 'Phone',
+      controller: c,
+      inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
+    )));
+    await t.enterText(find.byType(TextField), '05a1b2');
+    expect(c.text, '0512');
   });
 }
