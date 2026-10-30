@@ -23,7 +23,7 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 import 'package:thewhsherbiker/utilties/validator.dart';
 
 class UpdateBikerData extends StatefulWidget {
-  const UpdateBikerData({Key? key}) : super(key: key);
+  const UpdateBikerData({super.key});
 
   @override
   State<UpdateBikerData> createState() => _UpdateBikerDataState();
@@ -71,7 +71,7 @@ class _UpdateBikerDataState extends State<UpdateBikerData> {
       final File imageTemp = File(image.path);
 
       setState(() => pick = imageTemp);
-    } on PlatformException catch (e) {}
+    } on PlatformException {}
   }
 
   Future<void> _updateBikerInfo() async {

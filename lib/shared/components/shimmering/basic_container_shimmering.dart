@@ -22,7 +22,7 @@ class BasicContainerShemmering extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius!.r),
-            color: ColorManager.primary.withOpacity(0.1),
+            color: ColorManager.primary.withValues(alpha: 0.1),
           ),
           width: width,
           height: height,

@@ -24,7 +24,7 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 import 'package:thewhsherbiker/utilties/validator.dart';
 
 class PhoneNumberScreen extends StatefulWidget {
-  PhoneNumberScreen({Key? key}) : super(key: key);
+  const PhoneNumberScreen({super.key});
 
   @override
   State<PhoneNumberScreen> createState() => _PhoneNumberScreenState();

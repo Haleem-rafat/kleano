@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -124,7 +123,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
               ),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: ColorManager.black.withOpacity(.08),
+                  color: ColorManager.black.withValues(alpha: .08),
                   blurRadius: 6.r,
                   offset: const Offset(0, 3),
                 ),
@@ -230,7 +229,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
         borderRadius: BorderRadius.circular(AppSize.s12),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.06),
+            color: ColorManager.black.withValues(alpha: .06),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           ),
@@ -243,8 +242,8 @@ class _BikerScheduleState extends State<BikerSchedule> {
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
               color: isWeekend
-                  ? ColorManager.primary.withOpacity(0.15)
-                  : ColorManager.primary.withOpacity(0.1),
+                  ? ColorManager.primary.withValues(alpha: 0.15)
+                  : ColorManager.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppSize.s12),
                 topRight: Radius.circular(AppSize.s12),
@@ -327,7 +326,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
             decoration: BoxDecoration(
-              color: ColorManager.primary.withOpacity(0.1),
+              color: ColorManager.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Text(
@@ -366,7 +365,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
               decoration: BoxDecoration(
-                color: ColorManager.primary.withOpacity(0.15),
+                color: ColorManager.primary.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(6.r),
               ),
               child: Text(
@@ -401,7 +400,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
         borderRadius: BorderRadius.circular(AppSize.s12),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.06),
+            color: ColorManager.black.withValues(alpha: .06),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           ),
@@ -414,7 +413,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
             decoration: BoxDecoration(
-              color: ColorManager.primary.withOpacity(0.1),
+              color: ColorManager.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(AppSize.s12),
                 topRight: Radius.circular(AppSize.s12),

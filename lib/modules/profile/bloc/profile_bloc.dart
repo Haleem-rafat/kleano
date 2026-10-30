@@ -92,7 +92,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         emit(BikerProfileSuccess(profile: profile));
       }
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
     }
   }
 
@@ -120,7 +120,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final List<String> nameParts = userName.split(' ');
     return nameParts.length > 1
         ? '${nameParts.first[0].toUpperCase()}${nameParts.last[0].toUpperCase()}'
-        : '${userName[0].toUpperCase()}';
+        : userName[0].toUpperCase();
   }
 
   void _updateProfile(String name, String image) {
@@ -134,19 +134,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     final homeBloc = sl<HomeBloc>();
 
     if (status == BikerStatus.ONLINE.name) {
-      print('🟢 Biker status changed to ONLINE - initiating socket connection');
+      debugPrint('🟢 Biker status changed to ONLINE - initiating socket connection');
       // Connect socket when biker goes online
       homeBloc.socketService.connect(
         onNewOrder: (order) {
-          print("📦 New order received in ProfileBloc context");
+          debugPrint("📦 New order received in ProfileBloc context");
           homeBloc.add(BikerGetOrdersAccept());
         },
         onError: (error) {
-          print("❌ Socket error in ProfileBloc context: $error");
+          debugPrint("❌ Socket error in ProfileBloc context: $error");
         },
       );
     } else {
-      print('🔴 Biker status changed to OFFLINE - disconnecting socket');
+      debugPrint('🔴 Biker status changed to OFFLINE - disconnecting socket');
       // Disconnect socket when biker goes offline
       homeBloc.socketService.disconnect();
     }

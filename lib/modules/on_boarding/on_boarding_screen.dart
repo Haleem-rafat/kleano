@@ -14,7 +14,7 @@ import 'package:thewhsherbiker/shared/components/buttons.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class OnboardScreen extends StatefulWidget {
-  const OnboardScreen({Key? key}) : super(key: key);
+  const OnboardScreen({super.key});
 
   @override
   _OnboardScreenState createState() => _OnboardScreenState();
@@ -68,8 +68,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                     },
                     child: Image.asset(
                       e.image,
-                      height: AppSize.s812.h,
-                      width: AppSize.s375.w,
+                      height: 1.sh,
+                      width: 1.sw,
                       gaplessPlayback: true,
                       fit: BoxFit.cover,
                     ));
@@ -80,7 +80,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
               right: 0.w,
               child: SvgPicture.asset(
                 ImageAssets.shapeCircleRight,
-                color: ColorManager.primary,
+                colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
               ),
             ),
             Positioned(
@@ -155,7 +155,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                             innerPadding: AppPadding.p10.w,
                             selectedColor: ColorManager.white,
                             unselectedColor:
-                                ColorManager.white.withOpacity(.50),
+                                ColorManager.white.withValues(alpha: .50),
                           )),
                     ),
                     SizedBox(height: AppSize.s54.h),

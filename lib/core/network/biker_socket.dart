@@ -1,6 +1,7 @@
+import 'package:flutter/foundation.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:thewhsherbiker/api/app_config.dart';
 import 'package:thewhsherbiker/api/shared.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/responses/generic_response.dart';
 
@@ -24,19 +25,19 @@ class SocketService {
 
     // Prevent multiple simultaneous connection attempts
     if (_isConnecting) {
-      print('🔄 Socket connection already in progress');
+      debugPrint('🔄 Socket connection already in progress');
       return;
     }
 
     // If already connected, don't create a new connection
     if (_socket != null && _socket!.connected) {
-      print('✅ Socket already connected');
+      debugPrint('✅ Socket already connected');
       return;
     }
 
     // If socket exists but is disconnected, dispose it first
     if (_socket != null && !_socket!.connected) {
-      print('🔄 Socket exists but disconnected, disposing old socket...');
+      debugPrint('🔄 Socket exists but disconnected, disposing old socket...');
       _socket!.clearListeners();
       _socket!.dispose();
       _socket = null;
@@ -44,11 +45,11 @@ class SocketService {
 
     try {
       _isConnecting = true;
-      print('🔌 Initiating socket connection...');
-      print('🔑 Using token: ${AppShared.token.substring(0, 20)}...');
+      debugPrint('🔌 Initiating socket connection...');
+      debugPrint('🔑 Using token: ${AppShared.token.substring(0, 20)}...');
 
       var url = AppConfig.getSocketBaseUrl();
-      print('🌐 Connecting to: $url');
+      debugPrint('🌐 Connecting to: $url');
 
       _socket = IO.io(url, <String, dynamic>{
         'autoConnect': false,
@@ -59,58 +60,58 @@ class SocketService {
         'reconnectionAttempts': 10, // Increased attempts
         'timeout': 20000, // 20 second timeout
       });
-      print('🔑 Using token: ${AppShared.token}...');
+      debugPrint('🔑 Using token: ${AppShared.token}...');
       _socket!.io.options!['extraHeaders'] = {
         'authorization': 'Bearer ${AppShared.token}'
       };
 
       // Set up listeners before connecting
       _socket!.onConnect((_) {
-        print('✅ Socket connection established');
-        print('✅ Socket ID: ${_socket!.id}');
-        print('✅ Socket connected: ${_socket!.connected}');
+        debugPrint('✅ Socket connection established');
+        debugPrint('✅ Socket ID: ${_socket!.id}');
+        debugPrint('✅ Socket connected: ${_socket!.connected}');
       });
 
       _socket!.onDisconnect((reason) {
-        print('⚠️ Socket disconnected. Reason: $reason');
-        print('⚠️ Will auto-reconnect due to reconnection: true setting');
+        debugPrint('⚠️ Socket disconnected. Reason: $reason');
+        debugPrint('⚠️ Will auto-reconnect due to reconnection: true setting');
       });
 
       _socket!.onReconnect((attemptNumber) {
-        print('🔄 Socket reconnected after $attemptNumber attempts');
+        debugPrint('🔄 Socket reconnected after $attemptNumber attempts');
       });
 
       _socket!.onReconnectAttempt((attemptNumber) {
-        print('🔄 Reconnection attempt #$attemptNumber');
+        debugPrint('🔄 Reconnection attempt #$attemptNumber');
       });
 
       _socket!.onReconnectError((err) {
-        print('❌ Reconnection error: $err');
+        debugPrint('❌ Reconnection error: $err');
       });
 
       _socket!.onReconnectFailed((data) {
-        print('❌ Reconnection failed after all attempts');
+        debugPrint('❌ Reconnection failed after all attempts');
         if (_onErrorCallback != null) {
           _onErrorCallback!('Reconnection failed: $data');
         }
       });
 
       _socket!.onConnectError((err) {
-        print('❌ Socket connection error: $err');
+        debugPrint('❌ Socket connection error: $err');
         if (_onErrorCallback != null) {
           _onErrorCallback!('Connection error: $err');
         }
       });
 
       _socket!.onError((err) {
-        print('❌ Socket error: $err');
+        debugPrint('❌ Socket error: $err');
         if (_onErrorCallback != null) {
           _onErrorCallback!('Socket error: $err');
         }
       });
 
       _socket!.on('order:published', (data) {
-        print('📦 New order received: $data');
+        debugPrint('📦 New order received: $data');
         try {
           final order = GenericResponse(
             json: data,
@@ -120,7 +121,7 @@ class SocketService {
             _onNewOrderCallback!(order);
           }
         } catch (e) {
-          print('❌ Error parsing order data: $e');
+          debugPrint('❌ Error parsing order data: $e');
           if (_onErrorCallback != null) {
             _onErrorCallback!('Error parsing order: $e');
           }
@@ -129,9 +130,9 @@ class SocketService {
 
       // Now connect
       _socket!.connect();
-      print('🔌 Socket connect() called');
+      debugPrint('🔌 Socket connect() called');
     } catch (e) {
-      print('❌ Socket connection setup error: $e');
+      debugPrint('❌ Socket connection setup error: $e');
       if (_onErrorCallback != null) {
         _onErrorCallback!('Setup error: $e');
       }
@@ -143,14 +144,14 @@ class SocketService {
   /// Disconnect from the socket server
   void disconnect() {
     if (_socket != null) {
-      print('🔌 Disconnecting socket...');
+      debugPrint('🔌 Disconnecting socket...');
       _socket!.clearListeners();
       _socket!.disconnect();
       _socket!.dispose();
       _socket = null;
-      print('✅ Socket disconnected and disposed');
+      debugPrint('✅ Socket disconnected and disposed');
     } else {
-      print('⚠️ Socket was already null, no need to disconnect');
+      debugPrint('⚠️ Socket was already null, no need to disconnect');
     }
   }
 
@@ -166,10 +167,10 @@ class SocketService {
   /// Emit an event to the socket server
   void emit(String event, dynamic data) {
     if (_socket != null && _socket!.connected) {
-      print('📤 Emitting event: $event');
+      debugPrint('📤 Emitting event: $event');
       _socket!.emit(event, data);
     } else {
-      print('⚠️ Cannot emit event: Socket not connected');
+      debugPrint('⚠️ Cannot emit event: Socket not connected');
     }
   }
 

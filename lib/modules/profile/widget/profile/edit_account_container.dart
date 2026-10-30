@@ -8,7 +8,7 @@ import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 class EditAccountContainer extends StatelessWidget {
   final bool edit;
   final String title;
-  const EditAccountContainer({Key? key, required this.edit, required this.title}) : super(key: key);
+  const EditAccountContainer({super.key, required this.edit, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class EditAccountContainer extends StatelessWidget {
         child: Row(
           children: <Widget>[
             Text(
-              "${title} :",
+              "$title :",
               style: AppStyles.body14Medium.copyWith(color: ColorManager.darkGrey),
             ),
             Spacer(),

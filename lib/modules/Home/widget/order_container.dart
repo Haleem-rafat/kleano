@@ -19,7 +19,7 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class OrderContainer extends StatelessWidget {
   final int index;
-  const OrderContainer({Key? key, required this.index}) : super(key: key);
+  const OrderContainer({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class OrderContainer extends StatelessWidget {
             height: 11.h,
           ),
           Text(
-            "${translate(AppStrings.arrivedTime)} ${sl<HomeBloc>().orderList[index].startTime != null ? AppDateFormatter.allDate(sl<HomeBloc>().orderList[index].startTime!) + ' ' + AppDateFormatter.dateToStringHHMMA(sl<HomeBloc>().orderList[index].startTime!.toLocal()) : ''}",
+            "${translate(AppStrings.arrivedTime)} ${sl<HomeBloc>().orderList[index].startTime != null ? '${AppDateFormatter.allDate(sl<HomeBloc>().orderList[index].startTime!)} ${AppDateFormatter.dateToStringHHMMA(sl<HomeBloc>().orderList[index].startTime!.toLocal())}' : ''}",
             style: AppStyles.caption12Regular.copyWith(
               color: ColorManager.white,
               fontSize: FontSize.s10.sp,
@@ -51,7 +51,7 @@ class OrderContainer extends StatelessWidget {
                   borderRadius: BorderRadius.all(Radius.circular(15.r)),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                        color: ColorManager.black.withOpacity(.08),
+                        color: ColorManager.black.withValues(alpha: .08),
                         blurRadius: 6.r,
                         offset: const Offset(0, 3))
                   ]),

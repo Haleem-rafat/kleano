@@ -1,5 +1,6 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
@@ -29,29 +30,48 @@ class ButtonsShared extends StatelessWidget {
     this.showShadow = true,
   });
 
+  /// Filled (opaque, coloured) buttons map to Apple's prominent glass.
+  bool get _isProminent =>
+      colorButton != null &&
+      colorButton!.a > 0.5 &&
+      colorButton!.toARGB32() != ColorManager.white.toARGB32();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: height,
-      width: width,
-      child: ElevatedButton(
+      height: height!.h,
+      width: width!.w,
+      // iOS: Apple's real glass button; other platforms: the Material button.
+      child: NativeGlassButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          fixedSize: Size(width!.w, height!.h),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(borderRadius.r)),
-            side: BorderSide(color: colorBorder!, width: 1.w),
+        title: text,
+        style: _isProminent
+            ? GlassButtonStyle.prominent
+            // Apple: clear glass for controls over photos/media.
+            : (colorButton?.a ?? 0) < 0.5
+                ? GlassButtonStyle.clear
+                : GlassButtonStyle.glass,
+        tint: _isProminent ? colorButton : null,
+        foreground: textStyle.color ?? colorText,
+        fontSize: textStyle.fontSize ?? 16,
+        fallback: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            fixedSize: Size(width!.w, height!.h),
+            // Continuous (superellipse) corners, Liquid Glass style.
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.all(Radius.circular(borderRadius.r)),
+              side: BorderSide(color: colorBorder!, width: 1.w),
+            ),
+            elevation: showShadow! ? 4 : 0,
+            shadowColor: showShadow!
+                ? ColorManager.secondary.withValues(alpha: .35)
+                : Colors.transparent,
+            overlayColor: ColorManager.white.withValues(alpha: 0.12),
+            backgroundColor: colorButton,
+            foregroundColor: colorText, // Handles the text color in Material 3
           ),
-          elevation: showShadow! ? 6 : 0,
-          shadowColor: showShadow!
-              ? ColorManager.secondary.withOpacity(.50)
-              : Colors.transparent,
-          backgroundColor: colorButton,
-          foregroundColor: colorText, // Handles the text color in Material 3
-        ),
-        child: Text(
-          text,
-          style: textStyle,
+          child: Text(text, style: textStyle),
         ),
       ),
     );
@@ -74,14 +94,13 @@ class ButtonDottedShared extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: DottedBorder(
-        dashPattern: const [4, 3, 1, 0],
-        borderType: BorderType.RRect,
-        color: disable ? ColorManager.divider : ColorManager.primary,
-        radius: const Radius.circular(24),
+        options: RoundedRectDottedBorderOptions(
+          dashPattern: const <double>[4, 3, 1, 0],
+          color: disable ? ColorManager.divider : ColorManager.primary,
+          radius: const Radius.circular(24),
+        ),
         child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
           height: 50.h,
           width: 327.w,
           child: Center(

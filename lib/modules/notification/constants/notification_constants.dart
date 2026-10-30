@@ -1,5 +1,6 @@
 /// Notification Constants
 /// Contains all constants related to notifications
+library;
 
 class NotificationConstants {
   // Notification Channel IDs

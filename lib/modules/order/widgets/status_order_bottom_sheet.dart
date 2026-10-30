@@ -1,6 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
@@ -142,7 +140,7 @@ class _StatusOrderBottomSheetState extends State<StatusOrderBottomSheet> {
           //   action: () async {
           //     ///Do something here OnSlide
           //     // return true;
-          //     print("working");
+          //     debugPrint("working");
           //     return isCompleted == true ? false : true;
           //   },
           //   label: Text(
@@ -215,7 +213,7 @@ class _StatusOrderBottomSheetState extends State<StatusOrderBottomSheet> {
           //       child: Container(
           //         width: double.infinity,
           //         decoration: BoxDecoration(
-          //           color: ColorManager.red.withOpacity(0.08),
+          //           color: ColorManager.red.withValues(alpha: 0.08),
           //           borderRadius: BorderRadius.circular(8.r),
           //           border: Border.all(color: ColorManager.red),
           //         ),

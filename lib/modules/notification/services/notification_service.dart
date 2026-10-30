@@ -9,9 +9,9 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 /// Background message handler - MUST be a top-level function
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  print('Handling a background message: ${message.messageId}');
-  print('Message data: ${message.data}');
-  print('Message notification: ${message.notification?.title}');
+  debugPrint('Handling a background message: ${message.messageId}');
+  debugPrint('Message data: ${message.data}');
+  debugPrint('Message notification: ${message.notification?.title}');
 }
 
 /// Comprehensive notification service that handles both Firebase and Local notifications
@@ -58,9 +58,9 @@ class NotificationService {
       _setupMessageHandlers();
 
       _initialized = true;
-      print('✅ Notification service initialized successfully');
+      debugPrint('✅ Notification service initialized successfully');
     } catch (e) {
-      print('❌ Error initializing notification service: $e');
+      debugPrint('❌ Error initializing notification service: $e');
       rethrow;
     }
   }
@@ -78,18 +78,18 @@ class NotificationService {
       sound: true,
     );
 
-    print('User granted permission: ${settings.authorizationStatus}');
+    debugPrint('User granted permission: ${settings.authorizationStatus}');
 
     if (settings.authorizationStatus == AuthorizationStatus.authorized ||
         settings.authorizationStatus == AuthorizationStatus.provisional) {
       // Get FCM token
       _fcmToken = await _firebaseMessaging.getToken();
-      print('FCM Token: $_fcmToken');
+      debugPrint('FCM Token: $_fcmToken');
 
       // Listen to token refresh
       _firebaseMessaging.onTokenRefresh.listen((String newToken) {
         _fcmToken = newToken;
-        print('FCM Token refreshed: $newToken');
+        debugPrint('FCM Token refreshed: $newToken');
         // TODO: Send token to your backend
       });
     }
@@ -113,7 +113,7 @@ class NotificationService {
     );
 
     await _localNotifications.initialize(
-      initSettings,
+      settings: initSettings,
       onDidReceiveNotificationResponse: _onNotificationTapped,
     );
 
@@ -168,7 +168,7 @@ class NotificationService {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(orderChannel);
 
-      print('✅ Android notification channels created');
+      debugPrint('✅ Android notification channels created');
     }
   }
 
@@ -176,11 +176,11 @@ class NotificationService {
   void _setupMessageHandlers() {
     // Handle foreground messages
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('📱 Got a message whilst in the FOREGROUND!');
-      print('Message data: ${message.data}');
+      debugPrint('📱 Got a message whilst in the FOREGROUND!');
+      debugPrint('Message data: ${message.data}');
 
       if (message.notification != null) {
-        print('Message also contained a notification: ${message.notification}');
+        debugPrint('Message also contained a notification: ${message.notification}');
         _showLocalNotification(
           title: message.notification!.title ?? 'New Notification',
           body: message.notification!.body ?? '',
@@ -192,8 +192,8 @@ class NotificationService {
 
     // Handle notification opened from background
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('📬 Notification opened from BACKGROUND');
-      print('Message data: ${message.data}');
+      debugPrint('📬 Notification opened from BACKGROUND');
+      debugPrint('Message data: ${message.data}');
       _handleNotificationNavigation(message.data);
     });
 
@@ -207,8 +207,8 @@ class NotificationService {
         await _firebaseMessaging.getInitialMessage();
 
     if (initialMessage != null) {
-      print('🚀 App opened from TERMINATED state via notification');
-      print('Message data: ${initialMessage.data}');
+      debugPrint('🚀 App opened from TERMINATED state via notification');
+      debugPrint('Message data: ${initialMessage.data}');
       // Wait a bit for app to fully initialize
       await Future.delayed(const Duration(seconds: 1));
       _handleNotificationNavigation(initialMessage.data);
@@ -258,17 +258,17 @@ class NotificationService {
     );
 
     await _localNotifications.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      notificationDetails,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
       payload: payload,
     );
   }
 
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
-    print('Notification tapped with payload: ${response.payload}');
+    debugPrint('Notification tapped with payload: ${response.payload}');
 
     if (_context != null) {
       // Navigate to notification screen or specific screen based on payload
@@ -326,13 +326,13 @@ class NotificationService {
   }) async {
     // Note: For scheduled notifications, you may want to use a different package
     // like flutter_local_notifications with timezone support or workmanager
-    print('Scheduled notification for: $scheduledTime');
+    debugPrint('Scheduled notification for: $scheduledTime');
     // Implementation depends on your specific requirements
   }
 
   /// Cancel a specific notification
   Future<void> cancelNotification(int id) async {
-    await _localNotifications.cancel(id);
+    await _localNotifications.cancel(id: id);
   }
 
   /// Cancel all notifications
@@ -367,13 +367,13 @@ class NotificationService {
   /// Subscribe to a topic
   Future<void> subscribeToTopic(String topic) async {
     await _firebaseMessaging.subscribeToTopic(topic);
-    print('Subscribed to topic: $topic');
+    debugPrint('Subscribed to topic: $topic');
   }
 
   /// Unsubscribe from a topic
   Future<void> unsubscribeFromTopic(String topic) async {
     await _firebaseMessaging.unsubscribeFromTopic(topic);
-    print('Unsubscribed from topic: $topic');
+    debugPrint('Unsubscribed from topic: $topic');
   }
 
   /// Update context (useful when context changes)

@@ -1,9 +1,9 @@
-// import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/theme_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
@@ -18,6 +18,8 @@ import 'flavors.dart';
 import 'modules/Auth/bloc/phone_auth/phone_number_verification_cubit.dart';
 final GlobalKey<NavigatorState> navigatorKeyAlice = GlobalKey<NavigatorState>();
 class App extends StatelessWidget {
+  const App({super.key});
+
   @override
   Widget build(BuildContext context) {
     LocalizationDelegate localizationDelegate =
@@ -46,23 +48,25 @@ class App extends StatelessWidget {
       ],
       child: LocalizationProvider(
         state: LocalizationProvider.of(context).state,
-        child: ScreenUtilInit(
-          designSize: const Size(375, 812),
-          builder: (_, __) {
+        child: AdaptiveScreenUtil(
+          builder: (_) {
             return MaterialApp(
-              builder: (BuildContext context, Widget? novigator) {
-                String lang = Localizations.localeOf(context).languageCode;
+              navigatorKey: navigatorKeyAlice,
+              builder: (BuildContext context, Widget? navigator) {
+                final String lang = Localizations.localeOf(context).languageCode;
                 return Theme(
-                  data: getApplicationTheme(lang),
-                  child: novigator!,
+                  data: LiquidGlassTheme.apply(
+                    getApplicationTheme(lang),
+                    primary: ColorManager.primary,
+                  ),
+                  child: BackdropGroup(
+                    child: LiquidGlassTheme.clampTextScale(
+                          context, FoldScope(child: SystemBarInset(child: navigator!))),
+                  ),
                 );
               },
-              // navigatorObservers: [ChuckerFlutter.navigatorObserver],
               debugShowCheckedModeBanner: false,
               title: F.title,
-              theme: ThemeData(
-                  primarySwatch: Colors.cyan,
-                  scaffoldBackgroundColor: ColorManager.white),
               home: SplashScreen(),
               localizationsDelegates: [
                 GlobalMaterialLocalizations.delegate,

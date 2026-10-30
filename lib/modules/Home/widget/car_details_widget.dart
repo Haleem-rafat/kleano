@@ -12,14 +12,14 @@ import 'package:thewhsherbiker/shared/components/cached_network_image.dart';
 
 class CarDetailsWidget extends StatelessWidget {
   final order.Vehicle? carData;
-  const CarDetailsWidget({Key? key, required this.carData}) : super(key: key);
+  const CarDetailsWidget({super.key, required this.carData});
 
   void _showEnhancedFullScreenImage(BuildContext context) {
     showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
-      barrierColor: Colors.black.withOpacity(0.8),
+      barrierColor: Colors.black.withValues(alpha: 0.8),
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (context, animation, secondaryAnimation) {
         return Hero(
@@ -101,7 +101,7 @@ class CarDetailsWidget extends StatelessWidget {
                               child: Container(
                                 padding: EdgeInsets.all(6.r),
                                 decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
+                                  color: Colors.black.withValues(alpha: 0.6),
                                   borderRadius: BorderRadius.circular(20.r),
                                 ),
                                 child: Icon(
@@ -200,11 +200,10 @@ class _EnhancedImageViewer extends StatefulWidget {
   final String carModel;
 
   const _EnhancedImageViewer({
-    Key? key,
     required this.imageUrl,
     required this.carBrand,
     required this.carModel,
-  }) : super(key: key);
+  });
 
   @override
   State<_EnhancedImageViewer> createState() => _EnhancedImageViewerState();
@@ -354,7 +353,7 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
                         ],
                       ),
@@ -393,10 +392,10 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                             child: Container(
                               padding: EdgeInsets.all(12.r),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.5),
+                                color: Colors.black.withValues(alpha: 0.5),
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.white.withValues(alpha: 0.3),
                                   width: 1,
                                 ),
                               ),
@@ -434,7 +433,7 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Colors.black.withOpacity(0.7),
+                          Colors.black.withValues(alpha: 0.7),
                           Colors.transparent,
                         ],
                       ),
@@ -483,10 +482,10 @@ class _EnhancedImageViewerState extends State<_EnhancedImageViewer>
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(25.r),
             border: Border.all(
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
               width: 1,
             ),
           ),

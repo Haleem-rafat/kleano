@@ -32,7 +32,7 @@ class _DropDownLanguageState extends State<DropDownLanguage> {
     });
   }
 
-  _updateUserLanguage(String val) {
+  void _updateUserLanguage(String val) {
     if (val == AppConstants.english) {
       _changeLocale('en');
 
@@ -57,7 +57,7 @@ class _DropDownLanguageState extends State<DropDownLanguage> {
         width: 328.w,
         decoration: BoxDecoration(color: ColorManager.white, borderRadius: BorderRadius.circular(10.r), boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.05),
+            color: ColorManager.black.withValues(alpha: .05),
             blurRadius: 3.r,
             offset: const Offset(0, 3),
           ),

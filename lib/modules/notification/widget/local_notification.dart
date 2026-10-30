@@ -29,7 +29,6 @@ class LocalNotificationServices {
       requestSoundPermission: true,
       requestBadgePermission: true,
       requestAlertPermission: true,
-      onDidReceiveLocalNotification: onDidReceiveLocalNotification,
     );
 
     initializationSettings = InitializationSettings(
@@ -38,7 +37,7 @@ class LocalNotificationServices {
     );
 
     await flutterLocalNotificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: onSelectNotification,
     );
 
@@ -118,13 +117,8 @@ class LocalNotificationServices {
         );
   }
 
-  void onDidReceiveLocalNotification(
-      int id, String? title, String? body, String? payload) {
-    print("onDidReceiveLocalNotification: $title - $body");
-  }
-
   void onSelectNotification(NotificationResponse? payLoad) {
-    print("Notification tapped with payload: ${payLoad?.payload}");
+    debugPrint("Notification tapped with payload: ${payLoad?.payload}");
 
     if (payLoad != null && payLoad.payload != null) {
       // Handle different notification types based on payload
@@ -141,7 +135,7 @@ class LocalNotificationServices {
       // For now, just navigate to notification screen
       pushPage(context, NotificationScreen());
     } catch (e) {
-      print("Error handling notification payload: $e");
+      debugPrint("Error handling notification payload: $e");
       pushPage(context, NotificationScreen());
     }
   }
@@ -234,10 +228,10 @@ class LocalNotificationServices {
     );
 
     await flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      title,
-      body,
-      notificationDetails,
+      id: DateTime.now().millisecondsSinceEpoch.remainder(1 << 31),
+      title: title,
+      body: body,
+      notificationDetails: notificationDetails,
       payload: payload,
     );
   }
@@ -249,7 +243,7 @@ class LocalNotificationServices {
 
   /// Cancel a specific notification
   Future<void> cancel(int id) async {
-    await flutterLocalNotificationsPlugin.cancel(id);
+    await flutterLocalNotificationsPlugin.cancel(id: id);
   }
 
   /// Get pending notifications

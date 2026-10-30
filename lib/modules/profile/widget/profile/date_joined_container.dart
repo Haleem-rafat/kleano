@@ -12,8 +12,7 @@ import 'package:thewhsherbiker/core/resources/values_manager.dart';
 
 class DateJoinedContainer extends StatelessWidget {
   final String timeCreateAt;
-  const DateJoinedContainer({Key? key, required this.timeCreateAt})
-      : super(key: key);
+  const DateJoinedContainer({super.key, required this.timeCreateAt});
 
   String _formatDate(String dateString) {
     try {
@@ -77,7 +76,7 @@ class DateJoinedContainer extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(AppSize.s12)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.06),
+            color: ColorManager.black.withValues(alpha: .06),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           )

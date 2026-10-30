@@ -20,7 +20,7 @@ import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({Key? key}) : super(key: key);
+  const NotificationScreen({super.key});
 
   @override
   State<NotificationScreen> createState() => _NotificationScreenState();
@@ -45,7 +45,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375.w, AppSize.s60.h),
+        preferredSize: Size(1.sw, AppSize.s60.h),
         child: AppBarShared(
           titleAppBar: translate(AppStrings.notifications),
           isTextOnly: false,
@@ -54,7 +54,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (BuildContext context, HomeState state) {
           if (state is BikerOrderSuccess) {
-            print("hello");
+            debugPrint("hello");
             if (sl<HomeBloc>().orderDetails.status == "COMPLETED") {
               popALlAndPushPage(context, HomeScreen(initialIndex: 2));
             } else {

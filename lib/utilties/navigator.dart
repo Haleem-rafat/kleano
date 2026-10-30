@@ -51,7 +51,7 @@ void pushNameWithArguments(
   Navigator.of(context).pushNamed(route, arguments: argument);
 }
 
-pushPageForResult(BuildContext context, Widget widget) async {
+Future<dynamic> pushPageForResult(BuildContext context, Widget widget) async {
   return await Navigator.of(context).push(
     MaterialPageRoute(builder: (BuildContext context) => widget),
   );
@@ -70,7 +70,7 @@ void popAndPushName(BuildContext context, String route, {dynamic arguments}) {
   Navigator.of(context).popAndPushNamed(route, arguments: arguments);
 }
 
-pushWidgetWithFade(BuildContext context, Widget widget) {
+void pushWidgetWithFade(BuildContext context, Widget widget) {
   Navigator.of(context).push(
     PageRouteBuilder(
         transitionsBuilder: (BuildContext context, Animation<double> animation,

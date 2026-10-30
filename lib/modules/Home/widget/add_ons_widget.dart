@@ -8,7 +8,7 @@ import 'package:thewhsherbiker/shared/components/cached_network_image.dart';
 
 class AddOnsWidget extends StatelessWidget {
   final List<AddOns>? addOns;
-  const AddOnsWidget({Key? key, required this.addOns}) : super(key: key);
+  const AddOnsWidget({super.key, required this.addOns});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class AddOnsWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(15.r),
           boxShadow: <BoxShadow>[
             BoxShadow(
-                color: ColorManager.black.withOpacity(.02),
+                color: ColorManager.black.withValues(alpha: .02),
                 blurRadius: 6.r,
                 offset: const Offset(0, 3))
           ]),

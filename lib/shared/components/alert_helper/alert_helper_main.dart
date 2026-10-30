@@ -5,18 +5,18 @@ import 'package:thewhsherbiker/shared/components/alert_helper/rating_success_dia
 
 
 class AlertHelper {
-  static newOrder(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> newOrder(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => const OrderPopUp());
 
-  static ratingDialog(BuildContext context, String orderId) async => showDialog(
+  static Future<Future<dynamic>> ratingDialog(BuildContext context, String orderId) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => RatingOrderAlert(orderId: orderId));
 
 
-  static ratingSuccess(BuildContext context) async => showDialog(
+  static Future<Future<dynamic>> ratingSuccess(BuildContext context) async => showDialog(
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) => RatingSuccessDialog());

@@ -15,12 +15,12 @@ class ProfileShimmiring extends StatelessWidget {
       children: <Widget>[
         SizedBox(
             height: 180.h,
-            width: 375.w,
+            width: 1.sw,
             child: Stack(
               children: <Widget>[
                 BasicContainerShemmering(
                   height: 110.h,
-                  width: 375.w,
+                  width: 1.sw,
                 ),
                 Positioned(
                   bottom: 30.h,
@@ -32,7 +32,7 @@ class ProfileShimmiring extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: ColorManager.primary.withOpacity(0.1),
+                          color: ColorManager.primary.withValues(alpha: 0.1),
                         ),
                         width: 73.39.w,
                         height: 73.39.h,
@@ -79,7 +79,7 @@ class ProfileShimmiring extends StatelessWidget {
               width: 328.w,
             ),
           );
-        }).toList(),
+        }),
       ],
     );
   }

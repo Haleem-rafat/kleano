@@ -14,11 +14,11 @@ class CommissionContainer extends StatelessWidget {
   final String? minimumCommission;
   final String? ordersBeforeCommission;
   const CommissionContainer({
-    Key? key,
+    super.key,
     this.commission,
     this.minimumCommission,
     this.ordersBeforeCommission,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class CommissionContainer extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(AppSize.s12)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(.06),
+            color: ColorManager.black.withValues(alpha: .06),
             blurRadius: 6.r,
             offset: const Offset(0, 3),
           )

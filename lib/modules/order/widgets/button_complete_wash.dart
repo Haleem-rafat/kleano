@@ -58,7 +58,7 @@ class _ButtonCompleteWashWidgetState extends State<ButtonCompleteWashWidget> {
   }
 
   Future<void> _handleSwipe(ActionSliderController controller) async {
-    print('YYYYYYYY ${sl<HomeBloc>().orderStep}');
+    debugPrint('YYYYYYYY ${sl<HomeBloc>().orderStep}');
     if (sl<HomeBloc>().orderDetails.status == "ON_WASHING") {
       _showImageSelectionSheet(controller);
     } else if (sl<HomeBloc>().state is BikerCompleteOrderSuccess) {
@@ -88,7 +88,7 @@ class _ButtonCompleteWashWidgetState extends State<ButtonCompleteWashWidget> {
                 imageQuality: 80,
               );
 
-              if (image != null) {
+              if (image != null && context.mounted) {
                 sl<HomeBloc>().add(BikerCompleteOrder(
                   orderId: widget.orderId,
                   orderIndex: widget.index,
@@ -115,7 +115,7 @@ class _ButtonCompleteWashWidgetState extends State<ButtonCompleteWashWidget> {
                 imageQuality: 100,
               );
 
-              if (image != null) {
+              if (image != null && context.mounted) {
                 sl<HomeBloc>().add(BikerCompleteOrder(
                   orderId: widget.orderId,
                   orderIndex: widget.index,

@@ -9,6 +9,11 @@ import 'fonts_manager.dart';
 ThemeData getApplicationTheme(String lang) {
   return ThemeData(
     // main colors
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: ColorManager.primary,
+      primary: ColorManager.primary,
+      surface: ColorManager.white,
+    ),
     primaryColor: ColorManager.primary,
     primaryColorLight: ColorManager.primaryLight,
     primaryColorDark: ColorManager.darkPrimary,

@@ -10,15 +10,13 @@ import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/launch_map.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart'
     as order;
-import 'package:thewhsherbiker/utilties/app_date_formatter.dart';
 
 class UserDetailsWidget extends StatelessWidget {
   final order.OrderModel userData;
   final TextStyle textStyle;
 
   const UserDetailsWidget(
-      {Key? key, required this.userData, required this.textStyle})
-      : super(key: key);
+      {super.key, required this.userData, required this.textStyle});
 
   @override
   Widget build(BuildContext context) {

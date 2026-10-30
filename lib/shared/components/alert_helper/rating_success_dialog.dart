@@ -13,8 +13,8 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class RatingSuccessDialog extends StatefulWidget {
   const RatingSuccessDialog({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<RatingSuccessDialog> createState() => _RatingDialogState();
@@ -24,6 +24,7 @@ class _RatingDialogState extends State<RatingSuccessDialog> {
   @override
   void initState() {
     Future.delayed(const Duration(milliseconds: 1000), () {
+      if (!mounted) return;
       pushReplacement(
           context,
           HomeScreen(
@@ -47,7 +48,7 @@ class _RatingDialogState extends State<RatingSuccessDialog> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  ClipRRect _buildChild(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24.r),
       child: Container(

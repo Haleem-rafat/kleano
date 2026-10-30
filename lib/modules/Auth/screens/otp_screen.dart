@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_countdown_timer/countdown_timer_controller.dart';
 import 'package:flutter_countdown_timer/current_remaining_time.dart';
@@ -29,10 +28,10 @@ class OtpScreen extends StatefulWidget {
   final String verificationId;
 
   const OtpScreen({
-    Key? key,
+    super.key,
     required this.phone,
     required this.verificationId,
-  }) : super(key: key);
+  });
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -56,7 +55,7 @@ class _OtpScreenState extends State<OtpScreen> {
     _timerCounter();
   }
 
-  _timerCounter() {
+  void _timerCounter() {
     countdownTimerController = CountdownTimerController(
       endTime: DateTime.now()
           .add(const Duration(seconds: 120))
@@ -97,8 +96,8 @@ class _OtpScreenState extends State<OtpScreen> {
             ? const ArrowBackShared()
             : null,
       ),
-      body: WillPopScope(
-        onWillPop: countdownTimerController.isRunning ? () async => false : null,
+      body: PopScope(
+        canPop: !countdownTimerController.isRunning,
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -170,7 +169,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     log('----FCM token--: ${state.fcmToken}');
                     AppShared.setFcmValue(state.fcmToken);
                     pushPage(context, UpdatePassword(profile: false,));
-                    print("hello");
+                    debugPrint("hello");
                   } else if (state
                       is PhoneNumberVerificationUnknownErrorState) {
                     SnackBar(
@@ -268,10 +267,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         borderRadius: 25,
                         colorButton: pinComplete || login
                             ? ColorManager.primary
-                            : ColorManager.primaryLight.withOpacity(.5),
+                            : ColorManager.primaryLight.withValues(alpha: .5),
                         colorBorder: pinComplete || login
                             ? ColorManager.primary
-                            : ColorManager.primaryLight.withOpacity(.05),
+                            : ColorManager.primaryLight.withValues(alpha: .05),
                       ),
                       SizedBox(
                         height: AppSize.s40.h,

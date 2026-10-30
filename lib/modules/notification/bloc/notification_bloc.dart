@@ -2,7 +2,6 @@ import 'package:bloc/bloc.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:meta/meta.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/notification/data/model/notification_model.dart';
 import 'package:thewhsherbiker/modules/notification/data/repo/notification_repo.dart';
@@ -26,7 +25,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<GetBikerNotification>(
         (GetBikerNotification event, Emitter<NotificationState> emit) async {
       try {
-        print("Biker Get Notification");
+        debugPrint("Biker Get Notification");
         emit(BikerNotificationLoading());
         notificationPageNumber = 1;
         notificationTotalPage = 0;
@@ -56,7 +55,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<GetBikerNotificationPagination>((GetBikerNotificationPagination event,
         Emitter<NotificationState> emit) async {
       try {
-        print("Biker Get Notification Pagination");
+        debugPrint("Biker Get Notification Pagination");
         emit(BikerNotificationPaginationLoading());
         if (notificationPageNumber <= notificationTotalPage) {
           final GenericResponse<NotificationModel> response =
@@ -82,7 +81,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<MakePushNotification>(
         (MakePushNotification event, Emitter<NotificationState> emit) async {
       try {
-        print("Send now Notification ...");
+        debugPrint("Send now Notification ...");
         emit(MakePushNotificationLoading());
 
         final NotificationSettings notificationSettings =
@@ -117,7 +116,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
 
           final String? fcmToken =
               await firebaseCloudMessagingService.getFcmToken();
-          print('FCM Token: $fcmToken');
+          debugPrint('FCM Token: $fcmToken');
 
           if (fcmToken != null) {
             //final bool fcmTokenAdded = await NotificationsRepository.addFCMToken(fcmToken: fcmToken);
@@ -145,7 +144,7 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
     on<MakeNotificationIsRead>(
         (MakeNotificationIsRead event, Emitter<NotificationState> emit) async {
       try {
-        print("Make Notification IsRead ... ");
+        debugPrint("Make Notification IsRead ... ");
         emit(MakeNotificationIsReadLoading());
         final bool response = await NotificationRepo.makeNotificationIsRead(
           event.notificationId,
@@ -153,15 +152,16 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         if (response) {
           notificationList[event.notificationIndex].isRead = true;
           totalUnRead--;
-          sl<HomeBloc>().add(BikerOrder(
+          if (event.context.mounted) {
+            sl<HomeBloc>().add(BikerOrder(
             orderId: notificationList[event.notificationIndex].clickableItem!,
             context: event.context,
           ));
+          }
           emit(MakeNotificationIsReadSuccess());
         } else {
           emit(MakeNotificationIsReadFailed(error: "Error"));
         }
-        ;
       } catch (e) {
         emit(MakeNotificationIsReadFailed(error: e.toString()));
       }

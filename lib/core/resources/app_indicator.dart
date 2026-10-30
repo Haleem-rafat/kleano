@@ -12,7 +12,7 @@ class AppIndicator extends StatelessWidget {
   final Color selectedColor;
 
   const AppIndicator({
-    Key? key,
+    super.key,
     required this.currentIndex,
     this.length = 0,
     this.selectedColor = Colors.white,
@@ -21,7 +21,7 @@ class AppIndicator extends StatelessWidget {
     this.width = 8,
     this.selectedWidth = 15,
     this.innerPadding = 1,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

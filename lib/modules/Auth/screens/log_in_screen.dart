@@ -24,7 +24,7 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 import 'package:thewhsherbiker/utilties/validator.dart';
 
 class LogInScreen extends StatefulWidget {
-  const LogInScreen({Key? key}) : super(key: key);
+  const LogInScreen({super.key});
 
   @override
   State<LogInScreen> createState() => _LogInScreenState();
@@ -56,9 +56,9 @@ class _LogInScreenState extends State<LogInScreen> {
     try {
       // Initialize notification service to get FCM token ready for login
       await NotificationHelper.initialize(context);
-      print('✅ Notifications initialized in login screen');
+      debugPrint('✅ Notifications initialized in login screen');
     } catch (e) {
-      print('⚠️ Error initializing notifications: $e');
+      debugPrint('⚠️ Error initializing notifications: $e');
       // Don't block login if notification initialization fails
     }
   }
@@ -310,6 +310,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       );
                     } else if (state is BikerLoginSuccess) {
                       sl<AuthBloc>().getUserLocation().whenComplete(() {
+                        if (!context.mounted) return;
                         popALlAndPushPage(
                             context,
                             HomeScreen(

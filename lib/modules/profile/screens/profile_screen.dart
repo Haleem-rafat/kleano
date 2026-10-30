@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewhsherbiker/core/components/circle_image.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/fonts_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/modules/profile/data/model/profile_model.dart';
 import 'package:thewhsherbiker/modules/profile/data/model/total_commission_model.dart';
@@ -17,14 +18,12 @@ import 'package:thewhsherbiker/modules/profile/screens/settings_screen.dart';
 import 'package:thewhsherbiker/modules/profile/widget/biker_status_switch.dart';
 import 'package:thewhsherbiker/modules/profile/widget/logout_widget.dart';
 import 'package:thewhsherbiker/modules/profile/widget/profile/date_joined_container.dart';
-import 'package:thewhsherbiker/modules/profile/widget/profile/commission_container.dart';
 import 'package:thewhsherbiker/modules/profile/widget/profile_shimmering_screen.dart';
-import 'package:thewhsherbiker/core/components/circle_image.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+  const ProfileScreen({super.key});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -40,8 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ProfileBloc _profileBloc = context.read<ProfileBloc>();
-    final ProfileModel _profile = _profileBloc.profile;
+    final ProfileBloc profileBloc = context.read<ProfileBloc>();
+    final ProfileModel profile = profileBloc.profile;
 
     return Scaffold(
       backgroundColor: ColorManager.backGround,
@@ -54,7 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             return SingleChildScrollView(
               child: Column(
                 children: <Widget>[
-                  _buildModernHeader(context, _profile),
+                  _buildModernHeader(context, profile),
                   24.verticalSpace,
                   BikerStatusSwitchWidget(),
                   32.verticalSpace,
@@ -62,12 +61,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: EdgeInsets.symmetric(horizontal: 20.w),
                     child: Column(
                       children: <Widget>[
-                        _buildStatsSection(_profile),
+                        _buildStatsSection(profile),
                         24.verticalSpace,
                         // Display Total Commission if available
-                        if (_profile.totalCommission != null) ...[
+                        if (profile.totalCommission != null) ...[
                           _buildTotalCommissionSection(
-                              _profile.totalCommission!),
+                              profile.totalCommission!),
                           24.verticalSpace,
                         ],
                         // CommissionContainer(
@@ -79,9 +78,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         //           "0",
                         // ),
                         // 24.verticalSpace,
-                        if (_profile.createdAt != null)
+                        if (profile.createdAt != null)
                           DateJoinedContainer(
-                            timeCreateAt: _profile.createdAt!,
+                            timeCreateAt: profile.createdAt!,
                           ),
                       ],
                     ),
@@ -108,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           end: Alignment.bottomRight,
           colors: [
             ColorManager.primary,
-            ColorManager.primary.withOpacity(0.8),
+            ColorManager.primary.withValues(alpha: 0.8),
           ],
         ),
         borderRadius: const BorderRadius.vertical(
@@ -158,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Text(
                   profile.phone!,
                   style: AppStyles.subtext14Regular.copyWith(
-                    color: ColorManager.white.withOpacity(0.9),
+                    color: ColorManager.white.withValues(alpha: 0.9),
                   ),
                 ),
               ],
@@ -206,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(0.04),
+            color: ColorManager.black.withValues(alpha: 0.04),
             blurRadius: 10.r,
             offset: const Offset(0, 2),
           ),
@@ -271,7 +270,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(0.04),
+            color: ColorManager.black.withValues(alpha: 0.04),
             blurRadius: 10.r,
             offset: const Offset(0, 2),
           ),
@@ -377,7 +376,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         borderRadius: BorderRadius.circular(16.r),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: ColorManager.black.withOpacity(0.04),
+            color: ColorManager.black.withValues(alpha: 0.04),
             blurRadius: 10.r,
             offset: const Offset(0, 2),
           )

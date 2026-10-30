@@ -1,8 +1,8 @@
+import 'package:action_slider/action_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
-import 'package:action_slider/action_slider.dart';
 
 class CustomSwipeButton extends StatefulWidget {
   final double? height;

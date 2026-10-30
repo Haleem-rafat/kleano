@@ -9,10 +9,10 @@ class LoadingWidget extends StatelessWidget {
   final bool isLight;
 
   const LoadingWidget({
-    Key? key,
+    super.key,
     this.radius,
     this.isLight = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

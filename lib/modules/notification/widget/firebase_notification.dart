@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -53,10 +54,10 @@ class FirebaseCloudMessagingService {
   Future<String?> getFcmToken() async {
     try {
       final String? token = await firebaseMessaging.getToken();
-      print('FCM Token: $token');
+      debugPrint('FCM Token: $token');
       return token;
     } catch (e) {
-      print('Error getting FCM token: $e');
+      debugPrint('Error getting FCM token: $e');
       return null;
     }
   }
@@ -74,9 +75,9 @@ class FirebaseCloudMessagingService {
   Future<void> subscribeToTopic(String topic) async {
     try {
       await firebaseMessaging.subscribeToTopic(topic);
-      print('Subscribed to topic: $topic');
+      debugPrint('Subscribed to topic: $topic');
     } catch (e) {
-      print('Error subscribing to topic $topic: $e');
+      debugPrint('Error subscribing to topic $topic: $e');
     }
   }
 
@@ -84,9 +85,9 @@ class FirebaseCloudMessagingService {
   Future<void> unsubscribeFromTopic(String topic) async {
     try {
       await firebaseMessaging.unsubscribeFromTopic(topic);
-      print('Unsubscribed from topic: $topic');
+      debugPrint('Unsubscribed from topic: $topic');
     } catch (e) {
-      print('Error unsubscribing from topic $topic: $e');
+      debugPrint('Error unsubscribing from topic $topic: $e');
     }
   }
 
@@ -95,9 +96,9 @@ class FirebaseCloudMessagingService {
   Future<void> deleteToken() async {
     try {
       await firebaseMessaging.deleteToken();
-      print('FCM Token deleted');
+      debugPrint('FCM Token deleted');
     } catch (e) {
-      print('Error deleting FCM token: $e');
+      debugPrint('Error deleting FCM token: $e');
     }
   }
 

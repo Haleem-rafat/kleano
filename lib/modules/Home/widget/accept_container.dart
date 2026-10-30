@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -12,21 +11,20 @@ import 'package:thewhsherbiker/core/resources/fonts_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/core/utilis/launch_map.dart';
+import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/order/screens/order_change_status_screen.dart';
 import 'package:thewhsherbiker/modules/order/screens/order_details_screen.dart';
+import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/app_date_formatter.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
-import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 class AcceptContainer extends StatelessWidget {
   final OrderModel acceptOrder;
   final int index;
   const AcceptContainer(
-      {Key? key, required this.acceptOrder, required this.index})
-      : super(key: key);
+      {super.key, required this.acceptOrder, required this.index});
 
   Future<void> _openWhatsApp(String? phone) async {
     if (phone == null || phone.isEmpty) {
@@ -46,7 +44,7 @@ class AcceptContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _showCancelDialog() {
+    void showCancelDialog() {
       if (acceptOrder.sId == null) {
         return;
       }
@@ -154,7 +152,7 @@ class AcceptContainer extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(15.r)),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                          color: ColorManager.black.withOpacity(.08),
+                          color: ColorManager.black.withValues(alpha: .08),
                           blurRadius: 6.r,
                           offset: const Offset(0, 3))
                     ]),
@@ -170,7 +168,7 @@ class AcceptContainer extends StatelessWidget {
                       children: <Widget>[
                         InkWell(
                           onTap: () {
-                            print("llll ${acceptOrder.sId}");
+                            debugPrint("llll ${acceptOrder.sId}");
                           },
                           child: Text(
                             "${acceptOrder.vehicle!.brand} ${acceptOrder.vehicle!.model}",
@@ -196,7 +194,7 @@ class AcceptContainer extends StatelessWidget {
                             "assets/svg/whatsapp_icon.svg",
                             height: 20.h,
                             width: 20.w,
-                            color: const Color(0xFF25D366),
+                            colorFilter: ColorFilter.mode(const Color(0xFF25D366), BlendMode.srcIn),
                           ),
                         ),
                       ],
@@ -228,7 +226,7 @@ class AcceptContainer extends StatelessWidget {
                         ),
                         InkWell(
                           onTap: () {
-                            print("kkkk ${acceptOrder.user!.sId}");
+                            debugPrint("kkkk ${acceptOrder.user!.sId}");
                           },
                           child: Text(
                             acceptOrder.user?.userName ?? "N/A",
@@ -327,7 +325,7 @@ class AcceptContainer extends StatelessWidget {
                     //           : _showCancelDialog,
                     //       child: Container(
                     //         decoration: BoxDecoration(
-                    //           color: ColorManager.red.withOpacity(0.08),
+                    //           color: ColorManager.red.withValues(alpha: 0.08),
                     //           borderRadius: BorderRadius.circular(8.r),
                     //           border:
                     //               Border.all(color: ColorManager.red, width: 1),

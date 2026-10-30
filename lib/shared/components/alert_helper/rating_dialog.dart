@@ -15,10 +15,10 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class RatingOrderAlert extends StatefulWidget {
   final String? orderId;
-  RatingOrderAlert({
-    Key? key,
+  const RatingOrderAlert({
+    super.key,
     required this.orderId,
-  }) : super(key: key);
+  });
 
   @override
   State<RatingOrderAlert> createState() => _RatingOrderAlertState();
@@ -40,7 +40,7 @@ class _RatingOrderAlertState extends State<RatingOrderAlert> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  ClipRRect _buildChild(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(24.r),
       child: Container(
@@ -105,7 +105,7 @@ class _RatingOrderAlertState extends State<RatingOrderAlert> {
                     return ButtonsShared(
                       onPressed: () {
                         if (ratingCount != 0.0) {
-                          print("lllll ${sl<OrderBloc>().starsNum}");
+                          debugPrint("lllll ${sl<OrderBloc>().starsNum}");
                           sl<OrderBloc>().add(BikerRating(
                             starsNum: ratingCount,
                             orderId: widget.orderId!,

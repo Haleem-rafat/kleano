@@ -1,17 +1,16 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:bloc/bloc.dart';
-import 'package:custom_marker/marker_icon.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:meta/meta.dart';
 import 'package:thewhsherbiker/core/network/biker_socket.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
+import 'package:thewhsherbiker/core/utilis/marker_icon.dart';
 import 'package:thewhsherbiker/models/error_model.dart';
-import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/Home/data/repo/home_repo.dart';
+import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/responses/generic_response.dart';
 
 part 'home_event.dart';
@@ -44,7 +43,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetOrdersPending>(
         (BikerGetOrdersPending event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order");
+        debugPrint("Biker Get Order");
         emit(BikerGetOrdersLoading());
         pendingPageNumber = 1;
         pendingTotalPage = 0;
@@ -73,7 +72,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetOrdersPendingPagination>(
         (BikerGetOrdersPendingPagination event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order Pagination");
+        debugPrint("Biker Get Order Pagination");
         emit(BikerGetOrdersPaginationLoading());
         if (pendingPageNumber <= pendingTotalPage) {
           final GenericResponse<OrderModel> response =
@@ -100,7 +99,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetOrdersAccept>(
         (BikerGetOrdersAccept event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order Accept");
+        debugPrint("Biker Get Order Accept");
         emit(BikerGetOrdersAcceptLoading());
         activePageNumber = 1;
         activeTotalPage = 0;
@@ -129,7 +128,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetOrdersAcceptPagination>(
         (BikerGetOrdersAcceptPagination event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order Accept Pagination");
+        debugPrint("Biker Get Order Accept Pagination");
         emit(BikerGetOrdersPaginationAcceptLoading());
         if (activePageNumber <= activeTotalPage) {
           final GenericResponse<OrderModel> response =
@@ -155,7 +154,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetOrdersComplete>(
         (BikerGetOrdersComplete event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order Complete");
+        debugPrint("Biker Get Order Complete");
         emit(BikerGetOrdersCompleteLoading());
         completePageNumber = 1;
         completeTotalPage = 0;
@@ -173,12 +172,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             emit(BikerGetOrdersCompleteSuccess());
           }
         } else {
-          print("complete Error : ${response.error!.first.message}");
+          debugPrint("complete Error : ${response.error!.first.message}");
           emit(BikerGetOrdersCompleteFailed(
               error: response.error!.first.message));
         }
       } catch (e) {
-        print("complete Error2 : ${e.toString()}");
+        debugPrint("complete Error2 : ${e.toString()}");
         emit(BikerGetOrdersCompleteFailed(error: e.toString()));
       }
     });
@@ -187,7 +186,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         (BikerGetOrdersCompletePagination event,
             Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order Complete Pagination");
+        debugPrint("Biker Get Order Complete Pagination");
         emit(BikerGetOrdersPaginationCompleteLoading());
         if (completePageNumber <= completeTotalPage) {
           final GenericResponse<OrderModel> response =
@@ -213,31 +212,31 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerGetNewOrders>(
         (BikerGetNewOrders event, Emitter<HomeState> emit) async {
       try {
-        print("🚀 Biker Get New Order Start");
+        debugPrint("🚀 Biker Get New Order Start");
 
         // Use SocketService to connect
         await socketService.connect(
           onNewOrder: (OrderModel order) {
-            print("📦 New order received in HomeBloc");
+            debugPrint("📦 New order received in HomeBloc");
             _audioPlayer.play(AssetSource('audio/newOrder.wav'));
             add(BikerGetOrdersAccept());
           },
           onError: (String error) {
-            print("❌ Socket error: $error");
+            debugPrint("❌ Socket error: $error");
             emit(BikerGetNewOrdersFailed(error: error));
           },
         );
 
-        print("✅ Socket connection setup complete");
+        debugPrint("✅ Socket connection setup complete");
       } catch (e) {
-        print("❌ Socket connection failed: $e");
+        debugPrint("❌ Socket connection failed: $e");
         emit(BikerGetNewOrdersFailed(error: e.toString()));
       }
     });
 
     on<BikerCloseSocket>(
         (BikerCloseSocket event, Emitter<HomeState> emit) async {
-      print('🔌 Closing socket connection');
+      debugPrint('🔌 Closing socket connection');
       socketService.disconnect();
       emit(SocketClosed());
     });
@@ -245,7 +244,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerAcceptOrder>(
         (BikerAcceptOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Accept Order ... ");
+        debugPrint("Biker Accept Order ... ");
         emit(BikerAcceptOrderLoading());
         selected = event.orderIndex;
         final Either<ErrorModel, bool> response =
@@ -259,7 +258,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         response.fold(
           (ErrorModel l) {
-            print("ooooo ${l.en}");
+            debugPrint("ooooo ${l.en}");
             emit(BikerAcceptOrderFailed(
                 error:
                     Localizations.localeOf(event.context).languageCode == 'en'
@@ -278,7 +277,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           },
         );
       } catch (e) {
-        print("kkkk ${e.toString()}");
+        debugPrint("kkkk ${e.toString()}");
         emit(BikerAcceptOrderFailed(error: e.toString()));
       }
     });
@@ -286,7 +285,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerOnTheWayOrder>(
         (BikerOnTheWayOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker on The Way Order ... ");
+        debugPrint("Biker on The Way Order ... ");
         emit(BikerOnTheWayOrderLoading());
         final Either<ErrorModel, bool> response =
             await HomeRepo.bikerOnTheWayOrder(event.orderId);
@@ -313,7 +312,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerArrivedOrder>(
         (BikerArrivedOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Arrived Order ... ");
+        debugPrint("Biker Arrived Order ... ");
         emit(BikerArrivedOrderLoading());
         final Either<ErrorModel, bool> response =
             await HomeRepo.bikerArrivedOrder(event.orderId);
@@ -340,7 +339,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerOnWashingOrder>(
         (BikerOnWashingOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker On Washing Order ... ");
+        debugPrint("Biker On Washing Order ... ");
         emit(BikerOnWashingOrderLoading());
         final Either<ErrorModel, bool> response =
             await HomeRepo.bikerOnWashingOrder(event.orderId,
@@ -368,7 +367,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerCompleteOrder>(
         (BikerCompleteOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Complete Order ... ");
+        debugPrint("Biker Complete Order ... ");
         emit(BikerCompleteOrderLoading());
         final Either<ErrorModel, bool> response =
             await HomeRepo.bikerCompleteOrder(event.orderId,
@@ -396,7 +395,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<BikerCancelOrder>(
         (BikerCancelOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Cancel Order ... ");
+        debugPrint("Biker Cancel Order ... ");
         emit(BikerCancelOrderLoading(orderId: event.orderId));
         final Either<ErrorModel, bool> response =
             await HomeRepo.bikerCancelOrder(event.orderId);
@@ -433,16 +432,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     on<BikerOrder>((BikerOrder event, Emitter<HomeState> emit) async {
       try {
-        print("Biker Get Order details");
+        debugPrint("Biker Get Order details");
         emit(BikerOrderLoading());
         final GenericResponse<OrderModel> response =
             await HomeRepo.bikerOrder(event.orderId);
         if (response.success) {
+          if (!event.context.mounted) return;
           final BitmapDescriptor markerBikerLocation =
               await MarkerIcon.svgAsset(
                   assetName: ImageAssets.userLocationMarker,
                   context: event.context,
                   size: 40.w);
+          if (!event.context.mounted) return;
           final BitmapDescriptor markerUserLocation = await MarkerIcon.svgAsset(
               assetName: ImageAssets.currentLocationPin,
               context: event.context,
@@ -463,7 +464,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   @override
   Future<void> close() {
-    print('🧹 Disposing HomeBloc resources...');
+    debugPrint('🧹 Disposing HomeBloc resources...');
     // socketService.dispose();
     _audioPlayer.dispose();
     return super.close();

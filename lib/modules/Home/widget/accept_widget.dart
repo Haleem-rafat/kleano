@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/screens/empty_screen.dart';
@@ -12,7 +12,7 @@ import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 class AcceptWidget extends StatefulWidget {
-  const AcceptWidget({Key? key}) : super(key: key);
+  const AcceptWidget({super.key});
 
   @override
   State<AcceptWidget> createState() => _AcceptWidgetState();

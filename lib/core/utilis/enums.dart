@@ -50,7 +50,7 @@ Color orderStateColor(String orderState){
     break;
 
     case "BIKER_ARRIVED": {
-      return ColorManager.secondary.withOpacity(0.1);
+      return ColorManager.secondary.withValues(alpha: 0.1);
     }
     break;
 

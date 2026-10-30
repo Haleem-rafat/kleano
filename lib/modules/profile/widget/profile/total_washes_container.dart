@@ -6,7 +6,7 @@ import 'package:thewhsherbiker/modules/profile/widget/profile/card_profile_infor
 
 class TotalWashesContainer extends StatelessWidget {
   final String? totalWashes;
-  const TotalWashesContainer({Key? key, this.totalWashes}) : super(key: key);
+  const TotalWashesContainer({super.key, this.totalWashes});
 
   @override
   Widget build(BuildContext context) {

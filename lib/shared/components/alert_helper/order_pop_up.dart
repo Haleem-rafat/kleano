@@ -4,15 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
-import 'package:thewhsherbiker/modules/order/screens/order_change_status_screen.dart';
 import 'package:thewhsherbiker/modules/Home/widget/order_container.dart';
+import 'package:thewhsherbiker/modules/order/screens/order_change_status_screen.dart';
 import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class OrderPopUp extends StatefulWidget {
-  const OrderPopUp({Key? key}) : super(key: key);
+  const OrderPopUp({super.key});
 
   @override
   State<OrderPopUp> createState() => _OrderPopUpState();
@@ -29,10 +29,9 @@ class _OrderPopUpState extends State<OrderPopUp> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        sl<HomeBloc>().dialogCount--;
-        return true;
+    return PopScope(
+      onPopInvokedWithResult: (bool didPop, Object? result) {
+        if (didPop) sl<HomeBloc>().dialogCount--;
       },
       child: Dialog(
         insetPadding: EdgeInsets.symmetric(horizontal: 20.w),
@@ -47,7 +46,7 @@ class _OrderPopUpState extends State<OrderPopUp> {
     );
   }
 
-  _buildChild(BuildContext context) {
+  StatefulBuilder _buildChild(BuildContext context) {
     return StatefulBuilder(
       builder: (BuildContext context, Function setState) {
         return ClipRRect(
@@ -94,7 +93,7 @@ class _OrderPopUpState extends State<OrderPopUp> {
                       if (state is BikerGetOrdersLoading) {
                         return const LoadingWidget();
                       } else if (state is BikerGetOrdersEmpty) {
-                        print("here");
+                        debugPrint("here");
                         return Column(
                           children: <Widget>[
                             Container(

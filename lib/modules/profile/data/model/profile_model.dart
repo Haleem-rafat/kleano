@@ -60,7 +60,7 @@ class ProfileModel {
     nationalId = json['nationalId'];
     status = json['status'] ?? "";
     createdBy = json['createdBy'] != null
-        ? new CreatedBy.fromJson(json['createdBy'])
+        ? CreatedBy.fromJson(json['createdBy'])
         : null;
     createdAt = AppDateFormatter.dateWithDash(
       DateTime.parse(json['createdAt']).toLocal(),

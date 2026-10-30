@@ -18,7 +18,7 @@ import 'package:thewhsherbiker/utilties/validator.dart';
 
 class UpdatePassword extends StatefulWidget {
   final bool profile;
-  const UpdatePassword({Key? key, required this.profile}) : super(key: key);
+  const UpdatePassword({super.key, required this.profile});
 
   @override
   State<UpdatePassword> createState() => _UpdatePasswordState();

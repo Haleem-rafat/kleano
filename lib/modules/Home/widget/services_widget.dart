@@ -6,7 +6,7 @@ import 'package:thewhsherbiker/modules/order/widgets/card_services.dart';
 
 class ServicesWidget extends StatelessWidget {
   final List<WashingServices>? services;
-  const ServicesWidget({Key? key, required this.services}) : super(key: key);
+  const ServicesWidget({super.key, required this.services});
 
   @override
   Widget build(BuildContext context) {

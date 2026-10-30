@@ -19,18 +19,18 @@ class HeaderProfileWidget extends StatelessWidget {
     ProfileModel profile = context.read<ProfileBloc>().profile;
     return Container(
         height: 130.h,
-        width: 375.w,
+        width: 1.sw,
         color: Colors.transparent,
         child: Stack(
           children: <Widget>[
             Container(
               height: 90.h,
-              width: 375.w,
+              width: 1.sw,
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(12),
                 ),
-                boxShadow: <BoxShadow>[BoxShadow(color: ColorManager.black.withOpacity(.05), blurRadius: 3.r, offset: const Offset(0, 6))],
+                boxShadow: <BoxShadow>[BoxShadow(color: ColorManager.black.withValues(alpha: .05), blurRadius: 3.r, offset: const Offset(0, 6))],
                 color: ColorManager.primary,
               ),
             ),

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -23,7 +24,7 @@ class ProfileRepo {
         );
       }
     } catch (e) {
-      print('Error in bikerProfile: $e');
+      debugPrint('Error in bikerProfile: $e');
     }
 
     return GenericResponse(fromJson: ProfileModel.fromJson);
@@ -44,7 +45,7 @@ class ProfileRepo {
         return false;
       }
     } catch (e) {
-      print('Error in bikerUpdateStatus: $e');
+      debugPrint('Error in bikerUpdateStatus: $e');
       return false;
     }
   }
@@ -75,7 +76,7 @@ class ProfileRepo {
         return false;
       }
     } catch (e) {
-      print('Error in bikerProfileEdit: $e');
+      debugPrint('Error in bikerProfileEdit: $e');
       return false;
     }
   }
@@ -97,7 +98,7 @@ class ProfileRepo {
         );
       }
     } catch (e) {
-      print('Error in updateBikerLanguage: $e');
+      debugPrint('Error in updateBikerLanguage: $e');
     }
 
     return BaseResponse(statusCode: 400);
@@ -124,7 +125,7 @@ class ProfileRepo {
         return TotalCommissionModel.fromJson(response.data['data']);
       }
     } catch (e) {
-      print('Error in getTotalCommission: $e');
+      debugPrint('Error in getTotalCommission: $e');
     }
     return null;
   }
@@ -142,7 +143,7 @@ class ProfileRepo {
         return BikerScheduleModel.fromJson(response.data['data']);
       }
     } catch (e) {
-      print('Error in getBikerSchedule: $e');
+      debugPrint('Error in getBikerSchedule: $e');
     }
     return null;
   }

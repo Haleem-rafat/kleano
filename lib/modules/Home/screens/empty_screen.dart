@@ -9,8 +9,7 @@ import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 class EmptyScreen extends StatelessWidget {
   bool notification;
   String text;
-  EmptyScreen({Key? key, required this.notification, required this.text})
-      : super(key: key);
+  EmptyScreen({super.key, required this.notification, required this.text});
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderUserDetails extends StatelessWidget {
-  const OrderUserDetails({Key? key}) : super(key: key);
+  const OrderUserDetails({super.key});
   void openWhatsApp(String phoneBiker) async {
     final String phone =
         phoneBiker.replaceAll('+', '').replaceAll(' ', '').trim();
@@ -97,7 +97,7 @@ class OrderUserDetails extends StatelessWidget {
                   "assets/svg/whatsapp_icon.svg",
                   height: 22.h,
                   width: 22.w,
-                  color: const Color(0xFF25D366),
+                  colorFilter: ColorFilter.mode(const Color(0xFF25D366), BlendMode.srcIn),
                 ),
               ),
             ]

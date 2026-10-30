@@ -6,8 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:thewhsherbiker/core/components/circle_image.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
@@ -32,10 +32,11 @@ import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/components/tab_bar_shared.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatefulWidget {
   int initialIndex;
-  HomeScreen({Key? key, required this.initialIndex}) : super(key: key);
+  HomeScreen({super.key, required this.initialIndex});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -49,14 +50,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool isFinished = false;
   late int currentTabIndex;
   String whatsappNumber = "+966533720654";
-  final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(
-        length: 2, vsync: this, initialIndex: widget.initialIndex);
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialIndex,
+    );
     currentTabIndex = 0;
 
     firebaseCloudMessagingService = FirebaseCloudMessagingService();
@@ -112,27 +117,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     return BlocConsumer<NotificationBloc, NotificationState>(
       listener: (BuildContext context, NotificationState state) {
         if (state is MakePushNotificationFailed) {
-          showSnackBar(
-            buildContext: context,
-            message: state.error,
-          );
+          showSnackBar(buildContext: context, message: state.error);
         } else if (state is MakePushNotificationSuccess) {
-          firebaseCloudMessagingService
-              .listenToForegroundNotifications((RemoteMessage message) async {
+          firebaseCloudMessagingService.listenToForegroundNotifications((
+            RemoteMessage message,
+          ) async {
             sl<NotificationBloc>().totalUnRead++;
             LocalNotificationServices(context: context).notification(
-                title: message.notification!.title!,
-                body: message.notification!.body!);
+              title: message.notification!.title!,
+              body: message.notification!.body!,
+            );
           });
-          firebaseCloudMessagingService
-              .listenToBackgroundNotifications((RemoteMessage message) async {
+          firebaseCloudMessagingService.listenToBackgroundNotifications((
+            RemoteMessage message,
+          ) async {
             pushPage(context, NotificationScreen());
           });
         }
       },
       builder: (BuildContext context, NotificationState state) {
-        return WillPopScope(
-          onWillPop: () async {
+        return PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, Object? result) {
+            if (didPop) return;
             final Duration timeGap = DateTime.now().difference(preBackPress);
             final bool cantExit = timeGap >= const Duration(seconds: 2);
             preBackPress = DateTime.now();
@@ -142,36 +149,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 duration: const Duration(seconds: 2),
               );
               ScaffoldMessenger.of(context).showSnackBar(snack);
-              return false;
             } else {
               SystemNavigator.pop();
-              return true;
             }
           },
           child: Scaffold(
             appBar: PreferredSize(
-                preferredSize: Size(AppSize.s375, AppSize.s100.h),
-                child: HomeAppBar()),
+              preferredSize: Size(AppSize.s375, AppSize.s100.h),
+              child: HomeAppBar(),
+            ),
             body: SmartRefresher(
               controller: _refreshController,
               onRefresh: _onRefresh,
               enablePullDown: true,
               enablePullUp: false,
-              header: const ClassicHeader(
-                refreshStyle: RefreshStyle.Follow,
-              ),
+              header: const ClassicHeader(refreshStyle: RefreshStyle.Follow),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    SizedBox(
-                      height: 25.h,
-                    ),
+                    SizedBox(height: 25.h),
                     _YourAnalyticsSection(),
-                    SizedBox(
-                      height: 18.h,
-                    ),
+                    SizedBox(height: 18.h),
                     TabsHome(),
                   ],
                 ),
@@ -179,19 +179,26 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () async {
-                final Uri whatsappUri =
-                    Uri.parse("https://wa.me/$whatsappNumber");
+                final Uri whatsappUri = Uri.parse(
+                  "https://wa.me/$whatsappNumber",
+                );
 
                 if (await canLaunchUrl(whatsappUri)) {
-                  await launchUrl(whatsappUri,
-                      mode: LaunchMode.externalApplication);
+                  await launchUrl(
+                    whatsappUri,
+                    mode: LaunchMode.externalApplication,
+                  );
                 } else {
                   final Uri whatsappWebUri = Uri.parse(
-                      "https://web.whatsapp.com/send?phone=$whatsappNumber");
+                    "https://web.whatsapp.com/send?phone=$whatsappNumber",
+                  );
                   if (await canLaunchUrl(whatsappWebUri)) {
-                    await launchUrl(whatsappWebUri,
-                        mode: LaunchMode.externalApplication);
+                    await launchUrl(
+                      whatsappWebUri,
+                      mode: LaunchMode.externalApplication,
+                    );
                   } else {
+                    if (!context.mounted) return;
                     showSnackBar(
                       buildContext: context,
                       message:
@@ -205,7 +212,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 "assets/svg/whatsapp_icon.svg",
                 height: 24,
                 width: 24,
-                color: Colors.white,
+                colorFilter: ColorFilter.mode(Colors.white, BlendMode.srcIn),
               ),
             ),
             floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -237,16 +244,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     });
                   },
                 ),
-                SizedBox(
-                  height: 18.h,
-                ),
+                SizedBox(height: 18.h),
                 Expanded(
                   child: TabBarView(
                     controller: _tabController,
                     children: <Widget>[
                       // PendingWidget(),
                       AcceptWidget(),
-                      CompleteWidget()
+                      CompleteWidget(),
                     ],
                   ),
                 ),
@@ -267,13 +272,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     color: ColorManager.darkGrey,
                   ),
                 ),
-                SizedBox(
-                  height: 38.h,
-                ),
+                SizedBox(height: 38.h),
                 ButtonsShared(
                   onPressed: () {
                     sl<ProfileBloc>().add(
-                        BikerUpdateStatus(status: BikerStatus.ONLINE.name));
+                      BikerUpdateStatus(status: BikerStatus.ONLINE.name),
+                    );
                   },
                   textStyle: AppStyles.title16Bold,
                   borderRadius: 8,
@@ -290,9 +294,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 }
 
 class _YourAnalyticsSection extends StatelessWidget {
-  const _YourAnalyticsSection({
-    super.key,
-  });
+  const _YourAnalyticsSection();
 
   @override
   Widget build(BuildContext context) {
@@ -303,14 +305,13 @@ class _YourAnalyticsSection extends StatelessWidget {
           translate(AppStrings.yourAnalytics),
           style: AppStyles.body14Medium.copyWith(color: ColorManager.darkGrey),
         ),
-        SizedBox(
-          height: 14.h,
-        ),
+        SizedBox(height: 14.h),
         BlocBuilder<ProfileBloc, ProfileState>(
           bloc: sl<ProfileBloc>(),
           builder: (BuildContext context, ProfileState state) {
             // Check if analytics data is loading
-            final bool isLoading = state is BikerGetTotalWashesLoading ||
+            final bool isLoading =
+                state is BikerGetTotalWashesLoading ||
                 state is BikerGetTotalCommissionLoading;
 
             if (isLoading) {
@@ -322,19 +323,21 @@ class _YourAnalyticsSection extends StatelessWidget {
             final int? totalWashes = profile.totalWashes;
             final totalCommission = profile.totalCommission;
 
-            print("jnjknnknkjnjknk ${totalCommission}");
+            debugPrint("jnjknnknkjnjknk $totalCommission");
 
             return Container(
               width: 327.w,
               decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                        color: ColorManager.black.withOpacity(.08),
-                        blurRadius: 6.r,
-                        offset: const Offset(0, 3))
-                  ]),
+                color: ColorManager.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: ColorManager.black.withValues(alpha: .08),
+                    blurRadius: 6.r,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
               padding: EdgeInsets.all(20.w),
               child: Column(
                 children: <Widget>[
@@ -351,7 +354,10 @@ class _YourAnalyticsSection extends StatelessWidget {
                               "assets/svg/total_washes.svg",
                               height: 32.h,
                               width: 32.w,
-                              color: ColorManager.primary,
+                              colorFilter: ColorFilter.mode(
+                                ColorManager.primary,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             SizedBox(height: 8.h),
                             Text(
@@ -389,7 +395,10 @@ class _YourAnalyticsSection extends StatelessWidget {
                               "assets/svg/rating.svg",
                               height: 32.h,
                               width: 32.w,
-                              color: ColorManager.primary,
+                              colorFilter: ColorFilter.mode(
+                                ColorManager.primary,
+                                BlendMode.srcIn,
+                              ),
                             ),
                             SizedBox(height: 8.h),
                             Text(
@@ -529,7 +538,7 @@ class _YourAnalyticsSection extends StatelessWidget {
                         ),
                       ],
                     ),
-                  ]
+                  ],
                 ],
               ),
             );
@@ -543,14 +552,16 @@ class _YourAnalyticsSection extends StatelessWidget {
     return Container(
       width: 327.w,
       decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: ColorManager.black.withOpacity(.08),
-                blurRadius: 6.r,
-                offset: const Offset(0, 3))
-          ]),
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: ColorManager.black.withValues(alpha: .08),
+            blurRadius: 6.r,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       padding: EdgeInsets.all(20.w),
       child: Column(
         children: <Widget>[
@@ -727,73 +738,66 @@ class _YourAnalyticsSection extends StatelessWidget {
 }
 
 class HomeAppBar extends StatelessWidget {
-  const HomeAppBar({
-    super.key,
-  });
+  const HomeAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: AppSize.s100.h,
-      decoration: BoxDecoration(
-          color: ColorManager.primary,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(12.r),
-            bottomRight: Radius.circular(12.r),
-          ),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: ColorManager.black.withOpacity(.08),
-                blurRadius: 6.r,
-                offset: const Offset(0, 3))
-          ]),
-      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 10.h),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          BlocBuilder<ProfileBloc, ProfileState>(
-            bloc: sl<ProfileBloc>(),
-            builder: (BuildContext context, ProfileState state) {
-              if (state is BikerProfileSuccess ||
-                  state is BikerProfileEditSuccess ||
-                  state is ChangeBikerLanguageSuccess) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: () {
-                        pushPage(context, ProfileScreen());
-                      },
-                      child: CircleImageShared(
-                        imageUrl: sl<ProfileBloc>().profile.imageLink!,
-                        radius: 20.r,
-                        name: sl<ProfileBloc>().profile.userName!,
+    // iOS 26/27: a floating glass toolbar instead of a coloured bar.
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        16.w,
+        MediaQuery.paddingOf(context).top + 6,
+        16.w,
+        6,
+      ),
+      child: FoldPane(
+        child: LiquidGlass(
+          capsule: true,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              BlocBuilder<ProfileBloc, ProfileState>(
+                bloc: sl<ProfileBloc>(),
+                builder: (BuildContext context, ProfileState state) {
+                  if (state is BikerProfileSuccess ||
+                      state is BikerProfileEditSuccess ||
+                      state is ChangeBikerLanguageSuccess) {
+                    return Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () {
+                              pushPage(context, ProfileScreen());
+                            },
+                            child: CircleImageShared(
+                              imageUrl: sl<ProfileBloc>().profile.imageLink!,
+                              radius: 20.r,
+                              name: sl<ProfileBloc>().profile.userName!,
+                            ),
+                          ),
+                          BikerStatusSwitchWidget(isHome: true),
+                          _notificationComponent(),
+                        ],
                       ),
-                    ),
-                    89.horizontalSpace,
-                    BikerStatusSwitchWidget(
-                      isHome: true,
-                    ),
-                    96.horizontalSpace,
-                    _notificationComponent()
-                  ],
-                );
-              } else {
-                return Container();
-              }
-            },
+                    );
+                  } else {
+                    return SizedBox(height: 40.r);
+                  }
+                },
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 }
 
 class _notificationComponent extends StatelessWidget {
-  const _notificationComponent({
-    super.key,
-  });
+  const _notificationComponent();
 
   @override
   Widget build(BuildContext context) {
@@ -803,17 +807,20 @@ class _notificationComponent extends StatelessWidget {
           onTap: () {
             pushPage(context, NotificationScreen());
           },
-          child: sl<NotificationBloc>().totalUnRead > 0
-              ? SvgPicture.asset(
-                  ImageAssets.notificationLogo,
-                  height: 24.h,
-                  width: 24.w,
-                )
-              : SvgPicture.asset(
-                  ImageAssets.notificationEmptySvg,
-                  height: 24.h,
-                  width: 24.w,
-                ),
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Badge(
+              isLabelVisible: sl<NotificationBloc>().totalUnRead > 0,
+              smallSize: 9,
+              backgroundColor: ColorManager.red,
+              child: const Icon(
+                Icons.notifications_none_rounded,
+                size: 26,
+                color: ColorManager.primary,
+              ),
+            ),
+          ),
         );
       },
     );

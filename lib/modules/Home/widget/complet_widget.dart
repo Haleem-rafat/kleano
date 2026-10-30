@@ -13,7 +13,7 @@ import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 class CompleteWidget extends StatefulWidget {
-  const CompleteWidget({Key? key}) : super(key: key);
+  const CompleteWidget({super.key});
 
   @override
   State<CompleteWidget> createState() => _CompleteWidgetState();

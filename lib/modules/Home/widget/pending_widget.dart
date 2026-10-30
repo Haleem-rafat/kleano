@@ -8,15 +8,15 @@ import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/screens/empty_screen.dart';
-import 'package:thewhsherbiker/modules/order/screens/order_change_status_screen.dart';
 import 'package:thewhsherbiker/modules/Home/widget/order_container.dart';
+import 'package:thewhsherbiker/modules/order/screens/order_change_status_screen.dart';
 import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class PendingWidget extends StatefulWidget {
-  const PendingWidget({Key? key}) : super(key: key);
+  const PendingWidget({super.key});
 
   @override
   State<PendingWidget> createState() => _PendingWidgetState();

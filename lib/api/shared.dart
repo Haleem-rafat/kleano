@@ -61,10 +61,11 @@ class AppShared {
     await prefs.setString(sharedPreferencesRefreshTokenKey, newRefreshToken);
   }
 
-  static Future<dynamic> getRefreshToken() async {
+  static Future<String?> getRefreshToken() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesRefreshTokenKey);
     if (result != null) refreshToken = result;
+    return result;
   }
 
   static Future<void> logOut() async {
@@ -83,6 +84,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesPhone);
     if (result != null) phone = result;
+    return result;
   }
 
   static Future<void> setPhoneCode(String newLang) async {
@@ -95,6 +97,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesPhoneCode);
     if (result != null) phoneCode = result;
+    return result;
   }
 
   static Future<void> setFcmValue(String newLang) async {
@@ -107,20 +110,18 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesFCMValue);
     if (result != null) fcmValue = result;
+    return result;
   }
    static bool isTokenExpired(String token) {
-    print(token);
-    var expDate = JwtDecoder.getExpirationDate(token);
-
-    bool isExpired = expDate.isBefore(DateTime.now().add(Duration(minutes: 1)))
-        ? true
-        : false;
-
-    return isExpired;
-
-    // bool isExpired = JwtDecoder.isExpired(token);
-    // return isExpired;
+    // Treat unreadable tokens as expired so they get refreshed, not crash.
+    try {
+      return JwtDecoder.getExpirationDate(token)
+          .isBefore(DateTime.now().add(const Duration(minutes: 1)));
+    } catch (_) {
+      return true;
+    }
   }
+
 
   /////////////////////////////////////////
   static Future<void> setFCM(bool newLang) async {
@@ -133,6 +134,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool? result = prefs.getBool(sharedPreferencesFCM);
     if (result != null) fcm = result;
+    return result;
   }
 
   static Future<void> setNotification(bool newLang) async {
@@ -145,6 +147,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final bool? result = prefs.getBool(sharedPreferencesNotification);
     if (result != null) notification = result;
+    return result;
   }
 
   ////////////////////////////////////////
@@ -158,6 +161,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesID);
     if (result != null) id = result;
+    return result;
   }
 
   static Future<void> setLoad(String newLang) async {
@@ -170,6 +174,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesLoadMore);
     if (result != null) load = result;
+    return result;
   }
 
   static Future<void> setGender(String newLang) async {
@@ -182,6 +187,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesGender);
     if (result != null) gender = result;
+    return result;
   }
 
   static Future<void> setCountry(String newLang) async {
@@ -194,6 +200,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesCountry);
     if (result != null) country = result;
+    return result;
   }
 
   static Future<void> setSubject(String newLang) async {
@@ -206,6 +213,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesSubject);
     if (result != null) subject = result;
+    return result;
   }
 
   static Future<void> setName(String newLang) async {
@@ -218,6 +226,7 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesName);
     if (result != null) name = result;
+    return result;
   }
 
   static Future<void> setNameAr(String newLang) async {
@@ -230,5 +239,6 @@ class AppShared {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? result = prefs.getString(sharedPreferencesNameAr);
     if (result != null) nameAr = result;
+    return result;
   }
 }

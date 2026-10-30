@@ -124,7 +124,7 @@ class _CardServicesState extends State<CardServices>
                     children: <Widget>[
                       SvgPicture.asset(
                         ImageAssets.serviceCoinSvg,
-                        color: ColorManager.black,
+                        colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
                       ),
                       5.horizontalSpace,
                       Text(

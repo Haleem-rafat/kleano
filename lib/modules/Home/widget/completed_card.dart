@@ -54,7 +54,7 @@ class CompletedCard extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(15.r)),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                          color: ColorManager.black.withOpacity(.08),
+                          color: ColorManager.black.withValues(alpha: .08),
                           blurRadius: 6.r,
                           offset: const Offset(0, 3))
                     ]),

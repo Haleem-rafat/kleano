@@ -1,103 +1,87 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thewhsherbiker/api/api_path.dart';
-
+import 'package:thewhsherbiker/api/api_service.dart';
 import 'package:thewhsherbiker/api/shared.dart';
 import 'package:thewhsherbiker/app.dart';
-import 'package:thewhsherbiker/modules/Auth/data/model/auth_model.dart';
 import 'package:thewhsherbiker/modules/Auth/screens/log_in_screen.dart';
 
 class AuthInterceptor extends Interceptor {
-  Future? refreshFuture;
+  /// Shared across requests so concurrent 403s trigger a single refresh.
+  static Future<String?>? _refreshing;
+  static const String _retriedKey = 'authRetried';
+
   final Dio dio;
   AuthInterceptor({required this.dio});
 
-  @override
-  void onRequest(
-      RequestOptions options, RequestInterceptorHandler handler) async {
-    print("Request [${options.method}] => PATH: ${options.path}");
+  bool _requiresAuth(RequestOptions options) =>
+      options.extra['requiresAuth'] == true &&
+      options.path != ApiPaths.refreshTokens;
 
-    if (options.extra["requiresAuth"] == false) {
-      return handler.next(options);
-    }
+  @override
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    if (!_requiresAuth(options)) return handler.next(options);
 
     await AppShared.getToken();
-
-    if (AppShared.token.isEmpty) {
-      // No token, treat as unauthenticated
-      navigatorKeyAlice.currentState?.pushReplacement(
-        MaterialPageRoute(
-            builder: (context) => LogInScreen(
-                )),
-      );
-      return handler.next(options);
-    }
-
-    if (AppShared.isTokenExpired(AppShared.token)) {
-      var refreshToken = await AppShared.getRefreshToken();
-      if (refreshToken == null ||
-          refreshToken.isEmpty ||
-          AppShared.isTokenExpired(refreshToken)) {
-        // Both tokens are expired or missing, force login
-        navigatorKeyAlice.currentState?.pushReplacement(
-          MaterialPageRoute(
-              builder: (context) => LogInScreen(
-                  )),
-        );
-        return handler.next(options);
+    if (AppShared.token.isNotEmpty &&
+        AppShared.isTokenExpired(AppShared.token)) {
+      try {
+        await _refresh();
+      } catch (_) {
+        // Offline: send with the old token; a 403 will retry the refresh.
       }
-      // Try to refresh
-      if (refreshFuture == null) {
-        refreshFuture = _handleRefreshtoken(refreshToken);
-        try {
-          await refreshFuture;
-        } finally {
-          refreshFuture = null;
-        }
-      } else {
-        await refreshFuture;
-      }
-      await AppShared.getToken();
-      options.headers["Authorization"] = "Bearer ${AppShared.token}";
-    } else {
-      // Token is valid
-      options.headers["Authorization"] = "Bearer ${AppShared.token}";
     }
-
-    super.onRequest(options, handler);
+    if (AppShared.token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer ${AppShared.token}';
+    }
+    handler.next(options);
   }
 
   @override
-  void onResponse(Response response, ResponseInterceptorHandler handler) {
-    print(
-        "Response [${response.statusCode}] => PATH: ${response.requestOptions.path}");
-    super.onResponse(response, handler);
+  Future<void> onResponse(
+      Response<dynamic> response, ResponseInterceptorHandler handler) async {
+    final RequestOptions options = response.requestOptions;
+    // The backend answers 403 (not 401) for missing/expired credentials.
+    if (response.statusCode != ApiService.unAuthorizedCode ||
+        !_requiresAuth(options) ||
+        options.extra[_retriedKey] == true) {
+      return handler.next(response);
+    }
+
+    final String? newRefreshToken;
+    try {
+      newRefreshToken = await _refresh();
+    } catch (_) {
+      // Network failure while refreshing: keep the session, surface the 403.
+      return handler.next(response);
+    }
+    if (newRefreshToken == null) {
+      _goToLogin();
+      return handler.next(response);
+    }
+
+    try {
+      options.extra[_retriedKey] = true;
+      options.headers['Authorization'] = 'Bearer ${AppShared.token}';
+      handler.resolve(await dio.fetch<dynamic>(options));
+    } on DioException catch (e) {
+      handler.reject(e);
+    }
   }
 
-  @override
-  void onError(err, ErrorInterceptorHandler handler) async {
-    print(
-        "Error [${err.response?.statusCode}] => PATH: ${err.requestOptions.path}");
-
-    super.onError(err, handler);
+  Future<String?> _refresh() async {
+    _refreshing ??=
+        ApiService.refreshToken().whenComplete(() => _refreshing = null);
+    return _refreshing;
   }
 
-  Future<void> _handleRefreshtoken(String refreshToken) async {
-    var response = await dio.post(
-      ApiPaths.refreshTokens,
-      options: Options(extra: {
-        "requiresAuth": false
-      }, headers: {
-        "Authorization": 'Bearer $refreshToken',
-        "x-api-version": "1"
-      }),
+  void _goToLogin() {
+    AppShared.setToken('');
+    AppShared.setRefreshToken('');
+    navigatorKeyAlice.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute<void>(builder: (BuildContext context) => LogInScreen()),
+      (Route<dynamic> route) => false,
     );
-
-    final authResponse = AuthModel.fromJson(response.data);
-    final prefs = await SharedPreferences.getInstance();
-    
-    await AppShared.setToken(authResponse.accessToken!);
-    await AppShared.setRefreshToken(authResponse.refreshToken!);
   }
 }

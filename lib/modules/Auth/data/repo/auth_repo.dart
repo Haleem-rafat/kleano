@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:thewhsherbiker/api/api_path.dart';
@@ -10,7 +11,7 @@ class AuthRepo {
   static Future<Either<ErrorModel, GenericResponse>> bikerLogin(
       String userName, String password, String fcmToken) async {
     ErrorModel? errorModel;
-    print("Token $fcmToken");
+    debugPrint("Token $fcmToken");
     final Response<dynamic>? response = await ApiService.postApi(ApiPaths.logIn,
         body: {
           'userName': userName,

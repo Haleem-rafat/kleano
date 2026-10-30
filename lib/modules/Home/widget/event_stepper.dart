@@ -63,7 +63,7 @@ class _EventsStepperState extends State<EventsStepper> {
                 imageQuality: 100,
               );
 
-              if (image != null) {
+              if (image != null && context.mounted) {
                 sl<HomeBloc>().add(BikerOnWashingOrder(
                   orderId: widget.order.sId!,
                   orderIndex: widget.orderIndex,
@@ -88,7 +88,7 @@ class _EventsStepperState extends State<EventsStepper> {
                 imageQuality: 80,
               );
 
-              if (image != null) {
+              if (image != null && context.mounted) {
                 sl<HomeBloc>().add(BikerOnWashingOrder(
                   orderId: widget.order.sId!,
                   orderIndex: widget.orderIndex,

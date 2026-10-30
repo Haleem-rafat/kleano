@@ -3,14 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:google_map_polyline_new/google_map_polyline_new.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:thewhsherbiker/core/components/circle_image.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
+import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/map_style.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart'
@@ -24,7 +25,6 @@ import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
-import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 
 class OrderChangeStatus extends StatefulWidget {
   final ord.OrderModel order;
@@ -33,13 +33,12 @@ class OrderChangeStatus extends StatefulWidget {
   final BitmapDescriptor? markerBikerLocation;
   final BitmapDescriptor? markerUserLocation;
   const OrderChangeStatus(
-      {Key? key,
+      {super.key,
       required this.order,
       this.index,
       required this.notification,
       this.markerBikerLocation,
-      this.markerUserLocation})
-      : super(key: key);
+      this.markerUserLocation});
 
   @override
   State<OrderChangeStatus> createState() => _OrderChangeStatusState();
@@ -66,10 +65,10 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
     positionStream = Geolocator.getPositionStream(
             locationSettings: LocationSettings(accuracy: LocationAccuracy.high))
         .listen((Position position) async {
-      print("llll ${position.latitude} ${position.longitude}");
+      debugPrint("llll ${position.latitude} ${position.longitude}");
       sl<AuthBloc>().currentPosition =
           LatLng(position.latitude, position.longitude);
-      print(
+      debugPrint(
           "llll2 ${sl<AuthBloc>().currentPosition.latitude} ${sl<AuthBloc>().currentPosition.longitude}");
       setState(() {
         markers.clear();
@@ -104,7 +103,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
       });
 
       if (sl<HomeBloc>().orderStep == 0) {
-        print("on the way");
+        debugPrint("on the way");
         sl<HomeBloc>()
             .socketService
             .emit("biker:location-changes", <String, Object?>{
@@ -115,7 +114,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
           "subAdministrativeArea": "dataValue",
         });
       } else if (sl<HomeBloc>().orderStep == 1) {
-        print("Arrived");
+        debugPrint("Arrived");
         positionStream.cancel();
       }
     });
@@ -150,7 +149,6 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
   }
 
   Future<dynamic> onMapCreated(GoogleMapController mapController) async {
-    mapController.setMapStyle(mapStyle);
   }
 
   @override
@@ -224,6 +222,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
       children: <Widget>[
         Center(
           child: GoogleMap(
+            style: mapStyle,
             onMapCreated: onMapCreated,
             markers: markers,
             polylines: Set.from(polyline),
@@ -272,7 +271,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
                 color: ColorManager.white,
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                      color: ColorManager.black.withOpacity(.07),
+                      color: ColorManager.black.withValues(alpha: .07),
                       blurRadius: 6.r,
                       offset: const Offset(0, 3))
                 ]),

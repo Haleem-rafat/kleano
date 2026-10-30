@@ -96,7 +96,7 @@ class ImageShared extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius:
                     raduis != null ? BorderRadius.circular(raduis!) : null,
-                color: ColorManager.primary.withOpacity(0.1),
+                color: ColorManager.primary.withValues(alpha: 0.1),
               ),
               child: Center(
                 child: Text(
@@ -114,7 +114,7 @@ class ImageShared extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius:
                     raduis != null ? BorderRadius.circular(raduis!) : null,
-                color: ColorManager.primary.withOpacity(0.1),
+                color: ColorManager.primary.withValues(alpha: 0.1),
               ),
               child: const Center(
                 child: CircularProgressIndicator(),
@@ -127,7 +127,7 @@ class ImageShared extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius:
                   raduis != null ? BorderRadius.circular(raduis!) : null,
-              color: ColorManager.primary.withOpacity(0.1),
+              color: ColorManager.primary.withValues(alpha: 0.1),
             ),
             child: const Center(
               child: CircularProgressIndicator(),

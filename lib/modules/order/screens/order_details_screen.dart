@@ -1,9 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/app_bar.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
@@ -27,9 +28,12 @@ class OrderDetailsScreen extends StatefulWidget {
   final OrderModel data;
   final bool complete;
   final int? index;
-  const OrderDetailsScreen(
-      {Key? key, required this.data, required this.complete, this.index})
-      : super(key: key);
+  const OrderDetailsScreen({
+    super.key,
+    required this.data,
+    required this.complete,
+    this.index,
+  });
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -55,16 +59,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375.w, AppSize.s60.h),
+        preferredSize: Size(1.sw, AppSize.s60.h),
         child: AppBarShared(
           titleAppBar: translate(AppStrings.washDetails),
           isTextOnly: false,
         ),
       ),
       body: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: AppPadding.p24.w,
-        ),
+        padding: EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,20 +103,16 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                     vertical: 12.h,
                   ),
                   decoration: BoxDecoration(
-                    color: ColorManager.green.withOpacity(0.1),
+                    color: ColorManager.green.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12.r),
                     border: Border.all(
-                      color: ColorManager.green.withOpacity(0.3),
+                      color: ColorManager.green.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.air,
-                        color: ColorManager.green,
-                        size: 20.sp,
-                      ),
+                      Icon(Icons.air, color: ColorManager.green, size: 20.sp),
                       8.horizontalSpace,
                       Expanded(
                         child: Text(
@@ -144,72 +142,72 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           ),
         ),
       ),
-      bottomNavigationBar:
-          !widget.complete ? _bottomSheetActionOrder(context) : null,
+      bottomNavigationBar: !widget.complete
+          ? _bottomSheetActionOrder(context)
+          : null,
     );
   }
 
-  Container _bottomSheetActionOrder(BuildContext context) {
-    return Container(
-      height: 79.h,
-      width: 375.w,
-      padding: EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-      decoration:
-          BoxDecoration(color: ColorManager.white, boxShadow: <BoxShadow>[
-        BoxShadow(
-            color: ColorManager.black.withOpacity(.16),
-            blurRadius: 6.r,
-            offset: const Offset(0, 3))
-      ]),
-      child: Row(
-        children: <Widget>[
-          BlocConsumer<HomeBloc, HomeState>(
-            listener: (BuildContext context, HomeState state) {
-              if (state is BikerAcceptOrderSuccess) {
-                if (state.details) {
-                  _navigateToOrderDetails();
-                }
-              }
-            },
-            builder: (BuildContext context, HomeState state) {
-              if (state is BikerAcceptOrderLoading) {
-                return Padding(
-                  padding:
-                      EdgeInsets.symmetric(vertical: 15.h, horizontal: 10.w),
-                  child: SizedBox(
-                    height: 50.h,
-                    child: const LoadingWidget(),
-                  ),
-                );
-              } else {
-                return ButtonsShared(
-                  height: 50.h,
-                  width: 164.w,
-                  onPressed: _handleButtonPress,
-                  text: translate(AppStrings.accept),
-                  borderRadius: 25,
-                  textStyle: AppStyles.body14Medium,
-                );
-              }
-            },
-          ),
-          SizedBox(
-            width: 90.w,
-          ),
-          InkWell(
-            onTap: () {
-              pop(context);
-            },
-            child: Text(
-              translate(AppStrings.back),
-              style: AppStyles.subtext14Regular.copyWith(
-                color: ColorManager.medGray,
-                decorationColor: ColorManager.medGray,
-                decoration: TextDecoration.underline,
+  Widget _bottomSheetActionOrder(BuildContext context) {
+    return SafeArea(
+      top: false,
+      minimum: EdgeInsets.fromLTRB(12.w, 0, 12.w, 10.h),
+      child: LiquidGlass(
+        radius: 28.r,
+        padding: EdgeInsets.symmetric(horizontal: AppPadding.p12.w),
+        child: SizedBox(
+          height: 79.h,
+          child: Row(
+            children: <Widget>[
+              BlocConsumer<HomeBloc, HomeState>(
+                listener: (BuildContext context, HomeState state) {
+                  if (state is BikerAcceptOrderSuccess) {
+                    if (state.details) {
+                      _navigateToOrderDetails();
+                    }
+                  }
+                },
+                builder: (BuildContext context, HomeState state) {
+                  if (state is BikerAcceptOrderLoading) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 15.h,
+                        horizontal: 10.w,
+                      ),
+                      child: SizedBox(
+                        height: 50.h,
+                        child: const LoadingWidget(),
+                      ),
+                    );
+                  } else {
+                    return ButtonsShared(
+                      height: 50.h,
+                      width: 164.w,
+                      onPressed: _handleButtonPress,
+                      text: translate(AppStrings.accept),
+                      borderRadius: 25,
+                      textStyle: AppStyles.body14Medium,
+                    );
+                  }
+                },
               ),
-            ),
+              SizedBox(width: 90.w),
+              InkWell(
+                onTap: () {
+                  pop(context);
+                },
+                child: Text(
+                  translate(AppStrings.back),
+                  style: AppStyles.subtext14Regular.copyWith(
+                    color: ColorManager.medGray,
+                    decorationColor: ColorManager.medGray,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -273,10 +271,14 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
   }
 
   void _navigateToOrderDetails() {
-    Navigator.of(context).pushReplacement(createRoute(OrderChangeStatus(
-      order: sl<HomeBloc>().orderDetails,
-      notification: false,
-    )));
+    Navigator.of(context).pushReplacement(
+      createRoute(
+        OrderChangeStatus(
+          order: sl<HomeBloc>().orderDetails,
+          notification: false,
+        ),
+      ),
+    );
   }
 
   Widget _buildBeforeAfterImages() {
@@ -285,9 +287,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
       children: [
         Text(
           translate(AppStrings.carImages),
-          style: AppStyles.title16Bold.copyWith(
-            color: ColorManager.primary,
-          ),
+          style: AppStyles.title16Bold.copyWith(color: ColorManager.primary),
         ),
         12.verticalSpace,
         Row(
@@ -384,7 +384,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                       child: Container(
                         padding: EdgeInsets.all(4.w),
                         decoration: BoxDecoration(
-                          color: ColorManager.black.withOpacity(0.6),
+                          color: ColorManager.black.withValues(alpha: 0.6),
                           borderRadius: BorderRadius.circular(4.r),
                         ),
                         child: Icon(
@@ -402,8 +402,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
               padding: EdgeInsets.symmetric(vertical: 8.h),
               decoration: BoxDecoration(
                 color: isBefore
-                    ? ColorManager.red.withOpacity(0.1)
-                    : ColorManager.green.withOpacity(0.1),
+                    ? ColorManager.red.withValues(alpha: 0.1)
+                    : ColorManager.green.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(10.r),
                   bottomRight: Radius.circular(10.r),
@@ -428,10 +428,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
   void _showFullScreenImage(String imageUrl, String title) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => FullScreenImageViewer(
-          imageUrl: imageUrl,
-          title: title,
-        ),
+        builder: (context) =>
+            FullScreenImageViewer(imageUrl: imageUrl, title: title),
       ),
     );
   }
@@ -442,25 +440,25 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
 
     final int? orderIndex = widget.index;
     final String? orderId = widget.data.sId;
-    final String? latitude = authBloc.currentPosition.latitude.toString();
-    final String? longitude = authBloc.currentPosition.longitude.toString();
+    final String latitude = authBloc.currentPosition.latitude.toString();
+    final String longitude = authBloc.currentPosition.longitude.toString();
     final String streetName = authBloc.currentAddress;
     final String subAdministrativeArea = authBloc.administrativeArea;
 
     if (orderIndex != null &&
-        orderId != null &&
-        latitude != null &&
-        longitude != null) {
-      homeBloc.add(BikerAcceptOrder(
-        context: context,
-        orderIndex: orderIndex,
-        orderId: orderId,
-        lat: latitude,
-        lng: longitude,
-        streetName: streetName,
-        subAdministrativeArea: subAdministrativeArea,
-        details: true,
-      ));
+        orderId != null) {
+      homeBloc.add(
+        BikerAcceptOrder(
+          context: context,
+          orderIndex: orderIndex,
+          orderId: orderId,
+          lat: latitude,
+          lng: longitude,
+          streetName: streetName,
+          subAdministrativeArea: subAdministrativeArea,
+          details: true,
+        ),
+      );
     }
   }
 }
@@ -470,10 +468,10 @@ class FullScreenImageViewer extends StatelessWidget {
   final String title;
 
   const FullScreenImageViewer({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -483,18 +481,12 @@ class FullScreenImageViewer extends StatelessWidget {
         backgroundColor: ColorManager.black,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(
-            Icons.arrow_back,
-            color: ColorManager.white,
-            size: 24.sp,
-          ),
+          icon: Icon(Icons.arrow_back, color: ColorManager.white, size: 24.sp),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
           title,
-          style: AppStyles.title16Bold.copyWith(
-            color: ColorManager.white,
-          ),
+          style: AppStyles.title16Bold.copyWith(color: ColorManager.white),
         ),
         centerTitle: true,
       ),
@@ -503,9 +495,7 @@ class FullScreenImageViewer extends StatelessWidget {
         minScale: PhotoViewComputedScale.contained,
         maxScale: PhotoViewComputedScale.covered * 3.0,
         initialScale: PhotoViewComputedScale.contained,
-        backgroundDecoration: BoxDecoration(
-          color: ColorManager.black,
-        ),
+        backgroundDecoration: BoxDecoration(color: ColorManager.black),
         enableRotation: true,
         loadingBuilder: (context, event) => Center(
           child: SizedBox(
@@ -513,9 +503,7 @@ class FullScreenImageViewer extends StatelessWidget {
             height: 40.h,
             child: CircularProgressIndicator(
               strokeWidth: 3,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                ColorManager.primary,
-              ),
+              valueColor: AlwaysStoppedAnimation<Color>(ColorManager.primary),
             ),
           ),
         ),
@@ -523,11 +511,7 @@ class FullScreenImageViewer extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.error_outline,
-                color: ColorManager.white,
-                size: 60.sp,
-              ),
+              Icon(Icons.error_outline, color: ColorManager.white, size: 60.sp),
               16.verticalSpace,
               Text(
                 translate(AppStrings.errorLoadingImage),
@@ -545,11 +529,7 @@ class FullScreenImageViewer extends StatelessWidget {
 }
 
 class RowInfoWidget extends StatelessWidget {
-  const RowInfoWidget({
-    super.key,
-    required this.title,
-    required this.infoText,
-  });
+  const RowInfoWidget({super.key, required this.title, required this.infoText});
 
   final String title;
   final String infoText;

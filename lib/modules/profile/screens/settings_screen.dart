@@ -9,7 +9,7 @@ import 'package:thewhsherbiker/modules/profile/widget/profile/drop_down_language
 import 'package:thewhsherbiker/shared/components/app_bar.dart';
 
 class SettingScreen extends StatelessWidget {
-  const SettingScreen({Key? key}) : super(key: key);
+  const SettingScreen({super.key});
   @override
   Widget build(BuildContext context) {
     Localizations.localeOf(context).languageCode;

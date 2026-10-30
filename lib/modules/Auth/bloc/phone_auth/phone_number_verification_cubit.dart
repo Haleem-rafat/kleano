@@ -18,7 +18,7 @@ class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
   Future<void> requestOTP({required String phoneNumber}) async {
     emit(const RequestOTPLoadingState());
 
-    print('Phone number doesn\'t exists, requesting OTP');
+    debugPrint('Phone number doesn\'t exists, requesting OTP');
     await _firebaseAuthenticationService.firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       timeout: const Duration(seconds: 60),
@@ -27,7 +27,7 @@ class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
       },
       verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {
-        print("Error Login Phone====> ${e.code}");
+        debugPrint("Error Login Phone====> ${e.code}");
 
         if (e.code == 'phone-number-already-exists') {
           emit(const PhoneNumberAlreadyExistsState());
@@ -47,7 +47,7 @@ class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
 
   Future<void> resendOTPRequest({required String phoneNumber}) async {
     emit(const RequestOTPLoadingState());
-    print('Phone number doesn\'t exists, requesting OTP');
+    debugPrint('Phone number doesn\'t exists, requesting OTP');
     await _firebaseAuthenticationService.firebaseAuth.verifyPhoneNumber(
       phoneNumber: phoneNumber,
       timeout: const Duration(seconds: 60),
@@ -56,7 +56,7 @@ class PhoneNumberVerificationCubit extends Cubit<PhoneNumberVerificationState> {
       },
       verificationCompleted: (PhoneAuthCredential credential) {},
       verificationFailed: (FirebaseAuthException e) {
-        print("Error Login Phone====> ${e.code}");
+        debugPrint("Error Login Phone====> ${e.code}");
 
         if (e.code == 'phone-number-already-exists') {
           emit(const PhoneNumberAlreadyExistsState());

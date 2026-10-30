@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:thewhsherbiker/api/api_path.dart';
 import 'package:thewhsherbiker/api/app_config.dart';
 import 'package:thewhsherbiker/api/shared.dart';
@@ -11,152 +13,58 @@ class ApiService {
   static const String jsonType = 'application/json';
   static const int unAuthorizedCode = 403;
   static const int internalServerErrorCode = 500;
-  static const String authorizationParameter = 'Authorization';
-  static const String bearer = 'Bearer';
+
+  /// One shared client: connection pooling, a single refresh lock and one
+  /// interceptor chain instead of a new Dio per request.
+  static final Dio _dio = _createDio();
 
   static Dio _createDio() {
-    final dio = Dio(
+    final Dio dio = Dio(
       BaseOptions(
         baseUrl: AppConfig.getAppBaseUrl(),
+        // The backend can cold-start (Render), so allow a slow first response.
+        connectTimeout: const Duration(seconds: 30),
+        receiveTimeout: const Duration(seconds: 60),
+        // Callers read 4xx bodies (validation / localized messages) themselves.
+        validateStatus: (int? status) =>
+            status != null && status < internalServerErrorCode,
       ),
     );
 
-    // Logging interceptor
-    dio.interceptors.add(
-      LogInterceptor(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        logPrint: (Object? object) => log(object.toString(), name: 'HTTP'),
-      ),
-    );
+    if (kDebugMode) {
+      dio.interceptors.add(
+        LogInterceptor(
+          requestBody: true,
+          responseBody: true,
+          logPrint: (Object? object) => log(object.toString(), name: 'HTTP'),
+        ),
+      );
+    }
     dio.interceptors.add(AuthInterceptor(dio: dio));
-
-    // dio.interceptors.add(ChuckerDioInterceptor());
-
     return dio;
   }
 
-  /// ✅ إعداد التوكين
-  static Future<void> _setAuthHeader(Dio dio, bool isAuth) async {
-    if (isAuth) {
-      await AppShared.getToken();
-      dio.options.headers[authorizationParameter] =
-          '$bearer ${AppShared.token}';
-    }
-  }
+  static Options _options(bool isAuth, {String? contentType}) => Options(
+        extra: <String, dynamic>{'requiresAuth': isAuth},
+        contentType: contentType,
+      );
 
   static Future<Response<T>?> getApi<T>(String path,
       {bool isAuth = true}) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.get<T>(
-      path,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-      ),
-    );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
-  }
-
-  static Future<Response<T>?> getApiSubject<T>(
-    String path,
-    List<String> educationLevels,
-    List<String> secondaryTracks, {
-    bool isAuth = true,
-  }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final queryParameters = {
-      'education_levels[]': educationLevels,
-      'secondary_tracks[]': secondaryTracks,
-    };
-
-    final response = await dio.get<T>(
-      path,
-      queryParameters: queryParameters,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-      ),
-    );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
-  }
-
-  static Future<Response<T>?> getSchoolFilter<T>(
-    String path,
-    List<String> city,
-    List<String> studentsGender,
-    List<String> educationLevels,
-    List<String> educationCenters,
-    List<String> schoolType, {
-    bool isAuth = true,
-  }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final queryParameters = {
-      'city[]': city,
-      'students_gender[]': studentsGender,
-      'education_levels[]': educationLevels,
-      'education_centers[]': educationCenters,
-      'school_type[]': schoolType,
-    };
-
-    final response = await dio.get<T>(
-      path,
-      queryParameters: queryParameters,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-      ),
-    );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
+    return _dio.get<T>(path, options: _options(isAuth));
   }
 
   static Future<Response<T>?> postApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.post<T>(
+    return _dio.post<T>(
       path,
       data: body,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: isJson ? jsonType : urlEncodedType,
-      ),
+      options: _options(isAuth, contentType: isJson ? jsonType : urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> deleteApi<T>(
@@ -164,244 +72,127 @@ class ApiService {
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.delete<T>(
+    return _dio.delete<T>(
       path,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: isJson ? jsonType : urlEncodedType,
-      ),
+      options: _options(isAuth, contentType: isJson ? jsonType : urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> patchApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.patch<T>(
+    return _dio.patch<T>(
       path,
       data: body,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: isJson ? jsonType : urlEncodedType,
-      ),
+      options: _options(isAuth, contentType: isJson ? jsonType : urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> putApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.put<T>(
+    return _dio.put<T>(
       path,
       data: body,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: isJson ? jsonType : urlEncodedType,
-      ),
+      options: _options(isAuth, contentType: isJson ? jsonType : urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> putMultiPartApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     List<String?>? filesName,
     List<File>? files,
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final formData = FormData();
-    body.forEach((key, value) {
-      if (value is List) {
-        value.forEach((e) {
-          formData.fields.add(MapEntry(key, e.toString()));
-        });
-      } else {
-        formData.fields.add(MapEntry(key, value.toString()));
-      }
-    });
-
-    if (files != null && files.isNotEmpty) {
-      for (int i = 0; i < files.length; i++) {
-        final fileName = files[i].path.split('/').last;
-        formData.files.add(
-          MapEntry(
-            filesName?[i] ?? fileName,
-            MultipartFile.fromFileSync(files[i].path,
-                filename: filesName?[i] ?? fileName),
-          ),
-        );
-      }
-    }
-
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.put<T>(
+    return _dio.put<T>(
       path,
-      data: formData,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: urlEncodedType,
-      ),
+      data: await _formData(body, files, filesName),
+      options: _options(isAuth, contentType: urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> postMultiPartApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     List<String?>? filesName,
     List<File>? files,
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final formData = FormData();
-    body.forEach((key, value) {
-      if (value is List) {
-        value.forEach((e) {
-          formData.fields.add(MapEntry(key, e.toString()));
-        });
-      } else {
-        formData.fields.add(MapEntry(key, value.toString()));
-      }
-    });
-
-    if (files != null && files.isNotEmpty) {
-      for (int i = 0; i < files.length; i++) {
-        final fileName = files[i].path.split('/').last;
-        formData.files.add(
-          MapEntry(
-            filesName?[i] ?? fileName,
-            MultipartFile.fromFileSync(files[i].path,
-                filename: filesName?[i] ?? fileName),
-          ),
-        );
-      }
-    }
-
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.post<T>(
+    return _dio.post<T>(
       path,
-      data: formData,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: urlEncodedType,
-      ),
+      data: await _formData(body, files, filesName),
+      options: _options(isAuth, contentType: urlEncodedType),
     );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
   }
 
   static Future<Response<T>?> patchMultiPartApi<T>(
     String path, {
-    Map<String, dynamic> body = const {},
+    Map<String, dynamic> body = const <String, dynamic>{},
     List<String?>? filesName,
     List<File>? files,
     bool isJson = true,
     bool isAuth = false,
   }) async {
-    final formData = FormData();
-    body.forEach((key, value) {
+    return _dio.patch<T>(
+      path,
+      data: await _formData(body, files, filesName),
+      options: _options(isAuth, contentType: urlEncodedType),
+    );
+  }
+
+  static Future<FormData> _formData(Map<String, dynamic> body,
+      List<File>? files, List<String?>? filesName) async {
+    final FormData formData = FormData();
+    body.forEach((String key, dynamic value) {
       if (value is List) {
-        value.forEach((e) {
-          formData.fields.add(MapEntry(key, e.toString()));
-        });
+        for (final dynamic e in value) {
+          formData.fields.add(MapEntry<String, String>(key, e.toString()));
+        }
       } else {
-        formData.fields.add(MapEntry(key, value.toString()));
+        formData.fields.add(MapEntry<String, String>(key, value.toString()));
       }
     });
 
-    if (files != null && files.isNotEmpty) {
-      for (int i = 0; i < files.length; i++) {
-        final fileName = files[i].path.split('/').last;
-        formData.files.add(
-          MapEntry(
-            filesName?[i] ?? fileName,
-            MultipartFile.fromFileSync(files[i].path,
-                filename: filesName?[i] ?? fileName),
-          ),
-        );
-      }
+    for (int i = 0; i < (files?.length ?? 0); i++) {
+      final File file = files![i];
+      final String fileName = file.path.split('/').last;
+      final String field = filesName?[i] ?? fileName;
+      formData.files.add(MapEntry<String, MultipartFile>(
+        field,
+        await MultipartFile.fromFile(file.path, filename: field),
+      ));
     }
-
-    final dio = _createDio();
-    await _setAuthHeader(dio, isAuth);
-
-    final response = await dio.patch<T>(
-      path,
-      data: formData,
-      options: Options(
-        validateStatus: (status) =>
-            status != null && status < internalServerErrorCode,
-        contentType: urlEncodedType,
-      ),
-    );
-
-    if (response.statusCode == unAuthorizedCode) {
-      await refreshToken();
-      return null;
-    }
-    return response;
+    return formData;
   }
 
+  /// Exchanges the stored refresh token for a new pair and persists both.
+  /// Returns the new refresh token, or null when the session is no longer
+  /// valid. Network failures are rethrown so callers can tell "offline" apart
+  /// from "logged out".
   static Future<String?> refreshToken() async {
     await AppShared.getRefreshToken();
-    final response = await postApi(
+    if (AppShared.refreshToken.isEmpty) return null;
+
+    final Response<dynamic> response = await _dio.post<dynamic>(
       ApiPaths.refreshTokens,
-      isAuth: false,
-      body: {"refresh_token": AppShared.refreshToken},
+      data: <String, dynamic>{'refresh_token': AppShared.refreshToken},
+      options: _options(false, contentType: jsonType),
     );
 
-    if (response != null && response.statusCode == 201) {
-      AppShared.setToken(response.data['data']['access_token']);
-      return response.data['data']['refresh_token'];
+    final dynamic data = response.data is Map ? response.data['data'] : null;
+    if (response.statusCode == 201 && data is Map) {
+      await AppShared.setToken(data['access_token'] as String);
+      await AppShared.setRefreshToken(data['refresh_token'] as String);
+      return data['refresh_token'] as String;
     }
     return null;
   }

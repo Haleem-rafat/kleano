@@ -6,6 +6,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 
 class SwitchSVGs extends StatefulWidget {
+  const SwitchSVGs({super.key});
+
   @override
   _SwitchSVGsState createState() => _SwitchSVGsState();
 }
@@ -66,7 +68,7 @@ class _SwitchSVGsState extends State<SwitchSVGs> with TickerProviderStateMixin {
           child: AnimatedBuilder(
             animation: _controller,
             builder: (BuildContext context, Widget? child) {
-              return Container(
+              return SizedBox(
                 height: 30.h,
                 width: 30.w,
                 child: Transform.translate(

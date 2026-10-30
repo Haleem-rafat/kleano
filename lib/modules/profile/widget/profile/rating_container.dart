@@ -7,7 +7,7 @@ import 'package:thewhsherbiker/modules/profile/widget/profile/card_profile_infor
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 class RatingContainer extends StatelessWidget {
-  const RatingContainer({Key? key}) : super(key: key);
+  const RatingContainer({super.key});
 
   @override
   Widget build(BuildContext context) {

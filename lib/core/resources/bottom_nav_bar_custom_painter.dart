@@ -9,13 +9,13 @@ class BNBCustomPainter extends CustomPainter {
       ..color = ColorManager.white
       ..style = PaintingStyle.fill;
     Path path = Path()..moveTo(0, 15);
-    path.quadraticBezierTo(375.w * 0.20, 0, 375.w * 0.35, 0);
-    path.quadraticBezierTo(375.w * 0.40, 0, 375.w * 0.40, 20);
-    path.arcToPoint(Offset(375.w * 0.60, 20),
+    path.quadraticBezierTo(1.sw * 0.20, 0, 1.sw * 0.35, 0);
+    path.quadraticBezierTo(1.sw * 0.40, 0, 1.sw * 0.40, 20);
+    path.arcToPoint(Offset(1.sw * 0.60, 20),
         radius: Radius.circular(10.0.r), clockwise: false);
-    path.quadraticBezierTo(375.w * 0.60, 0, 375.w * 0.65, 0);
-    path.quadraticBezierTo(375.w * 0.85, 0, 375.w, 15);
-    path.lineTo(375.w, 85.h);
+    path.quadraticBezierTo(1.sw * 0.60, 0, 1.sw * 0.65, 0);
+    path.quadraticBezierTo(1.sw * 0.85, 0, 1.sw, 15);
+    path.lineTo(1.sw, 85.h);
     path.lineTo(0, 85.h);
     path.close();
     canvas.drawShadow(path, ColorManager.medGray, 7, true);
