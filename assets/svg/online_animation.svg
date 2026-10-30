@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="60" height="22" viewBox="0 0 60 22">
+  <g id="Component_228_2" data-name="Component 228 – 2" transform="translate(0 0)">
+    <rect id="Rectangle_249" data-name="Rectangle 249" width="60" height="22" rx="11" transform="translate(0 0)" fill="#5aa79c"/>
+    <g id="Group_631" data-name="Group 631" transform="translate(5 4)">
+      <circle id="Ellipse_122" data-name="Ellipse 122" cx="7" cy="7" r="7" transform="translate(36)" fill="#fff"/>
+      <text id="Online" transform="translate(19 11)" fill="#fff" font-size="10" font-family="Roboto-Regular, Roboto"><tspan x="-14" y="0">Online</tspan></text>
+    </g>
+  </g>
+</svg>

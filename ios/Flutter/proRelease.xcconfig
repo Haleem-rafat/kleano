@@ -1,0 +1,6 @@
+#include "Generated.xcconfig"
+
+FLUTTER_TARGET=lib/main_pro.dart
+ASSET_PREFIX=pro
+BUNDLE_NAME=Kleano Biker
+BUNDLE_DISPLAY_NAME=Kleano Biker
