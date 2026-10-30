@@ -18,6 +18,7 @@ import 'package:thewhsherbiker/modules/order/screens/order_details_screen.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/app_date_formatter.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
+import 'package:thewhsherbiker/utilties/whatsapp_number.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class AcceptContainer extends StatelessWidget {
@@ -31,11 +32,8 @@ class AcceptContainer extends StatelessWidget {
       return;
     }
 
-    final String cleanedPhone =
-        phone.replaceAll('+', '').replaceAll(' ', '').trim();
-    final String whatsappNumber =
-        cleanedPhone.startsWith('966') ? cleanedPhone : '966$cleanedPhone';
-    final Uri whatsappUri = Uri.parse('https://wa.me/$whatsappNumber');
+    final Uri whatsappUri =
+        Uri.parse('https://wa.me/${whatsAppNumber(phone)}');
 
     if (await canLaunchUrl(whatsappUri)) {
       await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);

@@ -9,18 +9,14 @@ import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/core/utilis/launch_map.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
+import 'package:thewhsherbiker/utilties/whatsapp_number.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderUserDetails extends StatelessWidget {
   const OrderUserDetails({super.key});
   void openWhatsApp(String phoneBiker) async {
-    final String phone =
-        phoneBiker.replaceAll('+', '').replaceAll(' ', '').trim();
-
-    // Ensure the phone number starts with country code
-    String whatsappNumber = phone.startsWith('966') ? phone : '966$phone';
-
-    final Uri whatsappUri = Uri.parse('https://wa.me/$whatsappNumber');
+    final Uri whatsappUri =
+        Uri.parse('https://wa.me/${whatsAppNumber(phoneBiker)}');
 
     if (await canLaunchUrl(whatsappUri)) {
       await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);

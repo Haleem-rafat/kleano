@@ -333,6 +333,20 @@ class _NativeGlassButtonState extends State<NativeGlassButton> {
   @override
   Widget build(BuildContext context) {
     if (!GlassTokens.useNative) return widget.fallback;
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        // An unbounded platform view gets an infinite frame and iOS kills the
+        // app (CALayer NaN). Give the caller a visible error instead.
+        if (!constraints.hasBoundedWidth || !constraints.hasBoundedHeight) {
+          assert(false, 'NativeGlassButton needs a bounded size: $constraints');
+          return widget.fallback;
+        }
+        return _native();
+      },
+    );
+  }
+
+  Widget _native() {
     return Semantics(
       button: true,
       label: widget.title,
