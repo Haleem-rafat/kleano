@@ -180,6 +180,9 @@ final class GlassButtonPlatformView: NSObject, FlutterPlatformView {
       // Glass buttons draw SF Symbols in the button's tint, not the base
       // foreground: without this a white back chevron renders black.
       config.imageColorTransformer = UIConfigurationColorTransformer { _ in color }
+      // Plain glass also reads the symbol colour from tintColor (prominent
+      // glass uses tintColor for its fill, set below).
+      if style != "prominent" { button.tintColor = color }
     }
     if let tint = args["tint"] as? NSNumber {
       // Prominent glass takes its colour from the tint (brand purple).
