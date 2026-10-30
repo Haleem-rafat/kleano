@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../liquid_glass.dart';
 import '../tokens.dart';
+import 'k_list_row.dart';
 import 'k_sheet.dart';
 
 /// Picks one value from a (long) list: a field that opens a searchable sheet.
@@ -152,16 +155,24 @@ class _PickerSheetState<T> extends State<_PickerSheet<T>> {
               textAlign: TextAlign.center,
               style: KType.headline.copyWith(color: c.text)),
           const SizedBox(height: KSpace.m),
-          TextField(
-            autofocus: widget.items.length > 12,
-            onChanged: (String v) => setState(() => _query = v.trim()),
-            style: KType.body.copyWith(color: c.text),
-            decoration: InputDecoration(
+          // Platform search field: Apple's on iOS, Material 3 SearchBar on
+          // Android — never an outlined form field.
+          if (GlassTokens.useNative)
+            CupertinoSearchTextField(
+              autofocus: widget.items.length > 12,
+              placeholder: widget.searchHint,
+              style: KType.body.copyWith(color: c.text),
+              onChanged: (String v) => setState(() => _query = v.trim()),
+            )
+          else
+            SearchBar(
+              autoFocus: widget.items.length > 12,
               hintText: widget.searchHint,
-              prefixIcon: Icon(Icons.search_rounded, color: c.textSecondary),
-              contentPadding: const EdgeInsets.symmetric(vertical: KSpace.m),
+              elevation: const WidgetStatePropertyAll<double>(0),
+              backgroundColor: WidgetStatePropertyAll<Color>(c.fill),
+              leading: Icon(Icons.search_rounded, color: c.textSecondary),
+              onChanged: (String v) => setState(() => _query = v.trim()),
             ),
-          ),
           const SizedBox(height: KSpace.s),
           Expanded(
             child: ListView.separated(
@@ -171,14 +182,11 @@ class _PickerSheetState<T> extends State<_PickerSheet<T>> {
               itemBuilder: (BuildContext context, int i) {
                 final String text = widget.itemLabel(shown[i]);
                 final bool on = text == widget.selected;
-                return ListTile(
-                  minTileHeight: KSpace.tapTarget + 4,
-                  title: Text(text,
-                      style: KType.body.copyWith(
-                          color: c.text,
-                          fontWeight: on ? FontWeight.w600 : null)),
-                  trailing:
-                      on ? Icon(Icons.check_rounded, color: c.brand) : null,
+                return KListRow(
+                  title: text,
+                  trailing: on
+                      ? Icon(Icons.check_rounded, color: c.brand)
+                      : null,
                   onTap: () => Navigator.of(context).pop(shown[i]),
                 );
               },
