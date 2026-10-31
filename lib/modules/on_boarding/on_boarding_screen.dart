@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:thewasher/core/design/tokens.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
+import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/on_boarding/choose_register.dart';
@@ -133,6 +135,8 @@ class _OnboardScreenState extends State<OnboardScreen> {
                           ),
                       ],
                     ),
+                    const SizedBox(height: KSpace.l),
+                    SvgPicture.asset(AssetsManager.logoWhite, height: 48),
                     const Spacer(),
                     Text(
                       page.title,
@@ -167,6 +171,7 @@ class _OnboardScreenState extends State<OnboardScreen> {
                     ),
                     const SizedBox(height: KSpace.xxl),
                     KButton(
+                      variant: KButtonVariant.onPhoto,
                       label: translate(
                         last ? AppStrings.getStarted : AppStrings.next,
                       ),

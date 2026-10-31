@@ -1,36 +1,29 @@
 import 'dart:io';
-import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_picker_field.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/update_profile/update_profile_bloc.dart';
 import 'package:thewasher/modules/profile/data/models/profile_user.dart';
 import 'package:thewasher/modules/profile/data/models/update_profile_request.dart';
 import 'package:thewasher/modules/profile/widgets/upload_user_photo.dart';
-import 'package:thewasher/shared/components/app_bar.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/list_tile_text_form.dart';
 import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/navigator.dart';
 import 'package:thewasher/utilties/validator.dart';
 
 class ChangePersonalInformation extends StatefulWidget {
   final Profile user;
-  const ChangePersonalInformation({
-    super.key,
-    required this.user,
-  });
+  const ChangePersonalInformation({super.key, required this.user});
 
   @override
   State<ChangePersonalInformation> createState() =>
@@ -38,10 +31,12 @@ class ChangePersonalInformation extends StatefulWidget {
 }
 
 class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
-  late List<Widget> textForms = [];
   late List<String> genderType;
   late GeneralSingleton generalSingleton;
-  final genderControllerDropdown = TextEditingController();
+  late final TextEditingController _nameController;
+  late final TextEditingController _emailController;
+  final TextEditingController _dobController = TextEditingController();
+  String? _pickedGender;
   late UpdateProfileBloc updateProfileBloc;
   late String nameText;
   late String emailText;
@@ -72,6 +67,12 @@ class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
       }
     }
 
+    _nameController = TextEditingController(text: nameText)
+      ..addListener(() => nameText = _nameController.text);
+    _emailController = TextEditingController(text: emailText)
+      ..addListener(() => emailText = _emailController.text);
+    _dobController.text = dobText ?? '';
+
     genderType = ['Male', 'Female'];
     generalSingleton = GeneralSingleton();
     updateProfileBloc = BlocProvider.of<UpdateProfileBloc>(context);
@@ -80,71 +81,66 @@ class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
 
   @override
   void dispose() {
-    genderControllerDropdown.dispose();
+    _nameController.dispose();
+    _emailController.dispose();
+    _dobController.dispose();
     super.dispose();
   }
 
   void _showDatePicker(BuildContext context) {
-    showCupertinoModalPopup(
+    showKSheet<void>(
       context: context,
-      builder: (BuildContext builder) {
-        return Container(
-          height: 300.h,
-          color: ColorManager.white,
-          child: Column(
-            children: [
-              Container(
-                height: 50.h,
-                color: ColorManager.white,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    CupertinoButton(
-                      child: Text(
-                        translate(AppStrings.cancel),
-                        style: AppStyles.title16Regular.copyWith(
-                          color: ColorManager.primary,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                    CupertinoButton(
-                      child: Text(
-                        translate(AppStrings.save),
-                        style: AppStyles.title16Regular.copyWith(
-                          color: ColorManager.primary,
-                        ),
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          // Display format for UI
-                          dobText = DateFormat('MMM dd, yyyy', 'en')
-                              .format(selectedDate!);
-                          // API format for backend
-                          dobApiFormat = DateFormat('yyyy-MM-dd', 'en')
-                              .format(selectedDate!);
-                        });
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: CupertinoDatePicker(
-                  initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
-                  mode: CupertinoDatePickerMode.date,
-                  maximumDate: DateTime.now(),
-                  minimumDate: DateTime(1900, 1, 1),
-                  onDateTimeChanged: (DateTime newDate) {
-                    selectedDate = newDate;
+      builder: (BuildContext context) {
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                KButton(
+                  label: translate(AppStrings.cancel),
+                  variant: KButtonVariant.text,
+                  expand: false,
+                  onPressed: () {
+                    Navigator.of(context).pop();
                   },
                 ),
+                KButton(
+                  label: translate(AppStrings.save),
+                  variant: KButtonVariant.text,
+                  expand: false,
+                  onPressed: () {
+                    setState(() {
+                      // Display format for UI
+                      dobText = DateFormat(
+                        'MMM dd, yyyy',
+                        'en',
+                      ).format(selectedDate!);
+                      _dobController.text = dobText!;
+                      // API format for backend
+                      dobApiFormat = DateFormat(
+                        'yyyy-MM-dd',
+                        'en',
+                      ).format(selectedDate!);
+                    });
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 216,
+              child: CupertinoDatePicker(
+                initialDateTime: selectedDate ?? DateTime(2000, 1, 1),
+                mode: CupertinoDatePickerMode.date,
+                maximumDate: DateTime.now(),
+                minimumDate: DateTime(1900, 1, 1),
+                onDateTimeChanged: (DateTime newDate) {
+                  selectedDate = newDate;
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         );
       },
     );
@@ -158,25 +154,31 @@ class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
                     generalSingleton.gender != null ||
                 widget.user.gender != null)) {
           generalSingleton.userImage != null
-              ? updateProfileBloc.add(UpdateProfileEvent(
-                  updateProfileRequest: UpdateProfileRequest(
-                  userName: nameText.trim(),
-                  email: emailText.trim(),
-                  image: File(generalSingleton.userImage!.path),
-                  gender: generalSingleton.gender != null
-                      ? generalSingleton.gender!
-                      : widget.user.gender!,
-                  dob: dobApiFormat,
-                )))
-              : updateProfileBloc.add(UpdateProfileEvent(
-                  updateProfileRequest: UpdateProfileRequest(
-                  userName: nameText.trim(),
-                  email: emailText.trim(),
-                  gender: generalSingleton.gender != null
-                      ? generalSingleton.gender!
-                      : widget.user.gender!,
-                  dob: dobApiFormat,
-                )));
+              ? updateProfileBloc.add(
+                  UpdateProfileEvent(
+                    updateProfileRequest: UpdateProfileRequest(
+                      userName: nameText.trim(),
+                      email: emailText.trim(),
+                      image: File(generalSingleton.userImage!.path),
+                      gender: generalSingleton.gender != null
+                          ? generalSingleton.gender!
+                          : widget.user.gender!,
+                      dob: dobApiFormat,
+                    ),
+                  ),
+                )
+              : updateProfileBloc.add(
+                  UpdateProfileEvent(
+                    updateProfileRequest: UpdateProfileRequest(
+                      userName: nameText.trim(),
+                      email: emailText.trim(),
+                      gender: generalSingleton.gender != null
+                          ? generalSingleton.gender!
+                          : widget.user.gender!,
+                      dob: dobApiFormat,
+                    ),
+                  ),
+                );
         }
       }
     } else if (((nameText.trim().isNotEmpty) ||
@@ -184,194 +186,137 @@ class _ChangePersonalInformationState extends State<ChangePersonalInformation> {
         (generalSingleton.gender != '---' && generalSingleton.gender != null ||
             widget.user.gender != null)) {
       generalSingleton.userImage != null
-          ? updateProfileBloc.add(UpdateProfileEvent(
-              updateProfileRequest: UpdateProfileRequest(
-              userName: nameText.trim(),
-              email: emailText.trim(),
-              image: File(generalSingleton.userImage!.path),
-              gender: generalSingleton.gender != null
-                  ? generalSingleton.gender!
-                  : widget.user.gender!,
-              dob: dobApiFormat,
-            )))
-          : updateProfileBloc.add(UpdateProfileEvent(
-              updateProfileRequest: UpdateProfileRequest(
-              userName: nameText.trim(),
-              email: emailText.trim(),
-              gender: generalSingleton.gender != null
-                  ? generalSingleton.gender!
-                  : widget.user.gender!,
-              dob: dobApiFormat,
-            )));
+          ? updateProfileBloc.add(
+              UpdateProfileEvent(
+                updateProfileRequest: UpdateProfileRequest(
+                  userName: nameText.trim(),
+                  email: emailText.trim(),
+                  image: File(generalSingleton.userImage!.path),
+                  gender: generalSingleton.gender != null
+                      ? generalSingleton.gender!
+                      : widget.user.gender!,
+                  dob: dobApiFormat,
+                ),
+              ),
+            )
+          : updateProfileBloc.add(
+              UpdateProfileEvent(
+                updateProfileRequest: UpdateProfileRequest(
+                  userName: nameText.trim(),
+                  email: emailText.trim(),
+                  gender: generalSingleton.gender != null
+                      ? generalSingleton.gender!
+                      : widget.user.gender!,
+                  dob: dobApiFormat,
+                ),
+              ),
+            );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    textForms = <Widget>[
-      ListTileTextForm(
-        initialValue: nameText,
-        validator: validatorName,
-        title: translate(AppStrings.name),
-        hintText: translate(AppStrings.username),
-        textInputType: TextInputType.name,
-        onChange: (val) {
-          setState(() {
-            nameText = val;
-          });
-        },
+    final KColors c = KColors.of(context);
+    final bool hasGender = gender != '----';
+    return Scaffold(
+      backgroundColor: c.background,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: Text(translate(AppStrings.changePersonalInformation)),
       ),
-      ListTileTextForm(
-        initialValue: emailText,
-        validator: validatorEmail,
-        title: translate(AppStrings.email),
-        hintText: "info@kleanoapp.com",
-        textInputType: TextInputType.emailAddress,
-        onChange: (val) {
-          setState(() {
-            emailText = val;
-          });
-        },
-      ),
-      ListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Padding(
-          padding: EdgeInsets.only(
-              left: AppPadding.p16.w,
-              right: AppPadding.p16.w,
-              bottom: AppPadding.p8.h),
-          child: Text(
-            translate(AppStrings.gender),
-            style:
-                AppStyles.title16Regular.copyWith(color: ColorManager.darkGrey),
+      body: ListView(
+        padding: const EdgeInsets.all(KSpace.xl),
+        children: <Widget>[
+          UserPhoto(
+            isEdit: true,
+            userPhoto: widget.user.imageLink != null
+                ? widget.user.imageLink!
+                : 'null',
           ),
-        ),
-        subtitle: CustomDropdown(
-            hintText: gender,
-            items: genderType,
-            excludeSelected: false,
-            decoration: CustomDropdownDecoration(
-              hintStyle: AppStyles.titleGray16Regular,
-              listItemStyle: AppStyles.title16Regular.copyWith(
-                color: ColorManager.darkGrey,
-              ),
-            ),
-            onChanged: (val) {
-              setState(() {
-                generalSingleton.gender = val;
-              });
-            }),
-      ),
-      // Date of Birth
-      ListTile(
-        contentPadding: EdgeInsets.zero,
-        title: Padding(
-          padding: EdgeInsets.only(
-              left: AppPadding.p16.w,
-              right: AppPadding.p16.w,
-              bottom: AppPadding.p8.h),
-          child: Text(
-            translate(AppStrings.dateOfBirth),
-            style:
-                AppStyles.title16Regular.copyWith(color: ColorManager.darkGrey),
-          ),
-        ),
-        subtitle: GestureDetector(
-          onTap: () {
-            _showDatePicker(context);
-          },
-          child: Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: AppPadding.p16.w,
-              vertical: AppPadding.p16.h,
-            ),
-            decoration: BoxDecoration(
-              border: Border.all(color: ColorManager.lightGray),
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  dobText ?? 'Select Date of Birth',
-                  style: AppStyles.title16Regular.copyWith(
-                    color: dobText != null
-                        ? ColorManager.darkGrey
-                        : ColorManager.medGray,
-                  ),
+          const SizedBox(height: KSpace.xxl),
+          Form(
+            key: _signUpFormKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                KTextField(
+                  label: translate(AppStrings.name),
+                  hint: translate(AppStrings.username),
+                  controller: _nameController,
+                  validator: validatorName,
+                  keyboardType: TextInputType.name,
+                  autofillHints: const <String>[AutofillHints.name],
+                  textInputAction: TextInputAction.next,
                 ),
-                Icon(
-                  Icons.calendar_today,
-                  color: ColorManager.primary,
-                  size: 20.sp,
+                const SizedBox(height: KSpace.l),
+                KTextField(
+                  label: translate(AppStrings.email),
+                  hint: 'info@kleanoapp.com',
+                  controller: _emailController,
+                  validator: validatorEmail,
+                  keyboardType: TextInputType.emailAddress,
+                  autofillHints: const <String>[AutofillHints.email],
+                  textInputAction: TextInputAction.done,
+                ),
+                const SizedBox(height: KSpace.l),
+                KPickerField<String>(
+                  label: translate(AppStrings.gender),
+                  items: genderType,
+                  itemLabel: (String item) => item,
+                  value: _pickedGender ?? (hasGender ? gender : null),
+                  placeholder: gender,
+                  onSelected: (String val) {
+                    setState(() {
+                      _pickedGender = val;
+                      generalSingleton.gender = val;
+                    });
+                  },
+                ),
+                const SizedBox(height: KSpace.l),
+                // Read-only: tapping opens the date sheet.
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _showDatePicker(context),
+                  child: AbsorbPointer(
+                    child: KTextField(
+                      label: translate(AppStrings.dateOfBirth),
+                      hint: 'Select Date of Birth',
+                      controller: _dobController,
+                      prefix: Icon(Icons.calendar_today, color: c.brand),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    ];
-    return Scaffold(
-      backgroundColor: ColorManager.white,
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, AppSize.s60.h),
-        child: AppBarWhiteShared(
-          titleText: translate(AppStrings.changePersonalInformation),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-        child: SingleChildScrollView(
-          child: Column(children: <Widget>[
-            AppPadding.p10.ph,
-            UserPhoto(
-              isEdit: true,
-              userPhoto: widget.user.imageLink != null
-                  ? widget.user.imageLink!
-                  : "null",
-            ),
-            AppPadding.p66.ph,
-            Form(
-              key: _signUpFormKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: textForms.map((userForms) {
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: AppPadding.p32.h),
-                    child: userForms,
-                  );
-                }).toList(),
-              ),
-            ),
-            AppPadding.p100.ph,
-            BlocConsumer<UpdateProfileBloc, UpdateProfileState>(
-              listener: (BuildContext context, UpdateProfileState stateUpdate) {
-                if (stateUpdate is UpdateProfileFailed) {
-                  showSnackBar(
-                      buildContext: context,
-                      message:
-                          Localizations.localeOf(context).languageCode == 'ar'
-                              ? stateUpdate.error!.ar!
-                              : stateUpdate.error!.en!);
-                } else if (stateUpdate is UpdateProfileSuccess) {
-                  BlocProvider.of<GetUserProfileBloc>(context)
-                      .add(GetUserProfileEvent());
-                  pop(context);
-                }
-              },
-              builder: (BuildContext context, UpdateProfileState stateUpdate) {
-                if (stateUpdate is UpdateProfileLoading) {
-                  return const LoadingWidget();
-                }
-                return ButtonsShared(
-                    onPressed: () {
-                      validationSaveButton();
-                    },
-                    text: translate(AppStrings.save));
-              },
-            ),
-          ]),
-        ),
+          const SizedBox(height: KSpace.xxl),
+          BlocConsumer<UpdateProfileBloc, UpdateProfileState>(
+            listener: (BuildContext context, UpdateProfileState stateUpdate) {
+              if (stateUpdate is UpdateProfileFailed) {
+                showSnackBar(
+                  buildContext: context,
+                  message: Localizations.localeOf(context).languageCode == 'ar'
+                      ? stateUpdate.error!.ar!
+                      : stateUpdate.error!.en!,
+                );
+              } else if (stateUpdate is UpdateProfileSuccess) {
+                BlocProvider.of<GetUserProfileBloc>(
+                  context,
+                ).add(GetUserProfileEvent());
+                pop(context);
+              }
+            },
+            builder: (BuildContext context, UpdateProfileState stateUpdate) {
+              return KButton(
+                label: translate(AppStrings.save),
+                loading: stateUpdate is UpdateProfileLoading,
+                onPressed: validationSaveButton,
+              );
+            },
+          ),
+        ],
       ),
     );
   }

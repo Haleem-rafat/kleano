@@ -1,329 +1,162 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_status_chip.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/profile/data/models/promo_code_model.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/promo_codes/pormo_codes_screen.dart';
 import 'package:thewasher/modules/profile/widgets/button_use_promo.dart';
 
-class PromoContainerWidget extends StatefulWidget {
+class PromoContainerWidget extends StatelessWidget {
   final PromoCodeModel promoCodeModel;
   final String type;
   final bool isVisible;
   final bool isHighlighted;
-  const PromoContainerWidget(
-      {super.key,
-      required this.type,
-      required this.promoCodeModel,
-      required this.isVisible,
-      this.isHighlighted = false});
+  const PromoContainerWidget({
+    super.key,
+    required this.type,
+    required this.promoCodeModel,
+    required this.isVisible,
+    this.isHighlighted = false,
+  });
 
-  @override
-  State<PromoContainerWidget> createState() => _PromoContainerWidgetState();
-}
+  bool get _isFixed => promoCodeModel.discountFixedNumber != null;
 
-class _PromoContainerWidgetState extends State<PromoContainerWidget> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  // Helper method to get the appropriate discount value and type
-  Map<String, dynamic> getDiscountInfo() {
-    if (widget.promoCodeModel.discountFixedNumber != null) {
-      return {
-        'value': widget.promoCodeModel.discountFixedNumber!,
-        'type': 'fixed',
-        'displayText': '${widget.promoCodeModel.discountFixedNumber}',
-        'showSvg': true
-      };
-    } else if (widget.promoCodeModel.discountPercentage != null) {
-      return {
-        'value': widget.promoCodeModel.discountPercentage!,
-        'type': 'percentage',
-        'displayText': '${widget.promoCodeModel.discountPercentage} %'
-      };
-    } else {
-      return {
-        'value': 0,
-        'type': 'none',
-        'displayText': translate(AppStrings.promoTitle)
-      };
+  String get _discountText {
+    if (_isFixed) return '${promoCodeModel.discountFixedNumber}';
+    if (promoCodeModel.discountPercentage != null) {
+      return '${promoCodeModel.discountPercentage} %';
     }
+    return translate(AppStrings.promoTitle);
   }
+
+  bool get _hasDiscount =>
+      _isFixed || promoCodeModel.discountPercentage != null;
 
   @override
   Widget build(BuildContext context) {
-    final discountInfo = getDiscountInfo();
-    final bool highlight = widget.isHighlighted;
+    final KColors c = KColors.of(context);
+    final bool expired = type == PromoCodeTypes.expired.name;
+    final Color accent = expired ? c.error : c.brand;
 
-    Color resolveTypeColor() {
-      if (widget.type == PromoCodeTypes.expired.name) {
-        return ColorManager.red;
-      } else if (widget.type == PromoCodeTypes.used.name) {
-        return ColorManager.darkGrey;
-      }
-      return ColorManager.primary;
-    }
+    Widget riyal(double size) => SvgPicture.asset(
+      AssetsManager.saudiRiyalSymbol,
+      height: size,
+      width: size,
+      colorFilter: ColorFilter.mode(accent, BlendMode.srcIn),
+    );
 
-    final Color typeColor = resolveTypeColor();
-    final Color borderColor =
-        highlight ? ColorManager.primary : typeColor.withValues(alpha: 0.7);
-    final List<BoxShadow> boxShadows = highlight
-        ? <BoxShadow>[
-            BoxShadow(
-              color: ColorManager.primary.withValues(alpha: .2),
-              blurRadius: 18.r,
-              offset: const Offset(0, 8),
-            ),
-          ]
-        : <BoxShadow>[
-            BoxShadow(
-              color: widget.type == PromoCodeTypes.active.name ||
-                      widget.type == PromoCodeTypes.used.name
-                  ? ColorManager.primary.withValues(alpha: .08)
-                  : ColorManager.black.withValues(alpha: .05),
-              blurRadius: 8.r,
-              offset: const Offset(0, 4),
-            ),
-          ];
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 24.w),
-      decoration: BoxDecoration(
-        color: highlight
-            ? ColorManager.primary.withValues(alpha: 0.05)
-            : ColorManager.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(
-          color: borderColor,
-          width: highlight ? 2 : 1,
+    return DecoratedBox(
+      position: DecorationPosition.foreground,
+      decoration: ShapeDecoration(
+        shape: KRadius.shape(
+          BorderRadius.circular(KRadius.card),
+          side: isHighlighted
+              ? BorderSide(color: c.brand, width: 2)
+              : BorderSide.none,
         ),
-        boxShadow: boxShadows,
       ),
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          if (widget.isVisible) ...[
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                color: ColorManager.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8.r),
-                border: Border.all(
-                  color: ColorManager.primary.withValues(alpha: 0.3),
-                  width: 1.5,
+      child: KCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (isVisible) ...<Widget>[
+              DecoratedBox(
+                decoration: ShapeDecoration(
+                  color: c.brandTint,
+                  shape: KRadius.shape(BorderRadius.circular(KRadius.field)),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.local_offer_outlined,
-                    size: 16.sp,
-                    color: ColorManager.primary,
-                  ),
-                  8.horizontalSpace,
-                  Expanded(
-                    child: Text(
-                      widget.promoCodeModel.code ?? "",
-                      style: AppStyles.body14Medium.copyWith(
-                        color: ColorManager.primary,
-                        letterSpacing: 1.2,
-                        fontWeight: FontWeight.bold,
+                child: Padding(
+                  padding: const EdgeInsets.all(KSpace.m),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.local_offer_outlined,
+                        size: 18,
+                        color: c.onBrandTint,
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            12.ph,
-          ],
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          "${discountInfo['displayText']} ",
-                          style: AppStyles.title16Bold.copyWith(
-                            color: widget.type == PromoCodeTypes.active.name ||
-                                    widget.type == PromoCodeTypes.used.name
-                                ? ColorManager.primary
-                                : widget.type == PromoCodeTypes.used.name
-                                    ? ColorManager.darkGrey
-                                    : ColorManager.red,
+                      const SizedBox(width: KSpace.s),
+                      Expanded(
+                        child: Text(
+                          promoCodeModel.code ?? '',
+                          style: KType.headline.copyWith(
+                            color: c.onBrandTint,
+                            letterSpacing: 1.2,
                           ),
                         ),
-                        if (discountInfo['showSvg'] == true)
-                          SvgPicture.asset(
-                            AssetsManager.saudiRiyalSymbol,
-                            height: 16.h,
-                            width: 16.w,
-                            colorFilter: ColorFilter.mode(widget.type == PromoCodeTypes.active.name ||
-                                    widget.type == PromoCodeTypes.used.name
-                                ? ColorManager.primary
-                                : widget.type == PromoCodeTypes.used.name
-                                    ? ColorManager.darkGrey
-                                    : ColorManager.red, BlendMode.srcIn),
-                          ),
-                        if (discountInfo['type'] != 'none')
-                          Text(
-                            " ${translate(AppStrings.promoTitle)}",
-                            style: AppStyles.body14Medium
-                                .copyWith(color: ColorManager.black),
-                          ),
-                      ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: KSpace.m),
+            ],
+            Row(
+              children: <Widget>[
+                Expanded(
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: KSpace.xs,
+                    children: <Widget>[
+                      Text(
+                        _discountText,
+                        style: KType.title.copyWith(color: accent),
+                      ),
+                      if (_isFixed) riyal(20),
+                      if (_hasDiscount)
+                        Text(
+                          translate(AppStrings.promoTitle),
+                          style: KType.subhead.copyWith(color: c.text),
+                        ),
+                    ],
+                  ),
+                ),
+                if (!expired) ...<Widget>[
+                  const SizedBox(width: KSpace.s),
+                  ButtonUsePromoCode(promoCodeModel: promoCodeModel),
+                ],
+              ],
+            ),
+            if (promoCodeModel.numberOfUses != null) ...<Widget>[
+              const SizedBox(height: KSpace.s),
+              KStatusChip(
+                label:
+                    '${translate(AppStrings.used)}: ${promoCodeModel.numberOfUses}',
+                status: expired
+                    ? KStatus.error
+                    : type == PromoCodeTypes.used.name
+                    ? KStatus.neutral
+                    : KStatus.brand,
+              ),
+            ],
+            if (promoCodeModel.expiryDate != null) ...<Widget>[
+              const SizedBox(height: KSpace.s),
+              Text.rich(
+                TextSpan(
+                  style: KType.footnote.copyWith(color: c.textSecondary),
+                  children: <InlineSpan>[
+                    TextSpan(
+                      text: '${translate(AppStrings.validUp)} $_discountText ',
+                    ),
+                    if (_isFixed)
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.middle,
+                        child: riyal(12),
+                      ),
+                    TextSpan(
+                      text: type == PromoCodeTypes.used.name
+                          ? ' ${promoCodeModel.expiryDate!}'
+                          : ' ${translate(AppStrings.expiresDate)} ${promoCodeModel.expiryDate!}',
                     ),
                   ],
                 ),
               ),
-              if (widget.type == PromoCodeTypes.active.name ||
-                  widget.type == PromoCodeTypes.used.name)
-                ButtonUsePromoCode(
-                  promoCodeModel: widget.promoCodeModel,
-                ),
             ],
-          ),
-          10.ph,
-          // Display number of uses
-          if (widget.promoCodeModel.numberOfUses != null) ...[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: widget.type == PromoCodeTypes.active.name
-                    ? ColorManager.primary.withValues(alpha: 0.1)
-                    : widget.type == PromoCodeTypes.used.name
-                        ? ColorManager.darkGrey.withValues(alpha: 0.1)
-                        : ColorManager.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.confirmation_number_outlined,
-                    size: 12.sp,
-                    color: widget.type == PromoCodeTypes.active.name
-                        ? ColorManager.primary
-                        : widget.type == PromoCodeTypes.used.name
-                            ? ColorManager.darkGrey
-                            : ColorManager.red,
-                  ),
-                  4.horizontalSpace,
-                  Text(
-                    "${translate(AppStrings.used)}: ${widget.promoCodeModel.numberOfUses}",
-                    style: AppStyles.caption12Regular.copyWith(
-                      color: widget.type == PromoCodeTypes.active.name
-                          ? ColorManager.primary
-                          : widget.type == PromoCodeTypes.used.name
-                              ? ColorManager.darkGrey
-                              : ColorManager.red,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            8.ph,
           ],
-          if (widget.promoCodeModel.expiryDate != null) ...[
-            8.ph,
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-              decoration: BoxDecoration(
-                color: widget.type == PromoCodeTypes.active.name
-                    ? ColorManager.primary.withValues(alpha: 0.1)
-                    : widget.type == PromoCodeTypes.used.name
-                        ? ColorManager.darkGrey.withValues(alpha: 0.1)
-                        : ColorManager.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(6.r),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.schedule,
-                    size: 12.sp,
-                    color: widget.type == PromoCodeTypes.active.name
-                        ? ColorManager.primary
-                        : widget.type == PromoCodeTypes.used.name
-                            ? ColorManager.darkGrey
-                            : ColorManager.red,
-                  ),
-                  4.horizontalSpace,
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text:
-                                "${translate(AppStrings.validUp)} ${discountInfo['displayText']} ",
-                            style: AppStyles.caption12Regular.copyWith(
-                              color: widget.type ==
-                                          PromoCodeTypes.active.name ||
-                                      widget.type == PromoCodeTypes.used.name
-                                  ? ColorManager.primary
-                                  : widget.type == PromoCodeTypes.used.name ||
-                                          widget.type ==
-                                              PromoCodeTypes.active.name
-                                      ? ColorManager.darkGrey
-                                      : ColorManager.red,
-                            ),
-                          ),
-                          if (discountInfo['showSvg'] == true)
-                            WidgetSpan(
-                              child: SvgPicture.asset(
-                                AssetsManager.saudiRiyalSymbol,
-                                height: 12.h,
-                                width: 12.w,
-                                colorFilter: ColorFilter.mode(widget.type ==
-                                            PromoCodeTypes.active.name ||
-                                        widget.type == PromoCodeTypes.used.name
-                                    ? ColorManager.primary
-                                    : widget.type == PromoCodeTypes.used.name
-                                        ? ColorManager.darkGrey
-                                        : ColorManager.red, BlendMode.srcIn),
-                              ),
-                            ),
-                          TextSpan(
-                            text: widget.type == PromoCodeTypes.active.name
-                                ? " ${translate(AppStrings.expiresDate)} ${widget.promoCodeModel.expiryDate!}"
-                                : widget.type == PromoCodeTypes.used.name
-                                    ? " ${widget.promoCodeModel.expiryDate!}"
-                                    : " ${translate(AppStrings.expiresDate)} ${widget.promoCodeModel.expiryDate!}",
-                            style: AppStyles.caption12Regular.copyWith(
-                              color: widget.type ==
-                                          PromoCodeTypes.active.name ||
-                                      widget.type == PromoCodeTypes.used.name
-                                  ? ColorManager.primary
-                                  : widget.type == PromoCodeTypes.used.name ||
-                                          widget.type ==
-                                              PromoCodeTypes.active.name
-                                      ? ColorManager.darkGrey
-                                      : ColorManager.red,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
+        ),
       ),
     );
   }

@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_translate/flutter_translate.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/my_booking/widgets/empty_services_and_addons.dart';
 import 'package:thewasher/modules/notifications/blocs/notifications/notifications_bloc.dart';
+import 'package:thewasher/modules/notifications/widgets/loading_and_listen_when_get_order.dart';
 import 'package:thewasher/modules/notifications/widgets/notifications_list.dart';
-import 'package:thewasher/shared/components/connection_error/connection_error_screen.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/smart_refresh.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
@@ -58,34 +59,53 @@ class _AllNotificationsState extends State<AllNotifications> {
           refreshController.requestRefresh();
           showSnackBar(
             buildContext: context,
-            message: Localizations.localeOf(context).languageCode == 'en' ? state.errorModel!.en! : state.errorModel!.ar!,
+            message: Localizations.localeOf(context).languageCode == 'en'
+                ? state.errorModel!.en!
+                : state.errorModel!.ar!,
           );
         } else if (state is ReadNotificationSuccess) {
-          sl<NotificationsBloc>().add(FetchAllNotifications(
-            isRefresh: false,
-          ));
+          sl<NotificationsBloc>().add(FetchAllNotifications(isRefresh: false));
         }
       },
       builder: (BuildContext context, NotificationsState state) {
         if (state is NotificationsLoading) {
-          return const LoadingWidget();
+          return const KLoadingState();
         } else if (state is NotificationsConnectionError) {
-          return Center(
-            child: ConnectionErrorSharedScreen(onPressed: _getNotifications),
+          return KErrorState(
+            message: translate('somethingWentWrong'),
+            onRetry: _getNotifications,
           );
         }
-        return SmartRefresherCustomWidget(
-          refreshController: refreshController,
-          onLoading: _getNotificationsPerPage,
-          onRefresh: _getNotifications,
-          child: notificationsBloc.notifacations.isNotEmpty
-              ? const NotificationsList()
-              : const Center(
-                  child: EmptyScreen(
-                    image: AssetsManager.notificationsEmpty,
-                    text: AppStrings.thereIsNoNotifivationsYet,
-                  ),
-                ),
+        final bool hasNotifications =
+            notificationsBloc.notifacations.isNotEmpty;
+        return Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            SmartRefresherCustomWidget(
+              refreshController: refreshController,
+              onLoading: _getNotificationsPerPage,
+              onRefresh: _getNotifications,
+              // The list must be the refresher's direct child to stay lazy.
+              child: hasNotifications
+                  ? buildNotificationsList(
+                      context: context,
+                      notificationsBloc: notificationsBloc,
+                      onCompletedOrderChanged: (bool completed) {
+                        setState(() {
+                          generalSingleton.completedOrder = completed;
+                        });
+                      },
+                    )
+                  : const Center(
+                      child: EmptyScreen(
+                        image: AssetsManager.notificationsEmpty,
+                        text: AppStrings.thereIsNoNotifivationsYet,
+                      ),
+                    ),
+            ),
+            if (hasNotifications && !generalSingleton.completedOrder)
+              LoadingAndListenWhenGetOrder(),
+          ],
         );
       },
     );

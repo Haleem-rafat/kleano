@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/notifications/data/models/notifaction_model.dart';
 import 'package:thewasher/modules/notifications/screens/methods/select_notification_type.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
@@ -15,9 +13,11 @@ class NotificationCard extends StatefulWidget {
   const NotificationCard({
     super.key,
     required this.notification,
+    required this.onTap,
   });
 
   final Notifications notification;
+  final VoidCallback onTap;
 
   @override
   State<NotificationCard> createState() => _NotificationCardState();
@@ -66,6 +66,7 @@ class _NotificationCardState extends State<NotificationCard> {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     final languageCode = Localizations.localeOf(context).languageCode;
     final isPromoCode = widget.notification.type == AppConstants.promoCodeBased;
 
@@ -80,131 +81,90 @@ class _NotificationCardState extends State<NotificationCard> {
         bodyText = _maskPromoCode(bodyText, promoCode, languageCode);
       }
     }
-    return Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-      Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+    return KCard(
+      onTap: widget.onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
-                height: AppSize.s6.h,
-                width: AppSize.s6.w,
-                child: !widget.notification.isRead!
-                    ? CircleAvatar(
-                        radius: 3.5.r,
-                        backgroundColor: ColorManager.darkPrimary,
-                      )
-                    : null,
+              SvgPicture.asset(
+                getImageNotificationType(widget.notification.type!),
               ),
-              AppPadding.p8.pw,
-              SizedBox(
-                child: SvgPicture.asset(
-                  getImageNotificationType(widget.notification.type!),
-                  fit: BoxFit.cover,
+              const SizedBox(width: KSpace.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      languageCode == 'en'
+                          ? widget.notification.message!.enTitle!
+                          : widget.notification.message!.arTitle!,
+                      style: KType.headline.copyWith(color: c.text),
+                    ),
+                    const SizedBox(height: KSpace.xs),
+                    Text(
+                      bodyText,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 2,
+                      style: KType.subhead.copyWith(color: c.textSecondary),
+                    ),
+                    if (isPromoCode && promoCode.isNotEmpty)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          KButton(
+                            label: _isPromoCodeVisible
+                                ? (languageCode == 'en' ? 'Hide' : 'إخفاء')
+                                : (languageCode == 'en' ? 'Show' : 'عرض'),
+                            variant: KButtonVariant.text,
+                            expand: false,
+                            onPressed: () {
+                              setState(() {
+                                _isPromoCodeVisible = !_isPromoCodeVisible;
+                              });
+                            },
+                          ),
+                          if (_isPromoCodeVisible)
+                            KButton(
+                              label: languageCode == 'en' ? 'Copy' : 'نسخ',
+                              variant: KButtonVariant.text,
+                              expand: false,
+                              onPressed: () => _copyPromoCode(promoCode),
+                            ),
+                        ],
+                      ),
+                  ],
                 ),
               ),
+              if (!widget.notification.isRead!) ...<Widget>[
+                const SizedBox(width: KSpace.s),
+                Padding(
+                  padding: const EdgeInsets.only(top: KSpace.xs),
+                  child: DecoratedBox(
+                    decoration: ShapeDecoration(
+                      color: c.brand,
+                      shape: const CircleBorder(),
+                    ),
+                    child: const SizedBox.square(dimension: KSpace.s),
+                  ),
+                ),
+              ],
             ],
           ),
-          AppPadding.p11.pw,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  languageCode == 'en'
-                      ? widget.notification.message!.enTitle!
-                      : widget.notification.message!.arTitle!,
-                  style: AppStyles.caption12Medium.copyWith(
-                    color: ColorManager.darkGrey,
-                  ),
-                ),
-                AppPadding.p2.ph,
-                Text(
-                  bodyText,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  style: AppStyles.caption12Regular.copyWith(
-                    color: ColorManager.darkGrey,
-                  ),
-                ),
-                if (isPromoCode && promoCode.isNotEmpty) ...[
-                  AppPadding.p4.ph,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _isPromoCodeVisible = !_isPromoCodeVisible;
-                          });
-                        },
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              _isPromoCodeVisible
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
-                              size: 14.sp,
-                              color: ColorManager.darkPrimary,
-                            ),
-                            SizedBox(width: 4.w),
-                            Text(
-                              _isPromoCodeVisible
-                                  ? (languageCode == 'en' ? 'Hide' : 'إخفاء')
-                                  : (languageCode == 'en' ? 'Show' : 'عرض'),
-                              style: AppStyles.caption12Regular.copyWith(
-                                color: ColorManager.darkPrimary,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      if (_isPromoCodeVisible) ...[
-                        SizedBox(width: 8.w),
-                        InkWell(
-                          onTap: () => _copyPromoCode(promoCode),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.copy,
-                                size: 14.sp,
-                                color: ColorManager.darkPrimary,
-                              ),
-                              SizedBox(width: 4.w),
-                              Text(
-                                languageCode == 'en' ? 'Copy' : 'نسخ',
-                                style: AppStyles.caption12Regular.copyWith(
-                                  color: ColorManager.darkPrimary,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ],
+          const SizedBox(height: KSpace.xs),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: Text(
+              widget.notification.createdAt! == widget.notification.timeNow
+                  ? widget.notification.createdAtByTime!
+                  : widget.notification.createdAt!,
+              style: KType.footnote.copyWith(color: c.textSecondary),
             ),
-          )
+          ),
         ],
       ),
-      Align(
-        alignment:
-            languageCode == 'en' ? Alignment.centerRight : Alignment.centerLeft,
-        child: Text(
-          widget.notification.createdAt! == widget.notification.timeNow
-              ? widget.notification.createdAtByTime!
-              : widget.notification.createdAt!,
-          style: AppStyles.captionGray12Medium.copyWith(
-            fontSize: 10.sp,
-          ),
-        ),
-      ),
-    ]);
+    );
   }
 }

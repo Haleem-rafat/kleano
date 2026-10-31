@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/color_model.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
+/// A vehicle: its photo above solid details, with a brand outline when
+/// selected.
 class VehiclesCard extends StatelessWidget {
   final int index;
   final int selectedColor;
@@ -21,127 +22,111 @@ class VehiclesCard extends StatelessWidget {
     this.cardWidth,
   });
 
+  static const double _height = 200;
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     final vehicle = sl<VehiclesBloc>().vehiclesList[index];
     final bool isSelected =
         sl<VehiclesBloc>().selectedVehicle.sId == vehicle.sId;
+    final TextStyle label = KType.footnote.copyWith(color: c.textSecondary);
+    final TextStyle value = KType.footnote.copyWith(
+      color: c.text,
+      fontWeight: FontWeight.w600,
+    );
 
-    return Container(
-      width: cardWidth ?? 323.w,
-      height: 180.h,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(15.r),
-        border: Border.all(
-          color: isSelected ? ColorManager.secondary : Colors.transparent,
-          width: 2.w,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: ColorManager.black2.withValues(alpha: 0.1),
-            offset: const Offset(0, 4),
-            blurRadius: 8,
+    return SizedBox(
+      width: cardWidth,
+      height: _height,
+      child: DecoratedBox(
+        position: DecorationPosition.foreground,
+        decoration: ShapeDecoration(
+          shape: KRadius.shape(
+            BorderRadius.circular(KRadius.card),
+            side: isSelected
+                ? BorderSide(color: c.brand, width: 2)
+                : BorderSide.none,
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(15.r),
-        child: Stack(
-          children: [
-            // Background Image
-            vehicle.imageLink!.isEmpty
-                ? Container(
-                    color: ColorManager.black2.withValues(alpha: 0.1),
-                    child: const Center(
-                      child: Icon(Icons.directions_car,
-                          size: 50, color: Colors.grey),
+        ),
+        child: KCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                child: vehicle.imageLink!.isEmpty
+                    ? ColoredBox(
+                        color: c.fill,
+                        child: Center(
+                          child: Icon(
+                            Icons.directions_car,
+                            size: 48,
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      )
+                    : ImageShared(
+                        image: vehicle.imageLink!,
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(KSpace.m),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      '${vehicle.brand} ${vehicle.model}',
+                      style: KType.headline.copyWith(color: c.text),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  )
-                : ImageShared(
-                    image: vehicle.imageLink!,
-                    width: double.infinity,
-                    height: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
-
-            // Gradient overlay
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.center,
-                  colors: [
-                    Colors.black.withValues(alpha: 0.7),
-                    Colors.black.withValues(alpha: 0.0),
+                    const SizedBox(height: KSpace.xs),
+                    Row(
+                      children: <Widget>[
+                        Text(translate(AppStrings.plateNo), style: label),
+                        const SizedBox(width: KSpace.xs),
+                        Flexible(
+                          child: Text(
+                            vehicle.plateNumber ?? '',
+                            style: value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: KSpace.m),
+                        Text(translate(AppStrings.color), style: label),
+                        const SizedBox(width: KSpace.xs),
+                        DecoratedBox(
+                          decoration: ShapeDecoration(
+                            color: colorList[selectedColor].color,
+                            shape: CircleBorder(
+                              side: selectedColor == 0
+                                  ? BorderSide(color: c.separator)
+                                  : BorderSide.none,
+                            ),
+                          ),
+                          child: const SizedBox.square(dimension: KSpace.m),
+                        ),
+                        const SizedBox(width: KSpace.xs),
+                        Flexible(
+                          child: Text(
+                            vehicle.color ?? '',
+                            style: value,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
-            ),
-
-            // Details
-            Positioned(
-              left: 16.w,
-              right: 16.w,
-              bottom: 12.h,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "${vehicle.brand} ${vehicle.model}",
-                    style: AppStyles.body14Medium.copyWith(
-                      color: Colors.white,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(height: 6.h),
-                  Row(
-                    children: [
-                      Text(
-                        translate(AppStrings.plateNo),
-                        style: AppStyles.caption12Regular
-                            .copyWith(color: Colors.white70),
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        vehicle.plateNumber ?? '',
-                        style: AppStyles.caption12Medium
-                            .copyWith(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      Text(
-                        translate(AppStrings.color),
-                        style: AppStyles.caption12Regular
-                            .copyWith(color: Colors.white70),
-                      ),
-                      SizedBox(width: 6.w),
-                      Container(
-                        height: 12.h,
-                        width: 12.w,
-                        decoration: BoxDecoration(
-                          color: colorList[selectedColor].color,
-                          border: selectedColor == 0
-                              ? Border.all(color: Colors.white)
-                              : null,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: 6.w),
-                      Text(
-                        vehicle.color ?? '',
-                        style: AppStyles.caption12Medium
-                            .copyWith(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

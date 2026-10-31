@@ -1,50 +1,41 @@
-import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_status_chip.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/shared/singleton.dart';
 
-Tuple4<Color, String ,Color, int> getStepData(String status) {
-  final map = {
-    AppConstants.acceptedByBiker: Tuple4(
-      const Color.fromRGBO(111, 251, 76, 0.1),
-      translate(AppStrings.accepted),
-      const Color.fromRGBO(28, 127, 84, 1),
-      GeneralSingleton().step = -1,
-    ),
-    AppConstants.bikerOnTheWay: Tuple4(
-      const Color.fromRGBO(103, 135, 198, 0.1),
-      translate(AppStrings.onTheWay),
-      const Color.fromRGBO(225, 111, 0, 1),
-      GeneralSingleton().step = 0,
-    ),
-    AppConstants.bikerArrived: Tuple4(
-      const Color.fromRGBO(251, 174, 76, 0.1),
-      translate(AppStrings.arrived),
-      ColorManager.darkGrey,
-      GeneralSingleton().step = 1,
-    ),
-    AppConstants.onWashing: Tuple4(
-      const Color.fromRGBO(255, 228, 54, 0.1),
-      translate(AppStrings.inProgress),
-      ColorManager.darkGrey,
-      GeneralSingleton().step = 2,
+typedef StepData = ({String label, KStatus chip, int step});
 
-    ),
-    AppConstants.completed: Tuple4(
-      const Color.fromRGBO(245, 240, 250, 1),
-      translate(AppStrings.ended),
-      ColorManager.divider,
-      GeneralSingleton().step = 3,
-    ),
-  };
-  return map[status] ?? Tuple4(
-       ColorManager.divider,
-      translate(AppStrings.biker),
-      ColorManager.divider,
-      GeneralSingleton().step = -1,
+StepData getStepData(String status) {
+  if (status == AppConstants.acceptedByBiker) {
+    return (
+      label: translate(AppStrings.accepted),
+      chip: KStatus.brand,
+      step: -1,
     );
-  // return map.containsKey(status) ? map[status] : Tuple2(ColorManager.divider, translate(AppStrings.biker));
+  }
+  if (status == AppConstants.bikerOnTheWay) {
+    return (
+      label: translate(AppStrings.onTheWay),
+      chip: KStatus.warning,
+      step: 0,
+    );
+  }
+  if (status == AppConstants.bikerArrived) {
+    return (
+      label: translate(AppStrings.arrived),
+      chip: KStatus.warning,
+      step: 1,
+    );
+  }
+  if (status == AppConstants.onWashing) {
+    return (
+      label: translate(AppStrings.inProgress),
+      chip: KStatus.warning,
+      step: 2,
+    );
+  }
+  if (status == AppConstants.completed) {
+    return (label: translate(AppStrings.ended), chip: KStatus.success, step: 3);
+  }
+  return (label: translate(AppStrings.biker), chip: KStatus.neutral, step: -1);
 }

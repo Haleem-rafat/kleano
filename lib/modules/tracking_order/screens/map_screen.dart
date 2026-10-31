@@ -1,11 +1,10 @@
 import 'package:thewasher/core/utilis/marker_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 // import 'package:google_map_polyline_new/google_map_polyline_new.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
 import 'package:thewasher/modules/tracking_order/blocs/socket_bloc.dart';
 import 'package:thewasher/utilties/map_style.dart';
@@ -37,28 +36,40 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    bikerLocation =
-        LatLng(widget.bikerLocation.latitude, widget.bikerLocation.longitude);
-    orderLocation =
-        LatLng(widget.orderLocation.latitude!, widget.orderLocation.longitude!);
+    bikerLocation = LatLng(
+      widget.bikerLocation.latitude,
+      widget.bikerLocation.longitude,
+    );
+    orderLocation = LatLng(
+      widget.orderLocation.latitude!,
+      widget.orderLocation.longitude!,
+    );
 
     socketBloc = BlocProvider.of<SocketBloc>(context)
       ..stream.listen((SocketState socketState) {
         if (socketState is ReceivedAnUpdateBikerOnTheWayState) {
-          bikerLocation = LatLng(socketState.cameraPosition!.target.latitude,
-              socketState.cameraPosition!.target.longitude);
+          bikerLocation = LatLng(
+            socketState.cameraPosition!.target.latitude,
+            socketState.cameraPosition!.target.longitude,
+          );
           setState(() {
             _polylines.clear();
             _markers.clear();
-            setPolyline(LatLng(socketState.cameraPosition!.target.latitude,
-                socketState.cameraPosition!.target.longitude));
-            _polylines.add(Polyline(
-              polylineId: const PolylineId('polyline'),
-              points: routes,
-              width: 3,
-              color: ColorManager.darkGrey,
-              patterns: [PatternItem.dash(15), PatternItem.gap(5)],
-            ));
+            setPolyline(
+              LatLng(
+                socketState.cameraPosition!.target.latitude,
+                socketState.cameraPosition!.target.longitude,
+              ),
+            );
+            _polylines.add(
+              Polyline(
+                polylineId: const PolylineId('polyline'),
+                points: routes,
+                width: 3,
+                color: KColors.of(context).brand,
+                patterns: [PatternItem.dash(15), PatternItem.gap(5)],
+              ),
+            );
             _markers.add(
               Marker(
                 markerId: const MarkerId("currentLocation"),
@@ -89,13 +100,15 @@ class _MapScreenState extends State<MapScreen> {
       //   destination: latLng,
       //   mode: RouteMode.driving,
       // ))!;
-      _polylines.add(Polyline(
-        polylineId: const PolylineId('polyline'),
-        points: routes,
-        width: 3,
-        color: ColorManager.darkGrey,
-        patterns: [PatternItem.dash(15), PatternItem.gap(5)],
-      ));
+      _polylines.add(
+        Polyline(
+          polylineId: const PolylineId('polyline'),
+          points: routes,
+          width: 3,
+          color: KColors.of(context).brand,
+          patterns: [PatternItem.dash(15), PatternItem.gap(5)],
+        ),
+      );
       setState(() {});
     } catch (error) {
       debugPrint("Error fetching polyline: $error");
@@ -110,18 +123,22 @@ class _MapScreenState extends State<MapScreen> {
 
   Future<void> addMarker() async {
     markerCurrentLocation = await MarkerIcon.svgAsset(
-        assetName: AssetsManager.currentLocationPin,
-        context: context,
-        size: 30.w);
-//     markerCurrentLocation = await BitmapDescriptor.fromAssetImage(
-//   ImageConfiguration(size: Size(80, 80)),
-//   AssetsManager.locationPin,
-// );
+      assetName: AssetsManager.currentLocationPin,
+      context: context,
+      size: 30,
+    );
+    //     markerCurrentLocation = await BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(size: Size(80, 80)),
+    //   AssetsManager.locationPin,
+    // );
     // MarkerIcon.pictureAsset (assetName: AssetsManager.currentLocationPin, context: context, size: 47.w);
 
     if (!mounted) return;
     markerDestinationLocation = await MarkerIcon.svgAsset(
-        assetName: AssetsManager.bikerPin, context: context, size: 30);
+      assetName: AssetsManager.bikerPin,
+      context: context,
+      size: 30,
+    );
     setState(() {
       _markers.add(
         Marker(

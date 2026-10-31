@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SocialWidget extends StatelessWidget {
@@ -18,14 +19,15 @@ class SocialWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: icon,
-      title: Text(
-        titleSocial,
-        style: AppStyles.title16Regular,
+    return KListRow(
+      leading: IconTheme.merge(
+        data: IconThemeData(color: KColors.of(context).brand),
+        child: icon,
       ),
+      title: titleSocial,
+      showChevron: true,
       onTap: () =>
-          isPhone == true ? launchURL("https://wa.me/$url") : launchURL(url),
+          isPhone == true ? launchURL('https://wa.me/$url') : launchURL(url),
     );
   }
 

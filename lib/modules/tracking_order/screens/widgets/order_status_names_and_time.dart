@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/modules/tracking_order/screens/widgets/events_stepper.dart';
 
 class OrderStutesNamesAndTime extends StatelessWidget {
   const OrderStutesNamesAndTime({
@@ -16,44 +14,34 @@ class OrderStutesNamesAndTime extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 330.h,
-      width: 200.w,
-      child: ListView.separated(
-        itemCount: 4,
-        padding: EdgeInsets.zero,
-        scrollDirection: Axis.vertical,
-        physics: const NeverScrollableScrollPhysics(),
-        separatorBuilder: (_, index) {
-          return 45.ph;
-        },
-        itemBuilder: (_, int index) {
-          return SizedBox(
-            height: 38.h,
+    final KColors c = KColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        for (int index = 0; index < EventsStepper.stepCount; index++)
+          SizedBox(
+            height: EventsStepper.rowHeight,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+              children: <Widget>[
                 Text(
                   bikerStatesName[index],
-                  style: AppStyles.caption12Regular.copyWith(
-                    color: ColorManager.darkGrey,
-                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: KType.subhead.copyWith(color: c.text),
                 ),
                 Expanded(
                   child: Text(
                     estimatedTimeBikerStates[index],
                     overflow: TextOverflow.ellipsis,
                     maxLines: 2,
-                    style: AppStyles.caption12Regular.copyWith(
-                      color: ColorManager.medGray,
-                    ),
+                    style: KType.footnote.copyWith(color: c.textSecondary),
                   ),
                 ),
               ],
             ),
-          );
-        },
-      ),
+          ),
+      ],
     );
   }
 }

@@ -2,19 +2,16 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
+import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactBiker extends StatelessWidget {
   final String phoneBiker;
-  const ContactBiker({
-    super.key,
-    required this.phoneBiker,
-  });
+  const ContactBiker({super.key, required this.phoneBiker});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +31,10 @@ class ContactBiker extends StatelessWidget {
     }
 
     void openWhatsApp() async {
-      final String phone =
-          phoneBiker.replaceAll('+', '').replaceAll(' ', '').trim();
+      final String phone = phoneBiker
+          .replaceAll('+', '')
+          .replaceAll(' ', '')
+          .trim();
 
       // Ensure the phone number starts with country code
       String whatsappNumber = phone.startsWith('966') ? phone : '966$phone';
@@ -50,23 +49,28 @@ class ContactBiker extends StatelessWidget {
     }
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        GestureDetector(
-          onTap: callNumber,
-          child: SvgPicture.asset(
+        IconButton(
+          tooltip: translate(AppStrings.phoneNumber),
+          onPressed: callNumber,
+          icon: SvgPicture.asset(
             AssetsManager.phoneIcon,
-            height: 34.h,
-            width: 34.w,
+            height: 34,
+            width: 34,
           ),
         ),
-        AppPadding.p16.pw,
-        GestureDetector(
-          onTap: openWhatsApp,
-          child: SvgPicture.asset(
+        IconButton(
+          tooltip: 'WhatsApp',
+          onPressed: openWhatsApp,
+          icon: SvgPicture.asset(
             AssetsManager.whatsappIcon,
-            height: 22.h,
-            width: 22.w,
-            colorFilter: ColorFilter.mode(const Color(0xFF25D366), BlendMode.srcIn),
+            height: KSpace.xxl,
+            width: KSpace.xxl,
+            colorFilter: ColorFilter.mode(
+              KColors.of(context).success,
+              BlendMode.srcIn,
+            ),
           ),
         ),
       ],

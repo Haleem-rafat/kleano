@@ -163,7 +163,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
           children: [
             _title(translate(AppStrings.selectYourCar)),
             SizedBox(
-              height: 120,
+              height: 212,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 itemCount: sl<VehiclesBloc>().vehiclesList.length,

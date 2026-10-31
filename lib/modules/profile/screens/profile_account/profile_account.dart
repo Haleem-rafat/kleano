@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/data/models/profile_user.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/change_personal_information/change_personal_info.dart';
@@ -15,14 +15,10 @@ import 'package:thewasher/modules/profile/screens/profile_account/edit_phone_num
 import 'package:thewasher/modules/profile/widgets/edit_profile/info_user_profile.dart';
 import 'package:thewasher/modules/profile/widgets/upload_user_photo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/app_bar.dart';
-import 'package:thewasher/shared/components/connection_error/connection_error_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class ProfileAccountScreen extends StatefulWidget {
-  const ProfileAccountScreen({
-    super.key,
-  });
+  const ProfileAccountScreen({super.key});
 
   @override
   State<ProfileAccountScreen> createState() => _ProfileAccountScreenState();
@@ -43,159 +39,110 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: AppStyles.darkStatusBarIconsWithTransparentColorStyle,
-      child: Scaffold(
-        backgroundColor: ColorManager.white,
-        appBar: PreferredSize(
-          preferredSize: Size(AppSize.s375, AppSize.s60.h),
-          child: AppBarWhiteShared(
-            titleText: translate(AppStrings.account),
-          ),
-        ),
-        body: BlocConsumer<GetUserProfileBloc, GetUserProfileState>(
-          listener: (context, state) async {
-            if (state is GetUserProfileSuccess) {
-              user = state.userProfile.data!;
-              if ((user.phone ?? '').isNotEmpty) {
-                final PhoneNumber phoneNumber =
-                    PhoneNumber.parse(user.phone!);
-                setState(() {
-                  countryCode = '+${phoneNumber.countryCode}';
-                  phoneNumberText = phoneNumber.international;
-                });
-              } else {
-                setState(() {
-                  countryCode = '+20';
-                });
-              }
+    final KColors c = KColors.of(context);
+    return Scaffold(
+      backgroundColor: c.background,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: Text(translate(AppStrings.account)),
+      ),
+      body: BlocConsumer<GetUserProfileBloc, GetUserProfileState>(
+        listener: (BuildContext context, GetUserProfileState state) async {
+          if (state is GetUserProfileSuccess) {
+            user = state.userProfile.data!;
+            if ((user.phone ?? '').isNotEmpty) {
+              final PhoneNumber phoneNumber = PhoneNumber.parse(user.phone!);
+              setState(() {
+                countryCode = '+${phoneNumber.countryCode}';
+                phoneNumberText = phoneNumber.international;
+              });
+            } else {
+              setState(() {
+                countryCode = '+20';
+              });
             }
-          },
-          builder: (context, state) {
-            if (state is GetUserProfileConnectionError) {
-              return Center(
-                child: ConnectionErrorSharedScreen(
-                  onPressed: () {
-                    getUserProfileBloc.add(GetUserProfileEvent());
-                  },
+          }
+        },
+        builder: (BuildContext context, GetUserProfileState state) {
+          if (state is GetUserProfileConnectionError) {
+            return KErrorState(
+              message: translate('somethingWentWrong'),
+              onRetry: () => getUserProfileBloc.add(GetUserProfileEvent()),
+            );
+          } else if (state is GetUserProfileSuccess) {
+            return ListView(
+              padding: const EdgeInsets.all(KSpace.xl),
+              children: <Widget>[
+                UserPhoto(
+                  isEdit: false,
+                  userPhoto: user.imageLink != null ? user.imageLink! : 'null',
                 ),
-              );
-            } else if (state is GetUserProfileSuccess) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.w),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      AppPadding.p20.ph,
-
-                      /// User photo
-                      Center(
-                        child: UserPhoto(
-                          isEdit: false,
-                          userPhoto:
-                              user.imageLink != null ? user.imageLink! : "null",
-                        ),
+                const SizedBox(height: KSpace.xxl),
+                SectionCard(
+                  title: translate(AppStrings.personalInformation),
+                  onEdit: () {
+                    pushPage(context, ChangePersonalInformation(user: user));
+                  },
+                  child: PersonalInformation(user: user),
+                ),
+                const SizedBox(height: KSpace.l),
+                SectionCard(
+                  title: translate(AppStrings.phoneNumberUser),
+                  onEdit: () {
+                    pushPage(
+                      context,
+                      EditPhoneScreen(
+                        phoneNumber: phoneNumberText,
+                        countryCodeSelected: countryCode!,
                       ),
-
-                      AppPadding.p20.ph,
-
-                      /// Personal Info Section
-                      SectionCard(
-                        title: translate(AppStrings.personalInformation),
-                        onEdit: () {
-                          pushPage(
-                              context, ChangePersonalInformation(user: user));
-                        },
-                        child: PersonalInformation(user: user),
-                      ),
-
-                      AppPadding.p16.ph,
-
-                      /// Phone Section
-                      SectionCard(
-                        title: translate(AppStrings.phoneNumberUser),
-                        onEdit: () {
-                          pushPage(
-                            context,
-                            EditPhoneScreen(
-                              phoneNumber: phoneNumberText,
-                              countryCodeSelected: countryCode!,
-                            ),
-                          );
-                        },
-                        child: phoneNumberText != ''
-                            ? buildFormattedPhoneNumber(phoneNumberText)
-                            : Text(
-                                translate(AppStrings.phoneNumber),
-                                style: AppStyles.titleGray16Regular.copyWith(
-                                  color: ColorManager.gray,
-                                ),
-                              ),
-                      ),
-
-                      AppPadding.p20.ph,
-
-                      /// Delete Account
-                      Center(
-                        child: GestureDetector(
-                          onTap: () {
-                            AlertHelper.deleteUserAccount(context);
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 12.h, horizontal: 24.w),
-                            decoration: BoxDecoration(
-                              color: ColorManager.red.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(12.r),
-                            ),
-                            child: Text(
-                              translate(AppStrings.deleteAccount),
-                              style: AppStyles.titleGray16Regular.copyWith(
-                                color: ColorManager.red,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      KSpace.l,
+                      0,
+                      KSpace.l,
+                      KSpace.l,
+                    ),
+                    child: phoneNumberText != ''
+                        ? buildFormattedPhoneNumber(c, phoneNumberText)
+                        : Text(
+                            translate(AppStrings.phoneNumber),
+                            style: KType.body.copyWith(color: c.textSecondary),
                           ),
-                        ),
-                      ),
-
-                      AppPadding.p30.ph,
-                    ],
                   ),
                 ),
-              );
-            }
-            return const SizedBox();
-          },
-        ),
+                const SizedBox(height: KSpace.xl),
+                KButton(
+                  label: translate(AppStrings.deleteAccount),
+                  variant: KButtonVariant.text,
+                  color: c.error,
+                  onPressed: () => AlertHelper.deleteUserAccount(context),
+                ),
+              ],
+            );
+          }
+          return const KLoadingState();
+        },
       ),
     );
   }
 
-  Widget buildFormattedPhoneNumber(String phoneNumber) {
+  Widget buildFormattedPhoneNumber(KColors c, String phoneNumber) {
     String countryCode = phoneNumber.substring(0, 4);
     String restOfNumber = phoneNumber.substring(4);
 
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20.w),
-        child: Text.rich(
-          TextSpan(
-            children: <InlineSpan>[
-              TextSpan(
-                text: '($countryCode) ',
-                style: AppStyles.titleGray16Regular
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-              TextSpan(
-                text: restOfNumber,
-                style: AppStyles.titleGray16Regular,
-              ),
-            ],
-          ),
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      child: Text.rich(
+        textDirection: TextDirection.ltr,
+        TextSpan(
+          style: KType.body.copyWith(color: c.text),
+          children: <InlineSpan>[
+            TextSpan(text: '($countryCode) '),
+            TextSpan(text: restOfNumber),
+          ],
         ),
       ),
     );
@@ -216,44 +163,33 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.w),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 6,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    final KColors c = KColors.of(context);
+    return KCard(
+      padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /// Header Row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: AppStyles.titleGray16Regular.copyWith(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 15.sp,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsetsDirectional.only(
+              start: KSpace.l,
+              end: KSpace.xs,
+            ),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    title,
+                    style: KType.headline.copyWith(color: c.text),
+                  ),
                 ),
-              ),
-              GestureDetector(
-                onTap: onEdit,
-                child: Icon(
-                  Icons.edit_outlined,
-                  size: 20.sp,
-                  color: ColorManager.primary,
+                IconButton(
+                  tooltip: translate(AppStrings.editProfile),
+                  onPressed: onEdit,
+                  icon: Icon(Icons.edit_outlined, size: 20, color: c.brand),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          AppPadding.p12.ph,
           child,
         ],
       ),

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../liquid_glass.dart';
 import '../tokens.dart';
 
-enum KButtonVariant { primary, secondary, text, destructive }
+enum KButtonVariant { primary, secondary, text, destructive, onPhoto }
 
 /// The Kleano button.
 ///
@@ -62,10 +62,15 @@ class KButton extends StatelessWidget {
 
   bool get _prominent =>
       variant == KButtonVariant.primary ||
-      variant == KButtonVariant.destructive;
+      variant == KButtonVariant.destructive ||
+      variant == KButtonVariant.onPhoto;
 
-  Color _fill(KColors c) =>
-      variant == KButtonVariant.destructive ? c.error : c.brand;
+  /// White fill for the main action over a photo.
+  bool get _onPhoto => variant == KButtonVariant.onPhoto;
+
+  Color _fill(KColors c) => _onPhoto
+      ? Colors.white
+      : (variant == KButtonVariant.destructive ? c.error : c.brand);
 
   Widget _ios(BuildContext context) {
     final KColors c = KColors.of(context);
@@ -83,7 +88,9 @@ class KButton extends StatelessWidget {
     }
     final Color foreground = onPressed == null
         ? c.textSecondary
-        : (_prominent
+        : (_onPhoto
+              ? c.brand
+              : _prominent
               ? Colors.white
               : (color ??
                     (variant == KButtonVariant.secondary
@@ -160,6 +167,15 @@ class KButton extends StatelessWidget {
               theme.colorScheme.onSurface.withValues(alpha: 0.12),
               theme.colorScheme.surface,
             ),
+          ),
+          child: content,
+        );
+      case KButtonVariant.onPhoto:
+        return FilledButton(
+          onPressed: tap,
+          style: FilledButton.styleFrom(
+            backgroundColor: Colors.white,
+            foregroundColor: KColors.of(context).brand,
           ),
           child: content,
         );

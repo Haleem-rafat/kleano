@@ -1,13 +1,13 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:thewasher/shared/singleton.dart';
@@ -23,51 +23,56 @@ class UserPhoto extends StatefulWidget {
 }
 
 class _UserPhotoState extends State<UserPhoto> {
+  static const double _size = 84;
+
   final ImagePicker picker = ImagePicker();
   GeneralSingleton generalSingleton = GeneralSingleton();
   late String userPhoto;
   void getGalleryImage() {
     picker
         .pickImage(
-            source: ImageSource.gallery,
-            maxHeight: 1000,
-            maxWidth: 1000,
-            imageQuality: 75)
+          source: ImageSource.gallery,
+          maxHeight: 1000,
+          maxWidth: 1000,
+          imageQuality: 75,
+        )
         .then((XFile? image) {
-      setState(() {
-        generalSingleton.userImage = image;
-        userPhoto = image!.path;
-      });
-    });
+          setState(() {
+            generalSingleton.userImage = image;
+            userPhoto = image!.path;
+          });
+        });
   }
 
   void getCameraImage() {
     picker
         .pickImage(
-            source: ImageSource.camera,
-            maxHeight: 1000,
-            maxWidth: 1000,
-            imageQuality: 75)
+          source: ImageSource.camera,
+          maxHeight: 1000,
+          maxWidth: 1000,
+          imageQuality: 75,
+        )
         .then((XFile? image) {
-      setState(() {
-        generalSingleton.userImage = image;
-        userPhoto = image!.path;
-      });
-    });
+          setState(() {
+            generalSingleton.userImage = image;
+            userPhoto = image!.path;
+          });
+        });
   }
 
   @override
   void initState() {
     super.initState();
-    userPhoto = widget.userPhoto != "null"
+    userPhoto = widget.userPhoto != 'null'
         ? widget.userPhoto!
         : generalSingleton.userImage != null
-            ? generalSingleton.userImage!.path
-            : generalSingleton.characterUserName!;
+        ? generalSingleton.userImage!.path
+        : generalSingleton.characterUserName!;
   }
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return GestureDetector(
       onTap: () {
         widget.isEdit ? showActionSheet(context) : null;
@@ -75,92 +80,39 @@ class _UserPhotoState extends State<UserPhoto> {
       behavior: HitTestBehavior.opaque,
       child: Center(
         child: Stack(
-          alignment: Alignment.bottomRight,
+          alignment: AlignmentDirectional.bottomEnd,
           children: <Widget>[
-            SizedBox(
-                height: 84.h,
-                width: 84.w,
-                child:
-                    // CircleAvatar(
-                    //     backgroundColor: ColorManager.orange,
-                    //     child:
-                    //     userPhoto.isNotEmpty
-                    //         ? userPhoto != generalSingleton.characterUserName
-                    //         ? Container(
-                    //             height: 84.h,
-                    //             width: 84.w,
-                    //           decoration: BoxDecoration(
-                    //             shape: BoxShape.circle,
-                    //             image: DecorationImage(
-                    //               image: FileImage(
-                    //                 File(generalSingleton.userImage!.path),
-                    //                 ),
-                    //               fit: BoxFit.cover
-                    //               )
-                    //           ),
-                    //         )
-                    //         : ImageShared(
-                    //             image: userPhoto,
-                    //             height: 84.h,
-                    //             width: 84.w,
-                    //             raduis: 50,
-                    //           )
-                    //         : Text(
-                    //             generalSingleton.characterUserName!,
-                    //             style: AppStyles.title16Bold.copyWith(
-                    //               color: ColorManager.secondary,
-                    //               fontSize: 30.sp,
-                    //             ),
-                    //           ),
-                    //   ),
-                    CircleAvatar(
-                  backgroundColor: ColorManager.primaryLight,
-                  child: userPhoto != generalSingleton.characterUserName
-                      ? Container(
-                          height: 84.h,
-                          width: 84.w,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                  image: FileImage(
-                                    File(generalSingleton.userImage!.path),
-                                  ),
-                                  fit: BoxFit.cover)),
-                        )
-                      : userPhoto == widget.userPhoto
-                          ? ImageShared(
-                              image: userPhoto,
-                              height: 84.h,
-                              width: 84.w,
-                              raduis: 50,
-                            )
-                          : Text(
-                              generalSingleton.characterUserName!,
-                              style: AppStyles.title16Bold.copyWith(
-                                color: ColorManager.secondary,
-                                fontSize: 30.sp,
-                              ),
+            SizedBox.square(
+              dimension: _size,
+              child: CircleAvatar(
+                backgroundColor: c.brandTint,
+                child: userPhoto != generalSingleton.characterUserName
+                    ? DecoratedBox(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          image: DecorationImage(
+                            image: FileImage(
+                              File(generalSingleton.userImage!.path),
                             ),
-                )
-                // CircleAvatar(
-                //   backgroundColor: ColorManager.orange,
-                //   backgroundImage:userPhoto != generalSingleton.characterUserName ? FileImage(File(updateProfileBloc.userImage!.path)) : null,
-                //   child: userPhoto == generalSingleton.characterUserName
-                //    ? Text(
-                //        generalSingleton.characterUserName!,
-                //        style: AppStyles.title16Bold.copyWith(
-                //          color: ColorManager.secondary,
-                //          fontSize: 30.sp,
-                //        ),
-                //      ): null
-                // ),
-
-                ),
-            widget.isEdit
-                ? SvgPicture.asset(
-                    AssetsManager.cameraIcon,
-                  )
-                : const SizedBox()
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        child: const SizedBox.square(dimension: _size),
+                      )
+                    : userPhoto == widget.userPhoto
+                    ? ImageShared(
+                        image: userPhoto,
+                        height: _size,
+                        width: _size,
+                        raduis: _size / 2,
+                      )
+                    : Text(
+                        generalSingleton.characterUserName!,
+                        style: KType.largeTitle.copyWith(color: c.onBrandTint),
+                      ),
+              ),
+            ),
+            if (widget.isEdit) SvgPicture.asset(AssetsManager.cameraIcon),
           ],
         ),
       ),
@@ -168,36 +120,30 @@ class _UserPhotoState extends State<UserPhoto> {
   }
 
   void showActionSheet(BuildContext context) {
-    showCupertinoModalPopup<void>(
+    showKSheet<void>(
       context: context,
-      builder: (BuildContext context) => CupertinoActionSheet(
-        title: Text(
-          translate(AppStrings.chooseYourPicture),
-          style: AppStyles.title16Bold,
-        ),
-        actions: <CupertinoActionSheetAction>[
-          CupertinoActionSheetAction(
-            onPressed: () {
+      builder: (BuildContext context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(KSpace.s),
+            child: Text(
+              translate(AppStrings.chooseYourPicture),
+              style: KType.headline.copyWith(color: KColors.of(context).text),
+            ),
+          ),
+          KListRow(
+            leading: Icon(
+              Icons.photo_library_outlined,
+              color: KColors.of(context).brand,
+            ),
+            title: translate(AppStrings.chooseFromGallery),
+            onTap: () {
               pop(context);
               getGalleryImage();
             },
-            child: Text(
-              translate(AppStrings.chooseFromGallery),
-              style: AppStyles.title16Regular
-                  .copyWith(color: ColorManager.primary),
-            ),
           ),
-          // CupertinoActionSheetAction(
-          //   onPressed: () {
-          //     pop(context);
-          //     getCameraImage();
-          //   },
-          //   child: Text(
-          //     translate(AppStrings.takeAPhoto),
-          //     style: AppStyles.title16Regular
-          //         .copyWith(color: ColorManager.primary),
-          //   ),
-          // ),
         ],
       ),
     );

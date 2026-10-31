@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 
 class EmptyVehiclesScreen extends StatelessWidget {
   final VoidCallback onPressed;
@@ -16,35 +12,36 @@ class EmptyVehiclesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 23.w),
+      padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            AppPadding.p23.ph,
-            Text(
-              translate(AppStrings.myVehicles),
-              style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          const SizedBox(height: KSpace.xxl),
+          Text(
+            translate(AppStrings.myVehicles),
+            style: KType.title.copyWith(color: c.text),
+          ),
+          const SizedBox(height: KSpace.s),
+          Text(
+            translate(AppStrings.addCarInfo),
+            style: KType.subhead.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: KSpace.xxxl),
+          Center(
+            child: SvgPicture.asset(
+              AssetsManager.emptyCarSVG,
+              colorFilter: ColorFilter.mode(c.textSecondary, BlendMode.srcIn),
             ),
-            AppPadding.p8.ph,
-            Text(translate(AppStrings.addCarInfo),
-                style: AppStyles.subtextGray14Regular
-                    .copyWith(color: ColorManager.black)),
-            87.ph,
-            Center(
-              child: SvgPicture.asset(
-                AssetsManager.emptyCarSVG,
-                colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
-              ),
-            ),
-            148.ph,
-            Center(
-              child: ButtonDottedShared(
-                onPressed: onPressed,
-                text: translate(AppStrings.addNewVehicles),
-              ),
-            )
-          ]),
+          ),
+          const SizedBox(height: KSpace.xxxl),
+          KButton(
+            label: translate(AppStrings.addNewVehicles),
+            onPressed: onPressed,
+          ),
+        ],
+      ),
     );
   }
 }

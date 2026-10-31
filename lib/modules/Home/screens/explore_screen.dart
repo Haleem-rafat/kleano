@@ -1,19 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/fonts_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/Home/widget/services_widget.dart';
+import 'package:thewasher/modules/my_booking/widgets/empty_services_and_addons.dart';
 import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
@@ -24,261 +22,160 @@ import 'package:thewasher/utilties/navigator.dart';
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
 
+  static const double _addOnsHeight = 200;
+  static const double _addOnWidth = 148;
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    Widget sectionTitle(String key) => Padding(
+      padding: const EdgeInsets.fromLTRB(
+        KSpace.xl,
+        KSpace.xxl,
+        KSpace.xl,
+        KSpace.m,
+      ),
+      child: Text(translate(key), style: KType.title.copyWith(color: c.text)),
+    );
+
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, 60.h),
-        child: const AppBarShared(
-          titleAppBar: "TheWasher",
-          isCenter: true,
-          isTextOnly: false,
-        ),
+      backgroundColor: c.background,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: const Text('Kleano'),
       ),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            AppPadding.p16.ph,
+            sectionTitle(AppStrings.offers),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Text(
-                translate(AppStrings.offers),
-                style: AppStyles.titleWhite16Bold
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-            ),
-            AppPadding.p12.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Container(
-                height: 152.h,
-                width: 334.w,
-                decoration: BoxDecoration(
-                  color: ColorManager.primary.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Stack(
+              padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
+              child: KCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
                       children: <Widget>[
-                        11.ph,
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(
-                              height: 99.h,
-                              width: 211.w,
-                              child: Image.asset(AssetsManager.offerCar),
-                            ),
-                            Column(
-                              children: <Widget>[
-                                AppPadding.p22.ph,
-                                InkWell(
-                                  onTap: () {
-                                    pushPage(
-                                      context,
-                                      PlansAndSubscriptionScreen(
-                                        profile: sl.call<GetUserProfileBloc>.call()
-                                            .profile,
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    height: 26.h,
-                                    width: 77.w,
-                                    decoration: BoxDecoration(
-                                      color: ColorManager.white,
-                                      borderRadius: BorderRadius.circular(10.r),
-                                      border:
-                                          Border.all(color: ColorManager.white),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        translate(AppStrings.viewPlans),
-                                        style: AppStyles.title16Bold.copyWith(
-                                            color: ColorManager.darkGrey,
-                                            fontSize: FontSize.s10.sp),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                        Expanded(
+                          child: Image.asset(
+                            AssetsManager.offerCar,
+                            height: 96,
+                            cacheHeight: 288,
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                        10.ph,
-                        SvgPicture.asset(AssetsManager.offerBookingSvg)
+                        const SizedBox(width: KSpace.m),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                'Subscribe Now',
+                                style: KType.headline.copyWith(color: c.text),
+                              ),
+                              Text(
+                                '& get 30% off',
+                                style: KType.subhead.copyWith(color: c.brand),
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-                    Positioned(
-                      top: 21.h,
-                      left: Localizations.localeOf(context).languageCode == 'en'
-                          ? 173.w
-                          : 34.w,
-                      child: SizedBox(
-                        height: 42.h,
-                        width: 120.w,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "Subscribe Now",
-                              style: AppStyles.offerBigStyle
-                                  .copyWith(color: ColorManager.white),
-                            ),
-                            AppSize.s1_5.ph,
-                            Text(
-                              "& get 30% off",
-                              style: AppStyles.offerSmallStyle
-                                  .copyWith(color: ColorManager.darkPrimary),
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
+                    const SizedBox(height: KSpace.s),
+                    SvgPicture.asset(AssetsManager.offerBookingSvg),
+                    const SizedBox(height: KSpace.m),
+                    KButton(
+                      label: translate(AppStrings.viewPlans),
+                      variant: KButtonVariant.secondary,
+                      onPressed: () {
+                        pushPage(
+                          context,
+                          PlansAndSubscriptionScreen(
+                            profile: sl.call<GetUserProfileBloc>.call().profile,
+                          ),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
-            AppPadding.p24.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Text(
-                translate(AppStrings.services),
-                style: AppStyles.titleWhite16Bold
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-            ),
-            AppPadding.p12.ph,
+            sectionTitle(AppStrings.services),
+            // ServicesWidget still sizes itself with the old scaled units, so
+            // this keeps the same scaled height until it is restyled.
             SizedBox(
-              height: 185.h,
-              width: 1.sw,
+              height: MediaQuery.sizeOf(context).height * 185 / 812,
+              width: double.infinity,
               child: const ServicesWidget(),
             ),
-            AppPadding.p24.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Text(
-                translate(AppStrings.addOns),
-                style: AppStyles.titleWhite16Bold
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-            ),
-            AppPadding.p12.ph,
+            sectionTitle(AppStrings.addOns),
             SizedBox(
-              height: 182.h,
-              width: 1.sw,
-              child: BlocConsumer<OffersBloc, OffersState>(
+              height: _addOnsHeight,
+              width: double.infinity,
+              child: BlocBuilder<OffersBloc, OffersState>(
                 bloc: sl<OffersBloc>(),
-                listener: (context, state) {},
-                builder: (context, state) {
+                builder: (BuildContext context, OffersState state) {
+                  final OffersBloc offers = sl<OffersBloc>();
                   return ListView.separated(
-                    itemCount: sl<OffersBloc>().addOnsList.length,
-                    separatorBuilder: (BuildContext context, int index) {
-                      return AppPadding.p8.pw;
-                    },
+                    itemCount: offers.addOnsList.length,
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(width: KSpace.s),
                     scrollDirection: Axis.horizontal,
-                    padding: EdgeInsets.symmetric(horizontal: 10.w),
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.symmetric(vertical: 5.h),
-                        child: Container(
-                          height: 182.h,
-                          width: 120.w,
-                          decoration: BoxDecoration(
-                              color: ColorManager.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                  color: sl<OffersBloc>()
-                                          .cartAddOnsList
-                                          .contains(sl<OffersBloc>()
-                                              .addOnsList[index])
-                                      ? ColorManager.primary
-                                      : ColorManager.white),
-                              boxShadow: <BoxShadow>[
-                                BoxShadow(
-                                    color: ColorManager.black.withValues(alpha: .12),
-                                    blurRadius: 2.r,
-                                    offset: const Offset(0, 0))
-                              ]),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: KSpace.xl,
+                      vertical: KSpace.xs,
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      final addOn = offers.addOnsList[index];
+                      final bool inCart = offers.cartAddOnsList.contains(addOn);
+                      return SizedBox(
+                        width: _addOnWidth,
+                        child: KCard(
+                          padding: const EdgeInsets.all(KSpace.m),
                           child: Column(
                             children: <Widget>[
-                              AppPadding.p24.ph,
                               ImageShared(
-                                image: sl<OffersBloc>()
-                                    .addOnsList[index]
-                                    .icon!
-                                    .iconLink!,
-                                height: 50.h,
-                                width: 50.w,
+                                image: addOn.icon!.iconLink!,
+                                height: 50,
+                                width: 50,
                               ),
-                              25.ph,
-                              Text(
-                                sl<OffersBloc>().addOnsList[index].name!,
-                                style: AppStyles.caption12Regular.copyWith(
-                                    color: ColorManager.darkGrey,
-                                    fontSize: FontSize.s10.sp),
+                              const SizedBox(height: KSpace.s),
+                              Expanded(
+                                child: Text(
+                                  addOn.name!,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  textAlign: TextAlign.center,
+                                  style: KType.footnote.copyWith(color: c.text),
+                                ),
                               ),
-                              15.ph,
-                              InkWell(
-                                onTap: () {
+                              KButton(
+                                label: '+ ${addOn.price} ${AppStrings.sAR}',
+                                variant: inCart
+                                    ? KButtonVariant.primary
+                                    : KButtonVariant.secondary,
+                                icon: inCart ? Icons.check : null,
+                                onPressed: () {
                                   if (AppShared.token.isNotEmpty) {
-                                    if (sl<OffersBloc>()
-                                        .cartAddOnsList
-                                        .contains(sl<OffersBloc>()
-                                            .addOnsList[index])) {
-                                      var deleteCartService = sl<OffersBloc>()
-                                          .cartAddOnsList
-                                          .indexOf(sl<OffersBloc>()
-                                              .addOnsList[index]);
-                                      sl<OffersBloc>().add(DeleteExtraCart(
-                                          index: deleteCartService,
-                                          extra: sl<OffersBloc>()
-                                              .addOnsList[index]));
+                                    if (inCart) {
+                                      offers.add(
+                                        DeleteExtraCart(
+                                          index: offers.cartAddOnsList.indexOf(
+                                            addOn,
+                                          ),
+                                          extra: addOn,
+                                        ),
+                                      );
                                     } else {
-                                      sl<OffersBloc>().add(AddExtraCart(
-                                          extra: sl<OffersBloc>()
-                                              .addOnsList[index]));
+                                      offers.add(AddExtraCart(extra: addOn));
                                     }
                                   } else {
                                     AlertHelper.guestAlert(context);
                                   }
                                 },
-                                child: Container(
-                                  width: 76.w,
-                                  height: 20.h,
-                                  decoration: BoxDecoration(
-                                    color: sl<OffersBloc>()
-                                            .cartAddOnsList
-                                            .contains(sl<OffersBloc>()
-                                                .addOnsList[index])
-                                        ? ColorManager.primary
-                                        : ColorManager.white,
-                                    borderRadius: BorderRadius.circular(6.r),
-                                    border:
-                                        Border.all(color: ColorManager.primary),
-                                  ),
-                                  child: Center(
-                                    child: sl<OffersBloc>()
-                                            .cartAddOnsList
-                                            .contains(sl<OffersBloc>()
-                                                .addOnsList[index])
-                                        ? const Icon(
-                                            Icons.check,
-                                            color: ColorManager.white,
-                                            size: 15,
-                                          )
-                                        : Text(
-                                            "+ ${sl<OffersBloc>().addOnsList[index].price} ${AppStrings.sAR}",
-                                            style: AppStyles.subtext14Regular
-                                                .copyWith(
-                                                    color: ColorManager.primary,
-                                                    fontSize: FontSize.s10.sp),
-                                          ),
-                                  ),
-                                ),
                               ),
                             ],
                           ),
@@ -289,91 +186,52 @@ class ExploreScreen extends StatelessWidget {
                 },
               ),
             ),
-            AppPadding.p24.ph,
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Text(
-                translate(AppStrings.recentWashes),
-                style: AppStyles.titleWhite16Bold
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-            ),
-            AppPadding.p12.ph,
+            sectionTitle(AppStrings.recentWashes),
             BlocBuilder<OffersBloc, OffersState>(
               bloc: sl<OffersBloc>(),
-              builder: (context, state) {
+              builder: (BuildContext context, OffersState state) {
                 if (AppShared.token.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        AppPadding.p20.ph,
-                        SvgPicture.asset(
-                          AssetsManager.emptyRecentWashesSvg,
-                          height: 46.h,
-                          width: 46.w,
-                          fit: BoxFit.none,
-                        ),
-                        AppPadding.p12.ph,
-                        Text(
-                          translate(AppStrings.noWashesYet),
-                          style: AppStyles.captionGray12Medium,
-                        )
-                      ],
+                  return const Center(
+                    child: EmptyScreen(
+                      image: AssetsManager.emptyRecentWashesSvg,
+                      text: AppStrings.noWashesYet,
                     ),
                   );
-                } else {
-                  return Container();
                 }
+                return const SizedBox.shrink();
               },
             ),
-            50.ph,
+            const SizedBox(height: KSpace.xxxl),
           ],
         ),
       ),
       bottomNavigationBar: AppShared.token.isEmpty
           ? null
-          : Container(
-              height: 104.h,
-              width: 1.sw,
-              decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                        color: ColorManager.black.withValues(alpha: .16),
-                        blurRadius: 10.r,
-                        offset: const Offset(0, 3))
-                  ]),
-              child: BlocConsumer<OffersBloc, OffersState>(
-                listener: (context, state) {
-                  // Listener implementation for offers bloc state changes
-                },
-                builder: (context, state) {
-                  return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 31.h),
-                    child: Row(
+          : ColoredBox(
+              color: c.surface,
+              child: SafeArea(
+                minimum: const EdgeInsets.all(KSpace.l),
+                child: BlocBuilder<OffersBloc, OffersState>(
+                  builder: (BuildContext context, OffersState state) {
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              "${sl<OffersBloc>().cartServicesList.length} * services - ${sl<OffersBloc>().cartAddOnsList.length} * Add-ons",
-                              style: AppStyles.caption12Medium
-                                  .copyWith(color: ColorManager.medGray),
-                            ),
-                            4.ph,
-                            Text(
-                              "Total Pay : ${sl<OffersBloc>().total}",
-                              style: AppStyles.title16Bold
-                                  .copyWith(color: ColorManager.darkGrey),
-                            ),
-                          ],
+                        Text(
+                          '${sl<OffersBloc>().cartServicesList.length} * services - ${sl<OffersBloc>().cartAddOnsList.length} * Add-ons',
+                          style: KType.footnote.copyWith(
+                            color: c.textSecondary,
+                          ),
+                        ),
+                        const SizedBox(height: KSpace.xs),
+                        Text(
+                          'Total Pay : ${sl<OffersBloc>().total}',
+                          style: KType.headline.copyWith(color: c.text),
                         ),
                       ],
-                    ),
-                  );
-                },
+                    );
+                  },
+                ),
               ),
             ),
     );
