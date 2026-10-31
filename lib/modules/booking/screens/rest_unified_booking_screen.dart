@@ -18,6 +18,7 @@ import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc
 import 'package:thewasher/modules/booking/data/models/booking_available_model.dart';
 import 'package:thewasher/modules/profile/blocs/promo_code/promo_bloc.dart';
 import 'package:thewasher/modules/booking/widgets/calender_time_slots_widget.dart';
+import 'package:thewasher/modules/booking/screens/set_booking_location_screen.dart';
 import 'package:thewasher/modules/booking/widgets/location/fixed_map.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/car_model/cars_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
@@ -233,6 +234,17 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
                     ),
                     title: translate(AppStrings.location),
                     subtitle: fullLocationName,
+                    trailing: Text(
+                      translate(AppStrings.changeLocation),
+                      style: KType.subhead.copyWith(
+                        color: c.brand,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    // Prices depend on the place: choosing one goes back to
+                    // Home, which loads that place's services.
+                    onTap: () =>
+                        pushPage(context, const SetBookingLocationScreen()),
                   ),
                 ],
               ),
