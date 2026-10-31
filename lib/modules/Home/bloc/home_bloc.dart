@@ -223,7 +223,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           },
           onError: (String error) {
             debugPrint("❌ Socket error: $error");
-            emit(BikerGetNewOrdersFailed(error: error));
+            // Socket errors can arrive long after this handler has finished.
+            if (!emit.isDone) emit(BikerGetNewOrdersFailed(error: error));
           },
         );
 
