@@ -125,8 +125,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ) async {
             sl<NotificationBloc>().totalUnRead++;
             LocalNotificationServices(context: context).notification(
-              title: message.notification!.title!,
-              body: message.notification!.body!,
+              title: message.notification?.title ?? '',
+              body: message.notification?.body ?? '',
             );
           });
           firebaseCloudMessagingService.listenToBackgroundNotifications((
