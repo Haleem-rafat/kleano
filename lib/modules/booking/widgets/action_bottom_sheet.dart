@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
@@ -13,35 +12,32 @@ class ActionsBottom extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: const EdgeInsets.symmetric(
+        horizontal: KSpace.l,
+        vertical: KSpace.s,
+      ),
       child: Align(
-        alignment: Alignment.centerRight,
+        alignment: AlignmentDirectional.centerEnd,
         child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            TextButton(
+            KButton(
+              label: translate(AppStrings.cancel),
+              variant: KButtonVariant.text,
+              expand: false,
+              color: KColors.of(context).textSecondary,
               onPressed: () {
                 pop(context);
               },
-              child: Text(
-                translate(AppStrings.cancel),
-                style: AppStyles.body14Medium.copyWith(
-                  color: ColorManager.thirdColor400,
-                ),
-              ),
             ),
-            8.horizontalSpace,
-            TextButton(
+            const SizedBox(width: KSpace.s),
+            KButton(
+              label: translate(AppStrings.ok),
+              variant: KButtonVariant.text,
+              expand: false,
               onPressed: () {
                 onDateSelected();
               },
-              child: Text(
-                translate(AppStrings.ok),
-                style: AppStyles.body14Medium.copyWith(
-                  color: ColorManager.primary,
-                ),
-              ),
             ),
           ],
         ),

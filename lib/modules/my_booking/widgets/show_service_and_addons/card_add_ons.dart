@@ -1,59 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/data/model/add_ons_model.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 
+/// One add-on row inside the add-ons card.
 class CardAddOns extends StatelessWidget {
   final AddOnsModel addOns;
-  const CardAddOns({
-    super.key,
-    required this.addOns,
-  });
+  const CardAddOns({super.key, required this.addOns});
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(15.r),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-              color: ColorManager.black.withValues(alpha: .05),
-              blurRadius: 6.r,
-              offset: const Offset(0, 3))
-        ],
+    final KColors c = KColors.of(context);
+    return KListRow(
+      leading: ImageShared(
+        image: addOns.icon!.iconLink!,
+        height: KSpace.xxl,
+        width: KSpace.xxl,
       ),
-      padding: EdgeInsets.fromLTRB(
-          AppPadding.p18.w, 24.87.h, AppPadding.p18.w, AppPadding.p16.h),
-      child: Row(
-        textBaseline: TextBaseline.alphabetic,
-        children: [
-          ImageShared(
-            image: addOns.icon!.iconLink!,
-            height: 50.h,
-            width: 50.w,
-          ),
-          AppPadding.p18.pw,
-          Text(
-            addOns.name!,
-            style: AppStyles.subtextGray14Regular
-                .copyWith(color: ColorManager.darkGrey),
-          ),
-          const Spacer(),
+      title: addOns.name!,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
           Text(
             addOns.price!.toString(),
-            style: AppStyles.title16Bold.copyWith(color: ColorManager.darkGrey),
+            style: KType.headline.copyWith(color: c.text),
           ),
-          AppPadding.p4.pw,
+          const SizedBox(width: KSpace.xs),
           SvgPicture.asset(
             AssetsManager.saudiRiyalSymbol,
-            height: 16.h,
-            width: 16.w,
+            height: KSpace.l,
+            width: KSpace.l,
+            colorFilter: ColorFilter.mode(c.text, BlendMode.srcIn),
           ),
         ],
       ),

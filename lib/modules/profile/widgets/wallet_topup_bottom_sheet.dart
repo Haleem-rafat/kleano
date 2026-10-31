@@ -1,26 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:moyasar/moyasar.dart';
 import 'package:thewasher/core/config/api_keys.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/core/services/apple_pay_service.dart';
 import 'package:thewasher/modules/booking/widgets/card_form.dart';
 import 'package:thewasher/modules/booking/widgets/payment_webview.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/data/repo/profile_repo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
+import 'package:thewasher/utilties/navigator.dart';
 
 class WalletTopupScreen extends StatefulWidget {
   const WalletTopupScreen({super.key});
@@ -80,6 +82,7 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
       return;
     }
 
+    final Color errorColor = KColors.of(context).error;
     setState(() => _isLoading = true);
 
     try {
@@ -144,7 +147,7 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                               'en'
                           ? "Payment failed. Please try again"
                           : "فشل الدفع. الرجاء المحاولة مرة أخرى",
-                      backgroundColor: ColorManager.red,
+                      backgroundColor: errorColor,
                     );
                   }
                 },
@@ -159,7 +162,7 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
                       ? response.message
                       : "Failed to top up wallet. Please try again"
                 : "فشل شحن المحفظة. الرجاء المحاولة مرة أخرى",
-            backgroundColor: ColorManager.red,
+            backgroundColor: errorColor,
           );
         }
       }
@@ -171,7 +174,7 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
           message: Localizations.localeOf(context).languageCode == 'en'
               ? "An error occurred. Please try again"
               : "حدث خطأ. الرجاء المحاولة مرة أخرى",
-          backgroundColor: ColorManager.red,
+          backgroundColor: errorColor,
         );
       }
     }
@@ -184,7 +187,7 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
         showSnackBar(
           buildContext: context,
           message: result.message,
-          backgroundColor: ColorManager.red,
+          backgroundColor: KColors.of(context).error,
         );
       }
     } else if (result is PaymentResponse) {
@@ -223,28 +226,25 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
       return;
     }
 
+    final Color errorColor = KColors.of(context).error;
     if (!ApplePayService.isApplePayAvailable) {
       showSnackBar(
         buildContext: context,
         message: Localizations.localeOf(context).languageCode == 'en'
             ? "Apple Pay is not available on this device"
             : "Apple Pay غير متاح على هذا الجهاز",
-        backgroundColor: ColorManager.red,
+        backgroundColor: errorColor,
       );
       return;
     }
 
     final userId = sl<GetUserProfileBloc>().profile.sId ?? "";
 
-    showModalBottomSheet(
+    showKSheet<void>(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (context) {
+      builder: (BuildContext context) {
         return Padding(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.only(top: KSpace.s),
           child: ApplePay(
             config: PaymentConfig(
               metadata: {
@@ -272,233 +272,158 @@ class _WalletTopupScreenState extends State<WalletTopupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final KColors c = KColors.of(context);
+    final bool isEnglish = Localizations.localeOf(context).languageCode == 'en';
+    final bool isCard = _selectedPaymentMethod == 1;
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        backgroundColor: ColorManager.white,
-        appBar: PreferredSize(
-          preferredSize: Size(AppSize.s375, 60.h),
-          child: AppBarShared(
-            titleAppBar: translate(AppStrings.wallet),
-            isTextOnly: false,
+        backgroundColor: c.background,
+        // The form scrolls under the floating button.
+        extendBody: true,
+        appBar: GlassAppBar(
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+          leadingWidth: 60,
+          leading: GlassBackButton(
+            color: c.brand,
+            onPressed: () => pop(context),
+          ),
+          title: Text(
+            translate(AppStrings.wallet),
+            style: KType.headline.copyWith(color: c.text),
           ),
         ),
         body: _isLoading
-            ? const Center(child: LoadingWidget())
+            ? const KLoadingState()
             : SingleChildScrollView(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    AppPadding.p24.w,
-                    AppPadding.p24.h,
-                    AppPadding.p24.w,
-                    AppPadding.p100.h,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Amount Input
-                      Form(
-                        key: _amountFormKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isEnglish ? 'Amount (SAR)' : 'المبلغ (ريال)',
-                              style: AppStyles.title16Medium.copyWith(
-                                color: ColorManager.black,
-                              ),
+                padding: EdgeInsets.fromLTRB(
+                  KSpace.xl,
+                  KSpace.l,
+                  KSpace.xl,
+                  MediaQuery.paddingOf(context).bottom + KSpace.xl,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Form(
+                      key: _amountFormKey,
+                      child: KTextField(
+                        label: isEnglish ? 'Amount (SAR)' : 'المبلغ (ريال)',
+                        hint: isEnglish ? 'Enter amount' : 'أدخل المبلغ',
+                        controller: _amountController,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        validator: _validateAmount,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter.allow(
+                            RegExp(r'^\d+\.?\d{0,2}'),
+                          ),
+                        ],
+                        prefix: Padding(
+                          padding: const EdgeInsets.all(KSpace.m),
+                          child: SvgPicture.asset(
+                            AssetsManager.saudiRiyalSymbol,
+                            width: KSpace.xl,
+                            height: KSpace.xl,
+                            colorFilter: ColorFilter.mode(
+                              c.textSecondary,
+                              BlendMode.srcIn,
                             ),
-                            SizedBox(height: 8.h),
-                            TextFormField(
-                              controller: _amountController,
-                              keyboardType: TextInputType.numberWithOptions(
-                                decimal: true,
-                              ),
-                              validator: _validateAmount,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d+\.?\d{0,2}'),
-                                ),
-                              ],
-                              decoration: InputDecoration(
-                                hintText: isEnglish
-                                    ? 'Enter amount'
-                                    : 'أدخل المبلغ',
-                                prefixIcon: Padding(
-                                  padding: EdgeInsets.all(12.w),
-                                  child: SvgPicture.asset(
-                                    AssetsManager.saudiRiyalSymbol,
-                                    width: 20.w,
-                                    height: 20.h,
-                                  ),
-                                ),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: BorderSide(
-                                    color: ColorManager.medGray.withValues(alpha: 
-                                      0.3,
-                                    ),
-                                  ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: ColorManager.primary,
-                                    width: 2,
-                                  ),
-                                ),
-                                errorBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                  borderSide: const BorderSide(
-                                    color: ColorManager.red,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: KSpace.xxl),
+                    Padding(
+                      padding: const EdgeInsetsDirectional.only(
+                        start: KSpace.xs,
+                        bottom: KSpace.s,
+                      ),
+                      child: Text(
+                        isEnglish ? 'Payment Method' : 'طريقة الدفع',
+                        style: KType.headline.copyWith(color: c.text),
+                      ),
+                    ),
+                    KCard(
+                      padding: EdgeInsets.zero,
+                      child: Column(
+                        children: <Widget>[
+                          _methodRow(
+                            c,
+                            value: 1,
+                            title: isEnglish ? 'Credit Card' : 'بطاقة ائتمان',
+                            icon: Icons.credit_card_rounded,
+                          ),
+                          if (ApplePayService.isApplePayAvailable) ...<Widget>[
+                            Divider(
+                              height: 1,
+                              indent: KSpace.l + KSpace.xxl + KSpace.m,
+                              color: c.separator,
+                            ),
+                            _methodRow(
+                              c,
+                              value: 2,
+                              title: 'Apple Pay',
+                              icon: Icons.apple,
                             ),
                           ],
-                        ),
+                        ],
                       ),
-                      SizedBox(height: 24.h),
-
-                      // Payment Method Selection
-                      Text(
-                        isEnglish ? 'Payment Method' : 'طريقة الدفع',
-                        style: AppStyles.title16Medium.copyWith(
-                          color: ColorManager.black,
-                        ),
+                    ),
+                    if (isCard) ...<Widget>[
+                      const SizedBox(height: KSpace.l),
+                      CardForm(
+                        formKey: _cardFormKey,
+                        nameController: _nameController,
+                        numberController: _numberController,
+                        expiryController: _expiryController,
+                        cvvController: _cvvController,
                       ),
-                      SizedBox(height: 12.h),
-
-                      // Card Payment Option
-                      GestureDetector(
-                        onTap: () => setState(() => _selectedPaymentMethod = 1),
-                        child: Container(
-                          padding: EdgeInsets.all(16.w),
-                          decoration: BoxDecoration(
-                            color: _selectedPaymentMethod == 1
-                                ? ColorManager.primary.withValues(alpha: 0.1)
-                                : ColorManager.white,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(
-                              color: _selectedPaymentMethod == 1
-                                  ? ColorManager.primary
-                                  : ColorManager.medGray.withValues(alpha: 0.3),
-                              width: _selectedPaymentMethod == 1 ? 2 : 1,
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              RadioGroup<int>(
-                                groupValue: _selectedPaymentMethod,
-                                onChanged: (value) => setState(
-                                  () => _selectedPaymentMethod = value!,
-                                ),
-                                child: Radio<int>(
-                                  value: 1,
-                                  activeColor: ColorManager.primary,
-                                ),
-                              ),
-                              SizedBox(width: 8.w),
-                              Text(
-                                isEnglish ? 'Credit Card' : 'بطاقة ائتمان',
-                                style: AppStyles.title16Regular.copyWith(
-                                  color: ColorManager.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 12.h),
-
-                      // Apple Pay Option (if available)
-                      if (ApplePayService.isApplePayAvailable)
-                        GestureDetector(
-                          onTap: () =>
-                              setState(() => _selectedPaymentMethod = 2),
-                          child: Container(
-                            padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(
-                              color: _selectedPaymentMethod == 2
-                                  ? ColorManager.primary.withValues(alpha: 0.1)
-                                  : ColorManager.white,
-                              borderRadius: BorderRadius.circular(12.r),
-                              border: Border.all(
-                                color: _selectedPaymentMethod == 2
-                                    ? ColorManager.primary
-                                    : ColorManager.medGray.withValues(alpha: 0.3),
-                                width: _selectedPaymentMethod == 2 ? 2 : 1,
-                              ),
-                            ),
-                            child: Row(
-                              children: [
-                                RadioGroup<int>(
-                                  groupValue: _selectedPaymentMethod,
-                                  onChanged: (value) => setState(
-                                    () => _selectedPaymentMethod = value!,
-                                  ),
-                                  child: Radio<int>(
-                                    value: 2,
-                                    activeColor: ColorManager.primary,
-                                  ),
-                                ),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  'Apple Pay',
-                                  style: AppStyles.title16Regular.copyWith(
-                                    color: ColorManager.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                      SizedBox(height: 24.h),
-
-                      // Card Form (shown when card payment is selected)
-                      if (_selectedPaymentMethod == 1) ...[
-                        CardForm(
-                          formKey: _cardFormKey,
-                          nameController: _nameController,
-                          numberController: _numberController,
-                          expiryController: _expiryController,
-                          cvvController: _cvvController,
-                        ),
-                      ],
-
-                      // Submit Button (shown in body for Apple Pay, or at bottom for Card)
-                      if (_selectedPaymentMethod == 2) ...[
-                        SizedBox(height: 24.h),
-                        if (_isLoading)
-                          const Center(child: LoadingWidget())
-                        else
-                          ButtonsShared(
-                            onPressed: _processApplePay,
-                            text: 'Apple Pay',
-                            width: double.infinity,
-                          ),
-                      ],
                     ],
-                  ),
+                  ],
                 ),
               ),
-        bottomNavigationBar: _isLoading || _selectedPaymentMethod == 2
-            ? const SizedBox.shrink()
-            : Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: AppPadding.p16.w,
-                  vertical: AppPadding.p16.h,
+        bottomNavigationBar: _isLoading
+            ? null
+            : SafeArea(
+                minimum: const EdgeInsets.fromLTRB(
+                  KSpace.xl,
+                  KSpace.s,
+                  KSpace.xl,
+                  KSpace.l,
                 ),
-                child: ButtonsShared(
-                  onPressed: _submitCardPayment,
-                  text: isEnglish ? 'Top Up Wallet' : 'شحن المحفظة',
-                  width: double.infinity,
+                child: KButton(
+                  label: isCard
+                      ? (isEnglish ? 'Top Up Wallet' : 'شحن المحفظة')
+                      : 'Apple Pay',
+                  onPressed: isCard ? _submitCardPayment : _processApplePay,
                 ),
               ),
+      ),
+    );
+  }
+
+  Widget _methodRow(
+    KColors c, {
+    required int value,
+    required String title,
+    required IconData icon,
+  }) {
+    final bool selected = _selectedPaymentMethod == value;
+    return Semantics(
+      selected: selected,
+      inMutuallyExclusiveGroup: true,
+      child: KListRow(
+        leading: SizedBox.square(
+          dimension: KSpace.xxl,
+          child: Icon(icon, color: c.textSecondary),
+        ),
+        title: title,
+        trailing: selected ? Icon(Icons.check_rounded, color: c.brand) : null,
+        onTap: () => setState(() => _selectedPaymentMethod = value),
       ),
     );
   }

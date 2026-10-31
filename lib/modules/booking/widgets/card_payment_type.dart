@@ -1,132 +1,107 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/booking/data/models/payment_type_model.dart';
 
+/// One payment method, as a row of a `KCard` group. Laid out like `KListRow`,
+/// whose subtitle is plain text and so cannot show the riyal symbol.
 class CardPaymentMethod extends StatelessWidget {
   final PaymentMethodModel type;
   final int groupValue;
-  final Color borderColor;
   final num walletBalance;
   final bool isWallet;
+  final VoidCallback? onTap;
   const CardPaymentMethod({
     super.key,
     required this.type,
     required this.groupValue,
-    required this.borderColor,
     required this.walletBalance,
     required this.isWallet,
+    this.onTap,
   });
+
+  static const double _iconSize = 40;
+
+  /// Lines a divider between rows up with the row's title.
+  static const double dividerIndent = KSpace.l + _iconSize + KSpace.m;
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     final bool isSelected = type.value == groupValue;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 0.h),
-      padding: EdgeInsets.all(AppPadding.p16.r),
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: BorderRadius.circular(20.r),
-        border: Border.all(
-          color: isSelected ? ColorManager.primary : borderColor,
-          width: 2.w,
-        ),
-      ),
-      child: Row(
-        children: <Widget>[
-          Container(
-            height: 40.w,
-            width: 40.w,
-            padding: EdgeInsets.all(8.r),
-            decoration: const BoxDecoration(
-              color: ColorManager.primary,
-              shape: BoxShape.circle,
-            ),
-            child: SvgPicture.asset(
-              type.image,
-              colorFilter: ColorFilter.mode(isSelected ? ColorManager.white : ColorManager.white, BlendMode.srcIn),
-            ),
+    return Semantics(
+      selected: isSelected,
+      inMutuallyExclusiveGroup: true,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: KSpace.l,
+            vertical: KSpace.m,
           ),
-          SizedBox(width: AppPadding.p12.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  type.title,
-                  style: AppStyles.title16Medium.copyWith(
-                    color:
-                        isSelected ? ColorManager.primary : ColorManager.black,
+          child: Row(
+            children: <Widget>[
+              DecoratedBox(
+                decoration: ShapeDecoration(
+                  shape: const CircleBorder(),
+                  color: c.brand.withValues(alpha: 0.12),
+                ),
+                child: SizedBox.square(
+                  dimension: _iconSize,
+                  child: Padding(
+                    padding: const EdgeInsets.all(KSpace.s + KSpace.xs / 2),
+                    child: SvgPicture.asset(
+                      type.image,
+                      colorFilter: ColorFilter.mode(c.brand, BlendMode.srcIn),
+                    ),
                   ),
                 ),
-                if (isWallet) ...[
-                  SizedBox(height: 4.h),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8.w,
-                      vertical: 4.h,
-                    ),
-                    decoration: BoxDecoration(
-                      color: ColorManager.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(
-                        color: ColorManager.primary.withValues(alpha: 0.2),
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.account_balance_wallet,
-                          size: 14.w,
-                          color: ColorManager.primary,
-                        ),
-                        SizedBox(width: 4.w),
-                        Text(
-                          ': ${translate(AppStrings.balance)}',
-                          style: AppStyles.caption12Regular.copyWith(
-                            color: ColorManager.primary,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          walletBalance.toStringAsFixed(2),
-                          style: AppStyles.caption12Regular.copyWith(
-                            color: ColorManager.primary,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        SizedBox(width: 2.w),
-                        SvgPicture.asset(
-                          AssetsManager.saudiRiyalSymbol,
-                          width: 12.w,
-                          height: 12.w,
-                          colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              ),
+              const SizedBox(width: KSpace.m),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(type.title, style: KType.body.copyWith(color: c.text)),
+                    if (isWallet) _buildBalance(c),
+                  ],
+                ),
+              ),
+              if (isSelected) ...<Widget>[
+                const SizedBox(width: KSpace.s),
+                Icon(Icons.check_circle, color: c.brand),
               ],
-            ),
+            ],
           ),
-          if (isSelected)
-            Icon(
-              Icons.check_circle,
-              color: ColorManager.primary,
-              size: 22.w,
-            ),
-        ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildBalance(KColors c) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Flexible(
+          child: Text(
+            '${translate(AppStrings.balance)}: '
+            '${walletBalance.toStringAsFixed(2)}',
+            style: KType.subhead.copyWith(color: c.textSecondary),
+          ),
+        ),
+        const SizedBox(width: KSpace.xs),
+        SvgPicture.asset(
+          AssetsManager.saudiRiyalSymbol,
+          width: KType.subhead.fontSize,
+          height: KType.subhead.fontSize,
+          colorFilter: ColorFilter.mode(c.textSecondary, BlendMode.srcIn),
+        ),
+      ],
     );
   }
 }

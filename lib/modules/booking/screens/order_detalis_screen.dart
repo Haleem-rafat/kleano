@@ -2,18 +2,24 @@ import 'dart:async';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:moyasar/moyasar.dart';
 import 'package:thewasher/core/config/api_keys.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
+import 'package:thewasher/core/design/components/k_status_chip.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/utilis/card_formatters.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
@@ -21,6 +27,7 @@ import 'package:thewasher/modules/Home/data/model/piked_model.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
 import 'package:thewasher/modules/booking/data/models/payment_methods_request.dart';
 import 'package:thewasher/modules/booking/data/models/payment_type_model.dart';
+import 'package:thewasher/modules/booking/widgets/card_form.dart';
 import 'package:thewasher/modules/booking/widgets/card_payment_type.dart';
 import 'package:thewasher/modules/booking/widgets/functions/create_order_data_request.dart';
 import 'package:thewasher/modules/booking/widgets/location/fixed_map.dart';
@@ -30,12 +37,9 @@ import 'package:thewasher/modules/plans_and_subscription/bloc/plans_and_subscrip
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/promo_code/promo_bloc.dart';
 import 'package:thewasher/modules/profile/widgets/button_use_promo.dart';
-import 'package:thewasher/modules/profile/widgets/text_onpressed.dart';
 import 'package:thewasher/modules/points/data/repo/point_repo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/text-form-shared.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 
@@ -77,6 +81,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     // _promoCode.text = copiedPromoCode?.promoCode ?? '';
     _inputMode = copiedPromoCode == null;
     _applePayTotal = generalSingleton.totalPay?.toDouble();
+    // KTextField has no onChanged: the buttons below follow these fields.
+    _promoCode.addListener(_onFieldChanged);
+    _pointsController.addListener(_onFieldChanged);
   }
 
   @override
@@ -93,526 +100,142 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         .format(dateTime);
   }
 
+  void _onFieldChanged() => setState(() {});
+
+  void _onPromoState(BuildContext context, PromoState state) {
+    if (state is GetPromoCodeDetailSuccess) {
+      // Set copiedPromoCode so it gets included in order creation
+      // copiedPromoCode = CopyPromoCode(
+      //   promoCode: _promoCode.text,
+      //   id: _promoCode.text,
+      // );
+
+      // Set promo as applied
+      setState(() {
+        _isPromoApplied = true;
+      });
+
+      // Show success message with promo code details
+      showSnackBar(
+        buildContext: context,
+        message: translate(AppStrings.promoCodeAppliedSuccessfully)
+            .replaceAll(
+                '{amount}', '${state.promoCodeDetail.discountAmount}'),
+      );
+    } else if (state is GetPromoCodeDetailError) {
+      // Show error message from API response
+      String errorMessage;
+      if (state.errorModel != null) {
+        errorMessage =
+            Localizations.localeOf(context).languageCode == 'en'
+                ? (state.errorModel!.en ??
+                    state.errorModel!.ar ??
+                    translate(AppStrings.promoCodeNotValid))
+                : (state.errorModel!.ar ??
+                    state.errorModel!.en ??
+                    translate(AppStrings.promoCodeNotValid));
+      } else {
+        errorMessage =
+            state.error ?? translate(AppStrings.promoCodeNotValid);
+      }
+      showSnackBar(
+        buildContext: context,
+        message: errorMessage,
+      );
+      setState(() {
+        _isPromoApplied = false;
+      });
+    } else if (state is PromoCodeDetailCleared) {
+      // Reset promo applied state when cleared
+      setState(() {
+        _isPromoApplied = false;
+      });
+    }
+  }
+
+  void _onBack() {
+    // Clear promo code when going back
+    sl<PromoBloc>().add(ClearPromoCodeDetail());
+    copiedPromoCode = null;
+    _promoCode.clear();
+
+    // Clear order details when going back
+    generalSingleton.orderId = null;
+    generalSingleton.totalPay = null;
+    generalSingleton.orderTime = null;
+    generalSingleton.nearByDescription = null;
+    generalSingleton.isCarFreshened = false;
+    generalSingleton.appliedPoints = 0;
+    selectedPaymentType = null;
+
+    // Clear points discount
+    setState(() {
+      _isPointsApplied = false;
+      _pointsDiscountAmount = null;
+      _pointsController.clear();
+    });
+
+    orderIdd = null;
+
+    setState(() {
+      _isPromoApplied = false;
+      _inputMode = true;
+    });
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final PreferredSizeWidget appBar = _buildAppBar();
+    // Not a ListView: the payment rows hold the order listeners and must stay
+    // mounted while scrolled away.
+    final Widget body = SingleChildScrollView(
+      padding: EdgeInsets.fromLTRB(
+        KSpace.xl,
+        KSpace.l,
+        KSpace.xl,
+        MediaQuery.viewPaddingOf(context).bottom + 96,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          _buildVehicleCard(),
+          _buildLocationCard(),
+          _buildNotesCard(),
+          _buildPromoSection(),
+          _buildPointsCard(),
+          _buildOrderSummaryCard(),
+          _buildPaymentMethodsCard(),
+        ],
+      ),
+    );
+    final Widget bottomBar = SafeArea(
+      minimum: const EdgeInsets.fromLTRB(
+        KSpace.xl,
+        KSpace.s,
+        KSpace.xl,
+        KSpace.l,
+      ),
+      child: _buildBottomAction(),
+    );
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: BlocListener<PromoBloc, PromoState>(
-        listener: (context, state) {
-          if (state is GetPromoCodeDetailSuccess) {
-            // Set copiedPromoCode so it gets included in order creation
-            // copiedPromoCode = CopyPromoCode(
-            //   promoCode: _promoCode.text,
-            //   id: _promoCode.text,
-            // );
-
-            // Set promo as applied
-            setState(() {
-              _isPromoApplied = true;
-            });
-
-            // Show success message with promo code details
-            showSnackBar(
-              buildContext: context,
-              message: translate(AppStrings.promoCodeAppliedSuccessfully)
-                  .replaceAll(
-                      '{amount}', '${state.promoCodeDetail.discountAmount}'),
-            );
-          } else if (state is GetPromoCodeDetailError) {
-            // Show error message from API response
-            String errorMessage;
-            if (state.errorModel != null) {
-              errorMessage =
-                  Localizations.localeOf(context).languageCode == 'en'
-                      ? (state.errorModel!.en ??
-                          state.errorModel!.ar ??
-                          translate(AppStrings.promoCodeNotValid))
-                      : (state.errorModel!.ar ??
-                          state.errorModel!.en ??
-                          translate(AppStrings.promoCodeNotValid));
-            } else {
-              errorMessage =
-                  state.error ?? translate(AppStrings.promoCodeNotValid);
-            }
-            showSnackBar(
-              buildContext: context,
-              message: errorMessage,
-            );
-            setState(() {
-              _isPromoApplied = false;
-            });
-          } else if (state is PromoCodeDetailCleared) {
-            // Reset promo applied state when cleared
-            setState(() {
-              _isPromoApplied = false;
-            });
-          }
-        },
-        child: Scaffold(
-          backgroundColor: ColorManager.gray,
-          appBar: _buildAppBar(),
-          body: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.only(bottom: 100.h),
-                  child: Column(
-                    children: [
-                      // Details
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 16.w),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            _buildVehicleCard(),
-                            SizedBox(height: 8.h),
-                            _buildLocationCard(),
-                            SizedBox(height: 8.h),
-                            _buildNotesCard(),
-                            if (copiedPromoCode != null ||
-                                _inputMode == false &&
-                                    _promoCode.text.isEmpty) ...[
-                              TextOnPressed(
-                                  fontSize: 14.sp,
-                                  textDecoration: TextDecoration.underline,
-                                  onPressed: () {
-                                    setState(() {
-                                      _inputMode = !_inputMode;
-                                      sl<PromoBloc>()
-                                          .add(ClearPromoCodeDetail());
-                                    });
-                                  },
-                                  text: _inputMode == false
-                                      ? translate(AppStrings.addPromoCode)
-                                      : translate(AppStrings.back)),
-                              SizedBox(height: 12.h),
-                            ],
-                            copiedPromoCode == null || _inputMode
-                                ? _buildModernCard(
-                                    title: translate(AppStrings.addPromoCode),
-                                    icon: Icons.local_offer,
-                                    child: Column(
-                                      children: [
-                                        TextFormShared(
-                                          hintText: translate(
-                                              AppStrings.promoCodeHint),
-                                          controller: _promoCode,
-                                          onChanged: (value) {
-                                            setState(() {});
-                                          },
-                                        ),
-                                        20.verticalSpace,
-                                        _promoCode.text.isEmpty
-                                            ? const SizedBox()
-                                            : SizedBox(
-                                                height: 40.h,
-                                                child: ButtonsShared(
-                                                  onPressed: _isPromoApplied
-                                                      ? () {
-                                                          sl<PromoBloc>().add(
-                                                              ClearPromoCodeDetail());
-                                                          setState(() {
-                                                            _isPromoApplied =
-                                                                false;
-                                                          });
-                                                        }
-                                                      : () {
-                                                          copiedPromoCode =
-                                                              CopyPromoCode(
-                                                                  promoCode:
-                                                                      _promoCode
-                                                                          .text,
-                                                                  id: _promoCode
-                                                                      .text);
-                                                          final totalPrice =
-                                                              generalSingleton
-                                                                      .totalPay ??
-                                                                  offersBloc
-                                                                      .total;
-                                                          sl<PromoBloc>().add(
-                                                              GetPromoCodeDetail(
-                                                            promoCode:
-                                                                _promoCode.text,
-                                                            totalPrice:
-                                                                totalPrice
-                                                                    .toString(),
-                                                          ));
-                                                          setState(() {
-                                                            _isPromoApplied =
-                                                                true;
-                                                          });
-                                                        },
-                                                  text: _isPromoApplied
-                                                      ? translate(AppStrings
-                                                          .removeButton)
-                                                      : translate(
-                                                          AppStrings.apply),
-                                                  colorButton: _isPromoApplied
-                                                      ? ColorManager.white
-                                                      : ColorManager.primary,
-                                                  colorBorder: _isPromoApplied
-                                                      ? ColorManager.red
-                                                      : ColorManager.primary,
-                                                  colorText: _isPromoApplied
-                                                      ? ColorManager.red
-                                                      : ColorManager.white,
-                                                ),
-                                              )
-                                      ],
-                                    ))
-                                : Container(
-                                    margin: EdgeInsets.only(bottom: 12.h),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(16.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.05),
-                                          blurRadius: 8,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(16.w),
-                                      child: Row(
-                                        children: [
-                                          // Promo code icon
-                                          Container(
-                                            padding: EdgeInsets.all(8.w),
-                                            decoration: BoxDecoration(
-                                              color: ColorManager.primary
-                                                  .withValues(alpha: 0.1),
-                                              borderRadius:
-                                                  BorderRadius.circular(12.r),
-                                            ),
-                                            child: Icon(
-                                              Icons.local_offer,
-                                              color: ColorManager.primary,
-                                              size: 20.w,
-                                            ),
-                                          ),
-                                          SizedBox(width: 12.w),
-                                          // Promo code details
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  translate(AppStrings
-                                                      .promoCodeApplied),
-                                                  style: AppStyles.title16Bold
-                                                      .copyWith(
-                                                    fontSize: 14.sp,
-                                                    color: ColorManager.black,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 2.h),
-                                                Text(
-                                                  "${copiedPromoCode?.promoCode}",
-                                                  style: AppStyles
-                                                      .subtext14Regular
-                                                      .copyWith(
-                                                    color: ColorManager.medGray,
-                                                    fontSize: 12.sp,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          // Single action button based on state
-                                          SizedBox(
-                                            height: 32.h,
-                                            child: _isPromoApplied
-                                                ? OutlinedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        // _promoCode.clear();
-                                                        _isPromoApplied = false;
-                                                      });
-                                                      // Clear copiedPromoCode so it doesn't get included in order creation
-                                                      // copiedPromoCode = null; // Keep promo code data for re-application
-                                                      // Clear promo code state and reset to initial state
-                                                      sl<PromoBloc>().add(
-                                                          ClearPromoCodeDetail());
-                                                    },
-                                                    style: OutlinedButton
-                                                        .styleFrom(
-                                                      side: const BorderSide(
-                                                          color:
-                                                              ColorManager.red),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.r),
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 12.w),
-                                                      minimumSize:
-                                                          const Size(0, 0),
-                                                    ),
-                                                    child: Text(
-                                                      translate(AppStrings
-                                                          .removeButton),
-                                                      style: AppStyles
-                                                          .subtext14Regular
-                                                          .copyWith(
-                                                        color: ColorManager.red,
-                                                        fontSize: 11.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  )
-                                                : ElevatedButton(
-                                                    onPressed: () {
-                                                      final totalPrice =
-                                                          generalSingleton
-                                                                  .totalPay ??
-                                                              offersBloc.total;
-                                                      sl<PromoBloc>().add(
-                                                        GetPromoCodeDetail(
-                                                          promoCode: copiedPromoCode
-                                                                  ?.promoCode ??
-                                                              '',
-                                                          totalPrice: totalPrice
-                                                              .toString(),
-                                                        ),
-                                                      );
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          ColorManager.primary,
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8.r),
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 12.w),
-                                                      minimumSize:
-                                                          const Size(0, 0),
-                                                    ),
-                                                    child: Text(
-                                                      translate(
-                                                          AppStrings.apply),
-                                                      style: AppStyles
-                                                          .subtext14Regular
-                                                          .copyWith(
-                                                        color: Colors.white,
-                                                        fontSize: 11.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                      ),
-                                                    ),
-                                                  ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                            // Promo Code Details Display
-                            BlocBuilder<PromoBloc, PromoState>(
-                              builder: (context, state) {
-                                if (state is GetPromoCodeDetailSuccess) {
-                                  return Container(
-                                    margin: EdgeInsets.only(top: 16.h),
-                                    padding: EdgeInsets.all(16.w),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          ColorManager.primary.withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: ColorManager.primary
-                                            .withValues(alpha: 0.3),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.check_circle,
-                                              color: ColorManager.primary,
-                                              size: 20.sp,
-                                            ),
-                                            SizedBox(width: 8.w),
-                                            Text(
-                                              translate(
-                                                  AppStrings.promoCodeApplied),
-                                              style: AppStyles.title16Bold
-                                                  .copyWith(
-                                                color: ColorManager.primary,
-                                                fontSize: 14.sp,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 12.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              translate(
-                                                  AppStrings.originalPrice),
-                                              style: AppStyles.subtext14Regular,
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "${generalSingleton.totalPay ?? offersBloc.total} ",
-                                                  style: AppStyles
-                                                      .subtext14Regular,
-                                                ),
-                                                SvgPicture.asset(
-                                                  AssetsManager
-                                                      .saudiRiyalSymbol,
-                                                  height: 14.h,
-                                                  width: 14.w,
-                                                  colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 8.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              translate(AppStrings.discount),
-                                              style: AppStyles.subtext14Regular
-                                                  .copyWith(
-                                                color: ColorManager.green,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "-${state.promoCodeDetail.discountAmount} ",
-                                                  style: AppStyles.title16Bold
-                                                      .copyWith(
-                                                    color: ColorManager.green,
-                                                    fontSize: 14.sp,
-                                                  ),
-                                                ),
-                                                SvgPicture.asset(
-                                                  AssetsManager
-                                                      .saudiRiyalSymbol,
-                                                  height: 14.h,
-                                                  width: 14.w,
-                                                  colorFilter: ColorFilter.mode(ColorManager.green, BlendMode.srcIn),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                        Divider(height: 16.h),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              translate(AppStrings.finalPrice),
-                                              style: AppStyles.title16Bold
-                                                  .copyWith(
-                                                color: ColorManager.primary,
-                                              ),
-                                            ),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  "${state.promoCodeDetail.totalPayAfterDiscount} ",
-                                                  style: AppStyles.title16Bold
-                                                      .copyWith(
-                                                    color: ColorManager.primary,
-                                                  ),
-                                                ),
-                                                SvgPicture.asset(
-                                                  AssetsManager
-                                                      .saudiRiyalSymbol,
-                                                  height: 16.h,
-                                                  width: 16.w,
-                                                  colorFilter: ColorFilter.mode(ColorManager.primary, BlendMode.srcIn),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                } else if (state is GetPromoCodeDetailLoading) {
-                                  return Container(
-                                    margin: EdgeInsets.only(top: 16.h),
-                                    padding: EdgeInsets.all(16.w),
-                                    decoration: BoxDecoration(
-                                      color: ColorManager.gray.withValues(alpha: 0.5),
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        SizedBox(
-                                          width: 20.w,
-                                          height: 20.h,
-                                          child:
-                                              const CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                              ColorManager.primary,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(width: 12.w),
-                                        Text(
-                                          translate(
-                                              AppStrings.validatingPromoCode),
-                                          style: AppStyles.subtext14Regular,
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            ),
-                            SizedBox(height: 8.h),
-                            _buildPointsCard(),
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 0.w, vertical: 12.h),
-                              child: _buildOrderSummaryCard(),
-                            ),
-                            SizedBox(height: 8.h),
-                            _buildPaymentMethodsCard(),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+        listener: _onPromoState,
+        // Only the scaffold rebuilds as the keyboard moves.
+        child: Builder(
+          builder: (BuildContext context) => Scaffold(
+            backgroundColor: c.background,
+            // The details scroll under the floating button. With the keyboard
+            // up they stop at the keyboard, so a focused field stays visible.
+            extendBody: MediaQuery.viewInsetsOf(context).bottom == 0,
+            appBar: appBar,
+            body: body,
+            bottomNavigationBar: bottomBar,
           ),
-          floatingActionButton: _buildFloatingActionButton(),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
         ),
       ),
     );
@@ -620,215 +243,292 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      elevation: 0,
-      backgroundColor: Colors.transparent,
-      foregroundColor: ColorManager.black,
-      title: Text(
-        translate(AppStrings.orderDetails),
-        style: AppStyles.title16Bold.copyWith(
-          color: ColorManager.white,
-          // fontSize: 20.sp,
+      automaticallyImplyLeading: false,
+      leading: GlassBackButton(onPressed: _onBack),
+      title: Text(translate(AppStrings.orderDetails)),
+    );
+  }
+
+  Widget _buildPromoSection() {
+    final bool showInput = copiedPromoCode == null || _inputMode;
+    final bool showToggle =
+        copiedPromoCode != null ||
+        _inputMode == false && _promoCode.text.isEmpty;
+    return _Section(
+      title: showInput ? translate(AppStrings.addPromoCode) : null,
+      action: showToggle
+          ? KButton(
+              label: _inputMode == false
+                  ? translate(AppStrings.addPromoCode)
+                  : translate(AppStrings.back),
+              variant: KButtonVariant.text,
+              expand: false,
+              onPressed: () {
+                setState(() {
+                  _inputMode = !_inputMode;
+                  sl<PromoBloc>().add(ClearPromoCodeDetail());
+                });
+              },
+            )
+          : null,
+      child: KCard(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            if (showInput) _buildPromoInput() else _buildPromoApplied(),
+            _buildPromoDetails(showHeader: showInput),
+          ],
         ),
       ),
-      centerTitle: false,
-      flexibleSpace: Container(
-        decoration: const BoxDecoration(color: ColorManager.primary),
+    );
+  }
+
+  Widget _buildPromoInput() {
+    return Padding(
+      padding: const EdgeInsets.all(KSpace.l),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          KTextField(
+            label: translate(AppStrings.promoCodeHint),
+            controller: _promoCode,
+          ),
+          if (_promoCode.text.isNotEmpty) ...<Widget>[
+            const SizedBox(height: KSpace.m),
+            _applyOrRemoveButton(
+              applied: _isPromoApplied,
+              onPressed: _isPromoApplied
+                  ? () {
+                      sl<PromoBloc>().add(ClearPromoCodeDetail());
+                      setState(() {
+                        _isPromoApplied = false;
+                      });
+                    }
+                  : () {
+                      copiedPromoCode = CopyPromoCode(
+                        promoCode: _promoCode.text,
+                        id: _promoCode.text,
+                      );
+                      final totalPrice =
+                          generalSingleton.totalPay ?? offersBloc.total;
+                      sl<PromoBloc>().add(
+                        GetPromoCodeDetail(
+                          promoCode: _promoCode.text,
+                          totalPrice: totalPrice.toString(),
+                        ),
+                      );
+                      setState(() {
+                        _isPromoApplied = true;
+                      });
+                    },
+            ),
+          ],
+        ],
       ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back_ios_new, size: 18.w, color: Colors.white),
-        onPressed: () {
-          // Clear promo code when going back
-          sl<PromoBloc>().add(ClearPromoCodeDetail());
-          copiedPromoCode = null;
-          _promoCode.clear();
+    );
+  }
 
-          // Clear order details when going back
-          generalSingleton.orderId = null;
-          generalSingleton.totalPay = null;
-          generalSingleton.orderTime = null;
-          generalSingleton.nearByDescription = null;
-          generalSingleton.isCarFreshened = false;
-          generalSingleton.appliedPoints = 0;
-          selectedPaymentType = null;
+  Widget _buildPromoApplied() {
+    return KListRow(
+      leading: Icon(Icons.local_offer, color: KColors.of(context).brand),
+      title: translate(AppStrings.promoCodeApplied),
+      subtitle: "${copiedPromoCode?.promoCode}",
+      trailing: _applyOrRemoveButton(
+        applied: _isPromoApplied,
+        expand: false,
+        onPressed: _isPromoApplied
+            ? () {
+                setState(() {
+                  // _promoCode.clear();
+                  _isPromoApplied = false;
+                });
+                // Clear copiedPromoCode so it doesn't get included in order creation
+                // copiedPromoCode = null; // Keep promo code data for re-application
+                // Clear promo code state and reset to initial state
+                sl<PromoBloc>().add(ClearPromoCodeDetail());
+              }
+            : () {
+                final totalPrice =
+                    generalSingleton.totalPay ?? offersBloc.total;
+                sl<PromoBloc>().add(
+                  GetPromoCodeDetail(
+                    promoCode: copiedPromoCode?.promoCode ?? '',
+                    totalPrice: totalPrice.toString(),
+                  ),
+                );
+              },
+      ),
+    );
+  }
 
-          // Clear points discount
-          setState(() {
-            _isPointsApplied = false;
-            _pointsDiscountAmount = null;
-            _pointsController.clear();
-          });
+  Widget _buildPromoDetails({required bool showHeader}) {
+    return BlocBuilder<PromoBloc, PromoState>(
+      builder: (context, state) {
+        if (state is GetPromoCodeDetailSuccess) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                if (showHeader)
+                  _appliedChip(translate(AppStrings.promoCodeApplied)),
+                _AmountRow(
+                  label: translate(AppStrings.originalPrice),
+                  amount: "${generalSingleton.totalPay ?? offersBloc.total}",
+                ),
+                _AmountRow(
+                  label: translate(AppStrings.discount),
+                  amount: "-${state.promoCodeDetail.discountAmount}",
+                ),
+                _AmountRow(
+                  label: translate(AppStrings.finalPrice),
+                  amount: "${state.promoCodeDetail.totalPayAfterDiscount}",
+                  emphasized: true,
+                ),
+              ],
+            ),
+          );
+        } else if (state is GetPromoCodeDetailLoading) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
+            child: _InlineProgress(
+              message: translate(AppStrings.validatingPromoCode),
+            ),
+          );
+        }
+        return const SizedBox.shrink();
+      },
+    );
+  }
 
-          orderIdd = null;
+  /// Apply is an action in the content; Remove is a quiet destructive link.
+  Widget _applyOrRemoveButton({
+    required bool applied,
+    required VoidCallback? onPressed,
+    bool loading = false,
+    bool expand = true,
+  }) {
+    return KButton(
+      label: applied
+          ? translate(AppStrings.removeButton)
+          : translate(AppStrings.apply),
+      variant: applied ? KButtonVariant.text : KButtonVariant.secondary,
+      color: applied ? KColors.of(context).error : null,
+      loading: loading,
+      expand: expand,
+      onPressed: onPressed,
+    );
+  }
 
-          setState(() {
-            _isPromoApplied = false;
-            _inputMode = true;
-          });
-          Navigator.pop(context);
-        },
+  Widget _appliedChip(String label) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: KSpace.s),
+      child: Align(
+        alignment: AlignmentDirectional.centerStart,
+        child: KStatusChip(label: label, status: KStatus.success),
       ),
     );
   }
 
   Widget _buildOrderSummaryCard() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            ColorManager.primary,
-            ColorManager.primary.withValues(alpha: 0.8),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(24.w),
+    final KColors c = KColors.of(context);
+    return _Section(
+      child: KCard(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
             Row(
-              children: [
-                Icon(Icons.schedule, color: Colors.white70, size: 18.w),
-                SizedBox(width: 6.w),
-                Text(
-                  humanReadableDateTime(
-                      GeneralSingleton().orderTime ?? DateTime.now()),
-                  style:
-                      AppStyles.caption12Medium.copyWith(color: Colors.white70),
+              children: <Widget>[
+                Icon(Icons.schedule, color: c.textSecondary, size: KSpace.xl),
+                const SizedBox(width: KSpace.s),
+                Expanded(
+                  child: Text(
+                    humanReadableDateTime(
+                        GeneralSingleton().orderTime ?? DateTime.now()),
+                    style: KType.subhead.copyWith(color: c.textSecondary),
+                  ),
                 ),
               ],
             ),
-            SizedBox(height: 20.h),
-            BlocBuilder<PromoBloc, PromoState>(
-              builder: (context, state) {
-                double totalAmount = offersBloc.total.toDouble();
-                bool hasPromoCode = false;
-                bool hasPointsDiscount =
-                    _isPointsApplied && _pointsDiscountAmount != null;
-
-                if (state is GetPromoCodeDetailSuccess) {
-                  totalAmount =
-                      state.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
-                          offersBloc.total.toDouble();
-                  hasPromoCode = true;
-                } else if (state is PromoCodeDetailCleared) {
-                  // Reset to original amount when cleared
-                  totalAmount = offersBloc.total.toDouble();
-                  hasPromoCode = false;
-                }
-
-                // Apply points discount
-                if (hasPointsDiscount && _pointsDiscountAmount != null) {
-                  totalAmount = totalAmount - _pointsDiscountAmount!.toDouble();
-                  if (totalAmount < 0) totalAmount = 0;
-                }
-
-                final bool hasAnyDiscount = hasPromoCode || hasPointsDiscount;
-
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (hasAnyDiscount) ...[
-                      // Show original price with strikethrough
-                      Row(
-                        children: [
-                          Text(
-                            "${translate(AppStrings.totalPay)} ${offersBloc.total} ",
-                            style: TextStyle(
-                              fontSize: 20.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.white70,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: Colors.white70,
-                              decorationThickness: 2.0,
-                              decorationStyle: TextDecorationStyle.solid,
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            AssetsManager.saudiRiyalSymbol,
-                            height: 20.h,
-                            width: 20.w,
-                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 4.h),
-                      // Show discounted price
-                      Row(
-                        children: [
-                          Text(
-                            "${translate(AppStrings.totalPay)} $totalAmount ",
-                            style: TextStyle(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            AssetsManager.saudiRiyalSymbol,
-                            height: 28.h,
-                            width: 28.w,
-                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
-                          ),
-                        ],
-                      ),
-                    ] else ...[
-                      // Show normal price
-                      Row(
-                        children: [
-                          Text(
-                            "${translate(AppStrings.totalPay)} $totalAmount ",
-                            style: TextStyle(
-                              fontSize: 28.sp,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            AssetsManager.saudiRiyalSymbol,
-                            height: 28.h,
-                            width: 28.w,
-                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ],
-                );
-              },
-            ),
-            SizedBox(height: 8.h),
+            const SizedBox(height: KSpace.s),
             _buildServicesSummary(),
+            Divider(height: KSpace.xxl, color: c.separator),
+            _buildTotal(),
           ],
         ),
       ),
     );
   }
 
+  Widget _buildTotal() {
+    final KColors c = KColors.of(context);
+    return BlocBuilder<PromoBloc, PromoState>(
+      builder: (context, state) {
+        double totalAmount = offersBloc.total.toDouble();
+        bool hasPromoCode = false;
+        bool hasPointsDiscount =
+            _isPointsApplied && _pointsDiscountAmount != null;
+
+        if (state is GetPromoCodeDetailSuccess) {
+          totalAmount =
+              state.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
+                  offersBloc.total.toDouble();
+          hasPromoCode = true;
+        } else if (state is PromoCodeDetailCleared) {
+          // Reset to original amount when cleared
+          totalAmount = offersBloc.total.toDouble();
+          hasPromoCode = false;
+        }
+
+        // Apply points discount
+        if (hasPointsDiscount && _pointsDiscountAmount != null) {
+          totalAmount = totalAmount - _pointsDiscountAmount!.toDouble();
+          if (totalAmount < 0) totalAmount = 0;
+        }
+
+        final bool hasAnyDiscount = hasPromoCode || hasPointsDiscount;
+
+        return Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                translate(AppStrings.totalPay),
+                style: KType.headline.copyWith(color: c.text),
+              ),
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                if (hasAnyDiscount)
+                  // Show original price with strikethrough
+                  _Amount(
+                    "${offersBloc.total}",
+                    style: KType.subhead.copyWith(
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                    color: c.textSecondary,
+                  ),
+                _Amount("$totalAmount", style: KType.title, color: c.text),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildServicesSummary() {
+    final TextStyle style = KType.subhead.copyWith(
+      color: KColors.of(context).text,
+    );
     if (sl.call<GetUserProfileBloc>().profile.isSubscribed! &&
         offersBloc.cartServicesList.isEmpty &&
         offersBloc.cartAddOnsList.isEmpty) {
-      return Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.15),
-          borderRadius: BorderRadius.circular(12.r),
-        ),
-        child: Text(
-          '${subscriptionBloc.subscription.remainingWashes} ${translate(AppStrings.outOf)} ${subscriptionBloc.subscription.plan!.usageCount!} ${subscriptionBloc.subscription.plan!.type!} ${translate(AppStrings.washes)}',
-          style: AppStyles.subtext14Regular.copyWith(color: Colors.white),
-        ),
+      return Text(
+        '${subscriptionBloc.subscription.remainingWashes} ${translate(AppStrings.outOf)} ${subscriptionBloc.subscription.plan!.usageCount!} ${subscriptionBloc.subscription.plan!.type!} ${translate(AppStrings.washes)}',
+        style: style,
       );
     }
 
@@ -842,174 +542,85 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Services Container
-        if (services.isNotEmpty) ...[
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              '${translate(AppStrings.services)}: ${services.map((s) => s.name).join(', ')}',
-              style: AppStyles.subtext14Regular.copyWith(color: Colors.white),
-            ),
+      children: <Widget>[
+        if (services.isNotEmpty)
+          Text(
+            '${translate(AppStrings.services)}: ${services.map((s) => s.name).join(', ')}',
+            style: style,
           ),
-          SizedBox(height: 8.h),
-        ],
-        // Add-ons Container
+        if (services.isNotEmpty && addOns.isNotEmpty)
+          const SizedBox(height: KSpace.xs),
         if (addOns.isNotEmpty)
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.15),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Text(
-              '${translate(AppStrings.addOns)}: ${addOns.map((a) => a.name).join(', ')}',
-              style: AppStyles.subtext14Regular.copyWith(color: Colors.white),
-            ),
+          Text(
+            '${translate(AppStrings.addOns)}: ${addOns.map((a) => a.name).join(', ')}',
+            style: style,
           ),
       ],
     );
   }
 
   Widget _buildVehicleCard() {
+    final KColors c = KColors.of(context);
     final vehicleBloc = sl<VehiclesBloc>();
     final vehicle = vehicleBloc.selectedVehicle;
 
     // Check if vehicle is available
-    if (vehicle.sId == null || vehicle.sId!.isEmpty) {
-      return _buildModernCard(
-        title: translate(AppStrings.myVehicle),
-        icon: Icons.directions_car,
-        child: Container(
-          padding: EdgeInsets.all(16.w),
-          decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12.r),
-            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.warning, color: Colors.orange, size: 20.w),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: Text(
-                  translate(AppStrings.noVehicleSelected),
-                  style: AppStyles.subtext14Regular
-                      .copyWith(color: Colors.orange.shade700),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
+    final bool hasVehicle = !(vehicle.sId == null || vehicle.sId!.isEmpty);
 
-    return _buildModernCard(
+    return _Section(
       title: translate(AppStrings.myVehicle),
-      icon: Icons.directions_car,
-      child: Row(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16.r),
-              child: vehicle.imageLink != null
-                  ? CachedNetworkImage(
-                      imageUrl: vehicle.imageLink!,
-                      height: 80.h,
-                      width: 80.w,
-                      fit: BoxFit.cover,
-                    )
-                  : Container(
-                      height: 80.h,
-                      width: 80.w,
-                      color: ColorManager.gray,
-                      child: Icon(Icons.directions_car,
-                          color: ColorManager.medGray),
+      child: KCard(
+        padding: EdgeInsets.zero,
+        child: hasVehicle
+            ? KListRow(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(KRadius.field),
+                  child: ColoredBox(
+                    color: c.fill,
+                    child: SizedBox.square(
+                      dimension: _vehiclePhotoSize,
+                      child: vehicle.imageLink != null
+                          ? CachedNetworkImage(
+                              imageUrl: vehicle.imageLink!,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(Icons.directions_car, color: c.textSecondary),
                     ),
-            ),
-          ),
-          SizedBox(width: 16.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text("${vehicle.brand} ${vehicle.model}",
-                    style: AppStyles.title16Bold),
-                SizedBox(height: 4.h),
-                _buildInfoRow(Icons.palette, vehicle.color ?? "N/A"),
-                SizedBox(height: 2.h),
-                _buildInfoRow(
-                    Icons.confirmation_number, vehicle.plateNumber ?? "N/A"),
-              ],
-            ),
-          ),
-        ],
+                  ),
+                ),
+                title: "${vehicle.brand} ${vehicle.model}",
+                subtitle:
+                    '${vehicle.color ?? "N/A"} · ${vehicle.plateNumber ?? "N/A"}',
+              )
+            : KListRow(
+                leading: Icon(Icons.warning_amber_rounded, color: c.warning),
+                title: translate(AppStrings.noVehicleSelected),
+              ),
       ),
     );
   }
 
   Widget _buildLocationCard() {
-    return _buildModernCard(
+    return _Section(
       title: translate(AppStrings.serviceLocation),
-      icon: Icons.location_on,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16.r),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16.r),
-              child: SizedBox(
-                height: 150.h,
-                width: double.infinity,
-                child: FixedMap(
-                  latLng: LatLng(
-                    blcoPosition.latitude,
-                    blcoPosition.longitude,
-                  ),
-                ),
+      child: KCard(
+        padding: EdgeInsets.zero,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            FixedMap(
+              height: _mapHeight,
+              latLng: LatLng(
+                blcoPosition.latitude,
+                blcoPosition.longitude,
               ),
             ),
-          ),
-          SizedBox(height: 12.h),
-          Row(
-            children: [
-              Icon(Icons.place, color: ColorManager.primary, size: 20.w),
-              SizedBox(width: 8.w),
-              Expanded(
-                child: Text(
-                  blcoCountry,
-                  style: AppStyles.subtext14Regular,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-        ],
+            KListRow(
+              leading: Icon(Icons.place, color: KColors.of(context).brand),
+              title: blcoCountry,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1018,241 +629,121 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     final notes = GeneralSingleton().nearByDescription;
     if (notes == null || notes.isEmpty) return const SizedBox.shrink();
 
-    return _buildModernCard(
+    return _Section(
       title: translate(AppStrings.additionalNotes),
-      icon: Icons.note_alt,
-      child: Text(
-        notes,
-        style: AppStyles.subtext14Regular,
+      child: KCard(
+        child: Text(
+          notes,
+          style: KType.body.copyWith(color: KColors.of(context).text),
+        ),
       ),
     );
   }
 
   Widget _buildPointsCard() {
+    final KColors c = KColors.of(context);
+
     final userProfileBloc = sl<GetUserProfileBloc>();
     final availablePoints = userProfileBloc.profile.points ?? 0;
     final enteredPoints = num.tryParse(_pointsController.text.trim()) ?? 0;
     final exceedsLimit = enteredPoints > availablePoints;
     final hasError = _pointsController.text.isNotEmpty && exceedsLimit;
 
-    return _buildModernCard(
+    return _Section(
       title: translate(AppStrings.points),
-      icon: Icons.stars,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Show available points
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-            decoration: BoxDecoration(
-              color: ColorManager.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8.r),
+      action: KStatusChip(
+        label: translate(
+          AppStrings.availablePoints,
+        ).replaceAll('{points}', '$availablePoints'),
+        status: KStatus.brand,
+      ),
+      child: KCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            KTextField(
+              label: translate(AppStrings.enterPointsToApply),
+              controller: _pointsController,
+              keyboardType: TextInputType.number,
             ),
-            child: Row(
-              children: [
-                Icon(Icons.info_outline,
-                    size: 16.w, color: ColorManager.primary),
-                SizedBox(width: 8.w),
-                Text(
-                  translate(AppStrings.availablePoints)
-                      .replaceAll('{points}', '$availablePoints'),
-                  style: AppStyles.subtext14Regular.copyWith(
-                    color: ColorManager.primary,
-                    fontSize: 12.sp,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 12.h),
-          TextFormShared(
-            hintText: translate(AppStrings.enterPointsToApply),
-            controller: _pointsController,
-            textInputType: TextInputType.number,
-            errorText: hasError
-                ? translate(AppStrings.pointsExceedAvailableLimit)
-                : null,
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
-          if (hasError) ...[
-            SizedBox(height: 8.h),
-            Row(
-              children: [
-                Icon(Icons.error_outline, size: 16.w, color: ColorManager.red),
-                SizedBox(width: 6.w),
-                Expanded(
-                  child: Text(
-                    translate(AppStrings.youCanOnlyUseUpToPointsSimple)
-                        .replaceAll('{points}', '$availablePoints'),
-                    style: AppStyles.subtext14Regular.copyWith(
-                      color: ColorManager.red,
-                      fontSize: 12.sp,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-          20.verticalSpace,
-          _pointsController.text.isEmpty
-              ? const SizedBox()
-              : SizedBox(
-                  height: 40.h,
-                  child: ButtonsShared(
-                    onPressed: _isPointsLoading || exceedsLimit
-                        ? () {}
-                        : _isPointsApplied
-                            ? () {
-                                // Recalculate total without points discount
-                                final promoState =
-                                    context.read<PromoBloc>().state;
-                                double baseTotal =
-                                    generalSingleton.totalPay?.toDouble() ??
-                                        offersBloc.total.toDouble();
-
-                                // Apply promo code discount if exists
-                                if (promoState is GetPromoCodeDetailSuccess) {
-                                  baseTotal = promoState
-                                          .promoCodeDetail.totalPayAfterDiscount
-                                          ?.toDouble() ??
-                                      baseTotal;
-                                } else {
-                                  final discount =
-                                      sl<PromoBloc>().totalPayModel.discount ??
-                                          0;
-                                  baseTotal = baseTotal - discount;
-                                }
-
-                                setState(() {
-                                  _isPointsApplied = false;
-                                  _pointsDiscountAmount = null;
-                                  generalSingleton.appliedPoints = 0;
-                                  // Update Apple Pay total to remove points discount
-                                  _applePayTotal = baseTotal;
-                                });
-                              }
-                            : _applyPointsDiscount,
-                    text: _isPointsApplied
-                        ? translate(AppStrings.removeButton)
-                        : translate(AppStrings.apply),
-                    colorButton: _isPointsApplied
-                        ? ColorManager.white
-                        : (exceedsLimit
-                            ? ColorManager.medGray
-                            : ColorManager.primary),
-                    colorBorder: _isPointsApplied
-                        ? ColorManager.red
-                        : (exceedsLimit
-                            ? ColorManager.medGray
-                            : ColorManager.primary),
-                    colorText: _isPointsApplied
-                        ? ColorManager.red
-                        : (exceedsLimit
-                            ? ColorManager.medGray
-                            : ColorManager.white),
-                  ),
-                ),
-          // Points Discount Details Display
-          if (_isPointsApplied && _pointsDiscountAmount != null) ...[
-            SizedBox(height: 16.h),
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: ColorManager.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12.r),
-                border: Border.all(
-                  color: ColorManager.primary.withValues(alpha: 0.3),
-                  width: 1,
-                ),
-              ),
-              child: Column(
+            if (hasError) ...<Widget>[
+              const SizedBox(height: KSpace.s),
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: ColorManager.primary,
-                        size: 20.sp,
-                      ),
-                      SizedBox(width: 8.w),
-                      Text(
-                        translate(AppStrings.pointsApplied),
-                        style: AppStyles.title16Bold.copyWith(
-                          color: ColorManager.primary,
-                          fontSize: 14.sp,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 12.h),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        translate(AppStrings.discount),
-                        style: AppStyles.subtext14Regular.copyWith(
-                          color: ColorManager.green,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            "-$_pointsDiscountAmount ",
-                            style: AppStyles.title16Bold.copyWith(
-                              color: ColorManager.green,
-                              fontSize: 14.sp,
-                            ),
-                          ),
-                          SvgPicture.asset(
-                            AssetsManager.saudiRiyalSymbol,
-                            height: 14.h,
-                            width: 14.w,
-                            colorFilter: ColorFilter.mode(ColorManager.green, BlendMode.srcIn),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-          if (_isPointsLoading) ...[
-            SizedBox(height: 16.h),
-            Container(
-              padding: EdgeInsets.all(16.w),
-              decoration: BoxDecoration(
-                color: ColorManager.gray.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(12.r),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20.w,
-                    height: 20.h,
-                    child: const CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        ColorManager.primary,
-                      ),
+                children: <Widget>[
+                  Icon(Icons.error_outline, size: KSpace.l, color: c.error),
+                  const SizedBox(width: KSpace.xs),
+                  Expanded(
+                    child: Text(
+                      '${translate(AppStrings.pointsExceedAvailableLimit)}\n'
+                      '${translate(AppStrings.youCanOnlyUseUpToPointsSimple).replaceAll('{points}', '$availablePoints')}',
+                      style: KType.footnote.copyWith(color: c.error),
                     ),
                   ),
-                  SizedBox(width: 12.w),
-                  Text(
-                    translate(AppStrings.calculatingDiscount),
-                    style: AppStyles.subtext14Regular,
-                  ),
                 ],
               ),
-            ),
+            ],
+            if (_pointsController.text.isNotEmpty) ...<Widget>[
+              const SizedBox(height: KSpace.m),
+              _applyOrRemoveButton(
+                applied: _isPointsApplied,
+                loading: _isPointsLoading,
+                onPressed: _isPointsLoading || exceedsLimit
+                    ? null
+                    : _isPointsApplied
+                    ? _removePointsDiscount
+                    : _applyPointsDiscount,
+              ),
+            ],
+            // Points Discount Details Display
+            if (_isPointsApplied && _pointsDiscountAmount != null) ...<Widget>[
+              const SizedBox(height: KSpace.m),
+              _appliedChip(translate(AppStrings.pointsApplied)),
+              _AmountRow(
+                label: translate(AppStrings.discount),
+                amount: "-$_pointsDiscountAmount",
+              ),
+            ],
+            if (_isPointsLoading) ...<Widget>[
+              const SizedBox(height: KSpace.m),
+              _InlineProgress(
+                message: translate(AppStrings.calculatingDiscount),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
+  }
+
+  void _removePointsDiscount() {
+        // Recalculate total without points discount
+        final promoState =
+            context.read<PromoBloc>().state;
+        double baseTotal =
+            generalSingleton.totalPay?.toDouble() ??
+                offersBloc.total.toDouble();
+
+        // Apply promo code discount if exists
+        if (promoState is GetPromoCodeDetailSuccess) {
+          baseTotal = promoState
+                  .promoCodeDetail.totalPayAfterDiscount
+                  ?.toDouble() ??
+              baseTotal;
+        } else {
+          final discount =
+              sl<PromoBloc>().totalPayModel.discount ??
+                  0;
+          baseTotal = baseTotal - discount;
+        }
+
+        setState(() {
+          _isPointsApplied = false;
+          _pointsDiscountAmount = null;
+          generalSingleton.appliedPoints = 0;
+          // Update Apple Pay total to remove points discount
+          _applePayTotal = baseTotal;
+        });
   }
 
   Future<void> _applyPointsDiscount() async {
@@ -1343,6 +834,75 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     }
   }
 
+  void _onBookingOrderState(BuildContext context, BookingOrderState state) {
+    if (state is CreateOrderSuccess) {
+      final orderData = state.reviewOrderModel.data;
+      final newOrderId = orderData?.sId;
+      final newTotalPay = orderData?.totalPay?.toDouble();
+
+      if (newOrderId != null && newOrderId.isNotEmpty) {
+        generalSingleton.orderId = newOrderId;
+        orderIdd = newOrderId;
+      }
+
+      if (newTotalPay != null) {
+        generalSingleton.totalPay = newTotalPay;
+        if (_applePayTotal != newTotalPay) {
+          if (mounted) {
+            setState(() {
+              _applePayTotal = newTotalPay;
+            });
+          } else {
+            _applePayTotal = newTotalPay;
+          }
+        }
+      }
+
+      if ((newTotalPay ?? 0) == 0) {
+        AlertHelper.createOrderSuccess(context);
+      }
+    } else if (state is CreateOrderFailed) {
+      setState(() {
+        _isProcessingPayment = false;
+      });
+
+      if (state.errorModel!.en ==
+              AppStrings.yourWalletBalanceIsNotValid ||
+          state.errorModel!.ar ==
+              AppStrings.yourWalletBalanceIsNotValid) {
+        AlertHelper.payWithWalletNotEnoughAmount(context);
+      } else {
+        showSnackBar(
+            buildContext: context,
+            message: Localizations.localeOf(context)
+                        .languageCode ==
+                    'en'
+                ? state.errorModel!.en!
+                : state.errorModel!.ar!);
+      }
+    } else if (state is PlaceOrderSuccess) {
+      // Prevent multiple success handling
+      if (_isProcessingPayment) {
+        setState(() {
+          _isProcessingPayment = false;
+        });
+        _onOrderSuccess(context,
+            transactionUrl: state.paymentUrl);
+      }
+    } else if (state is PlaceOrderFailed) {
+      setState(() {
+        _isProcessingPayment = false;
+      });
+      showSnackBar(
+          buildContext: context,
+          message:
+              Localizations.localeOf(context).languageCode ==
+                      'en'
+                  ? state.errormodel!.en!
+                  : state.errormodel!.ar!);
+    }
+  }
+
   Widget _buildPaymentMethodsCard() {
     return BlocBuilder<PromoBloc, PromoState>(
       builder: (context, promoState) {
@@ -1371,183 +931,54 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           paymentMethods = paymentMethods.where((m) => m.value != 3).toList();
         }
 
-        return _buildModernCard(
+        return _Section(
           title: translate(AppStrings.choosePaymentMethod),
-          icon: Icons.payment,
-          child: Column(
-            children: paymentMethods.map((type) {
-              return Container(
-                margin: EdgeInsets.only(bottom: 12.h),
-                child: Material(
-                  color: Colors.transparent,
-                  child: BlocConsumer<BookingOrderBloc, BookingOrderState>(
-                    listener: (context, state) {
-                      if (state is CreateOrderSuccess) {
-                        final orderData = state.reviewOrderModel.data;
-                        final newOrderId = orderData?.sId;
-                        final newTotalPay = orderData?.totalPay?.toDouble();
-
-                        if (newOrderId != null && newOrderId.isNotEmpty) {
-                          generalSingleton.orderId = newOrderId;
-                          orderIdd = newOrderId;
-                        }
-
-                        if (newTotalPay != null) {
-                          generalSingleton.totalPay = newTotalPay;
-                          if (_applePayTotal != newTotalPay) {
-                            if (mounted) {
-                              setState(() {
-                                _applePayTotal = newTotalPay;
-                              });
-                            } else {
-                              _applePayTotal = newTotalPay;
-                            }
-                          }
-                        }
-
-                        if ((newTotalPay ?? 0) == 0) {
-                          AlertHelper.createOrderSuccess(context);
-                        }
-                      } else if (state is CreateOrderFailed) {
-                        setState(() {
-                          _isProcessingPayment = false;
-                        });
-
-                        if (state.errorModel!.en ==
-                                AppStrings.yourWalletBalanceIsNotValid ||
-                            state.errorModel!.ar ==
-                                AppStrings.yourWalletBalanceIsNotValid) {
-                          AlertHelper.payWithWalletNotEnoughAmount(context);
-                        } else {
-                          showSnackBar(
-                              buildContext: context,
-                              message: Localizations.localeOf(context)
-                                          .languageCode ==
-                                      'en'
-                                  ? state.errorModel!.en!
-                                  : state.errorModel!.ar!);
-                        }
-                      } else if (state is PlaceOrderSuccess) {
-                        // Prevent multiple success handling
-                        if (_isProcessingPayment) {
-                          setState(() {
-                            _isProcessingPayment = false;
-                          });
-                          _onOrderSuccess(context,
-                              transactionUrl: state.paymentUrl);
-                        }
-                      } else if (state is PlaceOrderFailed) {
-                        setState(() {
-                          _isProcessingPayment = false;
-                        });
-                        showSnackBar(
-                            buildContext: context,
-                            message:
-                                Localizations.localeOf(context).languageCode ==
-                                        'en'
-                                    ? state.errormodel!.en!
-                                    : state.errormodel!.ar!);
-                      }
-                    },
-                    builder: (context, state) {
-                      final double currentTotalAmount =
-                          _calculateTotalAmount(promoState);
-                      final bool isWalletLocked = type.value == 2 &&
-                          (walletBalance ?? 0) < currentTotalAmount;
-
-                      return GestureDetector(
-                        onTap: isWalletLocked
-                            ? () {
-                                showSnackBar(
-                                  buildContext: context,
-                                  message:
-                                      '${translate(AppStrings.yourWalletBalanceIsNotValid)} Required: ${currentTotalAmount.toStringAsFixed(2)}',
-                                );
-                              }
-                            : () => _handlePaymentSelection(type),
-                        child: Column(
-                          children: [
-                            CardPaymentMethod(
-                              walletBalance: walletBalance ?? 0,
-                              isWallet: type.value == 2,
-                              type: type,
-                              borderColor:
-                                  createOrderBloc.paymentType == type.value
-                                      ? ColorManager.secondary
-                                      : Colors.transparent,
-                              groupValue: createOrderBloc.paymentType,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              );
-            }).toList(),
+          child: KCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: <Widget>[
+                for (int i = 0; i < paymentMethods.length; i++) ...<Widget>[
+                  if (i > 0)
+                    Divider(
+                      height: 1,
+                      indent: CardPaymentMethod.dividerIndent,
+                      color: KColors.of(context).separator,
+                    ),
+                  _buildPaymentRow(paymentMethods[i], promoState),
+                ],
+              ],
+            ),
           ),
         );
       },
     );
   }
 
-  Widget _buildModernCard({
-    required String title,
-    required IconData icon,
-    required Widget child,
-  }) {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.only(bottom: 12.h),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 12,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(20.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(10.w),
-                  decoration: BoxDecoration(
-                    color: ColorManager.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16.r),
-                  ),
-                  child: Icon(icon, color: ColorManager.primary, size: 22.w),
-                ),
-                SizedBox(width: 12.w),
-                Text(title,
-                    style: AppStyles.title16Bold
-                        .copyWith(color: ColorManager.black)),
-              ],
-            ),
-            SizedBox(height: 16.h),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
+  Widget _buildPaymentRow(PaymentMethodModel type, PromoState promoState) {
+    return BlocConsumer<BookingOrderBloc, BookingOrderState>(
+      listener: _onBookingOrderState,
+      builder: (context, state) {
+        final double currentTotalAmount =
+            _calculateTotalAmount(promoState);
+        final bool isWalletLocked = type.value == 2 &&
+            (walletBalance ?? 0) < currentTotalAmount;
 
-  Widget _buildInfoRow(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, size: 16.w, color: ColorManager.black),
-        SizedBox(width: 6.w),
-        Text(text,
-            style:
-                AppStyles.subtext14Regular.copyWith(color: ColorManager.black)),
-      ],
+        return CardPaymentMethod(
+          walletBalance: walletBalance ?? 0,
+          isWallet: type.value == 2,
+          type: type,
+          groupValue: createOrderBloc.paymentType,
+          onTap: isWalletLocked
+              ? () {
+                  showSnackBar(
+                    buildContext: context,
+                    message:
+                        '${translate(AppStrings.yourWalletBalanceIsNotValid)} Required: ${currentTotalAmount.toStringAsFixed(2)}',
+                  );
+                }
+              : () => _handlePaymentSelection(type),
+        );
+      },
     );
   }
 
@@ -1588,7 +1019,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     }
   }
 
-  Widget _buildFloatingActionButton() {
+  Widget _buildBottomAction() {
     return BlocBuilder<PromoBloc, PromoState>(
       builder: (context, promoState) {
         final double totalAmount = _calculateTotalAmount(promoState);
@@ -1620,20 +1051,15 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     // Ensure orderId exists before showing Apple Pay button
     final String currentOrderId = generalSingleton.orderId ?? orderIdd ?? "";
     if (currentOrderId.isEmpty) {
-      return Container(
-        width: double.infinity,
-        margin: EdgeInsets.symmetric(horizontal: 16.w),
-        child: Center(child: CircularProgressIndicator()),
-      );
+      return const SizedBox(height: KSpace.tapTarget, child: _InlineProgress());
     }
 
     // Always use calculatedAmount which includes all discounts (promo code + points)
     // calculatedAmount already has points discount subtracted in _calculateTotalAmount
     final double amountToCharge = calculatedAmount;
 
-    return Container(
+    return SizedBox(
       width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
       child: ApplePay(
         config: PaymentConfig(
           currency: "SAR",
@@ -1660,22 +1086,11 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   Widget _buildRegularConfirmButton() {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.symmetric(horizontal: 16.w),
-      child: FloatingActionButton.extended(
-        onPressed: _isProcessingPayment ? null : _handleConfirmOrder,
-        backgroundColor:
-            _isProcessingPayment ? ColorManager.medGray : ColorManager.primary,
-        elevation: 10,
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-        label: Padding(
-          padding: EdgeInsets.symmetric(vertical: 6.h),
-          child: Text(translate(AppStrings.confirmOrder),
-              style: AppStyles.title16Bold.copyWith(color: Colors.white)),
-        ),
-      ),
+    return KButton(
+      label: translate(AppStrings.confirmOrder),
+      // A card payment continues in its own sheet, which shows its own progress.
+      loading: _isProcessingPayment && createOrderBloc.paymentType != 1,
+      onPressed: _isProcessingPayment ? null : _handleConfirmOrder,
     );
   }
 
@@ -1763,126 +1178,56 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     required String message,
     required bool isError,
   }) {
-    showModalBottomSheet(
+    showKSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        margin: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(24.w),
+      builder: (context) {
+        final KColors c = KColors.of(context);
+        return SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              // Handle bar
-              Container(
-                width: 40.w,
-                height: 4.h,
-                decoration: BoxDecoration(
-                  color: ColorManager.medGray,
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              const SizedBox(height: KSpace.s),
+              Icon(
+                isError ? Icons.error_outline : Icons.info_outline,
+                color: isError ? c.error : c.warning,
+                size: 48,
               ),
-              SizedBox(height: 20.h),
-
-              // Icon
-              Container(
-                width: 60.w,
-                height: 60.h,
-                decoration: BoxDecoration(
-                  color: isError
-                      ? Colors.red.withValues(alpha: 0.1)
-                      : Colors.orange.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  isError ? Icons.error_outline : Icons.info_outline,
-                  color: isError ? Colors.red : Colors.orange,
-                  size: 30.w,
-                ),
-              ),
-              SizedBox(height: 20.h),
-
-              // Title
+              const SizedBox(height: KSpace.m),
               Text(
                 title,
-                style: AppStyles.title16Bold.copyWith(
-                  fontSize: 20.sp,
-                  color: ColorManager.black,
-                ),
+                style: KType.title.copyWith(color: c.text),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 12.h),
-
-              // Message
+              const SizedBox(height: KSpace.s),
               Text(
                 message,
-                style: AppStyles.subtext14Regular.copyWith(
-                  color: ColorManager.medGray,
-                ),
+                style: KType.subhead.copyWith(color: c.textSecondary),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 24.h),
-
-              // Action buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: ColorManager.medGray),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                      ),
-                      child: Text(
-                        translate(AppStrings.cancelButton),
-                        style: AppStyles.subtext14Regular.copyWith(
-                          color: ColorManager.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                        // Retry payment if it was an error, otherwise just close
-                        if (isError && createOrderBloc.paymentType == 3) {
-                          _prepareApplePayOrder();
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: ColorManager.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                      ),
-                      child: Text(
-                        isError
-                            ? translate(AppStrings.tryAgain)
-                            : translate(AppStrings.okButton),
-                        style: AppStyles.subtext14Regular.copyWith(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              const SizedBox(height: KSpace.xl),
+              KButton(
+                label: isError
+                    ? translate(AppStrings.tryAgain)
+                    : translate(AppStrings.okButton),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Retry payment if it was an error, otherwise just close
+                  if (isError && createOrderBloc.paymentType == 3) {
+                    _prepareApplePayOrder();
+                  }
+                },
               ),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+              const SizedBox(height: KSpace.xs),
+              KButton(
+                label: translate(AppStrings.cancelButton),
+                variant: KButtonVariant.text,
+                onPressed: () => Navigator.pop(context),
+              ),
             ],
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -2239,12 +1584,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   void _showCreditCardBottomSheet() {
-    showModalBottomSheet(
+    showKSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      isDismissible: true,
-      enableDrag: true,
       builder: (context) => _CreditCardPaymentBottomSheet(
         orderId: generalSingleton.orderId ?? "N/A",
       ),
@@ -2300,6 +1641,158 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       // No transaction URL, payment was successful without webview
       AlertHelper.createOrderSuccess(context);
     }
+  }
+}
+
+const double _vehiclePhotoSize = 64;
+const double _mapHeight = 150;
+
+/// A group on the order screen: an optional heading and action above [child].
+class _Section extends StatelessWidget {
+  const _Section({this.title, this.action, required this.child});
+
+  final String? title;
+  final Widget? action;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: KSpace.xl),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (title != null || action != null)
+            Padding(
+              padding: const EdgeInsetsDirectional.only(
+                start: KSpace.xs,
+                bottom: KSpace.s,
+              ),
+              // Wraps instead of overflowing at large text sizes.
+              child: Wrap(
+                alignment: title == null
+                    ? WrapAlignment.end
+                    : WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: KSpace.s,
+                runSpacing: KSpace.xs,
+                children: <Widget>[
+                  if (title != null)
+                    Semantics(
+                      header: true,
+                      child: Text(
+                        title!,
+                        style: KType.headline.copyWith(
+                          color: KColors.of(context).text,
+                        ),
+                      ),
+                    ),
+                  ?action,
+                ],
+              ),
+            ),
+          child,
+        ],
+      ),
+    );
+  }
+}
+
+/// An amount with the riyal symbol, sized to match the text.
+class _Amount extends StatelessWidget {
+  const _Amount(this.amount, {required this.style, required this.color});
+
+  final String amount;
+  final TextStyle style;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        // LTR so Arabic keeps the minus sign in front of the digits.
+        Text(
+          amount,
+          textDirection: TextDirection.ltr,
+          style: style.copyWith(color: color),
+        ),
+        const SizedBox(width: KSpace.xs),
+        SvgPicture.asset(
+          AssetsManager.saudiRiyalSymbol,
+          height: style.fontSize,
+          width: style.fontSize,
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        ),
+      ],
+    );
+  }
+}
+
+/// One line of a price breakdown.
+class _AmountRow extends StatelessWidget {
+  const _AmountRow({
+    required this.label,
+    required this.amount,
+    this.emphasized = false,
+  });
+
+  final String label;
+  final String amount;
+  final bool emphasized;
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final TextStyle style = emphasized ? KType.headline : KType.subhead;
+    return Padding(
+      padding: const EdgeInsets.only(top: KSpace.xs),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Text(
+              label,
+              style: style.copyWith(
+                color: emphasized ? c.text : c.textSecondary,
+              ),
+            ),
+          ),
+          const SizedBox(width: KSpace.s),
+          _Amount(amount, style: style, color: c.text),
+        ],
+      ),
+    );
+  }
+}
+
+/// A small platform spinner with an optional message, for a wait inside a card.
+class _InlineProgress extends StatelessWidget {
+  const _InlineProgress({this.message});
+
+  final String? message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        const SizedBox.square(
+          dimension: KSpace.xl,
+          child: CircularProgressIndicator.adaptive(strokeWidth: 2),
+        ),
+        if (message != null) ...<Widget>[
+          const SizedBox(width: KSpace.m),
+          Flexible(
+            child: Text(
+              message!,
+              style: KType.subhead.copyWith(
+                color: KColors.of(context).textSecondary,
+              ),
+            ),
+          ),
+        ],
+      ],
+    );
   }
 }
 
@@ -2827,282 +2320,119 @@ class _CreditCardPaymentBottomSheetState
     return value;
   }
 
+  /// KTextField has no onChanged, so the field formats itself as a formatter.
+  TextInputFormatter _reformatWith(String Function(String) format) {
+    return TextInputFormatter.withFunction((_, TextEditingValue value) {
+      final String formatted = format(value.text);
+      if (formatted == value.text) return value;
+      return TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Container(
-        margin: EdgeInsets.all(16.w),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20.r),
-        ),
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w,
-              MediaQuery.of(context).viewInsets.bottom + 24.h),
-          child: Form(
-            key: _cardFormKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Handle bar
-                Center(
-                  child: Container(
-                    width: 40.w,
-                    height: 4.h,
-                    decoration: BoxDecoration(
-                      color: ColorManager.medGray,
-                      borderRadius: BorderRadius.circular(2.r),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _cardFormKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // Title
+              Row(
+                children: <Widget>[
+                  Icon(Icons.credit_card, color: c.brand),
+                  const SizedBox(width: KSpace.m),
+                  Expanded(
+                    child: Text(
+                      translate(AppStrings.enterCardDetails).trim(),
+                      style: KType.headline.copyWith(color: c.text),
                     ),
                   ),
-                ),
-                SizedBox(height: 20.h),
+                ],
+              ),
+              const SizedBox(height: KSpace.l),
 
-                // Title
-                Row(
-                  children: [
-                    Icon(Icons.credit_card,
-                        color: ColorManager.primary, size: 24.w),
-                    SizedBox(width: 12.w),
-                    Text(
-                      translate(AppStrings.enterCardDetails),
-                      style: AppStyles.title16Bold.copyWith(
-                        fontSize: 18.sp,
-                        color: ColorManager.black,
+              // Card Number
+              CardField(
+                label: translate(AppStrings.cardNumber),
+                hint: '1234 5678 9012 3456',
+                prefix: Icon(Icons.credit_card, color: c.textSecondary),
+                controller: _numberController,
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  _reformatWith(_formatCardNumber),
+                ],
+                validator: _validateCardNumber,
+              ),
+              const SizedBox(height: KSpace.m),
+
+              // Cardholder Name
+              CardField(
+                label: translate(AppStrings.cardholderName),
+                hint: 'Cardholder Name',
+                prefix: Icon(Icons.person, color: c.textSecondary),
+                controller: _nameController,
+                inputFormatters: <TextInputFormatter>[UpperCaseTextFormatter()],
+                validator: _validateName,
+              ),
+              const SizedBox(height: KSpace.m),
+
+              // Expiry and CVV Row
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: CardField(
+                      label: translate(AppStrings.cardExpiryDate),
+                      hint: 'MM/YY',
+                      prefix: Icon(
+                        Icons.calendar_month,
+                        color: c.textSecondary,
                       ),
+                      controller: _expiryController,
+                      keyboardType: TextInputType.number,
+                      inputFormatters: <TextInputFormatter>[
+                        _reformatWith(_formatExpiryDate),
+                      ],
+                      validator: _validateExpiryDate,
                     ),
-                  ],
-                ),
-                SizedBox(height: 24.h),
+                  ),
+                  const SizedBox(width: KSpace.m),
+                  Expanded(
+                    child: CardField(
+                      label: translate(AppStrings.cvv),
+                      hint: '123',
+                      controller: _cvvController,
+                      keyboardType: TextInputType.number,
+                      obscure: true,
+                      validator: _validateCVV,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: KSpace.xxl),
 
-                // Card Number
-                Text(
-                  translate(AppStrings.cardNumber),
-                  style: AppStyles.subtext14Regular.copyWith(
-                    color: ColorManager.black,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                TextFormField(
-                  controller: _numberController,
-                  textDirection: TextDirection.ltr,
-                  keyboardType: TextInputType.number,
-                  decoration: InputDecoration(
-                    hintText: '1234 5678 9012 3456',
-                    prefixIcon:
-                        Icon(Icons.credit_card, color: ColorManager.medGray),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: BorderSide(
-                          color: ColorManager.medGray.withValues(alpha: 0.3)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: const BorderSide(
-                          color: ColorManager.primary, width: 2),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                  ),
-                  validator: _validateCardNumber,
-                  onChanged: (value) {
-                    final formatted = _formatCardNumber(value);
-                    if (formatted != value) {
-                      _numberController.value = TextEditingValue(
-                        text: formatted,
-                        selection:
-                            TextSelection.collapsed(offset: formatted.length),
-                      );
-                    }
-                  },
-                ),
-                SizedBox(height: 16.h),
-
-                // Cardholder Name
-                Text(
-                  translate(AppStrings.cardholderName),
-                  style: AppStyles.subtext14Regular.copyWith(
-                    color: const Color.fromARGB(255, 38, 17, 17),
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: 8.h),
-                TextFormField(
-                  textDirection: TextDirection.ltr,
-                  controller: _nameController,
-                  textCapitalization: TextCapitalization.words,
-                  inputFormatters: [
-                    UpperCaseTextFormatter(),
-                  ],
-                  decoration: InputDecoration(
-                    hintText: 'Cardholder Name',
-                    prefixIcon: Icon(Icons.person, color: ColorManager.medGray),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: BorderSide(
-                          color: ColorManager.medGray.withValues(alpha: 0.3)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: const BorderSide(
-                          color: ColorManager.primary, width: 2),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12.r),
-                      borderSide: const BorderSide(color: Colors.red),
-                    ),
-                  ),
-                  validator: _validateName,
-                ),
-                SizedBox(height: 16.h),
-
-                // Expiry and CVV Row
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            translate(AppStrings.expiryDate),
-                            style: AppStyles.subtext14Regular.copyWith(
-                              color: ColorManager.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          TextFormField(
-                            textDirection: TextDirection.ltr,
-                            controller: _expiryController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'MM/YY',
-                              prefixIcon: Icon(Icons.calendar_month,
-                                  color: ColorManager.medGray),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: BorderSide(
-                                    color:
-                                        ColorManager.medGray.withValues(alpha: 0.3)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(
-                                    color: ColorManager.primary, width: 2),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(color: Colors.red),
-                              ),
-                            ),
-                            validator: _validateExpiryDate,
-                            onChanged: (value) {
-                              final formatted = _formatExpiryDate(value);
-                              if (formatted != value) {
-                                _expiryController.value = TextEditingValue(
-                                  text: formatted,
-                                  selection: TextSelection.collapsed(
-                                      offset: formatted.length),
-                                );
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 16.w),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            translate(AppStrings.cvv),
-                            style: AppStyles.subtext14Regular.copyWith(
-                              color: ColorManager.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(height: 8.h),
-                          TextFormField(
-                            textDirection: TextDirection.ltr,
-                            controller: _cvvController,
-                            keyboardType: TextInputType.number,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              hintText: '123',
-                              prefixIcon:
-                                  Icon(Icons.lock, color: ColorManager.medGray),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: BorderSide(
-                                    color:
-                                        ColorManager.medGray.withValues(alpha: 0.3)),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(
-                                    color: ColorManager.primary, width: 2),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                                borderSide: const BorderSide(color: Colors.red),
-                              ),
-                            ),
-                            validator: _validateCVV,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 32.h),
-
-                // Payment Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _isLoading
-                        ? null
-                        : () {
-                            debugPrint("sadsadsassdadsdas ${widget.orderId}");
-                            _submitPayment(orderId: widget.orderId);
-                          },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _isLoading
-                          ? ColorManager.medGray
-                          : ColorManager.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.r),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                    ),
-                    child: _isLoading
-                        ? SizedBox(
-                            width: 20.w,
-                            height: 20.h,
-                            child: const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(Colors.white),
-                            ),
-                          )
-                        : Text(
-                            translate(AppStrings.payNow),
-                            style: AppStyles.title16Bold.copyWith(
-                              color: Colors.white,
-                              fontSize: 16.sp,
-                            ),
-                          ),
-                  ),
-                ),
-              ],
-            ),
+              // Payment Button
+              KButton(
+                label: translate(AppStrings.payNow),
+                loading: _isLoading,
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        debugPrint("sadsadsassdadsdas ${widget.orderId}");
+                        _submitPayment(orderId: widget.orderId);
+                      },
+              ),
+            ],
           ),
         ),
       ),

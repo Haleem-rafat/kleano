@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 
 class PriceAndPoints extends StatelessWidget {
@@ -31,51 +29,28 @@ class PriceAndPoints extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    // Arabic has its own singular and dual words, so no number for 1 and 2.
+    final bool wordOnly =
+        (duration == 1 || duration == 2) &&
+        Localizations.localeOf(context).languageCode != 'en';
     return Row(
       children: <Widget>[
-        Row(
-          children: [
-            Text(
-              '$price ',
-              style: AppStyles.title16Bold.copyWith(
-                color: const Color(0xFF2A2A2A),
-              ),
-            ),
-            SvgPicture.asset(
-              AssetsManager.saudiRiyalSymbol,
-              height: 16.h,
-              width: 16.w,
-            ),
-          ],
+        Text('$price ', style: KType.title.copyWith(color: c.text)),
+        SvgPicture.asset(
+          AssetsManager.saudiRiyalSymbol,
+          height: KSpace.l,
+          width: KSpace.l,
+          colorFilter: ColorFilter.mode(c.text, BlendMode.srcIn),
         ),
-        duration == 1 && Localizations.localeOf(context).languageCode != 'en' ||
-                duration == 2 &&
-                    Localizations.localeOf(context).languageCode != 'en'
-            ? Text(
-                ' / ${getMonth(duration)}',
-                style: AppStyles.body14Medium.copyWith(
-                  color: ColorManager.darkGrey,
-                ),
-              )
-            : Text(
-                ' / $duration ${getMonth(duration)}',
-                style: AppStyles.body14Medium.copyWith(
-                  color: ColorManager.darkGrey,
-                ),
-              ),
-        // const Spacer(),
-        // SvgPicture.asset(
-        //   AssetsManager.singleCoin,
-        //   height: 19.h,
-        //   width: 19.w,
-        // ),
-        // 8.horizontalSpace,
-        // Text(
-        //   pointsToPay.toString(),
-        //   style: AppStyles.title16Regular.copyWith(
-        //     color: ColorManager.medGray,
-        //   ),
-        // ),
+        Flexible(
+          child: Text(
+            wordOnly
+                ? ' / ${getMonth(duration)}'
+                : ' / $duration ${getMonth(duration)}',
+            style: KType.subhead.copyWith(color: c.textSecondary),
+          ),
+        ),
       ],
     );
   }

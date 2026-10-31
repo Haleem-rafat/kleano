@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
+import 'package:thewasher/core/design/components/k_segmented.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/my_booking/screens/my_booking_active.dart';
 import 'package:thewasher/modules/my_booking/screens/my_booking_history.dart';
 import 'package:thewasher/modules/my_booking/screens/my_booking_scheduled.dart';
 import 'package:thewasher/modules/my_vehicles/widgets/guest_my_vehicles.dart';
-import 'package:thewasher/shared/components/tab_bar/tab_bar_shared.dart';
 
 class MyBookingMainTabsScreen extends StatefulWidget {
   const MyBookingMainTabsScreen({super.key});
@@ -20,71 +18,52 @@ class MyBookingMainTabsScreen extends StatefulWidget {
       _MyBookingMainTabsScreenState();
 }
 
-class _MyBookingMainTabsScreenState extends State<MyBookingMainTabsScreen>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
-  late final List<Widget> _tabs;
-  late int currentTabIndex;
-  @override
-  void initState() {
-    super.initState();
-    initialTabs();
-  }
+class _MyBookingMainTabsScreenState extends State<MyBookingMainTabsScreen> {
+  static const List<Widget> _tabs = <Widget>[
+    MyBookingActive(),
+    MyBookingHistory(),
+    MyBookingScheduled(),
+  ];
 
-  void initialTabs() {
-    currentTabIndex = 0;
-    _tabController = TabController(length: 3, vsync: this);
-    _tabs = <Widget>[
-      const MyBookingActive(),
-      const MyBookingHistory(),
-      const MyBookingScheduled(),
-    ];
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
+  int currentTabIndex = 0;
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, AppSize.s60.h),
-        child: AppBarShared(
-          titleAppBar: translate(AppStrings.myBookings),
+      backgroundColor: c.background,
+      appBar: GlassAppBar(
+        automaticallyImplyLeading: false,
+        title: Text(
+          translate(AppStrings.myBookings),
+          style: KType.headline.copyWith(color: c.text),
         ),
       ),
       body: isGuestUser
           ? GuestMyVehicles()
-          : Column(children: <Widget>[
-              AppPadding.p16.ph,
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppPadding.p28.w),
-                child: TabBarSharedWidget(
-                  tabController: _tabController,
-                  currentTabIndex: currentTabIndex,
-                  tabWidget: <Widget>[
-                    Tab(
-                      text: translate(AppStrings.active),
-                    ),
-                    Tab(
-                      text: translate(AppStrings.history),
-                    ),
-                    Tab(
-                      text: translate(AppStrings.schedule),
-                    ),
-                  ],
-                  onTab: (int index) {
-                    setState(() {
-                      currentTabIndex = index;
-                    });
-                  },
+          : Column(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    KSpace.xl,
+                    KSpace.s,
+                    KSpace.xl,
+                    KSpace.s,
+                  ),
+                  child: KSegmented<int>(
+                    segments: <int, String>{
+                      0: translate(AppStrings.active),
+                      1: translate(AppStrings.history),
+                      2: translate(AppStrings.schedule),
+                    },
+                    selected: currentTabIndex,
+                    onChanged: (int index) =>
+                        setState(() => currentTabIndex = index),
+                  ),
                 ),
-              ),
-              Expanded(child: _tabs[currentTabIndex]),
-            ]),
+                Expanded(child: _tabs[currentTabIndex]),
+              ],
+            ),
     );
   }
 }

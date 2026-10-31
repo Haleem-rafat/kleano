@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/on_boarding/choose_register.dart';
-import 'package:thewasher/shared/components/buttons.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
 class GuestNotificationScreen extends StatelessWidget {
@@ -18,42 +14,41 @@ class GuestNotificationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, AppSize.s60.h),
-        child: AppBarShared(
-          titleAppBar: translate(AppStrings.notifications),
-          isTextOnly: false,
+      backgroundColor: c.background,
+      appBar: GlassAppBar(
+        automaticallyImplyLeading: false,
+        centerTitle: false,
+        leadingWidth: 60,
+        leading: GlassBackButton(color: c.brand, onPressed: () => pop(context)),
+        title: Text(
+          translate(AppStrings.notifications),
+          style: KType.headline.copyWith(color: c.text),
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          // crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            SvgPicture.asset(AssetsManager.notificationsEmpty),
-            AppPadding.p24.ph,
-            SizedBox(
-              width: 232.w,
-              child: Text(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(KSpace.xxl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SvgPicture.asset(AssetsManager.notificationsEmpty),
+              const SizedBox(height: KSpace.xxl),
+              Text(
                 translate(AppStrings.yourNotRegisteredYetJoinUs),
                 textAlign: TextAlign.center,
-                style: AppStyles.title16Regular.copyWith(
-                  color: ColorManager.darkGrey,
-                ),
+                style: KType.body.copyWith(color: c.textSecondary),
               ),
-            ),
-            AppPadding.p24.ph,
-            ButtonsShared(
-                width: 164.w,
-                onPressed: () {
-                  popALlAndPushPage(
-                      context,
-                      ChooseRegisterView(
-                      ));
-                },
-                text: translate(AppStrings.signUpNow))
-          ],
+              const SizedBox(height: KSpace.xxl),
+              KButton(
+                label: translate(AppStrings.signUpNow),
+                expand: false,
+                onPressed: () =>
+                    popALlAndPushPage(context, ChooseRegisterView()),
+              ),
+            ],
+          ),
         ),
       ),
     );

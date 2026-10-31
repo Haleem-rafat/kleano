@@ -1,10 +1,10 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/utilis/card_formatters.dart';
-import 'package:thewasher/shared/components/list_tile_text_form.dart';
 import 'package:thewasher/core/utilis/card_validation.dart';
 
 class CardForm extends StatelessWidget {
@@ -28,33 +28,33 @@ class CardForm extends StatelessWidget {
     return Form(
       key: formKey,
       child: Column(
-        children: [
-          8.verticalSpace,
-          ListTileTextForm(
-            title: translate(AppStrings.cardName),
-            hintText: translate(AppStrings.cardName),
-            textInputType: TextInputType.name,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          CardField(
+            label: translate(AppStrings.cardName),
+            hint: translate(AppStrings.cardName),
+            keyboardType: TextInputType.name,
             controller: nameController,
-            textInputFormatter: [
+            inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp('[a-zA-Z. ]')),
               UpperCaseTextFormatter(),
             ],
             validator: CardValidator.validateCardHolderName,
           ),
-          8.verticalSpace,
-          ListTileTextForm(
-            title: translate(AppStrings.cardNumber),
-            hintText: translate(AppStrings.cardNumber),
-            textInputType: TextInputType.number,
+          const SizedBox(height: KSpace.m),
+          CardField(
+            label: translate(AppStrings.cardNumber),
+            hint: translate(AppStrings.cardNumber),
+            keyboardType: TextInputType.number,
             controller: numberController,
-            textInputFormatter: [
+            inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(16),
               CardNumberInputFormatter(),
             ],
             validator: CardValidator.validateCardNumber,
           ),
-          8.verticalSpace,
+          const SizedBox(height: KSpace.m),
           _buildExpiryAndCVV(),
         ],
       ),
@@ -63,14 +63,15 @@ class CardForm extends StatelessWidget {
 
   Widget _buildExpiryAndCVV() {
     return Row(
-      children: [
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
         Expanded(
-          child: ListTileTextForm(
-            title: translate(AppStrings.cardExpiryDate),
-            hintText: 'MM/YY',
-            textInputType: TextInputType.number,
+          child: CardField(
+            label: translate(AppStrings.cardExpiryDate),
+            hint: 'MM/YY',
+            keyboardType: TextInputType.number,
             controller: expiryController,
-            textInputFormatter: [
+            inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(4),
               CardMonthInputFormatter(),
@@ -78,15 +79,15 @@ class CardForm extends StatelessWidget {
             validator: CardValidator.validateExpiryDate,
           ),
         ),
-        16.horizontalSpace,
+        const SizedBox(width: KSpace.m),
         Expanded(
-          child: ListTileTextForm(
-            title: translate(AppStrings.cvv),
-            hintText: '***',
-            textInputType: TextInputType.number,
+          child: CardField(
+            label: translate(AppStrings.cvv),
+            hint: '***',
+            keyboardType: TextInputType.number,
             controller: cvvController,
-            isPassword: true,
-            textInputFormatter: [
+            obscure: true,
+            inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.digitsOnly,
               LengthLimitingTextInputFormatter(4),
             ],
@@ -94,6 +95,55 @@ class CardForm extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// A [KTextField] for card details. What is printed on a card always reads
+/// left to right, even in Arabic: otherwise "1234 5678" shows its groups in
+/// reverse. The label stays on the reading side.
+class CardField extends StatelessWidget {
+  const CardField({
+    super.key,
+    required this.label,
+    this.hint,
+    this.controller,
+    this.keyboardType,
+    this.inputFormatters,
+    this.validator,
+    this.prefix,
+    this.obscure = false,
+  });
+
+  final String label;
+  final String? hint;
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? Function(String?)? validator;
+  final Widget? prefix;
+  final bool obscure;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool rtl = Directionality.of(context) == TextDirection.rtl;
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      // The field's own Text widgets (the label) take their alignment from
+      // here; the input does not.
+      child: DefaultTextStyle.merge(
+        textAlign: rtl ? TextAlign.right : TextAlign.left,
+        child: KTextField(
+          label: label,
+          hint: hint,
+          controller: controller,
+          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          validator: validator,
+          prefix: prefix,
+          obscure: obscure,
+        ),
+      ),
     );
   }
 }

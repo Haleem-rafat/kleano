@@ -1,19 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_bar.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/core/services/apple_pay_service.dart';
 import 'package:thewasher/modules/booking/data/models/payment_type_model.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/widgets/button_use_promo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
@@ -53,211 +50,242 @@ class _SelectPaymentTypeScreenState extends State<SelectPaymentTypeScreen> {
     _promoCode.text = copiedPromoCode?.promoCode ?? '';
   }
 
+  void _onSubscriptionState(
+    BuildContext context,
+    PlansAndSubscriptionState state,
+  ) {
+    if (state is CreateSubscriptionFailed) {
+      pop(context);
+      showSnackBar(
+        buildContext: context,
+        message: Localizations.localeOf(context).languageCode == 'ar'
+            ? state.errorModel!.ar!
+            : state.errorModel!.en!,
+      );
+    } else if (state is CreateSubscriptionSuccess) {
+      if (paymentTypeString == 'CREDIT') {
+        debugPrint('^^^^^^^${state.subscriptionId}');
+        pop(context);
+        pushPage(context, PaymentScreen(subscriptionId: state.subscriptionId));
+      } else if (paymentTypeString == 'APPLE_PAY') {
+        if (Platform.isIOS) {
+          debugPrint('^^^^^^^${state.subscriptionId}');
+          ApplePayService.showApplePayBottomSheetForSubscription(
+            context: context,
+            subscriptionId: state.subscriptionId ?? '',
+            amount: widget.amount ?? 0,
+            createdAt: widget.createdAt ?? DateTime.now().toIso8601String(),
+            onPaymentSuccess: (paymentId) {
+              pop(context);
+              AlertHelper.paymentAddCardSuccess(context);
+            },
+            onPaymentError: (error) {
+              pop(context);
+              showSnackBar(buildContext: context, message: error);
+            },
+          );
+        }
+      } else if (paymentTypeString == 'WALLET') {
+        // Call pay-subscription with just the subscription ID
+        if (state.subscriptionId != null && state.subscriptionId!.isNotEmpty) {
+          sl<PlansAndSubscriptionBloc>().add(
+            PaySubscription(subscriptionId: state.subscriptionId!),
+          );
+        }
+      }
+    } else if (state is PaySubscriptionFailed) {
+      pop(context);
+      showSnackBar(
+        buildContext: context,
+        message: Localizations.localeOf(context).languageCode == 'ar'
+            ? state.errorModel?.ar ?? state.error ?? 'Payment failed'
+            : state.errorModel?.en ?? state.error ?? 'Payment failed',
+      );
+    } else if (state is PaySubscriptionSuccess) {
+      // Wallet payment successful
+      if (paymentTypeString == 'WALLET') {
+        pop(context);
+        AlertHelper.paymentAddCardSuccess(context);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     int? paymentType;
     List<PaymentMethodModel> paymentMethods =
         PaymentMethodModel.listPaymentMethods;
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, 60.h),
-        child: AppBarShared(
-          titleAppBar: translate(AppStrings.payment),
-          isTextOnly: false,
-        ),
+      backgroundColor: c.background,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: GlassBackButton(onPressed: () => pop(context)),
+        title: Text(translate(AppStrings.payment)),
       ),
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(AppPadding.p24.w, AppPadding.p23.h,
-            AppPadding.p24.w, AppPadding.p64.h),
+      body: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(
+          KSpace.xl,
+          KSpace.l,
+          KSpace.xl,
+          KSpace.l,
+        ),
         child: StatefulBuilder(
           builder: (context, setState) {
             return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Text(
-                  translate(AppStrings.choosePaymentMethod),
-                  style: AppStyles.titleWhite16Bold
-                      .copyWith(color: ColorManager.darkGrey),
-                ),
-                SizedBox(
-                  height: AppPadding.p16.h,
-                ),
-                Column(
-                  children: paymentMethods.map((PaymentMethodModel type) {
-                    final bool isWalletLocked = type.value == 2 &&
-                        widget.amount != null &&
-                        (walletBalance ?? 0) < widget.amount!;
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(
+                            start: KSpace.xs,
+                            bottom: KSpace.s,
+                          ),
+                          child: Text(
+                            translate(AppStrings.choosePaymentMethod),
+                            style: KType.headline.copyWith(color: c.text),
+                          ),
+                        ),
+                        KCard(
+                          padding: EdgeInsets.zero,
+                          child: Column(
+                            children: <Widget>[
+                              for (
+                                int i = 0;
+                                i < paymentMethods.length;
+                                i++
+                              ) ...<Widget>[
+                                if (i > 0)
+                                  Divider(
+                                    height: 1,
+                                    indent: CardPaymentMethod.dividerIndent,
+                                    color: c.separator,
+                                  ),
+                                Builder(
+                                  builder: (context) {
+                                    final PaymentMethodModel type =
+                                        paymentMethods[i];
+                                    final bool isWalletLocked =
+                                        type.value == 2 &&
+                                        widget.amount != null &&
+                                        (walletBalance ?? 0) < widget.amount!;
 
-                    return GestureDetector(
-                        onTap: () {
-                          if (type.value == 2 && isWalletLocked) {
-                            showSnackBar(
-                              buildContext: context,
-                              message:
-                                  '${translate(AppStrings.yourWalletBalanceIsNotValid)}. Required: ${widget.amount!.toStringAsFixed(2)}',
-                            );
-                            return;
-                          }
+                                    return CardPaymentMethod(
+                                      walletBalance: walletBalance ?? 0,
+                                      isWallet: type.value == 2,
+                                      type: type,
+                                      groupValue: paymentType ?? -1,
+                                      onTap: () {
+                                        if (type.value == 2 && isWalletLocked) {
+                                          showSnackBar(
+                                            buildContext: context,
+                                            message:
+                                                '${translate(AppStrings.yourWalletBalanceIsNotValid)}. Required: ${widget.amount!.toStringAsFixed(2)}',
+                                          );
+                                          return;
+                                        }
 
-                          setState(() {
-                            paymentType = type.value;
-                          });
+                                        setState(() {
+                                          paymentType = type.value;
+                                        });
 
-                          if (type.value == 3 && Platform.isIOS) {
-                            // Apple Pay will be handled in the checkout button
-                          } else if (type.value == 3 && !Platform.isIOS) {
-                            showSnackBar(
-                                buildContext: context,
-                                message: "Apple Pay is only available on iOS");
-                          }
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: CardPaymentMethod(
-                          walletBalance: walletBalance ?? 0,
-                          isWallet: type.value == 2,
-                          type: type,
-                          borderColor: paymentType == type.value
-                              ? ColorManager.secondary
-                              : ColorManager.white,
-                          groupValue: paymentType ?? -1,
-                        ));
-                  }).toList(),
+                                        if (type.value == 3 && Platform.isIOS) {
+                                          // Apple Pay will be handled in the checkout button
+                                        } else if (type.value == 3 &&
+                                            !Platform.isIOS) {
+                                          showSnackBar(
+                                            buildContext: context,
+                                            message:
+                                                "Apple Pay is only available on iOS",
+                                          );
+                                        }
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                const Spacer(),
                 if (widget.planId != null && paymentType != null)
-                  BlocConsumer<PlansAndSubscriptionBloc,
-                      PlansAndSubscriptionState>(
-                    listener: (context, PlansAndSubscriptionState state) {
-                      if (state is CreateSubscriptionFailed) {
-                        pop(context);
-                        showSnackBar(
-                            buildContext: context,
-                            message:
-                                Localizations.localeOf(context).languageCode ==
-                                        'ar'
-                                    ? state.errorModel!.ar!
-                                    : state.errorModel!.en!);
-                      } else if (state is CreateSubscriptionSuccess) {
-                        if (paymentTypeString == 'CREDIT') {
-                          debugPrint('^^^^^^^${state.subscriptionId}');
-                          pop(context);
-                          pushPage(
-                            context,
-                            PaymentScreen(
-                              subscriptionId: state.subscriptionId,
-                            ),
-                          );
-                        } else if (paymentTypeString == 'APPLE_PAY') {
-                          if (Platform.isIOS) {
-                            debugPrint('^^^^^^^${state.subscriptionId}');
-                            ApplePayService
-                                .showApplePayBottomSheetForSubscription(
-                              context: context,
-                              subscriptionId: state.subscriptionId ?? '',
-                              amount: widget.amount ?? 0,
-                              createdAt: widget.createdAt ??
-                                  DateTime.now().toIso8601String(),
-                              onPaymentSuccess: (paymentId) {
-                                pop(context);
-                                AlertHelper.paymentAddCardSuccess(context);
-                              },
-                              onPaymentError: (error) {
-                                pop(context);
-                                showSnackBar(
-                                  buildContext: context,
-                                  message: error,
-                                );
-                              },
-                            );
-                          }
-                        } else if (paymentTypeString == 'WALLET') {
-                          // Call pay-subscription with just the subscription ID
-                          if (state.subscriptionId != null &&
-                              state.subscriptionId!.isNotEmpty) {
-                            sl<PlansAndSubscriptionBloc>().add(
-                              PaySubscription(
-                                subscriptionId: state.subscriptionId!,
-                              ),
-                            );
-                          }
-                        }
-                      } else if (state is PaySubscriptionFailed) {
-                        pop(context);
-                        showSnackBar(
-                          buildContext: context,
-                          message:
-                              Localizations.localeOf(context).languageCode ==
-                                      'ar'
-                                  ? state.errorModel?.ar ??
-                                      state.error ??
-                                      'Payment failed'
-                                  : state.errorModel?.en ??
-                                      state.error ??
-                                      'Payment failed',
-                        );
-                      } else if (state is PaySubscriptionSuccess) {
-                        // Wallet payment successful
-                        if (paymentTypeString == 'WALLET') {
-                          pop(context);
-                          AlertHelper.paymentAddCardSuccess(context);
-                        }
-                      }
-                    },
-                    builder: (context, state) {
-                      if (state is CreateSubscriptionLoading ||
-                          state is PaySubscriptionLoading) {
-                        return const LoadingWidget();
-                      }
-                      return ButtonsShared(
-                        onPressed: () {
-                          // Validate wallet balance before proceeding
-                          if (paymentType == 2) {
-                            if (widget.amount != null &&
-                                (walletBalance ?? 0) < widget.amount!) {
-                              showSnackBar(
-                                buildContext: context,
-                                message:
-                                    '${translate(AppStrings.yourWalletBalanceIsNotValid)}. Required: ${widget.amount!.toStringAsFixed(2)}',
-                              );
-                              return;
-                            }
-                          }
+                  Padding(
+                    padding: const EdgeInsets.only(top: KSpace.m),
+                    child:
+                        BlocConsumer<
+                          PlansAndSubscriptionBloc,
+                          PlansAndSubscriptionState
+                        >(
+                          listener: _onSubscriptionState,
+                          builder: (context, state) {
+                            final bool loading =
+                                state is CreateSubscriptionLoading ||
+                                state is PaySubscriptionLoading;
+                            return KButton(
+                              loading: loading,
+                              onPressed: loading
+                                  ? null
+                                  : () {
+                                      // Validate wallet balance before proceeding
+                                      if (paymentType == 2) {
+                                        if (widget.amount != null &&
+                                            (walletBalance ?? 0) <
+                                                widget.amount!) {
+                                          showSnackBar(
+                                            buildContext: context,
+                                            message:
+                                                '${translate(AppStrings.yourWalletBalanceIsNotValid)}. Required: ${widget.amount!.toStringAsFixed(2)}',
+                                          );
+                                          return;
+                                        }
+                                      }
 
-                          // Validate Apple Pay platform
-                          if (paymentType == 3 && !Platform.isIOS) {
-                            showSnackBar(
-                              buildContext: context,
-                              message: "Apple Pay is only available on iOS",
+                                      // Validate Apple Pay platform
+                                      if (paymentType == 3 && !Platform.isIOS) {
+                                        showSnackBar(
+                                          buildContext: context,
+                                          message:
+                                              "Apple Pay is only available on iOS",
+                                        );
+                                        return;
+                                      }
+
+                                      switch (paymentType) {
+                                        case 1:
+                                          paymentTypeString = 'CREDIT';
+                                          break;
+                                        case 2:
+                                          paymentTypeString = 'WALLET';
+                                          break;
+                                        case 3:
+                                          paymentTypeString = 'APPLE_PAY';
+                                          break;
+                                        default:
+                                          paymentTypeString = 'CREDIT';
+                                      }
+
+                                      debugPrint("Plan ID: ${widget.planId}");
+                                      debugPrint(
+                                        "Payment Type: $paymentTypeString",
+                                      );
+                                      sl<PlansAndSubscriptionBloc>().add(
+                                        CreateUserSubscription(
+                                          planId: widget.planId ?? '',
+                                          paymentType: paymentTypeString!,
+                                        ),
+                                      );
+                                    },
+                              label: "Checkout",
                             );
-                            return;
-                          }
-
-                          switch (paymentType) {
-                            case 1:
-                              paymentTypeString = 'CREDIT';
-                              break;
-                            case 2:
-                              paymentTypeString = 'WALLET';
-                              break;
-                            case 3:
-                              paymentTypeString = 'APPLE_PAY';
-                              break;
-                            default:
-                              paymentTypeString = 'CREDIT';
-                          }
-
-                          debugPrint("Plan ID: ${widget.planId}");
-                          debugPrint("Payment Type: $paymentTypeString");
-                          sl<PlansAndSubscriptionBloc>().add(
-                            CreateUserSubscription(
-                              planId: widget.planId ?? '',
-                              paymentType: paymentTypeString!,
-                            ),
-                          );
-                        },
-                        text: "Checkout",
-                      );
-                    },
+                          },
+                        ),
                   ),
               ],
             );
