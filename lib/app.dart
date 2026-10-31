@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
+import 'package:thewhsherbiker/core/design/k_theme_mode.dart';
 import 'package:thewhsherbiker/core/design/kleano_theme.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
@@ -17,14 +18,20 @@ import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 import 'flavors.dart';
 import 'modules/Auth/bloc/phone_auth/phone_number_verification_cubit.dart';
+
+final ThemeData _light = kleanoTheme(brightness: Brightness.light);
+final ThemeData _dark = kleanoTheme(brightness: Brightness.dark);
+
 final GlobalKey<NavigatorState> navigatorKeyAlice = GlobalKey<NavigatorState>();
+
 class App extends StatelessWidget {
   const App({super.key});
 
   @override
   Widget build(BuildContext context) {
-    LocalizationDelegate localizationDelegate =
-        LocalizedApp.of(context).delegate;
+    LocalizationDelegate localizationDelegate = LocalizedApp.of(
+      context,
+    ).delegate;
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthBloc>(
@@ -42,7 +49,7 @@ class App extends StatelessWidget {
         BlocProvider<OrderBloc>(
           create: (BuildContext context) => sl<OrderBloc>(),
         ),
-       
+
         BlocProvider<PhoneNumberVerificationCubit>(
           create: (_) => PhoneNumberVerificationCubit(),
         ),
@@ -51,29 +58,34 @@ class App extends StatelessWidget {
         state: LocalizationProvider.of(context).state,
         child: AdaptiveScreenUtil(
           builder: (_) {
-            return MaterialApp(
-              navigatorKey: navigatorKeyAlice,
-              theme: kleanoTheme(brightness: Brightness.light),
-              darkTheme: kleanoTheme(brightness: Brightness.dark),
-              // Light until every screen uses the design tokens.
-              themeMode: ThemeMode.light,
-              builder: (BuildContext context, Widget? navigator) {
-                return BackdropGroup(
-                  child: LiquidGlassTheme.clampTextScale(context,
-                      FoldScope(child: SystemBarInset(child: navigator!))),
-                );
-              },
-              debugShowCheckedModeBanner: false,
-              title: F.title,
-              home: SplashScreen(),
-              localizationsDelegates: [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-                localizationDelegate
-              ],
-              supportedLocales: localizationDelegate.supportedLocales,
-              locale: localizationDelegate.currentLocale,
+            return ValueListenableBuilder<ThemeMode>(
+              valueListenable: KThemeMode.mode,
+              builder: (BuildContext context, ThemeMode mode, Widget? child) =>
+                  MaterialApp(
+                    navigatorKey: navigatorKeyAlice,
+                    theme: _light,
+                    darkTheme: _dark,
+                    themeMode: mode,
+                    builder: (BuildContext context, Widget? navigator) {
+                      return BackdropGroup(
+                        child: LiquidGlassTheme.clampTextScale(
+                          context,
+                          FoldScope(child: SystemBarInset(child: navigator!)),
+                        ),
+                      );
+                    },
+                    debugShowCheckedModeBanner: false,
+                    title: F.title,
+                    home: SplashScreen(),
+                    localizationsDelegates: [
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                      localizationDelegate,
+                    ],
+                    supportedLocales: localizationDelegate.supportedLocales,
+                    locale: localizationDelegate.currentLocale,
+                  ),
             );
           },
         ),

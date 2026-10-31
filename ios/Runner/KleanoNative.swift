@@ -19,6 +19,19 @@ enum KleanoNative {
       SimpleFactory(messenger: messenger) { TabBarPlatformView(frame: $0, viewId: $1, args: $2, messenger: $3) },
       withId: "kleano/tab_bar")
     FoldBridge.shared.attach(registrar: registrar)
+    let appearance = FlutterMethodChannel(name: "kleano/appearance", binaryMessenger: messenger)
+    appearance.setMethodCallHandler { call, result in
+      let style: UIUserInterfaceStyle
+      switch call.arguments as? String {
+      case "dark": style = .dark
+      case "light": style = .light
+      default: style = .unspecified
+      }
+      for scene in UIApplication.shared.connectedScenes {
+        (scene as? UIWindowScene)?.windows.forEach { $0.overrideUserInterfaceStyle = style }
+      }
+      result(nil)
+    }
   }
 }
 

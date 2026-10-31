@@ -173,5 +173,9 @@
   "notValidEmail": "البريد الإلكتروني غير صحيح",
   "refresh": "تحديث",
   "requiredEmail": "البريد الإلكتروني مطلوب",
-  "yourNotConnected": "أنت غير متصل بالإنترنت"
+  "yourNotConnected": "أنت غير متصل بالإنترنت",
+  "appearance": "المظهر",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "themeSystem": "مثل الهاتف"
 }

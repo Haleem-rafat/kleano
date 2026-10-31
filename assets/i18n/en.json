@@ -173,5 +173,9 @@
   "notValidEmail": "This email is not valid",
   "refresh": "Refresh",
   "requiredEmail": "Email is required",
-  "yourNotConnected": "You are not connected to the internet"
+  "yourNotConnected": "You are not connected to the internet",
+  "appearance": "Appearance",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "Same as phone"
 }

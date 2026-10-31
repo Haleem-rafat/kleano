@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewhsherbiker/core/design/components/k_theme_picker.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
@@ -20,7 +21,13 @@ class SettingScreen extends StatelessWidget {
       ),
       body: const SingleChildScrollView(
         padding: EdgeInsets.all(KSpace.l),
-        child: DropDownLanguage(),
+        child: Column(
+          children: <Widget>[
+            DropDownLanguage(),
+            SizedBox(height: KSpace.xl),
+            KThemePicker(),
+          ],
+        ),
       ),
     );
   }
