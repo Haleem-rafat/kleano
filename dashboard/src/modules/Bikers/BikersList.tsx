@@ -140,12 +140,12 @@ export default function BikersList() {
     navigate(generatePath(ROUTES.BIKERS_SCHEDULE, { bikerId }));
   };
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="space-y-1">
       {isLoading && <ThreeDotsLoader />}
 
       {/* Professional Header */}
-      <div className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="px-6 py-4">
+      <div className="pb-4">
+        <div>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
@@ -179,7 +179,7 @@ export default function BikersList() {
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="pt-1">
         <div className="mx-auto w-full">
           {/* Filters */}
           <div className="mb-6 flex justify-end">

@@ -566,10 +566,10 @@ export default function BikersSchedule() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="space-y-1">
       {/* Professional Header */}
-      <div className="sticky top-0 z-[50] border-b border-slate-200 bg-white shadow-sm">
-        <div className="px-6 py-4">
+      <div className="pb-4">
+        <div>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
@@ -608,7 +608,7 @@ export default function BikersSchedule() {
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="pt-1">
         <div className="w-full">
           {/* Weekend Selection Card */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
@@ -694,7 +694,7 @@ export default function BikersSchedule() {
                         <TabsTrigger
                           key={day.value}
                           value={day.value}
-                          className="text-xs data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-md">
+                          className="text-xs data-[state=active]:shadow-md">
                           {day.label[lang]}
                         </TabsTrigger>
                       ))}

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import classNames from 'classnames';
-import { Input } from '@shadecn/components/ui/input';
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/shadecn/components/ui/form';
 
 interface IMainColorInputProps {
@@ -36,13 +35,17 @@ export default function MainColorInput({
     <FormItem className={classNames({ 'pointer-events-none opacity-50': disabled })}>
       {label && <FormLabel className="text-text-600 text-sm font-semibold">{label}</FormLabel>}
       <FormControl>
-        <Input
-          type="color"
-          disabled={disabled}
-          value={`${value}`}
-          onChange={handleChange}
-          inputSize={size}
-        />
+        <div className="flex h-9 items-center gap-3 rounded-lg border border-slate-200 bg-white px-2">
+          <input
+            type="color"
+            aria-label={label}
+            disabled={disabled}
+            value={`${value}`}
+            onChange={handleChange}
+            className="h-6 w-6 cursor-pointer rounded border-0 bg-transparent p-0"
+          />
+          <span className="text-[13px] uppercase tabular-nums text-slate-600">{value}</span>
+        </div>
       </FormControl>
       <FormMessage />
     </FormItem>

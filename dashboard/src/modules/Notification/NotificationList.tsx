@@ -35,7 +35,7 @@ const NotificationList = () => {
 
   return (
     <div>
-      <div className="px-4 text-3xl font-medium sm:px-0">{t('notification')}</div>
+      <div className="pb-2 text-xl font-semibold capitalize tracking-tight text-slate-900">{t('notification')}</div>
       {notificationList && <NotificationRow data={notificationList.data} />}
       {notificationList && (
         <PaginationComponent

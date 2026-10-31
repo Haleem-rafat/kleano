@@ -49,11 +49,11 @@ const Terms = () => {
     }
   };
   return (
-    <div className="flex h-full min-h-[600px] w-full flex-col items-center justify-start gap-6 ">
+    <div className="flex w-full flex-col gap-4">
       <h2 className="text-xl font-semibold tracking-tight text-slate-900">
         {!isEdit ? 'Terms & Conditions' : 'Edit Terms & Conditions'}
       </h2>
-      <div className="w-[60%] space-y-4">
+      <div className="max-w-3xl space-y-4 rounded-xl border border-slate-200 bg-white p-6">
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-700">English (EN)</label>
           <Textarea

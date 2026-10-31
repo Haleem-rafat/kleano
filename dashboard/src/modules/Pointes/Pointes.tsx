@@ -48,10 +48,10 @@ export default function Pointes() {
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col gap-3 rounded-lg  p-4  shadow">
+    <div className="relative flex w-full max-w-xl flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6">
       {isLoading && <ThreeDotsLoader />}
 
-      <div className="flex items-center justify-between pb-6">
+      <div className="flex items-center justify-between">
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('pointes')}</p>
       </div>
 
@@ -78,7 +78,7 @@ export default function Pointes() {
             />
           ))}
 
-          <div className=" bottom-0 left-0 w-full border-t-2 bg-white ">
+          <div className=" w-full">
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {t('applyEdit')}
             </Button>
