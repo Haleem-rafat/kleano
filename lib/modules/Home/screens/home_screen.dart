@@ -154,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         MediaQuery.viewPaddingOf(context).bottom)
                     .clamp(0.0, double.infinity),
           ),
-          child: FloatingActionButton(
+          child: FloatingActionButton.small(
             onPressed: _openSupportWhatsApp,
             backgroundColor: c.success,
             tooltip: 'WhatsApp',

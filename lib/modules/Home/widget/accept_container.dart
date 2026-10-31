@@ -90,7 +90,7 @@ class AcceptContainer extends StatelessWidget {
             OrderCarRow(order: acceptOrder),
           ],
           if (time != null) ...<Widget>[
-            const SizedBox(height: KSpace.xs),
+            const SizedBox(height: KSpace.s),
             Text(time, style: KType.footnote.copyWith(color: c.textSecondary)),
           ],
           const SizedBox(height: KSpace.m),
