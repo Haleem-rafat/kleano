@@ -3,13 +3,19 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/app_config.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_search_field.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
+import 'package:thewasher/shared/components/snack_bar.dart';
 
 class SearchMapScreen extends StatefulWidget {
   final Function showMap;
@@ -51,7 +57,6 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
     super.initState();
     showOptions = widget.showOptions ?? false;
     debugPrint('Platform: ${Platform.isAndroid ? "Android" : "iOS"}');
-    debugPrint('Using API Key: ${googleApiKey.substring(0, 10)}...');
 
     // Load user country from preferences
     _loadUserCountry();
@@ -155,93 +160,102 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
     super.dispose();
   }
 
+  Future<void> _selectSuggestion(dynamic suggestion) async {
+    final Map<String, dynamic> details = await fetchPlaceDetails(
+      suggestion['place_id'],
+      googleApiKey,
+    );
+    if (!mounted) return;
+    if (details['geometry']?['location']?['lat'] != null &&
+        details['geometry']?['location']?['lng'] != null) {
+      Navigator.pop(context, details);
+    } else {
+      showSnackBar(
+        buildContext: context,
+        message: translate(AppStrings.cannotLocateAddress),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
+        backgroundColor: c.background,
         appBar: AppBar(
-          scrolledUnderElevation: 0,
-          backgroundColor: ColorManager.primary,
-          elevation: 1,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _searchController,
-                onChanged: onSearchChanged,
-                autofocus: true,
-                decoration: InputDecoration(
-                  hintText: translate(AppStrings.searchLocation),
-                  border: InputBorder.none,
-                  hintStyle: AppStyles.body14Medium.copyWith(
-                    color: ColorManager.lightGray,
-                  ),
-                ),
-                style: AppStyles.body14Medium.copyWith(color: Colors.white),
-              ),
-              // if (_countryLoaded && _userCountryName.isNotEmpty)
-              //   Text(
-              //     'Searching in $_userCountryName',
-              //     style: AppStyles.body14Medium.copyWith(
-              //       color: ColorManager.lightGray,
-              //       fontSize: 10.sp,
-              //     ),
-              //   ),
-            ],
+          automaticallyImplyLeading: false,
+          leading: GlassBackButton(onPressed: () => Navigator.of(context).pop()),
+          titleSpacing: KSpace.s,
+          title: Padding(
+            padding: const EdgeInsetsDirectional.only(end: KSpace.l),
+            child: KSearchField(
+              controller: _searchController,
+              hint: translate(AppStrings.searchLocation),
+              autofocus: true,
+              onChanged: onSearchChanged,
+            ),
           ),
         ),
-        body: _buildBody(),
-        backgroundColor: ColorManager.white,
+        body: _buildBody(c),
       ),
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(KColors c) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const KLoadingState();
     }
-    if (_suggestions.isEmpty && _searchController.text.isNotEmpty) {
-      return Center(
-        child: Text(
-          'لا توجد نتائج',
-          style: AppStyles.body14Medium.copyWith(color: ColorManager.lightGray),
+    if (_suggestions.isEmpty) {
+      return _searchController.text.isNotEmpty
+          ? KEmptyState(
+              icon: Icons.search_off_rounded,
+              title: translate(AppStrings.noSearchResults),
+            )
+          : const SizedBox.shrink();
+    }
+    return ListView(
+      padding: EdgeInsets.fromLTRB(
+        KSpace.xl,
+        KSpace.l,
+        KSpace.xl,
+        MediaQuery.viewPaddingOf(context).bottom + KSpace.xxl,
+      ),
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      children: <Widget>[
+        KCard(
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: <Widget>[
+              for (int i = 0; i < _suggestions.length; i++) ...<Widget>[
+                if (i > 0)
+                  Divider(
+                    height: 1,
+                    indent: KSpace.l + 24 + KSpace.m,
+                    color: c.separator,
+                  ),
+                _buildSuggestion(c, _suggestions[i]),
+              ],
+            ],
+          ),
         ),
-      );
-    }
-    return ListView.separated(
-      padding: EdgeInsets.symmetric(vertical: 8.h),
-      itemCount: _suggestions.length,
-      separatorBuilder: (context, index) =>
-          Divider(height: 1, color: ColorManager.divider),
-      itemBuilder: (context, index) {
-        final s = _suggestions[index];
-        return ListTile(
-          title: Text(s['description'] ?? '', style: AppStyles.body14Medium),
-          onTap: () async {
-            final placeId = s['place_id'];
-            final details = await fetchPlaceDetails(placeId, googleApiKey);
-            if (details['geometry']?['location']?['lat'] != null &&
-                details['geometry']?['location']?['lng'] != null) {
-              if (!context.mounted) return;
-              Navigator.pop(context, details);
-            } else {
-              if (!context.mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('لا يمكن تحديد موقع العنوان، جرب عنوان آخر.'),
-                ),
-              );
-            }
-          },
-        );
-      },
+      ],
+    );
+  }
+
+  Widget _buildSuggestion(KColors c, dynamic suggestion) {
+    final dynamic formatted = suggestion['structured_formatting'];
+    return KListRow(
+      leading: SvgPicture.asset(
+        AssetsManager.locationIconLogo,
+        colorFilter: ColorFilter.mode(c.textSecondary, BlendMode.srcIn),
+      ),
+      title: formatted?['main_text'] ?? suggestion['description'] ?? '',
+      subtitle: formatted?['secondary_text'],
+      onTap: () => _selectSuggestion(suggestion),
     );
   }
 
@@ -262,13 +276,10 @@ class _SearchMapScreenState extends State<SearchMapScreen> {
 
       debugPrint(
           'Searching for "$input" in country: $_userCountryName ($_userCountry)');
-      debugPrint('Searching with URL: $url');
-      debugPrint('API Key: ${apiKey.substring(0, 10)}...');
 
       var response = await http.get(Uri.parse(url));
 
       debugPrint('Response status: ${response.statusCode}');
-      debugPrint('Response body: ${response.body}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         debugPrint('API Status: ${data['status']}');

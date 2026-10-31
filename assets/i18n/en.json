@@ -465,5 +465,7 @@
   "verifyCodeSubtitle": "We sent a 6-digit code to",
   "acceptTermsFirst": "Please accept the terms and conditions first",
   "acceptTerms": "I accept the terms and conditions",
-  "notValidEmail": "Please enter a valid email address"
+  "notValidEmail": "Please enter a valid email address",
+  "noSearchResults": "No results found",
+  "cannotLocateAddress": "Could not locate this address. Try another one."
 }

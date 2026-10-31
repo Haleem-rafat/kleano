@@ -2,29 +2,28 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/utilis/geocoding_helper.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_segmented.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/layout/main_navigation_screen.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/Home/screens/guest_home.dart';
-import 'package:thewasher/modules/Home/widget/search_model.dart';
 import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/text-form-shared.dart';
+import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/location_single_tone.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
@@ -68,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   String? selectedAddressType;
   TextEditingController addressController = TextEditingController();
+  final FocusNode _labelFocus = FocusNode();
   bool enabledAddress = false;
 
   static const LatLng _initialLatLng = LatLng(31.2001, 29.9187);
@@ -79,6 +79,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     searchController.dispose();
+    addressController.dispose();
+    _labelFocus.dispose();
     locationMap.markers.clear();
     locationMap.newLocation = const LatLng(0, 0);
     super.dispose();
@@ -163,6 +165,9 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
+    // Starts on a label, so a saved address always has a name.
+    selectedAddressType = translate(AppStrings.homeLocation);
+    addressController.text = selectedAddressType!;
     context.read<GetUserProfileBloc>().add(GetUserProfileEvent());
     _getUserLocation();
   }
@@ -191,15 +196,50 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  final controller = PageController(viewportFraction: 0.8, keepPage: true);
+  Future<void> _zoomBy(double delta) async {
+    if (!_controller.isCompleted) return;
+    try {
+      final GoogleMapController controller = await _controller.future;
+      final double level = await controller.getZoomLevel();
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: locationMap.newLocation == const LatLng(0, 0)
+                ? currentPosition
+                : locationMap.newLocation,
+            zoom: (level + delta).clamp(0, 20).toDouble(),
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint("Zoom error: $e");
+    }
+  }
+
+  void _selectLabel(String label) {
+    final bool other = label == translate(AppStrings.other);
+    setState(() {
+      selectedAddressType = label;
+      enabledAddress = other;
+      addressController.text = other ? "" : label;
+    });
+    if (other) {
+      _labelFocus.requestFocus();
+    } else {
+      FocusScope.of(context).unfocus();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final KColors c = KColors.of(context);
+    // Read above the Scaffold: it removes the keyboard inset from its body.
+    final bool keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
 
     return Scaffold(
       key: homeScaffoldKey,
-      backgroundColor: ColorManager.white,
+      backgroundColor: c.surface,
       resizeToAvoidBottomInset: true,
       body: AppShared.token.isEmpty
           ? GuestHome(
@@ -208,366 +248,58 @@ class _HomeScreenState extends State<HomeScreen>
               },
             )
           : LayoutBuilder(
-              builder: (context, constraints) {
-                final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-                final availableHeight = constraints.maxHeight - keyboardHeight;
-
-                return Column(
-                  children: [
-                    // Map Section with dynamic height
-                    SizedBox(
-                      height: keyboardHeight > 0
-                          ? availableHeight *
-                                0.4 // Smaller when keyboard is open
-                          : availableHeight * 0.6, // Normal size
-                      child: Stack(
-                        children: [
-                          // Map
-                          GoogleMap(
-                            key: _mapKey,
-                            onMapCreated: (GoogleMapController controller) {
-                              if (!_mapCreated && !_controller.isCompleted) {
-                                _mapCreated = true;
-                                _controller.complete(controller);
-
-                                if (currentPosition.latitude != 0 &&
-                                    currentPosition.longitude != 0) {
-                                  controller
-                                      .animateCamera(
-                                        CameraUpdate.newCameraPosition(
-                                          CameraPosition(
-                                            target: currentPosition,
-                                            zoom: zoom,
-                                          ),
-                                        ),
-                                      )
-                                      .catchError((e) {
-                                        debugPrint(
-                                          "Initial animation error: $e",
-                                        );
-                                      });
-                                }
-                              }
-                            },
-                            markers: Set<Marker>.of(locationMap.markers),
-                            myLocationEnabled: true,
-                            zoomControlsEnabled: false,
-                            myLocationButtonEnabled: false,
-                            compassEnabled: true,
-                            mapToolbarEnabled: false,
-                            buildingsEnabled: true,
-                            indoorViewEnabled: false,
-                            trafficEnabled: false,
-                            minMaxZoomPreference: const MinMaxZoomPreference(
-                              3,
-                              20,
-                            ),
-                            initialCameraPosition: _initialCameraPosition,
-                            onCameraMove: (CameraPosition cameraPosition) {
-                              _cameraTarget = cameraPosition.target;
-                            },
-                            onCameraIdle: () async {
-                              if (!mounted) return;
-
-                              currentPosition = _cameraTarget;
-                              locationMap.newLocation = _cameraTarget;
-                              location = _cameraTarget;
-
-                              try {
-                                final placemarks =
-                                    await placemarkFromCoordinates(
-                                      _cameraTarget.latitude,
-                                      _cameraTarget.longitude,
-                                    );
-
-                                if (!mounted) return;
-
-                                country = placemarks.first.country ?? "";
-                                administrativeArea =
-                                    placemarks.first.subAdministrativeArea ??
-                                    "";
-                                currentAddress = placemarks.first.street ?? '';
-
-                                sl<OffersBloc>().add(
-                                  GetServices(
-                                    lat: _cameraTarget.latitude,
-                                    lng: _cameraTarget.longitude,
-                                    country: "saudi arabia",
-                                  ),
-                                );
-                              } catch (e) {
-                                debugPrint("Reverse geocoding failed: $e");
-                              }
-
-                              if (mounted) {
-                                setState(() {});
-                              }
-                            },
-                          ),
-
-                          // Center Pin
-                          if (_showCenterPin)
-                            Positioned.fill(
-                              child: IgnorePointer(
-                                ignoring: true,
-                                child: Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      Transform.translate(
-                                        offset: Offset(0, -12.h),
-                                        child: Icon(
-                                          Icons.location_on,
-                                          size: 40.h,
-                                          color: ColorManager.secondary,
-                                        ),
-                                      ),
-                                      4.ph,
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-
-                          // Right Side Controls
-                          Positioned(
-                            top: MediaQuery.paddingOf(context).top + 130,
-                            right: 16.w,
-                            child: Column(
-                              children: <Widget>[
-                                _buildMapControl(
-                                  icon: CupertinoIcons.restart,
-                                  sfSymbol: 'arrow.clockwise',
-                                  onTap: _restartMap,
-                                ),
-                                12.verticalSpace,
-                                _buildMapControl(
-                                  icon: Icons.my_location,
-                                  sfSymbol: 'location.fill',
-                                  onTap: () {
-                                    if (!mounted) return;
-                                    setState(() {
-                                      locationMap.markers.clear();
-                                    });
-                                    context.read<OffersBloc>().add(
-                                      GetServices(
-                                        lat: currentPosition.latitude,
-                                        lng: currentPosition.longitude,
-                                        country: "saudi arabia",
-                                      ),
-                                    );
-                                    _currentLocation();
-                                  },
-                                ),
-                                12.verticalSpace,
-                                _buildMapControl(
-                                  icon: Icons.add,
-                                  sfSymbol: 'plus',
-                                  onTap: () async {
-                                    if (!_controller.isCompleted) return;
-                                    try {
-                                      final GoogleMapController controller =
-                                          await _controller.future;
-                                      var currentZoomLevel = await controller
-                                          .getZoomLevel();
-                                      currentZoomLevel = currentZoomLevel + 2;
-                                      if (currentZoomLevel > 20) {
-                                        currentZoomLevel = 20;
-                                      }
-                                      await controller.animateCamera(
-                                        CameraUpdate.newCameraPosition(
-                                          CameraPosition(
-                                            target:
-                                                locationMap.newLocation ==
-                                                    const LatLng(0, 0)
-                                                ? currentPosition
-                                                : locationMap.newLocation,
-                                            zoom: currentZoomLevel,
-                                          ),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      debugPrint("Zoom in error: $e");
-                                    }
-                                  },
-                                ),
-                                12.verticalSpace,
-                                _buildMapControl(
-                                  icon: Icons.remove,
-                                  sfSymbol: 'minus',
-                                  onTap: () async {
-                                    if (!_controller.isCompleted) return;
-                                    try {
-                                      final GoogleMapController controller =
-                                          await _controller.future;
-                                      var currentZoomLevel = await controller
-                                          .getZoomLevel();
-                                      currentZoomLevel = currentZoomLevel - 2;
-                                      if (currentZoomLevel < 0) {
-                                        currentZoomLevel = 0;
-                                      }
-                                      await controller.animateCamera(
-                                        CameraUpdate.newCameraPosition(
-                                          CameraPosition(
-                                            target:
-                                                locationMap.newLocation ==
-                                                    const LatLng(0, 0)
-                                                ? currentPosition
-                                                : locationMap.newLocation,
-                                            zoom: currentZoomLevel,
-                                          ),
-                                        ),
-                                      );
-                                    } catch (e) {
-                                      debugPrint("Zoom out error: $e");
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Search Model Overlay
-                          Positioned(
-                            top: MediaQuery.paddingOf(context).top + 62 + 58.h,
-                            left: 16.w,
-                            right: 16.w,
-                            child: Visibility(
-                              visible: locationMap.search,
-                              child: LiquidGlass(
-                                radius: 20.r,
-                                child: SearchModel(
-                                  currentAddress: currentAddress,
-                                  controller: _controller,
-                                  onTap: () => _handleSearchResult(),
-                                  setOnMap: () {
-                                    if (mounted) {
-                                      setState(() {
-                                        locationMap.search = false;
-                                      });
-                                    }
-                                  },
-                                  currentPosition: currentPosition,
-                                  subAdministrativeArea: administrativeArea,
-                                  country: country,
-                                ),
-                              ),
-                            ),
-                          ),
-
-                          // Floating glass controls over the map (Apple Maps
-                          // style): back button + title capsule.
-                          Positioned(
-                            top: MediaQuery.paddingOf(context).top + 6,
-                            left: 16.w,
-                            right: 16.w,
-                            child: FoldPane(
-                              child: Row(
-                                children: <Widget>[
-                                  if (widget.isFromSignUp == false) ...<Widget>[
-                                    GlassIconButton(
-                                      icon: Icons.arrow_back_ios_new_rounded,
-                                      sfSymbol: 'chevron.backward',
-                                      color: ColorManager.primary,
-                                      onPressed: () => pop(context),
-                                    ),
-                                    const SizedBox(width: 10),
-                                  ],
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 44,
-                                      child: LiquidGlass(
-                                        capsule: true,
-                                        child: Center(
-                                          child: Text(
-                                            translate(
-                                                AppStrings.setBookingLocation),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                              color: ColorManager.black,
-                                              fontSize: 16.sp,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  if (widget.isFromSignUp == false)
-                                    const SizedBox(width: 54),
-                                ],
-                              ),
-                            ),
-                          ),
-
-                          // Search Bar
-                          Positioned(
-                            top: MediaQuery.paddingOf(context).top + 62,
-                            left: 16.w,
-                            right: 16.w,
-                            child: GestureDetector(
-                              onTap: () => _handleSearchResult(),
-                              child: LiquidGlass(
-                                capsule: true,
-                                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                                child: SizedBox(
-                                  height: 50.h,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            translate(AppStrings.searchInMap),
-                                            style: AppStyles.titleGray16Regular,
-                                          ),
-                                          SvgPicture.asset(
-                                            AssetsManager.search,
-                                            colorFilter: ColorFilter.mode(
-                                              ColorManager.medGray,
-                                              BlendMode.srcIn,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+              builder: (BuildContext context, BoxConstraints constraints) {
+                final double mapHeight =
+                    constraints.maxHeight * (keyboardOpen ? 0.4 : 0.6);
+                return Stack(
+                  children: <Widget>[
+                    // The map runs under the panel's rounded corners; its
+                    // padding keeps the camera centre (and the Google logo) in
+                    // the visible part.
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: mapHeight + KRadius.sheet,
+                      child: _buildMap(),
                     ),
-
-                    // Bottom Sheet Section
-                    Expanded(
-                      child: BlocBuilder<OffersBloc, OffersState>(
-                        builder: (context, state) {
-                          final isServiceEmpty = sl<OffersBloc>().emptyServices;
-
-                          return Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: ColorManager.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, -4),
-                                ),
-                              ],
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: mapHeight,
+                      child: _buildMapOverlay(c, keyboardOpen),
+                    ),
+                    Positioned(
+                      top: mapHeight,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      child: DecoratedBox(
+                        decoration: ShapeDecoration(
+                          color: c.surface,
+                          shape: const RoundedSuperellipseBorder(
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(KRadius.sheet),
                             ),
-                            child: isServiceEmpty
-                                ? _buildOutOfServiceUI()
-                                : _buildAddAddressUI(),
-                          );
-                        },
+                          ),
+                        ),
+                        child: BlocBuilder<OffersBloc, OffersState>(
+                          builder: (BuildContext context, OffersState state) {
+                            return sl<OffersBloc>().emptyServices
+                                ? KEmptyState(
+                                    icon: Icons.location_off_rounded,
+                                    title: translate(
+                                      AppStrings.outOfServiceArea,
+                                    ),
+                                    message: translate(
+                                      AppStrings
+                                          .weApologizeServicesNotAvailable,
+                                    ),
+                                  )
+                                : _buildAddAddressUI(c, keyboardOpen);
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -577,7 +309,237 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
-  Widget _buildMapControl({
+  Widget _buildMap() {
+    return GoogleMap(
+      key: _mapKey,
+      padding: const EdgeInsets.only(bottom: KRadius.sheet),
+      onMapCreated: (GoogleMapController controller) {
+        if (!_mapCreated && !_controller.isCompleted) {
+          _mapCreated = true;
+          _controller.complete(controller);
+
+          if (currentPosition.latitude != 0 && currentPosition.longitude != 0) {
+            controller
+                .animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(target: currentPosition, zoom: zoom),
+                  ),
+                )
+                .catchError((e) {
+                  debugPrint("Initial animation error: $e");
+                });
+          }
+        }
+      },
+      markers: Set<Marker>.of(locationMap.markers),
+      myLocationEnabled: true,
+      zoomControlsEnabled: false,
+      myLocationButtonEnabled: false,
+      compassEnabled: true,
+      mapToolbarEnabled: false,
+      buildingsEnabled: true,
+      indoorViewEnabled: false,
+      trafficEnabled: false,
+      minMaxZoomPreference: const MinMaxZoomPreference(3, 20),
+      initialCameraPosition: _initialCameraPosition,
+      onCameraMove: (CameraPosition cameraPosition) {
+        _cameraTarget = cameraPosition.target;
+      },
+      onCameraIdle: () async {
+        if (!mounted) return;
+
+        currentPosition = _cameraTarget;
+        locationMap.newLocation = _cameraTarget;
+        location = _cameraTarget;
+
+        try {
+          final placemarks = await placemarkFromCoordinates(
+            _cameraTarget.latitude,
+            _cameraTarget.longitude,
+          );
+
+          if (!mounted) return;
+
+          country = placemarks.first.country ?? "";
+          administrativeArea = placemarks.first.subAdministrativeArea ?? "";
+          currentAddress = placemarks.first.street ?? '';
+
+          sl<OffersBloc>().add(
+            GetServices(
+              lat: _cameraTarget.latitude,
+              lng: _cameraTarget.longitude,
+              country: "saudi arabia",
+            ),
+          );
+        } catch (e) {
+          debugPrint("Reverse geocoding failed: $e");
+        }
+
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
+  }
+
+  /// Floating glass controls over the map (Apple Maps style).
+  Widget _buildMapOverlay(KColors c, bool keyboardOpen) {
+    final double top = MediaQuery.paddingOf(context).top;
+    return Stack(
+      children: <Widget>[
+        // The pin's tip marks the camera centre.
+        if (_showCenterPin)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: Center(
+                child: Transform.translate(
+                  offset: const Offset(0, -KSpace.xl),
+                  child: Icon(Icons.location_on, size: 44, color: c.brand),
+                ),
+              ),
+            ),
+          ),
+
+        if (!keyboardOpen)
+          PositionedDirectional(
+            top: top + 124,
+            end: KSpace.l,
+            child: Column(
+              children: <Widget>[
+                _buildMapControl(
+                  c,
+                  icon: CupertinoIcons.restart,
+                  sfSymbol: 'arrow.clockwise',
+                  onTap: _restartMap,
+                ),
+                const SizedBox(height: KSpace.m),
+                _buildMapControl(
+                  c,
+                  icon: Icons.my_location,
+                  sfSymbol: 'location.fill',
+                  onTap: () {
+                    if (!mounted) return;
+                    setState(() {
+                      locationMap.markers.clear();
+                    });
+                    context.read<OffersBloc>().add(
+                      GetServices(
+                        lat: currentPosition.latitude,
+                        lng: currentPosition.longitude,
+                        country: "saudi arabia",
+                      ),
+                    );
+                    _currentLocation();
+                  },
+                ),
+                const SizedBox(height: KSpace.m),
+                _buildMapControl(
+                  c,
+                  icon: Icons.add,
+                  sfSymbol: 'plus',
+                  onTap: () => _zoomBy(2),
+                ),
+                const SizedBox(height: KSpace.m),
+                _buildMapControl(
+                  c,
+                  icon: Icons.remove,
+                  sfSymbol: 'minus',
+                  onTap: () => _zoomBy(-2),
+                ),
+              ],
+            ),
+          ),
+
+        Positioned(
+          top: top + KSpace.s,
+          left: KSpace.l,
+          right: KSpace.l,
+          child: FoldPane(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    if (widget.isFromSignUp == false) ...<Widget>[
+                      GlassIconButton(
+                        icon: Icons.arrow_back_ios_new_rounded,
+                        sfSymbol: 'chevron.backward',
+                        color: c.brand,
+                        onPressed: () => pop(context),
+                      ),
+                      const SizedBox(width: KSpace.m),
+                    ],
+                    Expanded(
+                      child: SizedBox(
+                        height: KSpace.tapTarget,
+                        child: LiquidGlass(
+                          capsule: true,
+                          child: Center(
+                            child: Text(
+                              translate(AppStrings.setBookingLocation),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: KType.headline.copyWith(color: c.text),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (widget.isFromSignUp == false)
+                      const SizedBox(width: KSpace.tapTarget + KSpace.m),
+                  ],
+                ),
+                const SizedBox(height: KSpace.m),
+                Semantics(
+                  button: true,
+                  label: translate(AppStrings.searchInMap),
+                  excludeSemantics: true,
+                  child: GestureDetector(
+                    onTap: _handleSearchResult,
+                    child: SizedBox(
+                      height: KSpace.tapTarget,
+                      child: LiquidGlass(
+                        capsule: true,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: KSpace.l,
+                        ),
+                        child: Center(
+                          child: Row(
+                            children: <Widget>[
+                              SvgPicture.asset(
+                                AssetsManager.search,
+                                colorFilter: ColorFilter.mode(
+                                  c.textSecondary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              const SizedBox(width: KSpace.s),
+                              Expanded(
+                                child: Text(
+                                  translate(AppStrings.searchInMap),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: KType.body.copyWith(
+                                    color: c.textSecondary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMapControl(
+    KColors c, {
     required IconData icon,
     required VoidCallback onTap,
     String? sfSymbol,
@@ -585,224 +547,125 @@ class _HomeScreenState extends State<HomeScreen>
     return GlassIconButton(
       icon: icon,
       sfSymbol: sfSymbol,
-      color: ColorManager.primary,
+      color: c.brand,
       onPressed: onTap,
     );
   }
 
-
-  Widget _buildOutOfServiceUI() {
-    return Padding(
-      padding: EdgeInsets.all(24.w),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 80.w,
-            height: 80.h,
-            decoration: BoxDecoration(
-              color: ColorManager.red.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(Icons.close, color: ColorManager.red, size: 40.sp),
-          ),
-          20.verticalSpace,
-          Text(
-            translate(AppStrings.outOfServiceArea),
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: ColorManager.black,
-            ),
-          ),
-          12.verticalSpace,
-          Text(
-            translate(AppStrings.weApologizeServicesNotAvailable),
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14.sp,
-              color: ColorManager.darkGrey,
-              height: 1.5,
-            ),
-          ),
-          // 30.verticalSpace,
-          // Container(
-          //   width: double.infinity,
-          //   height: 52.h,
-          //   decoration: BoxDecoration(
-          //     border: Border.all(
-          //       color: ColorManager.secondary,
-          //       width: 2,
-          //     ),
-          //     borderRadius: BorderRadius.circular(8.r),
-          //   ),
-          //   child: Material(
-          //     color: Colors.transparent,
-          //     child: InkWell(
-          //       onTap: () {
-          //         // Navigate to saved locations
-          //       },
-          //       borderRadius: BorderRadius.circular(8.r),
-          //       child: Center(
-          //         child: Text(
-          //           translate(AppStrings.orSelectSavedLocation),
-          //           style: TextStyle(
-          //             fontSize: 16.sp,
-          //             fontWeight: FontWeight.w600,
-          //             color: ColorManager.secondary,
-          //           ),
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAddAddressUI() {
-    return GestureDetector(
-      onTap: () {
-        FocusScope.of(context).unfocus();
-      },
-      child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(
-          24.w,
-          10.w,
-          24.w,
-          MediaQuery.of(context).viewInsets.bottom > 0 ? 20.h : 100.h,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              translate(AppStrings.locationDetails),
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: ColorManager.black,
+  Widget _buildAddAddressUI(KColors c, bool keyboardOpen) {
+    final String home = translate(AppStrings.homeLocation);
+    final String work = translate(AppStrings.work);
+    final String other = translate(AppStrings.other);
+    final double bottom = MediaQuery.paddingOf(context).bottom;
+    return Stack(
+      children: <Widget>[
+        // The form scrolls under the floating glass button; with the keyboard
+        // up it stops above the button, so the field being typed in stays
+        // visible.
+        Positioned.fill(
+          bottom: keyboardOpen ? 72 : 0,
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: ListView(
+              padding: EdgeInsets.fromLTRB(
+                KSpace.xl,
+                KSpace.xl,
+                KSpace.xl,
+                keyboardOpen ? KSpace.s : bottom + 96,
               ),
-            ),
-            4.verticalSpace,
-            Text(
-              currentAddress.isEmpty
-                  ? translate(AppStrings.selectALocation)
-                  : currentAddress,
-              style: TextStyle(fontSize: 14.sp, color: ColorManager.darkGrey),
-            ),
-            10.verticalSpace,
-            TextFormShared(
-              hintText: translate(AppStrings.addressLabel),
-              radius: 8,
-              enabled: enabledAddress,
-              controller: addressController,
-            ),
-            12.verticalSpace,
-            Text(
-              translate(AppStrings.quickLabels),
-              style: TextStyle(
-                fontSize: 14.sp,
-                fontWeight: FontWeight.w600,
-                color: ColorManager.black,
-              ),
-            ),
-            10.verticalSpace,
-            Wrap(
-              spacing: 10.w,
-              runSpacing: 10.h,
-              children: [
-                _buildAddressChip(translate(AppStrings.homeLocation)),
-                _buildAddressChip(translate(AppStrings.work)),
-                _buildAddressChip(translate(AppStrings.other)),
+              children: <Widget>[
+                Text(
+                  translate(AppStrings.locationDetails),
+                  style: KType.title.copyWith(color: c.text),
+                ),
+                const SizedBox(height: KSpace.xs),
+                Text(
+                  currentAddress.isEmpty
+                      ? translate(AppStrings.selectALocation)
+                      : currentAddress,
+                  style: KType.subhead.copyWith(color: c.textSecondary),
+                ),
+                const SizedBox(height: KSpace.l),
+                Padding(
+                  padding: const EdgeInsetsDirectional.only(
+                    start: KSpace.xs,
+                    bottom: KSpace.s,
+                  ),
+                  child: Text(
+                    translate(AppStrings.addressLabel),
+                    style: KType.footnote.copyWith(color: c.textSecondary),
+                  ),
+                ),
+                KSegmented<String>(
+                  segments: <String, String>{
+                    home: home,
+                    work: work,
+                    other: other,
+                  },
+                  selected: selectedAddressType ?? home,
+                  onChanged: _selectLabel,
+                ),
+                AnimatedSize(
+                  duration: KMotion.of(context, KMotion.fast),
+                  curve: KMotion.curve,
+                  alignment: AlignmentDirectional.topStart,
+                  child: enabledAddress
+                      ? Padding(
+                          padding: const EdgeInsets.only(top: KSpace.m),
+                          child: KTextField(
+                            label: translate(AppStrings.other),
+                            hint: translate(AppStrings.addressLabel),
+                            controller: addressController,
+                            focusNode: _labelFocus,
+                            textInputAction: TextInputAction.done,
+                          ),
+                        )
+                      : const SizedBox(width: double.infinity),
+                ),
               ],
             ),
-            12.verticalSpace,
-            BlocListener<LocationBloc, LocationState>(
-              listener: (context, state) {
-                if (state is SaveLocationSuccess) {
-                  pop(context);
-                  popALlAndPushPage(
-                    context,
-                    MainNavigationScreen(selectedIndex: 0),
-                  );
-                }
-              },
-              child: SizedBox(
-                width: double.infinity,
-                child: BlocBuilder<LocationBloc, LocationState>(
-                  builder: (context, state) {
-                    return ButtonsShared(
-                      onPressed: () {
-                        context.read<LocationBloc>().add(
-                          SaveLocation(
-                            country: country,
-                            latitude: currentPosition.latitude.toString(),
-                            longitude: currentPosition.longitude.toString(),
-                            streetName: currentAddress,
-                            subAdministrativeArea: administrativeArea
-                                .toString(),
-                            savedName:
-                                selectedAddressType ==
-                                    translate(AppStrings.other)
-                                ? addressController.text
-                                : (selectedAddressType ??
-                                      addressController.text),
-                          ),
-                        );
-                      },
-                      text: state is SaveLocationLoading
-                          ? translate(AppStrings.saving)
-                          : translate(AppStrings.addAddress),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAddressChip(String label) {
-    final isSelected = selectedAddressType == label;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedAddressType = label;
-          if (label == translate(AppStrings.other)) {
-            addressController.text = "";
-            enabledAddress = true;
-          } else {
-            addressController.text = label;
-            enabledAddress = false;
-          }
-        });
-      },
-      child: Chip(
-        label: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? ColorManager.primary : ColorManager.darkGrey,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-        backgroundColor: isSelected
-            ? ColorManager.primaryLight
-            : ColorManager.lightGray,
-        side: BorderSide(
-          color: isSelected ? ColorManager.primary : ColorManager.medGray,
-          width: isSelected ? 2.0 : 1.5,
+        Positioned(
+          left: KSpace.xl,
+          right: KSpace.xl,
+          bottom: bottom + KSpace.l,
+          child: BlocConsumer<LocationBloc, LocationState>(
+            listener: (BuildContext context, LocationState state) {
+              if (state is SaveLocationSuccess) {
+                pop(context);
+                popALlAndPushPage(
+                  context,
+                  MainNavigationScreen(selectedIndex: 0),
+                );
+              } else if (state is SaveLocationFailed) {
+                showSnackBar(buildContext: context, message: state.error);
+              }
+            },
+            builder: (BuildContext context, LocationState state) {
+              return KButton(
+                label: translate(AppStrings.addAddress),
+                loading: state is SaveLocationLoading,
+                onPressed: () {
+                  context.read<LocationBloc>().add(
+                    SaveLocation(
+                      country: country,
+                      latitude: currentPosition.latitude.toString(),
+                      longitude: currentPosition.longitude.toString(),
+                      streetName: currentAddress,
+                      subAdministrativeArea: administrativeArea.toString(),
+                      savedName:
+                          selectedAddressType == translate(AppStrings.other)
+                          ? addressController.text
+                          : (selectedAddressType ?? addressController.text),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
         ),
-        elevation: isSelected ? 2.0 : 0.0,
-        shadowColor: isSelected
-            ? ColorManager.primary.withValues(alpha: 0.3)
-            : Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-      ),
+      ],
     );
   }
 
@@ -855,18 +718,11 @@ class _HomeScreenState extends State<HomeScreen>
       return;
     }
 
+    // The centre pin marks the chosen place once the camera arrives.
     setState(() {
       locationMap.markers.clear();
-      locationMap.markers.add(
-        Marker(
-          markerId: const MarkerId('searchedLocation'),
-          position: newLatLng!,
-          infoWindow: InfoWindow(title: address ?? ''),
-          icon: _customMarkerIcon ?? BitmapDescriptor.defaultMarker,
-        ),
-      );
-      locationMap.newLocation = newLatLng;
-      currentPosition = newLatLng;
+      locationMap.newLocation = newLatLng!;
+      currentPosition = newLatLng!;
       currentAddress = address ?? '';
     });
 

@@ -498,6 +498,8 @@ class AppStrings {
   static const String applied = 'applied';
   static const String free = 'free';
   static const String homeLocation = 'homeLocaion';
+  static const String noSearchResults = 'noSearchResults';
+  static const String cannotLocateAddress = 'cannotLocateAddress';
   static const welcomeBack = "welcomeBack";
   static const userLoginSubtitle = "userLoginSubtitle";
   static const createAccount = "createAccount";

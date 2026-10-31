@@ -470,5 +470,7 @@
   "verifyCodeSubtitle": "أرسلنا رمزًا من 6 أرقام إلى",
   "acceptTermsFirst": "يرجى الموافقة على الشروط والأحكام أولًا",
   "acceptTerms": "أوافق على الشروط والأحكام",
-  "notValidEmail": "يرجى إدخال بريد إلكتروني صحيح"
+  "notValidEmail": "يرجى إدخال بريد إلكتروني صحيح",
+  "noSearchResults": "لا توجد نتائج",
+  "cannotLocateAddress": "لا يمكن تحديد موقع العنوان، جرب عنوان آخر."
 }
