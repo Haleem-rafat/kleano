@@ -1,3 +1,4 @@
+import 'package:thewasher/modules/booking/widgets/home/home_service_layouts.dart';
 import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:flutter/material.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
@@ -108,6 +109,24 @@ class _MainServicesState extends State<MainServices> {
 
         if (widget.mainServices.isEmpty) {
           return const SizedBox();
+        }
+
+        final ServiceOpen? open = widget.onOpen;
+        if (open != null) {
+          switch (HomeStyleSetting.style.value) {
+            case HomeStyle.photoHero:
+              return HomePricedServices(
+                services: widget.mainServices,
+                onOpen: open,
+              );
+            case HomeStyle.serviceGrid:
+              return HomeServiceGrid(
+                services: widget.mainServices,
+                onOpen: open,
+              );
+            default:
+              break;
+          }
         }
 
         return ListView.builder(

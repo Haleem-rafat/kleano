@@ -3,7 +3,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// The Home layouts to compare. Same data and booking flow; only the order and
 /// emphasis change.
-enum HomeStyle { current, quickRebook, serviceFirst, liveStatus, offersFirst }
+enum HomeStyle {
+  current,
+  photoHero,
+  serviceGrid,
+  quickRebook,
+  serviceFirst,
+  liveStatus,
+  offersFirst,
+}
 
 /// The chosen Home layout, remembered on this device.
 abstract final class HomeStyleSetting {

@@ -498,5 +498,8 @@
   "homeStyle_quickRebook": "Quick rebook",
   "homeStyle_serviceFirst": "Service first",
   "homeStyle_liveStatus": "Live status",
-  "homeStyle_offersFirst": "Offers first"
+  "homeStyle_offersFirst": "Offers first",
+  "homeStyle_photoHero": "Photo hero",
+  "homeStyle_serviceGrid": "Service grid",
+  "searchServices": "Search services"
 }
