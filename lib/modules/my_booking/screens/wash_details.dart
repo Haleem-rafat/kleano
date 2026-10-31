@@ -1,4 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:thewasher/shared/singleton.dart';
+import 'package:thewasher/modules/my_booking/blocs/my_booking/my_booking_bloc.dart';
+import 'package:thewasher/modules/tracking_order/blocs/socket_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -39,14 +44,53 @@ class WashDetailsScreen extends StatefulWidget {
 }
 
 class _WashDetailsScreenState extends State<WashDetailsScreen> {
+  /// Last loaded order, kept on screen while a refresh runs.
+  OrderModel? _order;
+  Completer<void>? _refreshing;
+  StreamSubscription<SocketState>? _statusUpdates;
+
   @override
   void initState() {
     super.initState();
     _load();
+    _listenForStatus();
+  }
+
+  @override
+  void dispose() {
+    _statusUpdates?.cancel();
+    if (!GeneralSingleton().openTracking) SocketBloc.socketIo?.close();
+    super.dispose();
   }
 
   void _load() =>
       sl<BookingOrderBloc>().add(GetOrderById(orderId: widget.orderId));
+
+  /// The biker's status changes arrive on the socket, which only reports the
+  /// order held in the singleton.
+  void _listenForStatus() {
+    GeneralSingleton().orderId = widget.orderId;
+    final SocketBloc socketBloc = context.read<SocketBloc>();
+    socketBloc.add(OpenSocketIo());
+    _statusUpdates = socketBloc.stream.listen((SocketState state) {
+      if (state is SocketIoReceivedAnUpdateState ||
+          state is BikerAcceptedSuccess ||
+          state is ReceivedOrderCompletedSuccess) {
+        _load();
+        sl<MyBookingBloc>().add(FetchMyBookingActive(isRefresh: false));
+      }
+    });
+  }
+
+  Future<void> _refresh() {
+    _refreshing = Completer<void>();
+    _load();
+    return _refreshing!.future;
+  }
+
+  void _finishRefresh() {
+    if (_refreshing?.isCompleted == false) _refreshing!.complete();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +109,9 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
       ),
       body: BlocConsumer<BookingOrderBloc, BookingOrderState>(
         listener: (BuildContext context, BookingOrderState state) {
+          if (state is OrderByIdSuccess || state is OrderByIdFailed) {
+            _finishRefresh();
+          }
           if (state is OrderByIdFailed) {
             showSnackBar(
               buildContext: context,
@@ -77,6 +124,9 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
           }
         },
         builder: (BuildContext context, BookingOrderState state) {
+          if (state is OrderByIdSuccess) _order = state.orderModel;
+          final OrderModel? order = _order;
+          if (order != null) return _details(context, order);
           if (state is OrderByIdLoading) {
             return const KLoadingState();
           }
@@ -86,9 +136,6 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
               onRetry: _load,
             );
           }
-          if (state is OrderByIdSuccess) {
-            return _details(context, state.orderModel);
-          }
           return const SizedBox.shrink();
         },
       ),
@@ -96,44 +143,54 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
   }
 
   Widget _details(BuildContext context, OrderModel order) {
-    return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(
-        KSpace.xl,
-        KSpace.s,
-        KSpace.xl,
-        MediaQuery.paddingOf(context).bottom + KSpace.xxl,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        spacing: KSpace.xl,
-        children: <Widget>[
-          _OrderHeader(order: order, onCancelled: _load),
-          WashPhotos(
-            before: order.beforeWashImage,
-            after: order.afterWashImage,
-          ),
-          if (order.biker != null && order.location != null)
-            BikerDetails(biker: order.biker!, location: order.location!),
-          if (order.location != null) _ServiceLocationCard(order: order),
-          if (order.status == AppConstants.completed)
-            YourRating(orderId: order.sId!, orderRating: order.ratingOfBiker!),
-          if (order.vehicle != null) VechilceDetails(vehicle: order.vehicle!),
-          if (order.description != null && order.description!.isNotEmpty)
-            WashSection(
-              title: translate(AppStrings.description),
-              child: Text(
-                order.description!,
-                style: KType.subhead.copyWith(color: KColors.of(context).text),
-              ),
+    return RefreshIndicator.adaptive(
+      onRefresh: _refresh,
+      color: KColors.of(context).brand,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.fromLTRB(
+          KSpace.xl,
+          KSpace.s,
+          KSpace.xl,
+          MediaQuery.paddingOf(context).bottom + KSpace.xxl,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: KSpace.xl,
+          children: <Widget>[
+            _OrderHeader(order: order, onCancelled: _load),
+            WashPhotos(
+              before: order.beforeWashImage,
+              after: order.afterWashImage,
             ),
-          if (order.isCarFreshened == true) const _CarFreshenedCard(),
-          _DatesCard(order: order),
-          _PaymentSummary(order: order),
-          TabsServicesAndAddOns(
-            addOnsModel: order.addOns ?? [],
-            services: order.washingServices ?? [],
-          ),
-        ],
+            if (order.biker != null && order.location != null)
+              BikerDetails(biker: order.biker!, location: order.location!),
+            if (order.location != null) _ServiceLocationCard(order: order),
+            if (order.status == AppConstants.completed)
+              YourRating(
+                orderId: order.sId!,
+                orderRating: order.ratingOfBiker!,
+              ),
+            if (order.vehicle != null) VechilceDetails(vehicle: order.vehicle!),
+            if (order.description != null && order.description!.isNotEmpty)
+              WashSection(
+                title: translate(AppStrings.description),
+                child: Text(
+                  order.description!,
+                  style: KType.subhead.copyWith(
+                    color: KColors.of(context).text,
+                  ),
+                ),
+              ),
+            if (order.isCarFreshened == true) const _CarFreshenedCard(),
+            _DatesCard(order: order),
+            _PaymentSummary(order: order),
+            TabsServicesAndAddOns(
+              addOnsModel: order.addOns ?? [],
+              services: order.washingServices ?? [],
+            ),
+          ],
+        ),
       ),
     );
   }
