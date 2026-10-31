@@ -193,6 +193,14 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
             pop(context);
           } else if (state is BikerCancelOrderFailed) {
             showSnackBar(buildContext: context, message: state.error);
+          } else if (state is BikerOnTheWayOrderFailed) {
+            showSnackBar(buildContext: context, message: state.error);
+          } else if (state is BikerArrivedOrderFailed) {
+            showSnackBar(buildContext: context, message: state.error);
+          } else if (state is BikerOnWashingOrderFailed) {
+            showSnackBar(buildContext: context, message: state.error);
+          } else if (state is BikerCompleteOrderFailed) {
+            showSnackBar(buildContext: context, message: state.error);
           }
         },
         // The panel's parts listen for their own states.

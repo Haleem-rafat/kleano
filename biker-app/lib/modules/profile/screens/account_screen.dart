@@ -109,12 +109,6 @@ class AccountScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: KSpace.xxl),
-                Text(
-                  tr(context, AppStrings.deleteAccount),
-                  textAlign: TextAlign.center,
-                  style: KType.body.copyWith(color: c.error),
-                ),
               ],
             );
           },

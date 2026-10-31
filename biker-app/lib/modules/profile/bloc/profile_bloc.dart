@@ -90,9 +90,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         profile.status = event.status.toString();
         _manageSocketConnection(profile.status!);
         emit(BikerProfileSuccess(profile: profile));
+      } else {
+        emit(BikerUpdateStatusFailed());
       }
     } catch (e) {
       debugPrint(e.toString());
+      emit(BikerUpdateStatusFailed());
     }
   }
 

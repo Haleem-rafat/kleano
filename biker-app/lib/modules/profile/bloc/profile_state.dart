@@ -78,3 +78,5 @@ class BikerGetScheduleFailed extends ProfileState {
   final String error;
   BikerGetScheduleFailed({required this.error});
 }
+
+class BikerUpdateStatusFailed extends ProfileState {}

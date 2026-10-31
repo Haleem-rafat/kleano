@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/components/k_dialog.dart';
 import 'package:thewhsherbiker/core/design/components/k_picker_field.dart';
 import 'package:thewhsherbiker/core/design/components/k_states.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
@@ -49,6 +50,15 @@ void main() {
       expect(profile.sent[1], isA<BikerGetTotalCommission>());
 
       await t.tap(find.widgetWithText(KButton, translate(AppStrings.logOut)));
+      await settle(t);
+      expect(auth.sent, isEmpty);
+      await t.tap(
+        find.descendant(
+          of: find.byType(KDialog),
+          matching: find.widgetWithText(KButton, translate(AppStrings.logOut)),
+        ),
+      );
+      await settle(t);
       expect(auth.sent.single, isA<BikerLogOut>());
     });
 

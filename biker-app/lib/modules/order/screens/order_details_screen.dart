@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
@@ -55,6 +56,30 @@ class OrderDetailsScreen extends StatelessWidget {
             gap,
             if (data.vehicle != null) ...<Widget>[
               CarDetailsWidget(carData: data.vehicle),
+              gap,
+            ],
+            if (data.beforeWashImage != null ||
+                data.afterWashImage != null) ...<Widget>[
+              KCard(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      child: _WashPhoto(
+                        label: tr(context, AppStrings.beforeWash),
+                        url: data.beforeWashImage,
+                      ),
+                    ),
+                    const SizedBox(width: KSpace.m),
+                    Expanded(
+                      child: _WashPhoto(
+                        label: tr(context, AppStrings.afterWash),
+                        url: data.afterWashImage,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               gap,
             ],
             if (data.startTime != null || data.description != null) ...<Widget>[
@@ -209,6 +234,42 @@ class RowInfoWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A photo the biker took at one end of the wash.
+class _WashPhoto extends StatelessWidget {
+  const _WashPhoto({required this.label, required this.url});
+
+  final String label;
+  final String? url;
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final String? link = url;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text(label, style: KType.subhead.copyWith(color: c.textSecondary)),
+        const SizedBox(height: KSpace.s),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(KRadius.field),
+          child: AspectRatio(
+            aspectRatio: 3 / 4,
+            child: link == null
+                ? ColoredBox(color: c.fill)
+                : CachedNetworkImage(
+                    imageUrl: link,
+                    fit: BoxFit.cover,
+                    memCacheWidth: 600,
+                    errorWidget: (BuildContext _, String _, Object _) =>
+                        ColoredBox(color: c.fill),
+                  ),
+          ),
+        ),
+      ],
     );
   }
 }
