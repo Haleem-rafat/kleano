@@ -4,7 +4,6 @@ import 'package:thewhsherbiker/core/design/components/k_button.dart';
 import 'package:thewhsherbiker/core/design/components/k_card.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
-import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
@@ -122,10 +121,10 @@ class AcceptContainer extends StatelessWidget {
                 onTap: () {
                   launchUrl(Uri(scheme: 'tel', path: acceptOrder.user?.phone));
                 },
-                child: SvgPicture.asset(
-                  ImageAssets.phoneLogo,
-                  width: OrderIconAction.size,
-                  height: OrderIconAction.size,
+                child: Icon(
+                  Icons.call_rounded,
+                  size: KSpace.xxl,
+                  color: c.brand,
                 ),
               ),
               const SizedBox(width: KSpace.s),

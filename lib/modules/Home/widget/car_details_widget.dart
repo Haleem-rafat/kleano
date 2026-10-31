@@ -191,6 +191,7 @@ class _CarImageViewer extends StatelessWidget {
                 child: GlassIconButton(
                   icon: Icons.close,
                   sfSymbol: 'xmark',
+                  style: GlassButtonStyle.clear,
                   color: photo.text,
                   tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
                   onPressed: () => Navigator.of(context).pop(),

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
@@ -154,15 +155,15 @@ class _HomeScreenState extends State<HomeScreen> {
                         MediaQuery.viewPaddingOf(context).bottom)
                     .clamp(0.0, double.infinity),
           ),
-          child: FloatingActionButton.small(
+          child: GlassIconButton(
+            icon: Icons.chat_rounded,
             onPressed: _openSupportWhatsApp,
-            backgroundColor: c.success,
             tooltip: 'WhatsApp',
             child: SvgPicture.asset(
               "assets/svg/whatsapp_icon.svg",
               width: KSpace.xxl,
               height: KSpace.xxl,
-              colorFilter: ColorFilter.mode(c.surface, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(c.success, BlendMode.srcIn),
             ),
           ),
         ),

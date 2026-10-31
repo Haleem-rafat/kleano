@@ -75,7 +75,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               }
               if (state is BikerGetTotalCommissionLoading ||
                   state is BikerGetTotalWashesLoading) {
-                return const KLoadingState();
+                return const KSkeleton.details();
               }
             }
             return _content(context, profile, commission);

@@ -43,7 +43,7 @@ class HomeStatsCard extends StatelessWidget {
           switch (state) {
             case BikerGetTotalWashesLoading():
             case BikerGetTotalCommissionLoading():
-              return const KCard(child: KLoadingState());
+              return const KSkeleton.list(count: 1, padding: EdgeInsets.zero);
             case BikerGetTotalWashesFailed():
             case BikerGetTotalCommissionFailed():
               return KCard(

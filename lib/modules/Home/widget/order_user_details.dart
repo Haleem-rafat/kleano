@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
-import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
@@ -63,10 +62,10 @@ class OrderUserDetails extends StatelessWidget {
               OrderIconAction(
                 label: tr(context, AppStrings.phoneNumber),
                 onTap: () => launchUrl(Uri(scheme: 'tel', path: phone)),
-                child: SvgPicture.asset(
-                  ImageAssets.phoneLogo,
-                  width: OrderIconAction.size,
-                  height: OrderIconAction.size,
+                child: Icon(
+                  Icons.call_rounded,
+                  size: KSpace.xxl,
+                  color: c.brand,
                 ),
               ),
               const SizedBox(width: KSpace.s),

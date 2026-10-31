@@ -241,7 +241,7 @@ void main() {
 
       profile.push(BikerGetTotalCommissionLoading());
       await settle(t);
-      expect(find.byType(KLoadingState), findsOneWidget);
+      expect(find.byType(KSkeleton), findsOneWidget);
 
       profile.push(BikerGetTotalCommissionFailed(error: 'x'));
       await settle(t);

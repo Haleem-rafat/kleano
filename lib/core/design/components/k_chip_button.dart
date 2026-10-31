@@ -13,6 +13,7 @@ class KChipButton extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.leading,
+    this.trailing,
     this.semanticLabel,
     this.onPhoto = false,
   });
@@ -23,9 +24,11 @@ class KChipButton extends StatelessWidget {
   /// Longest the chip may grow before its label is cut.
   final double maxWidth;
   final Widget? leading;
+  final Widget? trailing;
   final String? semanticLabel;
 
-  /// Liquid Glass with white text, for a chip floating over a photo.
+  /// Liquid Glass with white text, for a chip floating over a photo. On iOS
+  /// it is Apple's clear glass button, with its own press response.
   final bool onPhoto;
 
   static const double height = 40;
@@ -57,9 +60,37 @@ class KChipButton extends StatelessWidget {
               ),
             ),
           ),
+          if (trailing != null) ...<Widget>[
+            const SizedBox(width: KSpace.xs),
+            IconTheme.merge(
+              data: IconThemeData(color: fg, size: 18),
+              child: trailing!,
+            ),
+          ],
         ],
       ),
     );
+    if (onPhoto && GlassTokens.useNative) {
+      return ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: maxWidth),
+        child: SizedBox(
+          height: height,
+          child: Stack(
+            children: <Widget>[
+              Positioned.fill(
+                child: NativeGlassButton(
+                  onPressed: onTap,
+                  style: GlassButtonStyle.clear,
+                  semanticLabel: semanticLabel ?? label,
+                  fallback: const SizedBox.shrink(),
+                ),
+              ),
+              IgnorePointer(child: Center(widthFactor: 1, child: content)),
+            ],
+          ),
+        ),
+      );
+    }
     final Widget chip = onPhoto
         ? LiquidGlass(
             capsule: true,

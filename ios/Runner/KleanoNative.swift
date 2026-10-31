@@ -193,6 +193,9 @@ final class GlassButtonPlatformView: NSObject, FlutterPlatformView {
       // Glass buttons draw SF Symbols in the button's tint, not the base
       // foreground: without this a white back chevron renders black.
       config.imageColorTransformer = UIConfigurationColorTransformer { _ in color }
+      // Glass can still recolour a template symbol to suit what is behind it,
+      // which turned the white bell black: fix the colour in the image itself.
+      config.image = config.image?.withTintColor(color, renderingMode: .alwaysOriginal)
       // Plain glass also reads the symbol colour from tintColor (prominent
       // glass uses tintColor for its fill, set below).
       if style != "prominent" { button.tintColor = color }
@@ -209,6 +212,7 @@ final class GlassButtonPlatformView: NSObject, FlutterPlatformView {
       button.traitOverrides.layoutDirection = rtl ? .rightToLeft : .leftToRight
     }
     button.configuration = config
+    button.accessibilityLabel = args["label"] as? String
     button.isEnabled = args["enabled"] as? Bool ?? true
   }
 }
