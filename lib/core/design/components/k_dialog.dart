@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
+import '../liquid_glass.dart';
 import '../tokens.dart';
-import 'k_glass_panel.dart';
+import 'k_panel.dart';
 
 /// A Kleano alert: optional [icon], [title], optional [message] and up to
-/// three [actions] (usually `KButton`s, the main one first) stacked full width.
+/// three [actions] (usually `KButton`s, the main one first).
 ///
-/// iOS: a Liquid Glass panel like iOS 26 alerts. Android: Material 3 surface.
+/// iOS: centred text with stacked buttons, like Apple's alerts. Android: a
+/// Material 3 dialog with start-aligned text and buttons along the bottom end.
 /// Show it with `showDialog(builder: (_) => KDialog(...))`.
 class KDialog extends StatelessWidget {
   const KDialog({
@@ -25,6 +27,8 @@ class KDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
+    final bool ios = GlassTokens.useNative;
+    final TextAlign align = ios ? TextAlign.center : TextAlign.start;
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -34,7 +38,7 @@ class KDialog extends StatelessWidget {
       ),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 400),
-        child: KGlassPanel(
+        child: KPanel(
           radius: BorderRadius.circular(KRadius.dialog),
           padding: const EdgeInsets.fromLTRB(
             KSpace.xxl,
@@ -53,22 +57,34 @@ class KDialog extends StatelessWidget {
                 ],
                 Text(
                   title,
-                  textAlign: TextAlign.center,
+                  textAlign: align,
                   style: KType.headline.copyWith(color: c.text),
                 ),
                 if (message != null) ...<Widget>[
                   const SizedBox(height: KSpace.s),
                   Text(
                     message!,
-                    textAlign: TextAlign.center,
+                    textAlign: align,
                     style: KType.subhead.copyWith(color: c.textSecondary),
                   ),
                 ],
                 if (actions.isNotEmpty) const SizedBox(height: KSpace.xl),
-                for (int i = 0; i < actions.length; i++) ...<Widget>[
-                  if (i > 0) const SizedBox(height: KSpace.s),
-                  actions[i],
-                ],
+                if (ios)
+                  for (int i = 0; i < actions.length; i++) ...<Widget>[
+                    if (i > 0) const SizedBox(height: KSpace.s),
+                    actions[i],
+                  ]
+                else if (actions.isNotEmpty)
+                  // Material puts the main action last, at the bottom end.
+                  OverflowBar(
+                    alignment: MainAxisAlignment.end,
+                    spacing: KSpace.s,
+                    overflowSpacing: KSpace.s,
+                    children: <Widget>[
+                      for (final Widget action in actions.reversed)
+                        IntrinsicWidth(child: action),
+                    ],
+                  ),
               ],
             ),
           ),

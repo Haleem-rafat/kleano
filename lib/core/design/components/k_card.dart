@@ -19,9 +19,10 @@ class KCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    final bool dark = identical(c, KColors.dark);
-    final ShapeBorder shape = RoundedSuperellipseBorder(
-        borderRadius: BorderRadius.circular(KRadius.card));
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
+    final ShapeBorder shape = KRadius.shape(
+      BorderRadius.circular(KRadius.card),
+    );
     return DecoratedBox(
       decoration: ShapeDecoration(
         shape: shape,
@@ -29,7 +30,11 @@ class KCard extends StatelessWidget {
         shadows: dark
             ? null
             : const <BoxShadow>[
-                BoxShadow(color: Color(0x0F000000), blurRadius: 12, offset: Offset(0, 2)),
+                BoxShadow(
+                  color: Color(0x0F000000),
+                  blurRadius: 12,
+                  offset: Offset(0, 2),
+                ),
               ],
       ),
       child: Material(

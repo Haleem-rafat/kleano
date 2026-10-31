@@ -1,26 +1,28 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'liquid_glass.dart';
 import 'tokens.dart';
 
-/// The Kleano theme (Material 3 Expressive on Android, base for the native
-/// Liquid Glass controls on iOS). Built only from [KColors], [KType],
-/// [KSpace], [KRadius]; documented in `docs/design-system.md`.
+/// The Kleano theme: real Material 3 on Android, and the base for Apple-style
+/// controls on iOS. Built only from [KColors], [KType], [KSpace], [KRadius];
+/// documented in `docs/design-system.md`.
 ThemeData kleanoTheme({required Brightness brightness}) {
-  final KColors c = brightness == Brightness.dark ? KColors.dark : KColors.light;
+  final KColors c = KColors.forBrightness(brightness);
+  final bool ios = defaultTargetPlatform == TargetPlatform.iOS;
 
-  final ColorScheme scheme = ColorScheme.fromSeed(
-    seedColor: KColors.light.brand,
-    brightness: brightness,
-  ).copyWith(
-    primary: c.brand,
-    onPrimary: Colors.white,
-    surface: c.surface,
-    onSurface: c.text,
-    onSurfaceVariant: c.textSecondary,
-    error: c.error,
-    outlineVariant: c.separator,
-  );
+  final ColorScheme scheme =
+      ColorScheme.fromSeed(
+        seedColor: KColors.light.brand,
+        brightness: brightness,
+      ).copyWith(
+        primary: c.brand,
+        onPrimary: Colors.white,
+        onSurface: c.text,
+        onSurfaceVariant: c.textSecondary,
+        error: c.error,
+        outlineVariant: c.separator,
+      );
 
   TextStyle t(TextStyle s, Color color) => s.copyWith(color: color);
   final TextTheme text = TextTheme(
@@ -41,16 +43,17 @@ ThemeData kleanoTheme({required Brightness brightness}) {
     shape: const WidgetStatePropertyAll<OutlinedBorder>(StadiumBorder()),
     minimumSize: const WidgetStatePropertyAll<Size>(Size(64, 52)),
     padding: const WidgetStatePropertyAll<EdgeInsets>(
-        EdgeInsets.symmetric(horizontal: KSpace.xl)),
+      EdgeInsets.symmetric(horizontal: KSpace.xl),
+    ),
     textStyle: WidgetStatePropertyAll<TextStyle>(KType.headline),
   );
 
   OutlineInputBorder field(Color color, double width) => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(KRadius.field),
-        borderSide: width == 0
-            ? BorderSide.none
-            : BorderSide(color: color, width: width),
-      );
+    borderRadius: BorderRadius.circular(KRadius.field),
+    borderSide: width == 0
+        ? BorderSide.none
+        : BorderSide(color: color, width: width),
+  );
 
   final ThemeData base = ThemeData(
     useMaterial3: true,
@@ -70,13 +73,16 @@ ThemeData kleanoTheme({required Brightness brightness}) {
       ),
     ),
     inputDecorationTheme: InputDecorationThemeData(
-      filled: true,
-      fillColor: c.fill,
+      // iOS: filled field. Android: Material 3 outlined field.
+      filled: ios,
+      fillColor: ios ? c.fill : null,
       hintStyle: KType.body.copyWith(color: c.textSecondary),
       contentPadding: const EdgeInsets.symmetric(
-          horizontal: KSpace.l, vertical: KSpace.m + 2),
-      border: field(c.brand, 0),
-      enabledBorder: field(c.brand, 0),
+        horizontal: KSpace.l,
+        vertical: KSpace.m + 2,
+      ),
+      border: ios ? field(c.brand, 0) : field(c.separator, 1),
+      enabledBorder: ios ? field(c.brand, 0) : field(c.textSecondary, 1),
       focusedBorder: field(c.brand, 2),
       errorBorder: field(c.error, 1.5),
       focusedErrorBorder: field(c.error, 2),
@@ -86,32 +92,39 @@ ThemeData kleanoTheme({required Brightness brightness}) {
       color: c.surface,
       elevation: 0,
       margin: EdgeInsets.zero,
-      shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(KRadius.card)),
+      shape: KRadius.shape(BorderRadius.circular(KRadius.card)),
     ),
     dialogTheme: DialogThemeData(
       backgroundColor: c.surface,
-      shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(KRadius.dialog)),
+      shape: KRadius.shape(BorderRadius.circular(KRadius.dialog)),
       titleTextStyle: t(KType.headline, c.text),
       contentTextStyle: t(KType.subhead, c.text),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: c.surface,
       indicatorColor: c.brand.withValues(alpha: 0.14),
-      labelTextStyle: WidgetStatePropertyAll<TextStyle>(KType.caption),
+      labelTextStyle: WidgetStatePropertyAll<TextStyle>(
+        KType.footnote.copyWith(fontWeight: FontWeight.w500, color: c.text),
+      ),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: ButtonStyle(
         shape: const WidgetStatePropertyAll<OutlinedBorder>(StadiumBorder()),
-        side: WidgetStatePropertyAll<BorderSide>(BorderSide(color: c.separator)),
+        side: WidgetStatePropertyAll<BorderSide>(
+          BorderSide(color: c.separator),
+        ),
       ),
     ),
-    switchTheme: SwitchThemeData(
-      thumbColor: const WidgetStatePropertyAll<Color>(Colors.white),
-      trackColor: WidgetStateProperty.resolveWith((Set<WidgetState> s) =>
-          s.contains(WidgetState.selected) ? c.success : c.fill),
-    ),
+    // Android keeps Material's own switch colours from the scheme.
+    switchTheme: ios
+        ? SwitchThemeData(
+            thumbColor: const WidgetStatePropertyAll<Color>(Colors.white),
+            trackColor: WidgetStateProperty.resolveWith(
+              (Set<WidgetState> s) =>
+                  s.contains(WidgetState.selected) ? c.success : c.fill,
+            ),
+          )
+        : null,
     listTileTheme: ListTileThemeData(
       minVerticalPadding: KSpace.m,
       titleTextStyle: t(KType.body, c.text),
@@ -121,8 +134,9 @@ ThemeData kleanoTheme({required Brightness brightness}) {
       backgroundColor: c.background,
       foregroundColor: c.text,
       elevation: 0,
-      centerTitle: true,
-      titleTextStyle: t(KType.headline, c.text),
+      // iOS centres the title; Material starts it after the back arrow.
+      centerTitle: ios,
+      titleTextStyle: t(ios ? KType.headline : KType.title, c.text),
     ),
     snackBarTheme: SnackBarThemeData(
       contentTextStyle: t(KType.subhead, Colors.white),
@@ -137,7 +151,19 @@ ThemeData kleanoTheme({required Brightness brightness}) {
       backgroundColor: c.surface,
       modalBackgroundColor: c.surface,
     ),
-    dialogTheme: glass.dialogTheme.copyWith(backgroundColor: c.surface),
+    dialogTheme: glass.dialogTheme.copyWith(
+      backgroundColor: c.surface,
+      shape: KRadius.shape(BorderRadius.circular(KRadius.dialog)),
+    ),
     cardTheme: base.cardTheme,
+    // Android: the bar takes a tonal surface when content scrolls under it.
+    appBarTheme: ios
+        ? glass.appBarTheme
+        : glass.appBarTheme.copyWith(
+            scrolledUnderElevation: 3,
+            surfaceTintColor: c.brand,
+          ),
+    // Android keeps Material's own switch instead of the iOS-style override.
+    switchTheme: ios ? glass.switchTheme : const SwitchThemeData(),
   );
 }

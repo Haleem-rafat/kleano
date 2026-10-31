@@ -24,13 +24,13 @@ class KEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _StateLayout(
-        icon: icon,
-        title: title,
-        message: message,
-        action: actionLabel == null
-            ? null
-            : KButton(label: actionLabel!, onPressed: onAction, expand: false),
-      );
+    icon: icon,
+    title: title,
+    message: message,
+    action: actionLabel == null
+        ? null
+        : KButton(label: actionLabel!, onPressed: onAction, expand: false),
+  );
 }
 
 /// Shown while content loads.
@@ -39,13 +39,13 @@ class KLoadingState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-        child: Padding(
-          padding: const EdgeInsets.all(KSpace.xxl),
-          child: GlassTokens.useNative
-              ? const CupertinoActivityIndicator(radius: 14)
-              : const CircularProgressIndicator(),
-        ),
-      );
+    child: Padding(
+      padding: const EdgeInsets.all(KSpace.xxl),
+      child: GlassTokens.useNative
+          ? const CupertinoActivityIndicator(radius: 14)
+          : const CircularProgressIndicator(),
+    ),
+  );
 }
 
 /// Shown when loading failed; offers a retry.
@@ -57,16 +57,16 @@ class KErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => _StateLayout(
-        icon: Icons.wifi_off_rounded,
-        title: message,
-        action: KButton(
-          key: const ValueKey<String>('k-error-retry'),
-          label: MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
-          variant: KButtonVariant.secondary,
-          onPressed: onRetry,
-          expand: false,
-        ),
-      );
+    icon: Icons.wifi_off_rounded,
+    title: message,
+    action: KButton(
+      key: const ValueKey<String>('k-error-retry'),
+      label: MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
+      variant: KButtonVariant.secondary,
+      onPressed: onRetry,
+      expand: false,
+    ),
+  );
 }
 
 class _StateLayout extends StatelessWidget {
@@ -93,14 +93,18 @@ class _StateLayout extends StatelessWidget {
           children: <Widget>[
             Icon(icon, size: 48, color: c.textSecondary),
             const SizedBox(height: KSpace.m),
-            Text(title,
-                textAlign: TextAlign.center,
-                style: KType.headline.copyWith(color: c.text)),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: KType.headline.copyWith(color: c.text),
+            ),
             if (message != null) ...<Widget>[
               const SizedBox(height: KSpace.xs),
-              Text(message!,
-                  textAlign: TextAlign.center,
-                  style: KType.subhead.copyWith(color: c.textSecondary)),
+              Text(
+                message!,
+                textAlign: TextAlign.center,
+                style: KType.subhead.copyWith(color: c.textSecondary),
+              ),
             ],
             if (action != null) ...<Widget>[
               const SizedBox(height: KSpace.l),

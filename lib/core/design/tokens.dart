@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Kleano design tokens: the single source of colour, type, spacing, radius
@@ -64,27 +65,88 @@ class KColors {
     fill: Color(0x5C787880),
   );
 
+  /// Android palette: Material 3 tonal surfaces from the brand seed, with the
+  /// exact brand kept as the action colour. iOS uses [light] and [dark].
+  static final KColors materialLight = _material(light, Brightness.light);
+  static final KColors materialDark = _material(dark, Brightness.dark);
+
+  static KColors _material(KColors base, Brightness brightness) {
+    final ColorScheme s = ColorScheme.fromSeed(
+      seedColor: light.brand,
+      brightness: brightness,
+    );
+    return KColors._(
+      brand: base.brand,
+      brandLight: base.brandLight,
+      background: s.surface,
+      surface: s.surfaceContainerLow,
+      text: s.onSurface,
+      textSecondary: s.onSurfaceVariant,
+      success: base.success,
+      warning: base.warning,
+      error: s.error,
+      separator: s.outlineVariant,
+      fill: s.surfaceContainerHighest,
+    );
+  }
+
+  /// The palette for the current platform and [brightness].
+  static KColors forBrightness(Brightness brightness) {
+    final bool isDark = brightness == Brightness.dark;
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return isDark ? dark : light;
+    }
+    return isDark ? materialDark : materialLight;
+  }
+
   static KColors of(BuildContext context) =>
-      Theme.of(context).brightness == Brightness.dark ? dark : light;
+      forBrightness(Theme.of(context).brightness);
 }
 
 /// Type scale. No font family: platform fonts (SF / SF Arabic on iOS,
 /// Roboto / Noto on Android). No colour: set it where the style is used.
 abstract final class KType {
-  static const TextStyle largeTitle =
-      TextStyle(fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -0.4, height: 1.15);
-  static const TextStyle title =
-      TextStyle(fontSize: 22, fontWeight: FontWeight.w700, height: 1.2);
-  static const TextStyle headline =
-      TextStyle(fontSize: 17, fontWeight: FontWeight.w600, height: 1.3);
-  static const TextStyle body =
-      TextStyle(fontSize: 17, fontWeight: FontWeight.w400, height: 1.3);
-  static const TextStyle subhead =
-      TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.3);
-  static const TextStyle footnote =
-      TextStyle(fontSize: 13, fontWeight: FontWeight.w400, height: 1.3);
-  static const TextStyle caption =
-      TextStyle(fontSize: 12, fontWeight: FontWeight.w400, height: 1.3);
+  static bool get _material => defaultTargetPlatform != TargetPlatform.iOS;
+
+  /// Screen titles. iOS Large Title / Material headline large.
+  static TextStyle get largeTitle => _material
+      ? const TextStyle(fontSize: 32, fontWeight: FontWeight.w600, height: 1.25)
+      : const TextStyle(
+          fontSize: 34,
+          fontWeight: FontWeight.w800,
+          letterSpacing: -0.4,
+          height: 1.2,
+        );
+
+  /// Section titles. iOS Title 2 / Material title large.
+  static TextStyle get title => _material
+      ? const TextStyle(fontSize: 22, fontWeight: FontWeight.w500, height: 1.27)
+      : const TextStyle(fontSize: 22, fontWeight: FontWeight.w700, height: 1.2);
+
+  /// Row and card titles, button labels. iOS Headline / Material title medium.
+  static TextStyle get headline => _material
+      ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, height: 1.5)
+      : const TextStyle(fontSize: 17, fontWeight: FontWeight.w600, height: 1.3);
+
+  /// Body text. iOS Body / Material body large.
+  static TextStyle get body => _material
+      ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w400, height: 1.5)
+      : const TextStyle(fontSize: 17, fontWeight: FontWeight.w400, height: 1.3);
+
+  /// Secondary text. iOS Subheadline / Material body medium.
+  static TextStyle get subhead => _material
+      ? const TextStyle(fontSize: 14, fontWeight: FontWeight.w400, height: 1.43)
+      : const TextStyle(fontSize: 15, fontWeight: FontWeight.w400, height: 1.3);
+
+  /// Field labels, metadata. iOS Footnote / Material body small.
+  static TextStyle get footnote => _material
+      ? const TextStyle(fontSize: 12, fontWeight: FontWeight.w400, height: 1.33)
+      : const TextStyle(fontSize: 13, fontWeight: FontWeight.w400, height: 1.3);
+
+  /// Small print. iOS Caption / Material label small.
+  static TextStyle get caption => _material
+      ? const TextStyle(fontSize: 11, fontWeight: FontWeight.w500, height: 1.45)
+      : const TextStyle(fontSize: 12, fontWeight: FontWeight.w400, height: 1.3);
 }
 
 /// Spacing on a 4/8 grid.
@@ -107,6 +169,14 @@ abstract final class KRadius {
   static const double card = 22;
   static const double sheet = 34;
   static const double dialog = 30;
+
+  /// Apple's continuous corners on iOS, Material rounded rectangles on Android.
+  static OutlinedBorder shape(
+    BorderRadius radius, {
+    BorderSide side = BorderSide.none,
+  }) => defaultTargetPlatform == TargetPlatform.iOS
+      ? RoundedSuperellipseBorder(borderRadius: radius, side: side)
+      : RoundedRectangleBorder(borderRadius: radius, side: side);
 }
 
 /// Motion durations and curve.
