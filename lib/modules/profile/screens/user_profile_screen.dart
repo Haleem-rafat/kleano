@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
@@ -9,6 +10,7 @@ import 'package:thewasher/core/design/components/k_list_row.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/enums/status.dart';
+import 'package:thewasher/core/resources/assets_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_cubit.dart';
 import 'package:thewasher/modules/Auth/cubit/auth_state.dart';
@@ -25,8 +27,8 @@ import 'package:thewasher/modules/profile/widgets/wallet_topup_bottom_sheet.dart
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-/// Profile tab: who you are, your wallet and points at a glance, one list of
-/// everything else, and log out at the end, confirmed in a [KDialog].
+/// Profile tab, in the biker app's style: centred photo and name, wallet and
+/// points, one list of everything else, and log out, confirmed in a [KDialog].
 class UserProfileScreen extends StatefulWidget {
   final bool? openAnother;
   const UserProfileScreen({super.key, this.openAnother = false});
@@ -147,13 +149,7 @@ class _ProfileBody extends StatelessWidget {
         (profile.imageLink == null || profile.imageLink == 'null')
         ? null
         : profile.imageLink;
-    Widget icon(IconData icon) => DecoratedBox(
-      decoration: BoxDecoration(shape: BoxShape.circle, color: c.brandTint),
-      child: SizedBox.square(
-        dimension: KSpace.xxxl + KSpace.xs,
-        child: Icon(icon, size: KSpace.xl, color: c.onBrandTint),
-      ),
-    );
+    Widget icon(IconData icon) => Icon(icon, color: c.brand);
     Widget group(List<Widget> rows) => KCard(
       padding: EdgeInsets.zero,
       child: Column(
@@ -162,7 +158,7 @@ class _ProfileBody extends StatelessWidget {
             if (i > 0)
               Divider(
                 height: 1,
-                indent: KSpace.l * 2 + KSpace.xxxl + KSpace.xs,
+                indent: KSpace.l * 2 + KSpace.xxl,
                 color: c.separator,
               ),
             rows[i],
@@ -182,80 +178,63 @@ class _ProfileBody extends StatelessWidget {
           120,
         ),
         children: <Widget>[
-          Semantics(
-            button: true,
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => pushPage(context, const ProfileAccountScreen()),
-              child: Row(
-                children: <Widget>[
-                  CircleAvatar(
-                    radius: KSpace.xxxl + KSpace.xs,
-                    backgroundColor: c.brandTint,
-                    foregroundImage: image == null ? null : NetworkImage(image),
-                    child: Text(
-                      name.isEmpty ? '' : name.characters.first.toUpperCase(),
-                      style: KType.largeTitle.copyWith(color: c.onBrandTint),
-                    ),
-                  ),
-                  const SizedBox(width: KSpace.l),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          name,
-                          style: KType.title.copyWith(color: c.text),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if ((profile.phone ?? '').isNotEmpty)
-                          Text(
-                            profile.phone!,
-                            textDirection: TextDirection.ltr,
-                            style: KType.subhead.copyWith(
-                              color: c.textSecondary,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  Icon(Icons.chevron_right_rounded, color: c.textSecondary),
-                ],
+          Text(
+            translate(AppStrings.profile),
+            textAlign: TextAlign.center,
+            style: KType.headline.copyWith(color: c.text),
+          ),
+          const SizedBox(height: KSpace.xl),
+          Center(
+            child: CircleAvatar(
+              radius: KSpace.xxxl * 1.5,
+              backgroundColor: c.brandTint,
+              foregroundImage: image == null ? null : NetworkImage(image),
+              child: Text(
+                name.isEmpty ? '' : name.characters.first.toUpperCase(),
+                style: KType.largeTitle.copyWith(color: c.onBrandTint),
               ),
             ),
           ),
+          const SizedBox(height: KSpace.m),
+          Text(
+            name,
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: KType.title.copyWith(color: c.text),
+          ),
+          if ((profile.phone ?? '').isNotEmpty)
+            Text(
+              profile.phone!,
+              textAlign: TextAlign.center,
+              textDirection: TextDirection.ltr,
+              style: KType.subhead.copyWith(color: c.textSecondary),
+            ),
           const SizedBox(height: KSpace.xl),
           KCard(
             padding: const EdgeInsets.all(KSpace.l),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: _Balance(
-                        label: translate(AppStrings.wallet),
-                        value: (profile.walletBalance ?? 0).toStringAsFixed(2),
-                        onTap: () =>
-                            pushPage(context, const WalletTopupScreen()),
-                      ),
+            child: IntrinsicHeight(
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _Balance(
+                      icon: AssetsManager.walletCoin,
+                      label: translate(AppStrings.wallet),
+                      value: (profile.walletBalance ?? 0).toStringAsFixed(2),
+                      onTap: () => pushPage(context, const WalletTopupScreen()),
                     ),
-                    SizedBox(
-                      height: KSpace.xxxl + KSpace.l,
-                      child: VerticalDivider(width: 1, color: c.separator),
+                  ),
+                  VerticalDivider(width: 1, color: c.separator),
+                  Expanded(
+                    child: _Balance(
+                      icon: AssetsManager.singleCoin,
+                      label: translate(AppStrings.points),
+                      value: '${profile.points ?? 0}',
+                      onTap: () => pushPage(context, const PointScreen()),
                     ),
-                    const SizedBox(width: KSpace.l),
-                    Expanded(
-                      child: _Balance(
-                        label: translate(AppStrings.points),
-                        value: '${profile.points ?? 0}',
-                        onTap: () => pushPage(context, const PointScreen()),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: KSpace.l),
@@ -299,14 +278,16 @@ class _ProfileBody extends StatelessWidget {
   }
 }
 
-/// One money figure on the profile: the label above, the number below.
+/// One figure on the profile, as in the biker's analytics card.
 class _Balance extends StatelessWidget {
   const _Balance({
+    required this.icon,
     required this.label,
     required this.value,
     required this.onTap,
   });
 
+  final String icon;
   final String label;
   final String value;
   final VoidCallback onTap;
@@ -320,20 +301,20 @@ class _Balance extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Text(label, style: KType.footnote.copyWith(color: c.textSecondary)),
+            SvgPicture.asset(icon, width: KSpace.xxl, height: KSpace.xxl),
             const SizedBox(height: KSpace.xs),
             FittedBox(
               fit: BoxFit.scaleDown,
-              alignment: AlignmentDirectional.centerStart,
               child: Text(
                 value,
                 maxLines: 1,
                 textDirection: TextDirection.ltr,
-                style: KType.title.copyWith(color: c.text),
+                style: KType.headline.copyWith(color: c.text),
               ),
             ),
+            Text(label, style: KType.footnote.copyWith(color: c.textSecondary)),
           ],
         ),
       ),
