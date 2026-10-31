@@ -1,0 +1,15 @@
+.Toastify__toast {
+  @apply !text-sm  border-none !rounded-lg !min-w-[300px] !text-[#313033] border !border-primary !p-4 
+}
+.Toastify__toast-icon {
+  @apply !hidden 
+}
+.Toastify__close-button {
+  @apply !text-primary hover:text-primary !my-auto
+}
+.Toastify__toast--error {
+  @apply !bg-[#FFEFEC] !text-[#313033] !rounded-lg border !border-primary !p-4 
+}
+.Toastify__toast-container--top-right{
+@apply sm:w-[400px] w-full
+}

@@ -1,0 +1,49 @@
+name: Deploy Client
+
+on: 
+  push:
+    branches: 
+      - dev
+      - prod
+
+jobs:
+  build-and-deploy-client:
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: "[PRE-BUILD]: Configure AWS credentials"
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-central-1
+
+      - name: "[PRE-BUILD]: Fetch env configs from s3"
+        run: |
+          aws s3 cp s3://zap-${{ github.ref_name }}-client-admin-web-env-configs/.env .env
+
+      - name: "[PRE-BUILD]: Install npm dependencies"
+        run: |
+          npm ci --only=production
+
+      - name: "[BUILD]: Build client"
+        run: |
+          npm run build
+
+      - name: "[POST-BUILD]: Copy .env to build folder"
+        run: |
+          cp .env dist/.env
+
+      - name: "[POST-BUILD]: Deploy client"
+        run: |
+          aws s3 rm s3://zap-${{ github.ref_name }}-client-admin-web/ --recursive
+          aws s3 cp dist s3://zap-${{ github.ref_name }}-client-admin-web/ --recursive
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
+    
+
+      

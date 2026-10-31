@@ -1,0 +1,17 @@
+export enum EFormFieldType {
+  TEXT = 'text',
+  NUMBER = 'number',
+  PASSWORD = 'password',
+  TEXT_AREA = 'text_area',
+  SELECT = 'select',
+  MULTI_SELECT = 'multi_select',
+  DATE = 'date',
+  RADIO = 'radio',
+  MULTI_CHECKBOX = 'multi_checkbox',
+  MULTI_RADIO = 'multi_radio',
+  MEDIA_UPLOAD = 'media_upload',
+  IMG_UPLOAD = 'img_upload',
+  DESCRIPTIONS = 'description',
+  COLOR_PICKER = 'color_picker',
+  PHONE_NUMBER = 'phone_number',
+}

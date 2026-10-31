@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="./src/assets/img/favicon.ico" />
+  <link rel="icon" type="image/svg+xml" />
+  <meta name="viewport"
+    content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, user-scalable=0" />
+  <title>kleano | Admin</title>
+
+  <!-- FullCalendar CSS -->
+  <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.css' rel='stylesheet' />
+  <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css' rel='stylesheet' />
+  <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css' rel='stylesheet' />
+  <link href='https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css' rel='stylesheet' />
+
+  <style>
+    .kleano-loader {
+      position: absolute;
+      inset: 0;
+      max-height: 100vh;
+      max-width: 100vw;
+      background-color: white;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .kleano-loader .loader--container {
+      height: 8rem;
+      width: 8rem;
+      animation: rotate 1s linear infinite;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+  <div id="loader" class="kleano-loader">
+    <div class="loader--container">
+      <svg xmlns="http://www.w3.org/2000/svg" display="block" preserveAspectRatio="xMidYMid"
+        style="margin: auto; background: 0 0; max-height: 300px" viewBox="0 0 100 100">
+        <path fill="#181830" d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50"></path>
+      </svg>
+    </div>
+  </div>
+</body>
+
+</html>
