@@ -11,6 +11,15 @@ rootProject.layout.buildDirectory.value(newBuildDir)
 subprojects {
     project.layout.buildDirectory.value(newBuildDir.dir(project.name))
 }
+// Some plugins (moyasar) still compile against android-33, which fails release
+// builds: their AndroidX dependencies need at least 34.
+subprojects { project ->
+    project.afterEvaluate {
+        if (project.name != "app" && project.hasProperty("android")) {
+            project.android.compileSdk = 36
+        }
+    }
+}
 subprojects {
     project.evaluationDependsOn(":app")
 }
