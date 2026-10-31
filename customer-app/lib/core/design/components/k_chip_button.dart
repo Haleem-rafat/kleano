@@ -63,6 +63,7 @@ class KChipButton extends StatelessWidget {
     final Widget chip = onPhoto
         ? LiquidGlass(
             capsule: true,
+            tint: KColors.light.brand.withValues(alpha: 0.4),
             child: Center(widthFactor: 1, child: content),
           )
         : Material(
