@@ -497,5 +497,11 @@
   "appearance": "المظهر",
   "themeLight": "فاتح",
   "themeDark": "داكن",
-  "themeSystem": "مثل الهاتف"
+  "themeSystem": "مثل الهاتف",
+  "homeStyle": "شكل الرئيسية",
+  "homeStyle_current": "الحالي",
+  "homeStyle_quickRebook": "إعادة الحجز السريع",
+  "homeStyle_serviceFirst": "الخدمات أولًا",
+  "homeStyle_liveStatus": "الحالة المباشرة",
+  "homeStyle_offersFirst": "العروض أولًا"
 }
