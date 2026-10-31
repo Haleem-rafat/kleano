@@ -1,3 +1,4 @@
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/resources/app_styles.dart';
@@ -25,13 +26,13 @@ class AppBarShared extends StatelessWidget {
       automaticallyImplyLeading: false,
       title: Text(
         titleAppBar,
-        style: AppStyles.titleWhite16Bold.copyWith(color: ColorManager.black),
+        style: KType.headline.copyWith(color: KColors.of(context).text),
       ),
       leadingWidth: 60,
       leading: isTextOnly
           ? null
           : GlassBackButton(
-              color: ColorManager.primary,
+              color: KColors.of(context).brand,
               onPressed: () => pop(context),
             ),
     );
