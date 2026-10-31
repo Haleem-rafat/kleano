@@ -123,8 +123,8 @@ class ContactUsScreen extends StatelessWidget {
             ),
           if (state.contactInfo!.linkedinLink.isNotEmpty)
             SocialWidget(
-              icon: const FaIcon(FontAwesomeIcons.snapchat),
-              titleSocial: 'Snapchat',
+              icon: const FaIcon(FontAwesomeIcons.linkedin),
+              titleSocial: 'LinkedIn',
               url: state.contactInfo!.linkedinLink,
             ),
           if (state.contactInfo!.youtubeLink.isNotEmpty)

@@ -1,3 +1,4 @@
+import 'package:thewasher/utilties/navigator.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -11,6 +12,8 @@ import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:animations/animations.dart';
+import 'package:thewasher/layout/services/notification_manager_service.dart';
+import 'package:thewasher/modules/notifications/screens/notifications_screen.dart';
 import 'package:thewasher/layout/assets_nav_bar.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/about_us/bloc/about_us_bloc.dart';
@@ -60,6 +63,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   @override
   void initState() {
+    if (NotificationManagerService().openNotificationsWhenReady) {
+      NotificationManagerService().openNotificationsWhenReady = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) pushPage(context, const NotificationsScreen());
+      });
+    }
     screenIndex = widget.selectedIndex;
     screens = <Widget>[
       const BookingMainScreen(),

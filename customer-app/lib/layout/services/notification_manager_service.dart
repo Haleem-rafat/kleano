@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:thewasher/app.dart';
 import 'package:thewasher/layout/services/firebase_cloud_messaging_service.dart';
 import 'package:thewasher/layout/services/local_notification_service.dart';
+import 'package:thewasher/modules/notifications/screens/notifications_screen.dart';
 
 class NotificationManagerService {
   static final NotificationManagerService _instance =
@@ -97,16 +99,19 @@ class NotificationManagerService {
     _backgroundSubscription?.cancel();
 
     // Listen to foreground messages
-    _foregroundSubscription =
-        _fcmService.listenToForegroundNotifications(_handleForegroundMessage);
+    _foregroundSubscription = _fcmService.listenToForegroundNotifications(
+      _handleForegroundMessage,
+    );
 
     // Listen to background messages (when app is in background)
-    _backgroundSubscription =
-        _fcmService.listenToBackgroundNotifications(_handleBackgroundMessage);
+    _backgroundSubscription = _fcmService.listenToBackgroundNotifications(
+      _handleBackgroundMessage,
+    );
 
     // Handle initial message (when app is opened from notification)
-    FirebaseCloudMessagingService.getInitialMessage
-        .then((RemoteMessage? message) {
+    FirebaseCloudMessagingService.getInitialMessage.then((
+      RemoteMessage? message,
+    ) {
       if (message != null) {
         _handleInitialMessage(message);
       }
@@ -120,7 +125,8 @@ class NotificationManagerService {
     if (message.messageId != null &&
         _recentlyShownMessageIds.contains(message.messageId)) {
       debugPrint(
-          "⚠️ Duplicate notification detected, skipping: ${message.messageId}");
+        "⚠️ Duplicate notification detected, skipping: ${message.messageId}",
+      );
       return;
     }
 
@@ -148,36 +154,26 @@ class NotificationManagerService {
   }
 
   void _handleBackgroundMessage(RemoteMessage message) {
-    debugPrint("📱 Received background message: ${message.messageId}");
-    // Handle background message logic here
+    debugPrint("📱 Opened from a notification: ${message.messageId}");
+    _navigateFromNotification();
   }
 
   void _handleInitialMessage(RemoteMessage message) {
     debugPrint("📱 Received initial message: ${message.messageId}");
-    // Handle initial message when app is opened from notification
-    if (_context != null) {
-      _navigateFromNotification(message);
-    }
+    // The app is still starting: Home opens the list once it is on screen.
+    openNotificationsWhenReady = true;
   }
 
-  void _navigateFromNotification(RemoteMessage message) {
-    // Navigate based on notification data
-    final type = message.data['type'] ?? 'general';
+  /// Set when the app was opened by tapping a push.
+  bool openNotificationsWhenReady = false;
 
-    switch (type) {
-      case 'booking':
-        // Navigate to booking details
-        break;
-      case 'order':
-        // Navigate to order details
-        break;
-      case 'promotion':
-        // Navigate to promotions
-        break;
-      default:
-        // Navigate to notifications screen
-        break;
-    }
+  void _navigateFromNotification() {
+    // The list opens the right order or promo for each message.
+    navigatorKeyAlice.currentState?.push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext _) => const NotificationsScreen(),
+      ),
+    );
   }
 
   NotificationType _getNotificationTypeFromFCM(RemoteMessage message) {
@@ -313,7 +309,9 @@ class NotificationManagerService {
 
   void setPromotionNotifications(bool enabled) {
     _promotionNotifications = enabled;
-    debugPrint("🎉 Promotion notifications ${enabled ? 'enabled' : 'disabled'}");
+    debugPrint(
+      "🎉 Promotion notifications ${enabled ? 'enabled' : 'disabled'}",
+    );
   }
 
   void setOrderNotifications(bool enabled) {

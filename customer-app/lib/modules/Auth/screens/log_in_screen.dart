@@ -1,3 +1,4 @@
+import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/core/services/appsflyer_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:thewasher/core/services/fcm_token.dart';
@@ -71,14 +72,14 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   /// The full international number sent to the backend.
-  String _fullPhone() =>
-      buildInternationalPhone(
-        dialCode: countryCode?.dialCode ?? AppConstants.defaultDialCode,
-        input: loginController.text,
-      );
+  String _fullPhone() => buildInternationalPhone(
+    dialCode: countryCode?.dialCode ?? AppConstants.defaultDialCode,
+    input: loginController.text,
+  );
 
   void _submit() {
     if (_loginFormKey.currentState!.validate()) {
+      isGuestUser = false;
       context.read<AuthCubit>().sendOTP(phone: _fullPhone());
     }
   }
@@ -131,9 +132,7 @@ class _LogInScreenState extends State<LogInScreen> {
                 autofillHints: const <String>[
                   AutofillHints.telephoneNumberNational,
                 ],
-                inputFormatters: <TextInputFormatter>[
-                  PhoneDigitsFormatter(),
-                ],
+                inputFormatters: <TextInputFormatter>[PhoneDigitsFormatter()],
                 validator: validatorPhone,
                 textInputAction: TextInputAction.done,
                 onSubmitted: (_) => _submit(),

@@ -12,7 +12,6 @@ import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/data/models/profile_user.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/change_personal_information/change_personal_info.dart';
-import 'package:thewasher/modules/profile/screens/profile_account/edit_phone_number/edit_phone_screen.dart';
 import 'package:thewasher/modules/profile/widgets/edit_profile/info_user_profile.dart';
 import 'package:thewasher/modules/profile/widgets/upload_user_photo.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
@@ -99,15 +98,6 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
                 const SizedBox(height: KSpace.l),
                 SectionCard(
                   title: translate(AppStrings.phoneNumberUser),
-                  onEdit: () {
-                    pushPage(
-                      context,
-                      EditPhoneScreen(
-                        phoneNumber: phoneNumberText,
-                        countryCodeSelected: countryCode!,
-                      ),
-                    );
-                  },
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                       KSpace.l,
@@ -163,13 +153,13 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
 
 class SectionCard extends StatelessWidget {
   final String title;
-  final VoidCallback onEdit;
+  final VoidCallback? onEdit;
   final Widget child;
 
   const SectionCard({
     super.key,
     required this.title,
-    required this.onEdit,
+    this.onEdit,
     required this.child,
   });
 
@@ -194,11 +184,12 @@ class SectionCard extends StatelessWidget {
                     style: KType.headline.copyWith(color: c.text),
                   ),
                 ),
-                IconButton(
-                  tooltip: translate(AppStrings.editProfile),
-                  onPressed: onEdit,
-                  icon: Icon(Icons.edit_outlined, size: 20, color: c.brand),
-                ),
+                if (onEdit != null)
+                  IconButton(
+                    tooltip: translate(AppStrings.editProfile),
+                    onPressed: onEdit,
+                    icon: Icon(Icons.edit_outlined, size: 20, color: c.brand),
+                  ),
               ],
             ),
           ),

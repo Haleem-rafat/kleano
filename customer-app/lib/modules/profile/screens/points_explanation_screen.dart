@@ -39,7 +39,7 @@ class PointsExplanationScreen extends StatelessWidget {
           ),
           const SizedBox(height: KSpace.s),
           Text(
-            'Earn rewards with every service you book',
+            translate('earnRewards'),
             textAlign: TextAlign.center,
             style: KType.subhead.copyWith(color: c.textSecondary),
           ),
