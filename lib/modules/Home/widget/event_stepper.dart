@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:thewhsherbiker/core/design/components/k_sheet.dart';
+import 'package:thewhsherbiker/core/design/components/k_stage_bar.dart';
 import 'package:thewhsherbiker/core/design/components/k_swipe_action.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
@@ -146,7 +147,15 @@ class EventsStepper extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            _WashProgress(step: done ? _lastStep : step),
+            KStageBar(
+              step: done ? _lastStep : step,
+              stages: <String>[
+                tr(context, AppStrings.onTheWay),
+                tr(context, AppStrings.arrived),
+                tr(context, AppStrings.washing),
+                tr(context, AppStrings.completed),
+              ],
+            ),
             const SizedBox(height: KSpace.xl),
             if (done)
               Row(
@@ -173,67 +182,6 @@ class EventsStepper extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-/// Four stages on one line; the reached ones fill in, the latest is named.
-class _WashProgress extends StatelessWidget {
-  const _WashProgress({required this.step});
-
-  final int step;
-
-  static const List<String> _stages = <String>[
-    AppStrings.onTheWay,
-    AppStrings.arrived,
-    AppStrings.washing,
-    AppStrings.completed,
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    final KColors c = KColors.of(context);
-    final Duration duration = KMotion.of(context, KMotion.slow);
-    return Semantics(
-      label: step < 0
-          ? tr(context, AppStrings.accepted)
-          : tr(context, _stages[step]),
-      excludeSemantics: true,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          for (int i = 0; i < _stages.length; i++) ...<Widget>[
-            if (i > 0) const SizedBox(width: KSpace.xs),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AnimatedContainer(
-                    duration: duration,
-                    curve: KMotion.curve,
-                    height: KSpace.s,
-                    decoration: ShapeDecoration(
-                      shape: const StadiumBorder(),
-                      color: i <= step
-                          ? (step == _stages.length - 1 ? c.success : c.brand)
-                          : c.fill,
-                    ),
-                  ),
-                  const SizedBox(height: KSpace.xs),
-                  Text(
-                    tr(context, _stages[i]),
-                    maxLines: 2,
-                    style: KType.caption.copyWith(
-                      color: i == step ? c.text : c.textSecondary,
-                      fontWeight: i == step ? FontWeight.w600 : null,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }

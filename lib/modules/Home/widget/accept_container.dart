@@ -87,7 +87,7 @@ class AcceptContainer extends StatelessWidget {
           ),
           if (car != null) ...<Widget>[
             const SizedBox(height: KSpace.m),
-            Text(car, style: KType.headline.copyWith(color: c.text)),
+            OrderCarRow(order: acceptOrder),
           ],
           if (time != null) ...<Widget>[
             const SizedBox(height: KSpace.xs),

@@ -6,6 +6,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
+import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/launch_map.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 
@@ -122,6 +123,85 @@ class HomeAvatar extends StatelessWidget {
 }
 
 /// The customer's photo and name on an order card.
+/// The order's car: photo, name, plate and colour.
+class OrderCarRow extends StatelessWidget {
+  const OrderCarRow({super.key, required this.order, this.showName = true});
+
+  final OrderModel order;
+  final bool showName;
+
+  static const double _photo = KSpace.xxxl * 2;
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final Vehicle? car = order.vehicle;
+    if (car == null) return const SizedBox.shrink();
+    final String image = car.imageLink ?? '';
+    final Widget fallback = ColoredBox(
+      color: c.fill,
+      child: Icon(Icons.directions_car_outlined, color: c.textSecondary),
+    );
+    final int cacheSize = (_photo * MediaQuery.devicePixelRatioOf(context))
+        .round();
+    Widget detail(String label, String? value) => Text.rich(
+      TextSpan(
+        style: KType.footnote.copyWith(color: c.textSecondary),
+        children: <InlineSpan>[
+          TextSpan(text: '$label '),
+          TextSpan(
+            text: value ?? '',
+            style: KType.footnote.copyWith(
+              color: c.text,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+    return Row(
+      children: <Widget>[
+        ClipRRect(
+          borderRadius: BorderRadius.circular(KRadius.field),
+          child: SizedBox.square(
+            dimension: _photo,
+            child: image.isEmpty
+                ? fallback
+                : CachedNetworkImage(
+                    imageUrl: image,
+                    fit: BoxFit.cover,
+                    memCacheWidth: cacheSize,
+                    placeholder: (BuildContext context, String url) => fallback,
+                    errorWidget:
+                        (BuildContext context, String url, Object error) =>
+                            fallback,
+                  ),
+          ),
+        ),
+        const SizedBox(width: KSpace.m),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              if (showName)
+                Text(
+                  '${car.brand} ${car.model}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: KType.headline.copyWith(color: c.text),
+                ),
+              detail(tr(context, AppStrings.plateNo), car.plateNumber),
+              detail(tr(context, AppStrings.color), car.color),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class OrderCustomerRow extends StatelessWidget {
   const OrderCustomerRow({super.key, required this.order});
 

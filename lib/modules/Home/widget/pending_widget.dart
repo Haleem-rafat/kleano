@@ -45,16 +45,17 @@ class _PendingWidgetState extends State<PendingWidget> {
         if (state is BikerGetOrdersSuccess) {
           refreshControllers.loadComplete();
         } else if (state is BikerAcceptOrderFailed) {
-          showSnackBar(
-            buildContext: context,
-            message: state.error,
-          );
+          showSnackBar(buildContext: context, message: state.error);
         } else if (state is BikerAcceptOrderSuccess) {
           if (state.details == false) {
-            Navigator.of(context).push(createRoute(OrderChangeStatus(
-              order: sl<HomeBloc>().orderDetails,
-              notification: false,
-            )));
+            Navigator.of(context).push(
+              createRoute(
+                OrderChangeStatus(
+                  order: sl<HomeBloc>().orderDetails,
+                  notification: false,
+                ),
+              ),
+            );
           }
         }
       },
@@ -62,10 +63,7 @@ class _PendingWidgetState extends State<PendingWidget> {
         if (state is BikerGetOrdersLoading) {
           return const LoadingWidget();
         } else if (state is BikerGetOrdersEmpty) {
-          return EmptyScreen(
-            notification: false,
-            text: AppStrings.letYouKnow,
-          );
+          return EmptyScreen(notification: false, text: AppStrings.letYouKnow);
         } else {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,9 +74,7 @@ class _PendingWidgetState extends State<PendingWidget> {
                   color: ColorManager.darkGrey,
                 ),
               ),
-              SizedBox(
-                height: 7.h,
-              ),
+              SizedBox(height: 7.h),
               Expanded(
                 child: SmartRefresher(
                   enablePullDown: true,
@@ -101,10 +97,7 @@ class _PendingWidgetState extends State<PendingWidget> {
                       } else {
                         body = const Text("No more Data");
                       }
-                      return SizedBox(
-                        height: 55.0,
-                        child: Center(child: body),
-                      );
+                      return SizedBox(height: 55.0, child: Center(child: body));
                     },
                   ),
                   onRefresh: () {
@@ -116,16 +109,14 @@ class _PendingWidgetState extends State<PendingWidget> {
                   child: ListView.separated(
                     itemCount: sl<HomeBloc>().orderList.length,
                     separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(
-                        height: 16.h,
-                      );
+                      return SizedBox(height: 16.h);
                     },
                     itemBuilder: (BuildContext context, int index) {
                       return OrderContainer(index: index);
                     },
                   ),
                 ),
-              )
+              ),
             ],
           );
         }

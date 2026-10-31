@@ -52,6 +52,8 @@ class OrderUserDetails extends StatelessWidget {
             ],
           ],
         ),
+        const SizedBox(height: KSpace.m),
+        OrderCarRow(order: order, showName: false),
         const SizedBox(height: KSpace.s),
         Row(
           children: <Widget>[

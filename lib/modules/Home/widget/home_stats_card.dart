@@ -47,7 +47,10 @@ class HomeStatsCard extends StatelessWidget {
             case BikerGetTotalWashesFailed():
             case BikerGetTotalCommissionFailed():
               return KCard(
-                child: KErrorState(message: translate('defaultError'), onRetry: _retry),
+                child: KErrorState(
+                  message: translate('defaultError'),
+                  onRetry: _retry,
+                ),
               );
             default:
               // Nothing in flight, so no spinner: show zeros, as before.
