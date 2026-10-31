@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -26,19 +27,19 @@ class VechicleCardData extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int selectedColor = 0;
-    selectedColor =
-        colorList.indexWhere((element) => element.colorName == vehicle.color);
+    selectedColor = colorList.indexWhere(
+      (element) => element.colorName == vehicle.color,
+    );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
           '${vehicle.brand!} ${vehicle.model}',
-          style: AppStyles.body14Medium.copyWith(color: ColorManager.black),
+          style: AppStyles.body14Medium.copyWith(
+            color: KColors.of(context).text,
+          ),
         ),
-        Divider(
-          endIndent: 88.w,
-          color: ColorManager.divider,
-        ),
+        Divider(endIndent: 88.w, color: KColors.of(context).separator),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
@@ -46,7 +47,7 @@ class VechicleCardData extends StatelessWidget {
               width: 90.w,
               height: 52.h,
               decoration: BoxDecoration(
-                color: ColorManager.white,
+                color: KColors.of(context).surface,
                 borderRadius: BorderRadius.circular(15.r),
               ),
               child: vehicle.imageLink!.isEmpty
@@ -74,34 +75,39 @@ class VechicleCardData extends StatelessWidget {
                       bookingDate != null ||
                       washingDate != null)
                     _bookingAndWashingDate(
-                        bookingDate: bookingDate!, washingDate: washingDate!),
+                      bookingDate: bookingDate!,
+                      washingDate: washingDate!,
+                    ),
                   3.verticalSpace,
                   Row(
                     children: <Widget>[
                       Text(
                         translate(AppStrings.color),
-                        style: AppStyles.caption12Regular
-                            .copyWith(color: ColorManager.black),
+                        style: AppStyles.caption12Regular.copyWith(
+                          color: KColors.of(context).text,
+                        ),
                       ),
                       6.pw,
                       Container(
                         height: 10.h,
                         width: 10.w,
                         decoration: BoxDecoration(
-                            color: colorList[
-                                    selectedColor == -1 ? 0 : selectedColor]
-                                .color,
-                            border: selectedColor == 0
-                                ? Border.all(color: ColorManager.black2)
-                                : null,
-                            shape: BoxShape.circle),
+                          color:
+                              colorList[selectedColor == -1 ? 0 : selectedColor]
+                                  .color,
+                          border: selectedColor == 0
+                              ? Border.all(color: KColors.of(context).separator)
+                              : null,
+                          shape: BoxShape.circle,
+                        ),
                       ),
                       4.pw,
                       Flexible(
                         child: Text(
                           vehicle.color!,
-                          style: AppStyles.caption12Medium
-                              .copyWith(color: ColorManager.black),
+                          style: AppStyles.caption12Medium.copyWith(
+                            color: KColors.of(context).text,
+                          ),
                         ),
                       ),
                     ],
@@ -116,8 +122,10 @@ class VechicleCardData extends StatelessWidget {
   }
 }
 
-Widget _bookingAndWashingDate(
-    {required DateTime bookingDate, required DateTime washingDate}) {
+Widget _bookingAndWashingDate({
+  required DateTime bookingDate,
+  required DateTime washingDate,
+}) {
   return Column(
     children: <Widget>[
       3.verticalSpace,
@@ -137,11 +145,7 @@ Widget _bookingAndWashingDate(
 }
 
 class RowInfoWidget extends StatelessWidget {
-  const RowInfoWidget({
-    super.key,
-    required this.title,
-    required this.infoText,
-  });
+  const RowInfoWidget({super.key, required this.title, required this.infoText});
 
   final String title;
   final String infoText;
@@ -152,8 +156,10 @@ class RowInfoWidget extends StatelessWidget {
       children: <Widget>[
         Text(
           '${translate(title)} :',
-          style: AppStyles.caption12Regular
-              .copyWith(color: ColorManager.black, fontSize: 10.sp),
+          style: AppStyles.caption12Regular.copyWith(
+            color: KColors.of(context).text,
+            fontSize: 10.sp,
+          ),
         ),
         6.pw,
         Flexible(
@@ -162,7 +168,7 @@ class RowInfoWidget extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: AppStyles.caption12Medium.copyWith(
-              color: ColorManager.black,
+              color: KColors.of(context).text,
               fontSize: 11.sp,
             ),
           ),

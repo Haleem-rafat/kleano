@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -19,15 +20,15 @@ class CardAddOns extends StatelessWidget {
     OffersBloc offersBloc = sl<OffersBloc>();
     return Container(
       decoration: BoxDecoration(
-        color: ColorManager.white,
+        color: KColors.of(context).surface,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color:
               sl<OffersBloc>().cartAddOnsList.contains(
                 offersBloc.addOnsList[index],
               )
-              ? ColorManager.primary
-              : ColorManager.white,
+              ? KColors.of(context).brand
+              : KColors.of(context).surface,
           width: 2.w,
         ),
         boxShadow: <BoxShadow>[
@@ -53,7 +54,7 @@ class CardAddOns extends StatelessWidget {
             offersBloc.addOnsList[index].name!,
             style: AppStyles.caption12Regular.copyWith(
               overflow: TextOverflow.ellipsis,
-              color: ColorManager.darkGrey,
+              color: KColors.of(context).text,
               fontSize: FontSize.s10.sp,
             ),
           ),
@@ -68,10 +69,10 @@ class CardAddOns extends StatelessWidget {
                     offersBloc.cartAddOnsList.contains(
                       offersBloc.addOnsList[index],
                     )
-                    ? ColorManager.primary
-                    : ColorManager.white,
+                    ? KColors.of(context).brand
+                    : KColors.of(context).surface,
                 borderRadius: BorderRadius.circular(6.r),
-                border: Border.all(color: ColorManager.primary),
+                border: Border.all(color: KColors.of(context).brand),
               ),
               child: Center(
                 child: Row(
@@ -84,8 +85,8 @@ class CardAddOns extends StatelessWidget {
                             offersBloc.cartAddOnsList.contains(
                               offersBloc.addOnsList[index],
                             )
-                            ? ColorManager.white
-                            : ColorManager.primary,
+                            ? KColors.of(context).surface
+                            : KColors.of(context).brand,
                         fontSize: FontSize.s10.sp,
                       ),
                     ),
@@ -98,8 +99,8 @@ class CardAddOns extends StatelessWidget {
                         offersBloc.cartAddOnsList.contains(
                               offersBloc.addOnsList[index],
                             )
-                            ? ColorManager.white
-                            : ColorManager.primary,
+                            ? KColors.of(context).surface
+                            : KColors.of(context).brand,
                         BlendMode.srcIn,
                       ),
                     ),

@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -48,7 +49,7 @@ class _WaitForBikerBottomSheetState extends State<WaitForBikerBottomSheet> {
       height: 475.48.h,
       width: 1.sw,
       decoration: BoxDecoration(
-        color: ColorManager.white,
+        color: KColors.of(context).surface,
         borderRadius: BorderRadius.only(
           topRight: Radius.circular(20.r),
           topLeft: Radius.circular(20.r),
@@ -64,7 +65,7 @@ class _WaitForBikerBottomSheetState extends State<WaitForBikerBottomSheet> {
               width: 70.w,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(15.r),
-                color: ColorManager.medGray,
+                color: KColors.of(context).textSecondary,
               ),
             ),
           ),
@@ -79,7 +80,7 @@ class _WaitForBikerBottomSheetState extends State<WaitForBikerBottomSheet> {
             child: Text(
               translate(AppStrings.connectingYouToNearestBiker),
               style: AppStyles.title16Bold.copyWith(
-                color: ColorManager.darkGrey,
+                color: KColors.of(context).text,
               ),
             ),
           ),
@@ -91,9 +92,9 @@ class _WaitForBikerBottomSheetState extends State<WaitForBikerBottomSheet> {
             selectedWidth: 70,
             innerPadding: 10.w,
             selectedColor: i == i + 1
-                ? ColorManager.primaryLight
-                : ColorManager.primary,
-            unselectedColor: ColorManager.divider,
+                ? KColors.of(context).brandTint
+                : KColors.of(context).brand,
+            unselectedColor: KColors.of(context).separator,
           ),
         ],
       ),

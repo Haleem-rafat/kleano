@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -62,7 +63,7 @@ class _UsingPointsState extends State<UsingPoints> {
                     Text(
                       translate(AppStrings.paymentMethod),
                       style: AppStyles.title16Bold.copyWith(
-                        color: ColorManager.darkGrey,
+                        color: KColors.of(context).text,
                       ),
                     ),
                     AppPadding.p8.ph,
@@ -71,13 +72,13 @@ class _UsingPointsState extends State<UsingPoints> {
                         Text(
                           '${translate(AppStrings.points)} : ',
                           style: AppStyles.body14Medium.copyWith(
-                            color: ColorManager.darkGrey,
+                            color: KColors.of(context).text,
                           ),
                         ),
                         Text(
                           '${sl.call<PointBloc>.call().pointResponse.points!} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
                           style: AppStyles.body14Medium.copyWith(
-                            color: ColorManager.darkGrey,
+                            color: KColors.of(context).text,
                           ),
                         ),
                         const Spacer(),
@@ -85,7 +86,7 @@ class _UsingPointsState extends State<UsingPoints> {
                           ignoring: checkPoints ? false : true,
                           child: CupertinoSwitch(
                             value: toggleSelected,
-                            activeTrackColor: ColorManager.secondary,
+                            activeTrackColor: KColors.of(context).brand,
                             onChanged: (bool value) {
                               setState(() {
                                 toggleSelected = value;
@@ -111,13 +112,13 @@ class _UsingPointsState extends State<UsingPoints> {
                   Text(
                     '${translate(AppStrings.points)} : ',
                     style: AppStyles.body14Medium.copyWith(
-                      color: ColorManager.darkGrey,
+                      color: KColors.of(context).text,
                     ),
                   ),
                   Text(
                     '${sl<PointBloc>().pointResponse.points} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
                     style: AppStyles.body14Medium.copyWith(
-                      color: ColorManager.darkGrey,
+                      color: KColors.of(context).text,
                     ),
                   ),
                   const Spacer(),
@@ -138,7 +139,7 @@ class _UsingPointsState extends State<UsingPoints> {
                       ignoring: checkPoints ? true : false,
                       child: CupertinoSwitch(
                         value: toggleSelected,
-                        activeTrackColor: ColorManager.secondary,
+                        activeTrackColor: KColors.of(context).brand,
                         onChanged: (bool value) {
                           setState(() {
                             toggleSelected = value;
