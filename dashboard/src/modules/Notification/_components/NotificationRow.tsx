@@ -23,62 +23,28 @@ const NotificationRow = ({ data }) => {
       });
   };
 
-  function timeSince(datetime) {
-    const now = new Date().getTime();
-    const seconds = Math.floor((now - datetime) / 1000);
-    let interval = seconds / 31536000;
-
-    if (interval > 1) {
-      return {
-        section: 'old',
-        displayDate: `${Math.floor(interval)} ${t('years')} `,
-      };
+  function timeSince(datetime: Date) {
+    const days = (Date.now() - datetime.getTime()) / 86400000;
+    const relative = new Intl.RelativeTimeFormat(lang, { numeric: 'auto' });
+    const section = days >= 2 ? 'old' : days >= 1 ? 'yes' : 'new';
+    if (days >= 365) {
+      return { section, displayDate: relative.format(-Math.floor(days / 365), 'year') };
     }
-
-    interval = seconds / 2592000;
-    if (interval > 1) {
-      return {
-        section: 'old',
-        displayDate: `${Math.floor(interval)} ${t('month')}`,
-      };
+    if (days >= 30) {
+      return { section, displayDate: relative.format(-Math.floor(days / 30), 'month') };
     }
-
-    interval = seconds / 86400;
-    if (interval >= 2) {
-      return {
-        section: 'old',
-        displayDate: `${Math.floor(interval)} ${t('day')}`,
-      };
+    if (days >= 1) return { section, displayDate: relative.format(-Math.floor(days), 'day') };
+    const minutes = days * 1440;
+    if (minutes >= 60) {
+      return { section, displayDate: relative.format(-Math.floor(minutes / 60), 'hour') };
     }
-    if (interval > 1) {
-      return {
-        section: 'yes',
-        displayDate: datetime.toLocaleTimeString(lang, {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      };
-    }
-
-    interval = seconds / 3600;
-    if (interval > 1) {
-      return {
-        section: 'new',
-        displayDate: `${Math.floor(interval)} ${t('hr')}`,
-      };
-    }
-
-    interval = seconds / 60;
-    return {
-      section: 'new',
-      displayDate: `${Math.ceil(interval)} ${t('min')}`,
-    };
+    return { section, displayDate: relative.format(-Math.max(1, Math.ceil(minutes)), 'minute') };
   }
 
   let currentSection = '';
 
   return (
-    <div className="px-4 sm:px-0">
+    <div>
       {data?.map((e) => {
         const notificationDateData = timeSince(new Date(e?.createdAt));
         const isNewSection = notificationDateData.section !== currentSection;
@@ -90,7 +56,7 @@ const NotificationRow = ({ data }) => {
         return (
           <div key={e?._id}>
             {isNewSection && (
-              <div className="text-textGray2 px-1 py-2 text-base font-normal sm:px-0">
+              <div className="px-1 pb-1 pt-3 text-xs font-medium text-slate-500 sm:px-0">
                 {currentSection === 'old'
                   ? t('older')
                   : currentSection === 'yes'
@@ -103,38 +69,33 @@ const NotificationRow = ({ data }) => {
                 handleIsRead(e?._id);
                 navigate(generatePath(ROUTES.ORDER_DETAILS, { orderId: e.clickableItem }));
               }}
-              className={`my-2 border border-b-[0.5px] p-2 ${
-                e?.isRead ? 'rounded-xl bg-white' : 'rounded-xl bg-secondary/10'
-              } active:dark:bg-darkMood-whitBlack/90 hover:dark:bg-darkMood-whitBlack/50 flex cursor-pointer justify-between hover:rounded-xl hover:bg-secondary/30 hover:text-white active:rounded-xl active:bg-primary/90`}>
+              className={`my-2 rounded-xl border border-slate-200 p-3 ${
+                e?.isRead ? 'bg-white' : 'bg-brandTint/60'
+              } hover:border-primary/40 active:dark:bg-darkMood-whitBlack/90 hover:dark:bg-darkMood-whitBlack/50 flex cursor-pointer justify-between hover:rounded-xl hover:bg-secondary/30 hover:text-white active:rounded-xl active:bg-primary/90`}>
               <div className="flex gap-x-2">
                 <MainAvatar
-                  size="3xl"
-                  src={
-                    lang === 'en'
-                      ? e?.message?.enTitle || 'Pending request'
-                      : e?.message?.arTitle || 'Pending request'
-                  }
+                  src=""
                   name={
                     lang === 'en'
                       ? e?.message?.enTitle || 'Pending request'
                       : e?.message?.arTitle || 'Pending request'
                   }
-                  className="h-10 w-10"
+                  className="h-10 w-10 shrink-0"
                 />
 
                 <div>
-                  <h1 className="pt-2 text-base font-medium">
+                  <h2 className="text-[13px] font-medium text-slate-900">
                     {lang === 'en' ? e?.message?.enTitle : e?.message?.arTitle}
-                  </h1>
-                  <p className="text-clip pb-0 text-base font-normal text-[#707070] sm:pb-2">
+                  </h2>
+                  <p className="text-[13px] text-slate-500">
                     {lang === 'en' ? e?.message?.enBody : e?.message?.arBody}
                   </p>
-                  <div className="block text-base font-normal text-[#707070] sm:hidden">
+                  <div className="block text-xs text-slate-500 sm:hidden">
                     {notificationDateData.displayDate}
                   </div>
                 </div>
               </div>
-              <div className="hidden px-6 pt-4 text-base font-normal text-[#707070] sm:block">
+              <div className="hidden shrink-0 px-2 text-xs text-slate-500 sm:block">
                 {notificationDateData.displayDate}
               </div>
             </div>

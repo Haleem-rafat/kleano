@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useForm, useFieldArray } from 'react-hook-form';
 import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -44,6 +45,7 @@ const schema = Yup.object().shape({
 });
 
 const ContactForm = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const fetchContacInfo = async () => {
@@ -164,7 +166,7 @@ const ContactForm = () => {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">Contact Information</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('Contact Information')}</h1>
                 <p className="mt-1 text-sm text-slate-500">
                   Manage your contact details and social media links
                 </p>
@@ -176,7 +178,7 @@ const ContactForm = () => {
                 buttonComponent={
                   <Button variant="danger" size="sm">
                     <IoTrash className="mr-2 h-4 w-4" />
-                    Delete
+                    {t('Delete')}
                   </Button>
                 }
                 handler={handleDelete}
@@ -199,8 +201,8 @@ const ContactForm = () => {
                       <IoCall className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Basic Information</h2>
-                      <p className="text-sm text-slate-500">Primary contact details and title</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Basic Information')}</h2>
+                      <p className="text-sm text-slate-500">{t('Primary contact details and title')}</p>
                     </div>
                   </div>
                 </div>
@@ -253,8 +255,8 @@ const ContactForm = () => {
                       <IoMail className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Email Addresses</h2>
-                      <p className="text-sm text-slate-500">Manage multiple email addresses</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Email Addresses')}</h2>
+                      <p className="text-sm text-slate-500">{t('Manage multiple email addresses')}</p>
                     </div>
                   </div>
                 </div>
@@ -262,7 +264,7 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-sm font-medium text-slate-700">Email Addresses</h4>
+                      <h4 className="text-sm font-medium text-slate-700">{t('Email Addresses')}</h4>
                       <Button
                         type="button"
                         variant="secondary"
@@ -270,7 +272,7 @@ const ContactForm = () => {
                         onClick={() => appendEmail('')}
                         className="flex items-center gap-2">
                         <IoAdd className="h-4 w-4" />
-                        Add Email
+                        {t('Add Email')}
                       </Button>
                     </div>
 
@@ -319,8 +321,8 @@ const ContactForm = () => {
                       <IoCall className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Phone Numbers</h2>
-                      <p className="text-sm text-slate-500">Manage multiple phone numbers</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Phone Numbers')}</h2>
+                      <p className="text-sm text-slate-500">{t('Manage multiple phone numbers')}</p>
                     </div>
                   </div>
                 </div>
@@ -328,7 +330,7 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-sm font-medium text-slate-700">Phone Numbers</h4>
+                      <h4 className="text-sm font-medium text-slate-700">{t('Phone Numbers')}</h4>
                       <Button
                         type="button"
                         variant="secondary"
@@ -336,7 +338,7 @@ const ContactForm = () => {
                         onClick={() => appendPhone('')}
                         className="flex items-center gap-2">
                         <IoAdd className="h-4 w-4" />
-                        Add Phone
+                        {t('Add Phone')}
                       </Button>
                     </div>
 
@@ -385,8 +387,8 @@ const ContactForm = () => {
                       <IoLogoWhatsapp className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Social Media Links</h2>
-                      <p className="text-sm text-slate-500">Connect your social media profiles</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Social Media Links')}</h2>
+                      <p className="text-sm text-slate-500">{t('Connect your social media profiles')}</p>
                     </div>
                   </div>
                 </div>
@@ -394,9 +396,9 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="border-b border-slate-200 pb-4">
-                      <h3 className="text-sm font-semibold text-slate-900">Social Media Links</h3>
+                      <h3 className="text-sm font-semibold text-slate-900">{t('Social Media Links')}</h3>
                       <p className="mt-1 text-sm text-slate-500">
-                        Connect your social media profiles
+                        {t('Connect your social media profiles')}
                       </p>
                     </div>
 
@@ -433,7 +435,7 @@ const ContactForm = () => {
               <div className="mt-6 flex items-center justify-end pt-6">
                 <div className="flex items-center gap-3">
                   <Button type="button" variant="secondary" onClick={() => navigate(-1)}>
-                    Cancel
+                    {t('Cancel')}
                   </Button>
                   <Button type="submit" className="bg-primary text-white hover:bg-primary">
                     {(data as any)?._id ? 'Update Contact Info' : 'Create Contact Info'}

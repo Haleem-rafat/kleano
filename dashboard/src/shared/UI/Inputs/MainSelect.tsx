@@ -47,7 +47,7 @@ export default function MainSelect({
   multiSelect = false,
   size = 'md',
   ...props
-}: SelectProps): React.ReactNode {
+}: SelectProps) {
   const [selectedValues, setSelectedValues] = useState<string[]>(
     Array.isArray(field?.value) ? field.value : defaultValue || []
   );

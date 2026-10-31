@@ -72,7 +72,7 @@ export default function Login() {
                 />
               ))}
               <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
-                Log in
+                {t('Log in')}
               </Button>
             </form>
           </Form>

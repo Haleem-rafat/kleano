@@ -3,19 +3,16 @@ import i18n from '@app/locales/i18n';
 export const formatDate = (isoString) => {
   const date = new Date(isoString);
   if (!isoString || Number.isNaN(date.getTime())) return '—';
-  // here i want to add the day name ex friday, saturday, sunday, monday, tuesday, wednesday, thursday
-  const day = date.toLocaleDateString('en-US', { weekday: 'long' });
-
-  return `${day} ${date.toLocaleDateString('en-US', {
+  return date.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : 'en-GB', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
     year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
-  })}`;
+    hour12: true,
+  });
 };
-
-
 
 export const formatToFilterDate = (date) => {
   if (date) {

@@ -1027,19 +1027,19 @@ export default function BikersSchedule() {
                       />
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <h4 className="mb-2 text-xs font-medium text-slate-500">
                         {t('name')}
                       </h4>
                       <p className="text-sm font-semibold text-slate-900">{bikerData?.userName}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <h4 className="mb-2 text-xs font-medium text-slate-500">
                         {t('phone')}
                       </h4>
                       <p className="text-sm font-semibold text-slate-900">{bikerData?.phone}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <h4 className="mb-2 text-xs font-medium text-slate-500">
                         {t('city')}
                       </h4>
                       <p className="text-sm font-semibold text-slate-900">

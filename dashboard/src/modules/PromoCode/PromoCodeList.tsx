@@ -219,7 +219,7 @@ const PromoCodeList = () => {
       </div>
 
       {!isChart ? (
-        <div className="h-[calc(100vh-300px)] w-full overflow-y-scroll rounded-lg  p-4 shadow">
+        <div>
           <Table className="scrollbar-hide">
             <TableHeader>
               <TableRow>
@@ -283,17 +283,17 @@ const PromoCodeList = () => {
                     {/* <TableCell>
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="primary">Edit</Button>
+                          <Button variant="primary">{t('Edit')}</Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80">
                           <div className="grid gap-4">
                             <div className="space-y-2">
-                              <h4 className="font-medium leading-none">Promo Name</h4>
-                              <p className="text-muted-foreground text-sm">Edit your promo name</p>
+                              <h4 className="font-medium leading-none">{t('Promo Name')}</h4>
+                              <p className="text-muted-foreground text-sm">{t('Edit your promo name')}</p>
                             </div>
 
                             <div className="flex flex-col gap-2 ">
-                              <Label htmlFor="name">Name</Label>
+                              <Label htmlFor="name">{t('Name')}</Label>
                               <Input
                                 ref={inputRef}
                                 id="name"
@@ -301,7 +301,7 @@ const PromoCodeList = () => {
                                 className="col-span-2 h-8"
                               />
                             </div>
-                            <Button onClick={() => handleEdit(promoCode._id)}>Submit</Button>
+                            <Button onClick={() => handleEdit(promoCode._id)}>{t('Submit')}</Button>
                           </div>
                         </PopoverContent>
                       </Popover>

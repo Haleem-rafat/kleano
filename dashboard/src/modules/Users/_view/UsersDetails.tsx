@@ -270,7 +270,7 @@ export default function UsersDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('userInfo')}</h2>
-                      <p className="text-sm text-slate-500">User profile information</p>
+                      <p className="text-sm text-slate-500">{t('User profile information')}</p>
                     </div>
                   </div>
                 </div>
@@ -278,13 +278,13 @@ export default function UsersDetails() {
                   <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                     <div className="space-y-4">
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('name')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">{user.userName}</p>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('phone')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">{user.phone}</p>
@@ -292,7 +292,7 @@ export default function UsersDetails() {
                     </div>
                     <div className="space-y-4">
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('walletBalance')}
                         </label>
                         <p className="font-mono text-2xl font-bold text-green-600">
@@ -300,7 +300,7 @@ export default function UsersDetails() {
                         </p>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('createddate')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">
@@ -311,7 +311,7 @@ export default function UsersDetails() {
                   </div>
 
                   <div className="mt-6 border-t border-slate-200 pt-6">
-                    <label className="mb-3 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <label className="mb-3 block text-xs font-medium text-slate-500">
                       {t('plans')}
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -356,7 +356,7 @@ export default function UsersDetails() {
                           <div className="flex-1">
                             <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
-                                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <label className="mb-1 block text-xs font-medium text-slate-500">
                                   {t('brand')}
                                 </label>
                                 <p className="text-sm font-semibold text-slate-900">
@@ -364,7 +364,7 @@ export default function UsersDetails() {
                                 </p>
                               </div>
                               <div>
-                                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <label className="mb-1 block text-xs font-medium text-slate-500">
                                   {t('model')}
                                 </label>
                                 <p className="text-sm font-semibold text-slate-900">
@@ -372,7 +372,7 @@ export default function UsersDetails() {
                                 </p>
                               </div>
                               <div>
-                                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <label className="mb-1 block text-xs font-medium text-slate-500">
                                   {t('plateNumber')}
                                 </label>
                                 <p className="font-mono text-sm font-semibold text-slate-900">
@@ -380,7 +380,7 @@ export default function UsersDetails() {
                                 </p>
                               </div>
                               <div>
-                                <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                                <label className="mb-1 block text-xs font-medium text-slate-500">
                                   {t('color')}
                                 </label>
                                 <p className="text-sm font-semibold text-slate-900">
@@ -417,8 +417,8 @@ export default function UsersDetails() {
                       <IoStatsChartOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Order Statistics</h2>
-                      <p className="text-sm text-slate-500">Overall order performance metrics</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Order Statistics')}</h2>
+                      <p className="text-sm text-slate-500">{t('Overall order performance metrics')}</p>
                     </div>
                   </div>
                 </div>
@@ -430,7 +430,7 @@ export default function UsersDetails() {
                         <IoReceiptOutline className="h-4 w-4 text-primary" />
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{user.ordersCount}</p>
-                      <p className="text-sm text-slate-500">Total Orders</p>
+                      <p className="text-sm text-slate-500">{t('Total Orders')}</p>
                     </div>
 
                     {/* Total Spent */}
@@ -439,7 +439,7 @@ export default function UsersDetails() {
                         <IoCashOutline className="h-6 w-6 text-green-600" />
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{user.totalOrdersPrice}</p>
-                      <p className="text-sm text-slate-500">Total Spent</p>
+                      <p className="text-sm text-slate-500">{t('Total Spent')}</p>
                     </div>
                     {/* Average Order Value */}
                     <div className="text-center">
@@ -456,7 +456,7 @@ export default function UsersDetails() {
                             ).toFixed(2)
                           : '0.00'}
                       </p>
-                      <p className="text-sm text-slate-500">Avg Order Value</p>
+                      <p className="text-sm text-slate-500">{t('Avg Order Value')}</p>
                     </div>
                     {/* Add ons count */}
 
@@ -465,7 +465,7 @@ export default function UsersDetails() {
                         <Blocks size={24} color="#6b7280" />
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{user.addOnsCount}</p>
-                      <p className="text-sm text-slate-500">Add ons Count</p>
+                      <p className="text-sm text-slate-500">{t('Add ons Count')}</p>
                     </div>
                     {/* toal add ons price */}
                     <div className="text-center">
@@ -473,7 +473,7 @@ export default function UsersDetails() {
                         <IoAddOutline className="h-6 w-6 text-purple-600" />
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{user.totalAddOnsPrice}</p>
-                      <p className="text-sm text-slate-500">Total Add ons Price</p>
+                      <p className="text-sm text-slate-500">{t('Total Add ons Price')}</p>
                     </div>
                     <div className="text-center">
                       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-purple-100">
@@ -488,7 +488,7 @@ export default function UsersDetails() {
                           )
                           .toFixed(2)}
                       </p>
-                      <p className="text-sm text-slate-500">Total Discounts</p>
+                      <p className="text-sm text-slate-500">{t('Total Discounts')}</p>
                     </div>
                   </div>
 
@@ -497,7 +497,7 @@ export default function UsersDetails() {
                     {/* Most Common Vehicle */}
                     <div className="rounded-lg bg-slate-50 p-4">
                       <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        Most Used Vehicle
+                        {t('Most Used Vehicle')}
                       </h4>
                       <p className="text-lg font-bold text-slate-900">
                         {(() => {
@@ -518,7 +518,7 @@ export default function UsersDetails() {
                     {/* Payment Method Distribution */}
                     <div className="rounded-lg bg-slate-50 p-4">
                       <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        Preferred Payment
+                        {t('Preferred Payment')}
                       </h4>
                       <p className="text-lg font-bold text-slate-900">
                         {(() => {
@@ -597,7 +597,7 @@ export default function UsersDetails() {
                           }}
                           className="flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50">
                           <IoRefreshOutline className="h-4 w-4" />
-                          Clear All
+                          {t('Clear All')}
                         </button>
                       </div>
 
@@ -621,34 +621,34 @@ export default function UsersDetails() {
                           {/* Status Filter */}
                           <div>
                             <label className="mb-2 block text-sm font-medium text-slate-700">
-                              Status
+                              {t('Status')}
                             </label>
                             <select
                               value={statusFilter}
                               onChange={(e) => setStatusFilter(e.target.value)}
                               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40">
-                              <option value="all">All Statuses</option>
-                              <option value="WAITING_FOR_BIKER_BY_ADMIN">Waiting for Biker</option>
-                              <option value="ACCEPTED_BY_BIKER">Accepted by Biker</option>
-                              <option value="BIKER_ON_THE_WAY">Biker on the Way</option>
-                              <option value="BIKER_ARRIVED">Biker Arrived</option>
-                              <option value="ON_WASHING">On Washing</option>
-                              <option value="COMPLETED">Completed</option>
-                              <option value="CANCELLED_BY_USER">Cancelled by User</option>
-                              <option value="CANCELLED_BY_ADMIN">Cancelled by Admin</option>
+                              <option value="all">{t('All Statuses')}</option>
+                              <option value="WAITING_FOR_BIKER_BY_ADMIN">{t('Waiting for Biker')}</option>
+                              <option value="ACCEPTED_BY_BIKER">{t('Accepted by Biker')}</option>
+                              <option value="BIKER_ON_THE_WAY">{t('Biker on the Way')}</option>
+                              <option value="BIKER_ARRIVED">{t('Biker Arrived')}</option>
+                              <option value="ON_WASHING">{t('On Washing')}</option>
+                              <option value="COMPLETED">{t('Completed')}</option>
+                              <option value="CANCELLED_BY_USER">{t('Cancelled by User')}</option>
+                              <option value="CANCELLED_BY_ADMIN">{t('Cancelled by Admin')}</option>
                             </select>
                           </div>
 
                           {/* Payment Type Filter */}
                           <div>
                             <label className="mb-2 block text-sm font-medium text-slate-700">
-                              Payment Type
+                              {t('Payment Type')}
                             </label>
                             <select
                               value={paymentTypeFilter}
                               onChange={(e) => setPaymentTypeFilter(e.target.value)}
                               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40">
-                              <option value="all">All Payment Types</option>
+                              <option value="all">{t('All Payment Types')}</option>
                               {uniquePaymentTypes.map((type) => (
                                 <option key={type} value={type}>
                                   {type}
@@ -660,17 +660,17 @@ export default function UsersDetails() {
                           {/* Date Range Filter */}
                           <div>
                             <label className="mb-2 block text-sm font-medium text-slate-700">
-                              Date Range
+                              {t('Date Range')}
                             </label>
                             <select
                               value={dateRangeFilter}
                               onChange={(e) => setDateRangeFilter(e.target.value)}
                               className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40">
-                              <option value="all">All Time</option>
-                              <option value="today">Today</option>
+                              <option value="all">{t('All Time')}</option>
+                              <option value="today">{t('Today')}</option>
                               <option value="week">Last 7 Days</option>
                               <option value="month">Last 30 Days</option>
-                              <option value="year">Last Year</option>
+                              <option value="year">{t('Last Year')}</option>
                             </select>
                           </div>
 
@@ -731,8 +731,8 @@ export default function UsersDetails() {
                             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                               {/* Vehicle Information */}
                               <div className="space-y-3">
-                                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
-                                  Vehicle
+                                <h4 className="text-sm font-semibold text-slate-700">
+                                  {t('Vehicle')}
                                 </h4>
                                 <div className="space-y-2">
                                   <div className="flex items-center space-x-2">
@@ -752,8 +752,8 @@ export default function UsersDetails() {
 
                               {/* Services Information */}
                               <div className="space-y-3">
-                                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
-                                  Services
+                                <h4 className="text-sm font-semibold text-slate-700">
+                                  {t('Services')}
                                 </h4>
                                 <div className="space-y-2">
                                   <div className="flex items-center space-x-2">
@@ -773,25 +773,25 @@ export default function UsersDetails() {
 
                               {/* Pricing Information */}
                               <div className="space-y-3">
-                                <h4 className="text-sm font-semibold uppercase tracking-wide text-slate-700">
-                                  Pricing
+                                <h4 className="text-sm font-semibold text-slate-700">
+                                  {t('Pricing')}
                                 </h4>
                                 <div className="space-y-2">
                                   <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <span className="text-sm text-slate-500">Total Price</span>
+                                    <span className="text-sm text-slate-500">{t('Total Price')}</span>
                                     <span className="text-sm font-semibold text-slate-900">
                                       {order.totalPrice}
                                     </span>
                                   </div>
                                   <div className="flex flex-wrap items-center justify-between gap-3">
-                                    <span className="text-sm text-slate-500">Discount</span>
+                                    <span className="text-sm text-slate-500">{t('Discount')}</span>
                                     <span className="text-sm font-semibold text-green-600">
                                       -{order.discount}
                                     </span>
                                   </div>
                                   <div className="flex items-center justify-between border-t border-slate-200 pt-2">
                                     <span className="text-sm font-semibold text-slate-700">
-                                      Amount Paid
+                                      {t('Amount Paid')}
                                     </span>
                                     <span className="text-lg font-bold text-green-600">
                                       {order.totalPay}
@@ -842,7 +842,7 @@ export default function UsersDetails() {
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <IoReceiptOutline className="h-8 w-8 text-slate-400" />
                       </div>
-                      <h3 className="mb-1 text-lg font-medium text-slate-900">No orders found</h3>
+                      <h3 className="mb-1 text-lg font-medium text-slate-900">{t('No orders found')}</h3>
                       <p className="text-slate-500">This user hasn&apos;t placed any orders yet.</p>
                     </div>
                   ) : (
@@ -851,7 +851,7 @@ export default function UsersDetails() {
                         <IoSearchOutline className="h-8 w-8 text-slate-400" />
                       </div>
                       <h3 className="mb-1 text-lg font-medium text-slate-900">
-                        No orders match your filters
+                        {t('No orders match your filters')}
                       </h3>
                       <p className="text-slate-500">
                         Try adjusting your search criteria or clear the filters.
@@ -866,7 +866,7 @@ export default function UsersDetails() {
                         }}
                         className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary">
                         <IoRefreshOutline className="h-4 w-4" />
-                        Clear Filters
+                        {t('Clear Filters')}
                       </button>
                     </div>
                   )}

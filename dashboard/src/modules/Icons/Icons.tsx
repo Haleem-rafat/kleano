@@ -59,7 +59,7 @@ export default function Icons() {
           <Button onClick={() => setOpenSheet(true)}>{t('AddNewIcons')}</Button>
         </div>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         {loadingiconsOptions && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>

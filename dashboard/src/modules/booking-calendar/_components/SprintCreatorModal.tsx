@@ -69,7 +69,7 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
     <div className={cn('grid gap-4')}>
       {/* Date Range Picker */}
       <div className="grid gap-2">
-        <label className="text-sm font-medium">Select Sprint Date Range</label>
+        <label className="text-sm font-medium">{t('Select Sprint Date Range')}</label>
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -88,7 +88,7 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
                   format(dateRange.from, 'LLL dd, y')
                 )
               ) : (
-                <span>Pick a date range</span>
+                <span>{t('Pick a date range')}</span>
               )}
             </Button>
           </PopoverTrigger>
@@ -108,7 +108,7 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
       {/* Sprint Info */}
       {dateRange?.from && dateRange?.to && (
         <div className="rounded-lg border bg-gray-50 p-3">
-          <h4 className="text-sm font-medium text-gray-700">Sprint Details</h4>
+          <h4 className="text-sm font-medium text-gray-700">{t('Sprint Details')}</h4>
           <div className="mt-2 space-y-1 text-sm text-gray-600">
             <p>
               <strong>Duration:</strong>{' '}
@@ -133,13 +133,13 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
       {/* Action Buttons */}
       <div className="flex justify-end gap-2">
         <Button variant="secondary" onClick={onClose} disabled={loading}>
-          Cancel
+          {t('Cancel')}
         </Button>
         <Button
           loading={loading}
           disabled={!dateRange?.from || !dateRange?.to}
           onClick={handleCreateSprint}>
-          Create Sprint
+          {t('Create Sprint')}
         </Button>
       </div>
     </div>

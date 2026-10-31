@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { Button } from '@UI/Index';
@@ -20,6 +21,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onFiltersChange,
   onNavigate,
 }) => {
+  const { t } = useTranslation();
   const viewButtons = [
     { key: 'dayGridMonth' as CalendarView, label: 'Month' },
     { key: 'timeGridWeek' as CalendarView, label: 'Week' },
@@ -53,7 +55,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               size="sm"
               onClick={() => onNavigate('today')}
               className="px-3 py-1 text-sm">
-              Today
+              {t('Today')}
             </Button>
             <Button
               variant="secondary"
@@ -91,7 +93,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             onCheckedChange={handleShowInactiveToggle}
           />
           <Label htmlFor="show-inactive" className="text-sm">
-            Show Inactive
+            {t('Show Inactive')}
           </Label>
         </div>
 

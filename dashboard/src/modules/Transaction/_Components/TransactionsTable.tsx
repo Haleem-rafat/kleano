@@ -40,17 +40,17 @@ const TransactionsTable = ({ data = [] }: { data }) => {
             return (
               <TableRow key={transaction._id}>
                 <TableCell>
-                  <div className="flex justify-center gap-x-10 md:justify-start">
+                  <div className="flex items-center gap-3">
                     <MainAvatar
                       src={order?.user?.imageLink}
                       name={order?.user?.userName}
                       className="h-10 w-10"
                     />
-                    <p className="pt-2 text-start">{order?.user?.userName}</p>
+                    <p className="font-medium text-slate-900">{order?.user?.userName}</p>
                   </div>
                 </TableCell>
                 <TableCell>{order?.user?.phone}</TableCell>
-                <TableCell>{order?.user?.userName}</TableCell>
+                <TableCell>{order?.biker?.userName || "—"}</TableCell>
                 <TableCell>{order?.discount}</TableCell>
                 <TableCell>{order?.totalPay}</TableCell>
                 <TableCell>{order?.refundAmount}</TableCell>

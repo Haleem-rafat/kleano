@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ColumnDef,
   flexRender,
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
   initialColumnVisibility = {},
   showColumnToggle = true,
 }: DataTableProps<TData, TValue>) {
+  const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
   const [columnFilters, setColumnFilters] =
     React.useState<ColumnFiltersState>(initialColumnFilters);
@@ -97,25 +99,19 @@ export function DataTable<TData, TValue>({
   };
 
   return (
-    <div
-      className={`overflow-hidden bg-white ${className}`}>
-      {isLoading && (
-        <div className="flex items-center justify-center py-12">
-          <ThreeDotsLoader />
-        </div>
-      )}
+    <div className={`relative ${isLoading ? 'min-h-64' : ''} ${className}`}>
+      {isLoading && <ThreeDotsLoader />}
 
       {!isLoading && (
         <>
           {/* Column Visibility Toggle */}
           {showColumnToggle && enableColumnVisibility && (
-            <div className="flex items-center justify-between border-b border-slate-100 bg-white px-4 py-2">
-              <span className="text-sm font-medium text-slate-700">Columns</span>
+            <div className="mb-3 flex justify-end">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8">
-                    <IoEyeOutline className="mr-2 h-4 w-4" />
-                    View
+                  <Button variant="outline" size="sm" className="h-8 gap-2">
+                    <IoEyeOutline className="h-4 w-4" />
+                    {t('columns')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
@@ -138,16 +134,16 @@ export function DataTable<TData, TValue>({
             </div>
           )}
 
-          <div className="overflow-x-auto">
+          <div>
             <Table className="w-full">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b border-slate-100 bg-white">
+                  <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap px-4 py-2 text-start">
+                      <TableHead key={header.id}>
                         {header.isPlaceholder ? null : (
-                          <div className="flex items-center space-x-2">
-                            <span className="text-xs font-medium text-slate-500">
+                          <div className="flex items-center gap-1">
+                            <span>
                               {flexRender(header.column.columnDef.header, header.getContext())}
                             </span>
                             {header.column.getCanSort() && (
@@ -174,16 +170,14 @@ export function DataTable<TData, TValue>({
               </TableHeader>
               <TableBody>
                 {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row, index) => (
+                  table.getRowModel().rows.map((row) => (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && 'selected'}
-                      className={`border-b border-slate-100 transition-all duration-200 ${
-                        onRowClick ? 'cursor-pointer hover:border-slate-200 hover:bg-slate-50' : ''
-                      } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}
+                      className={onRowClick ? 'cursor-pointer' : undefined}
                       onClick={() => handleRowClick(row.original)}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap px-4 py-2.5">
+                        <TableCell key={cell.id} className="whitespace-nowrap">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
@@ -197,12 +191,10 @@ export function DataTable<TData, TValue>({
                           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                             <ChevronUpDownIcon className="h-8 w-8 text-slate-400" />
                           </div>
-                          <h3 className="mb-1 text-lg font-medium text-slate-900">
-                            No data available
+                          <h3 className="mb-1 text-sm font-medium text-slate-900">
+                            {t('noDataAvailable')}
                           </h3>
-                          <p className="text-slate-500">
-                            No results found for your current filters.
-                          </p>
+                          <p className="text-[13px] text-slate-500">{t('noResultsForFilters')}</p>
                         </div>
                       )}
                     </TableCell>

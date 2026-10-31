@@ -5,7 +5,8 @@ import { Input } from '@/shadecn/components/ui/input';
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/shadecn/components/ui/form';
 
 interface IMainInputs {
-  field?: ControllerRenderProps<FieldValues, string>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  field?: ControllerRenderProps<any, any>;
   type?: HTMLInputElement['type']; // Made optional
   label?: string;
   placeholder: string;

@@ -2,7 +2,6 @@ import { EAPI } from '@constants/endpoints';
 import { ELocalStorageKeys } from '@constants/keys';
 import axios from 'axios';
 import jwt_decode from 'jwt-decode';
-import moment from 'moment';
 import * as Yup from 'yup';
 
 import { ILoginData } from '@servicesTypes/auth.types';
@@ -63,10 +62,7 @@ class AuthService {
 
     if (!decodedToken?.exp) return true;
 
-    const now = moment();
-    const expiryDate = moment.unix(decodedToken.exp);
-
-    return expiryDate.isSameOrBefore(now, 'minute');
+    return decodedToken.exp * 1000 <= Date.now();
   }
 
   /* API ENDPOINTS */

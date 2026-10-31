@@ -203,7 +203,7 @@ export default function AddOnsDetails() {
                   {/* Manage Cities */}
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
-                      <h4 className="text-sm font-semibold text-slate-700">Manage Cities</h4>
+                      <h4 className="text-sm font-semibold text-slate-700">{t('Manage Cities')}</h4>
                       <p className="text-xs text-slate-500">Add or remove add-on cities</p>
                     </div>
                     <CitiesDialoge

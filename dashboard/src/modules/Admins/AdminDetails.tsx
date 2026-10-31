@@ -181,7 +181,7 @@ export default function AdminDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('adminInfo')}</h2>
-                      <p className="text-sm text-slate-500">Personal and contact information</p>
+                      <p className="text-sm text-slate-500">{t('Personal and contact information')}</p>
                     </div>
                   </div>
                 </div>
@@ -225,7 +225,7 @@ export default function AdminDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('adminCities')}</h2>
-                      <p className="text-sm text-slate-500">Assigned cities and regions</p>
+                      <p className="text-sm text-slate-500">{t('Assigned cities and regions')}</p>
                     </div>
                   </div>
                 </div>
@@ -256,7 +256,7 @@ export default function AdminDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('actions')}</h2>
-                      <p className="text-sm text-slate-500">Manage admin settings</p>
+                      <p className="text-sm text-slate-500">{t('Manage admin settings')}</p>
                     </div>
                   </div>
                 </div>
@@ -267,7 +267,7 @@ export default function AdminDetails() {
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700">{t('editInfo')}</h4>
-                      <p className="text-xs text-slate-500">Update admin information</p>
+                      <p className="text-xs text-slate-500">{t('Update admin information')}</p>
                     </div>
                     <Button
                       size="sm"
@@ -324,7 +324,7 @@ export default function AdminDetails() {
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-red-300 hover:shadow-red-100">
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700">{t('delete')}</h4>
-                      <p className="text-xs text-slate-500">Permanently remove admin</p>
+                      <p className="text-xs text-slate-500">{t('Permanently remove admin')}</p>
                     </div>
                     <Alert
                       handler={handleDeleteAdmin}
@@ -347,17 +347,17 @@ export default function AdminDetails() {
                         <h4 className="text-sm font-semibold text-slate-700">
                           {t('Reset password')}
                         </h4>
-                        <p className="text-xs text-slate-500">Generate new password</p>
+                        <p className="text-xs text-slate-500">{t('Generate new password')}</p>
                       </div>
                       <Dialog open={open} onOpenChange={setOpen}>
                         <DialogTrigger asChild>
                           <Button variant="secondary" size="sm" className="min-w-[8rem]">
-                            Reset password
+                            {t('Reset password')}
                           </Button>
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                           <DialogHeader>
-                            <DialogTitle>Reset password</DialogTitle>
+                            <DialogTitle>{t('Reset password')}</DialogTitle>
                             <DialogDescription>
                               Make changes to your Password here. Click save when you&lsquo;re done.
                             </DialogDescription>
@@ -386,7 +386,7 @@ export default function AdminDetails() {
                                   loading={isLoading}
                                   type="submit"
                                   className="w-full">
-                                  Save changes
+                                  {t('Save changes')}
                                 </Button>
                               </form>
                             </Form>

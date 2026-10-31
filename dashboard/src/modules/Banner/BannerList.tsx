@@ -59,9 +59,9 @@ const BannerList = () => {
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('banners')}</p>
 
-        <Button onClick={() => setOpen(true)}>Add banner</Button>
+        <Button onClick={() => setOpen(true)}>{t('Add banner')}</Button>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         {isLoading && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>

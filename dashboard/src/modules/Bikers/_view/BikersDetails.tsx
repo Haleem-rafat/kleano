@@ -192,7 +192,7 @@ export default function BikersDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
-                      <p className="text-sm text-slate-500">Personal and contact information</p>
+                      <p className="text-sm text-slate-500">{t('Personal and contact information')}</p>
                     </div>
                   </div>
                 </div>
@@ -325,7 +325,7 @@ export default function BikersDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('bikerAreas')}</h2>
-                      <p className="text-sm text-slate-500">Assigned service areas</p>
+                      <p className="text-sm text-slate-500">{t('Assigned service areas')}</p>
                     </div>
                   </div>
                 </div> */}
@@ -354,7 +354,7 @@ export default function BikersDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('bikerCities')}</h2>
-                      <p className="text-sm text-slate-500">Assigned cities</p>
+                      <p className="text-sm text-slate-500">{t('Assigned cities')}</p>
                     </div>
                   </div>
                 </div> */}
@@ -381,7 +381,7 @@ export default function BikersDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('bikerActions')}</h2>
-                      <p className="text-sm text-slate-500">Manage biker settings</p>
+                      <p className="text-sm text-slate-500">{t('Manage biker settings')}</p>
                     </div>
                   </div>
                 </div>
@@ -392,7 +392,7 @@ export default function BikersDetails() {
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700">{t('editPassword')}</h4>
-                      <p className="text-xs text-slate-500">Update biker password</p>
+                      <p className="text-xs text-slate-500">{t('Update biker password')}</p>
                     </div>
                     <Dialog open={open} onOpenChange={setOpen}>
                       <DialogTrigger asChild>
@@ -431,7 +431,7 @@ export default function BikersDetails() {
                                 loading={isLoading}
                                 type="submit"
                                 className="w-full">
-                                Save changes
+                                {t('Save changes')}
                               </Button>
                             </form>
                           </Form>
@@ -444,7 +444,7 @@ export default function BikersDetails() {
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700">{t('editInfo')}</h4>
-                      <p className="text-xs text-slate-500">Update biker information</p>
+                      <p className="text-xs text-slate-500">{t('Update biker information')}</p>
                     </div>
                     <Button size="sm" loading={isloading} onClick={() => setOpenSheet(true)}>
                       {t('edit')}

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState, useRef } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -96,6 +97,7 @@ const convertSprintsToEvents = (sprints: EnhancedSprint[]) => {
 };
 
 const BookingCalendarV2 = () => {
+  const { t } = useTranslation();
   // State management
   const [currentView, setCurrentView] = useState<CalendarView>('dayGridMonth');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -198,7 +200,7 @@ const BookingCalendarV2 = () => {
       {/* Header with filters and controls */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-4">
-          <h1 className="text-xl font-semibold tracking-tight text-slate-900">Booking Calendar</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('Booking Calendar')}</h1>
 
           {/* Date Range Picker */}
           <Popover>
@@ -219,7 +221,7 @@ const BookingCalendarV2 = () => {
                     dateRange.from.toLocaleDateString()
                   )
                 ) : (
-                  <span>Pick a date range</span>
+                  <span>{t('Pick a date range')}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -240,11 +242,11 @@ const BookingCalendarV2 = () => {
         <div className="flex flex-wrap items-center gap-2">
           <Dialog open={sprintModalOpen} onOpenChange={setSprintModalOpen}>
             <DialogTrigger asChild>
-              <Button>Create Sprint</Button>
+              <Button>{t('Create Sprint')}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Create New Sprint</DialogTitle>
+                <DialogTitle>{t('Create New Sprint')}</DialogTitle>
                 <DialogDescription>
                   Create a new 14-day booking sprint with available time slots.
                 </DialogDescription>

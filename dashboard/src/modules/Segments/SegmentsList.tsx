@@ -46,7 +46,7 @@ const SegmentsList = () => {
           <Button onClick={() => setOpenSheet(true)}>{t('addNewSegments')}</Button>
         </div>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         <Table className="scrollbar-hide">
           <TableHeader>
             <TableRow>

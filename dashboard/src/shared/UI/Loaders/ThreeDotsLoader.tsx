@@ -1,23 +1,12 @@
-import { ThreeDots } from 'react-loader-spinner';
-
+/** Placeholder rows over the area that is loading, so nothing jumps. */
 export default function ThreeDotsLoader() {
   return (
-    <div className="absolute z-10 h-full w-full animate-pulse overflow-hidden bg-white ">
-      <div
-        className=" absolute"
-        style={{
-          left: '50%',
-          top: '50%',
-          transform: 'translate(-50%, -50%)',
-        }}>
-        <ThreeDots
-          height={80}
-          width={80}
-          color="#533063"
-          visible={true as any}
-          ariaLabel="oval-loading"
-        />
-      </div>
+    <div
+      className="absolute inset-x-0 top-0 z-10 min-h-64 w-full animate-pulse space-y-3 bg-background py-2 motion-reduce:animate-none"
+      aria-busy="true">
+      {[0, 1, 2, 3, 4].map((row) => (
+        <div key={row} className="h-11 rounded-lg bg-slate-200/60" />
+      ))}
     </div>
   );
 }

@@ -72,7 +72,7 @@ const CompletedTable = ({
   const handleMapClick = (order: OrderData) => {
     setMapDialog({
       isOpen: true,
-      location: order.location,
+      location: order.location as Location,
       cityName: order?.location?.city?.name[lang] || '',
       streetName: order?.location?.streetName || '',
     });

@@ -35,7 +35,7 @@ const generateHourlySlots = () => {
     const period = hour < 12 ? 'AM' : 'PM';
     slots.push({
       value: `${hour.toString().padStart(2, '0')}:00`,
-      label: `${period} ${hour12}:00`,
+      label: `${hour12}:00 ${period}`,
       hour24: hour,
       startTime: hour * 60, // minutes from midnight
       endTime: (hour + 1) * 60, // minutes from midnight
@@ -330,7 +330,7 @@ const Booking = () => {
   }, [bookingsByHour]);
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div>
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
@@ -498,13 +498,10 @@ const Booking = () => {
                         ref={(el) => {
                           if (el) hourRowRefs.current[slot.hour24] = el;
                         }}
-                        className="relative border-b border-slate-400"
+                        className="relative border-b border-slate-100"
                         style={{ minHeight: '100px' }}>
                         {/* Time Slot Content */}
                         <div className="flex min-h-full">
-                          {/* Left padding to align with timeline */}
-                          <div className="w-24 flex-shrink-0" />
-
                           {/* Content Area */}
                           <div className="flex-1 p-4">
                             {hasBookings ? (
@@ -551,16 +548,16 @@ const Booking = () => {
               </div>
 
               {/* Timeline Labels (Right Side) - Scrolls with content */}
-              <div className="w-24 flex-shrink-0 border-l border-slate-200 bg-slate-50">
+              <div className="order-first w-24 flex-shrink-0 border-e border-slate-200 bg-slate-50">
                 {HOURLY_SLOTS.map((slot) => {
                   const rowHeight = hourHeights[slot.hour24] || 100;
 
                   return (
                     <div
                       key={slot.value}
-                      className="flex items-start border-b border-slate-400 px-3 py-2"
+                      className="flex items-start border-b border-slate-100 px-3 py-2"
                       style={{ minHeight: '100px', height: `${rowHeight}px` }}>
-                      <span className="text-sm font-medium text-slate-600">{slot.label}</span>
+                      <span className="text-xs font-medium tabular-nums text-slate-500">{slot.label}</span>
                     </div>
                   );
                 })}

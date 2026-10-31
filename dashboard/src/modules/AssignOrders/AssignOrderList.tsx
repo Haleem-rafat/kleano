@@ -42,7 +42,7 @@ const AssignOrderList = () => {
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('admins')}</p>
         <div></div>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         {isLoading && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>
@@ -69,13 +69,13 @@ const AssignOrderList = () => {
                     navigate(generatePath(ROUTES.ORDER_DETAILS, { orderId: order._id }))
                   }>
                   <TableCell>
-                    <div className="flex justify-center gap-x-10 md:justify-start">
+                    <div className="flex items-center gap-3">
                       <MainAvatar
                         src={order?.user?.imageLink}
                         name={order?.user?.userName}
                         className="h-10 w-10"
                       />
-                      <p className="pt-2 text-start">{order?.user?.userName}</p>
+                      <p className="font-medium text-slate-900">{order?.user?.userName}</p>
                     </div>
                   </TableCell>
                   <TableCell>{order.user ? order.user.phone : '---'}</TableCell>

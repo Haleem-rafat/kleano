@@ -46,7 +46,7 @@ export default function WashingServices() {
           <Button onClick={() => setOpenSheet(true)}>{t('addNewServices')}</Button>
         </div>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         {isLoading && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>

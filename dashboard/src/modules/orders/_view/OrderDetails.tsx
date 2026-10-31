@@ -65,7 +65,7 @@ export default function OrderDetails() {
               <div>
                 <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('orderDetails')}</h1>
                 <div className="mt-1 flex items-center space-x-2">
-                  <span className="text-sm text-slate-500">Order ID:</span>
+                  <span className="text-sm text-slate-500">{t('orderId')}:</span>
                   <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
                     #{data?._id}
                   </span>
@@ -73,7 +73,9 @@ export default function OrderDetails() {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <UserPopover orderId={data?._id} />
+              {!['COMPLETED', 'CANCELLED_BY_ADMIN', 'CANCELLED_BY_USER'].includes(data?.status) && (
+                <UserPopover orderId={data?._id} />
+              )}
 
               {['WAITING_FOR_BIKER_BY_ADMIN', 'ACCEPTED_BY_BIKER'].includes(data?.status) && (
                 <Button onClick={() => setOpenSheet(true)}>{t('assignedBiker')}</Button>
@@ -100,7 +102,6 @@ export default function OrderDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('userInfo')}</h2>
-                        <p className="text-sm text-slate-500">Customer information</p>
                       </div>
                     </div>
                   </div>
@@ -110,7 +111,7 @@ export default function OrderDetails() {
                         <div
                           className="cursor-pointer"
                           onClick={() => navigate(`/app/users/${data?.user?._id}`)}>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('name')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -118,7 +119,7 @@ export default function OrderDetails() {
                           </p>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('phone')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -128,7 +129,7 @@ export default function OrderDetails() {
                       </div>
                       <div className="space-y-4">
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('orderDate')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -145,7 +146,7 @@ export default function OrderDetails() {
                         </div>
                       </div>{' '}
                       <div>
-                        <label className="mb-1 block whitespace-nowrap text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {/* user rating for this order */}
                           {t('userRatingForThisOrder')}
                         </label>
@@ -154,7 +155,7 @@ export default function OrderDetails() {
                     </div>
                     {data?.description && (
                       <div className="mt-6 border-t border-slate-200 pt-6">
-                        <label className="mb-3 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-3 block text-xs font-medium text-slate-500">
                           {t('User Notes')}
                         </label>
                         <div className="rounded-lg bg-slate-50 p-4">
@@ -179,14 +180,13 @@ export default function OrderDetails() {
                         </div>
                         <div>
                           <h2 className=" text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
-                          <p className="text-sm text-slate-500">Assigned service provider</p>
                         </div>
                       </div>
                     </div>
                     <div className="p-6">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div onClick={() => navigate(`/app/bikers/${data?.biker?._id}`)}>
-                          <label className="mb-1 block cursor-pointer text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block cursor-pointer text-xs font-medium text-slate-500">
                             {t('bikerName')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -194,7 +194,7 @@ export default function OrderDetails() {
                           </p>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('phone')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -202,15 +202,15 @@ export default function OrderDetails() {
                           </p>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('bikerCommission')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
-                            {data?.bikerCommission || 'N/A'}
+                            {data?.bikerCommission ?? '—'}
                           </p>
                         </div>
                         <div>
-                          <label className="mb-1 block whitespace-nowrap text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('bikerRatingForThisOrder')}
                           </label>
                           <StarRating
@@ -233,14 +233,13 @@ export default function OrderDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('vehicleInfo')}</h2>
-                        <p className="text-sm text-slate-500">Vehicle details</p>
                       </div>
                     </div>
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('brand')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">
@@ -248,7 +247,7 @@ export default function OrderDetails() {
                         </p>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('model')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">
@@ -256,7 +255,7 @@ export default function OrderDetails() {
                         </p>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('color')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">
@@ -264,7 +263,7 @@ export default function OrderDetails() {
                         </p>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('plateNumber')}
                         </label>
                         <p className="font-mono text-sm font-semibold text-slate-900">
@@ -274,7 +273,7 @@ export default function OrderDetails() {
                     </div>
                     {data?.vehicle?.imageLink && (
                       <div className="mt-6 border-t border-slate-200 pt-6">
-                        <label className="mb-3 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-3 block text-xs font-medium text-slate-500">
                           {t('image')}
                         </label>
                         <div className="flex justify-center">
@@ -302,7 +301,6 @@ export default function OrderDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('location')}</h2>
-                        <p className="text-sm text-slate-500">Service location details</p>
                       </div>
                     </div>
                   </div>
@@ -310,7 +308,7 @@ export default function OrderDetails() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('cityName')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -318,7 +316,7 @@ export default function OrderDetails() {
                           </p>
                         </div>
                         <div>
-                          <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                          <label className="mb-1 block text-xs font-medium text-slate-500">
                             {t('area')}
                           </label>
                           <p className="text-sm font-semibold text-slate-900">
@@ -327,7 +325,7 @@ export default function OrderDetails() {
                         </div>
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
+                        <label className="mb-1 block text-xs font-medium text-slate-500">
                           {t('streetName')}
                         </label>
                         <p className="text-sm font-semibold text-slate-900">
@@ -342,7 +340,7 @@ export default function OrderDetails() {
                             rel="noreferrer"
                             className="inline-flex items-center gap-2 rounded-lg bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 transition-colors hover:bg-orange-100">
                             <IoLocationOutline className="h-4 w-4" />
-                            View on Google Maps
+                            {t('View on Google Maps')}
                           </a>
                         </div>
                       )}
@@ -359,7 +357,6 @@ export default function OrderDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('pricing')}</h2>
-                        <p className="text-sm text-slate-500">Order pricing breakdown</p>
                       </div>
                     </div>
                   </div>
@@ -371,7 +368,7 @@ export default function OrderDetails() {
                             {t('total price')}
                           </span>
                           <span className="text-sm font-semibold text-slate-900">
-                            {data?.totalPrice}
+                            {data?.totalPrice} {t('SAR')}
                           </span>
                         </div>
                       </div>
@@ -410,7 +407,7 @@ export default function OrderDetails() {
                       <div className="rounded-lg border border-green-200 bg-green-50 p-4">
                         <div className="flex justify-between">
                           <span className="font-semibold text-slate-900">{t('paied price')}</span>
-                          <span className="text-xl font-bold text-green-600">{data?.totalPay}</span>
+                          <span className="text-xl font-bold text-green-600">{data?.totalPay} {t('SAR')}</span>
                         </div>
                       </div>
                     </div>
@@ -507,7 +504,6 @@ export default function OrderDetails() {
                         </div>
                         <div>
                           <h2 className="text-sm font-semibold text-slate-900">{t('carPictures')}</h2>
-                          <p className="text-sm text-slate-500">Before and after wash photos</p>
                         </div>
                       </div>
                     </div>

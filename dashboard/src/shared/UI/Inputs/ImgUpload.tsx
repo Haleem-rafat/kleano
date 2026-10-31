@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useRef, useState } from 'react';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 
@@ -19,7 +20,8 @@ export default function ImgUpload({
   textButton,
   title,
   disabled,
-}: IMainCoverUploadProps): React.ReactNode {
+}: IMainCoverUploadProps) {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -58,7 +60,7 @@ export default function ImgUpload({
                   type="button"
                   className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/50 text-white"
                   onClick={openFileSelector}>
-                  <span>Change Image</span>
+                  <span>{t('Change Image')}</span>
                 </button>
               )}
             </>

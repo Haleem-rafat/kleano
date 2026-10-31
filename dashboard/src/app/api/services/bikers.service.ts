@@ -76,12 +76,11 @@ class bikersService {
     return data;
   }
 
-  /*
     public async getAreaId(latitude: number, longitude: number) {
       const { data } = await api.get(`${EAPI.MAP_AREAS}?latitude=${latitude}&longitude=${longitude}`);
       return data;
     }
-  */
+
   /* API SCHEMAS */
 
   baseBikerSchema = {

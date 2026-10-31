@@ -45,8 +45,8 @@ const PaginationComponent = ({
   }, [page]);
 
   return (
-    <div className="flex  w-full items-center justify-start  rounded-lg py-3 shadow">
-      <Pagination className="flex  ">
+    <div className="flex w-full items-center justify-end py-3">
+      <Pagination className="mx-0 w-auto justify-end">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious

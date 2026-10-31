@@ -85,7 +85,7 @@ export default function WashingServicesDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('servicesInfo')}</h2>
-                      <p className="text-sm text-slate-500">Service details and pricing</p>
+                      <p className="text-sm text-slate-500">{t('Service details and pricing')}</p>
                     </div>
                   </div>
                 </div>
@@ -137,7 +137,7 @@ export default function WashingServicesDetails() {
                       <h2 className="text-sm font-semibold text-slate-900">
                         {t('servicesDescription')}
                       </h2>
-                      <p className="text-sm text-slate-500">Service details and features</p>
+                      <p className="text-sm text-slate-500">{t('Service details and features')}</p>
                     </div>
                   </div>
                 </div>
@@ -150,8 +150,8 @@ export default function WashingServicesDetails() {
                         key={index}
                         className="rounded-lg border-l-4 border-purple-200 bg-purple-50 p-4">
                         <p className="text-slate-700">
-                          {typeof description === 'object'
-                            ? description?.[lang] || description?.en || description?.ar
+                          {description && typeof description === 'object'
+                            ? (description as unknown as Record<string, string>)[lang]
                             : description}
                         </p>
                       </div>
@@ -171,7 +171,7 @@ export default function WashingServicesDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('servicesCities')}</h2>
-                        <p className="text-sm text-slate-500">Available service locations</p>
+                        <p className="text-sm text-slate-500">{t('Available service locations')}</p>
                       </div>
                     </div>
                     <CitiesDialoge
@@ -223,8 +223,8 @@ export default function WashingServicesDetails() {
                       <IoSettingsOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Service Actions</h2>
-                      <p className="text-sm text-slate-500">Manage service settings</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Service Actions')}</h2>
+                      <p className="text-sm text-slate-500">{t('Manage service settings')}</p>
                     </div>
                   </div>
                 </div>
@@ -235,7 +235,7 @@ export default function WashingServicesDetails() {
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
                       <h4 className="text-sm font-semibold text-slate-700">{t('editServices')}</h4>
-                      <p className="text-xs text-slate-500">Update service information</p>
+                      <p className="text-xs text-slate-500">{t('Update service information')}</p>
                     </div>
                     <Button size="sm" onClick={() => setOpenSheet(true)}>
                       {t('edit')}
@@ -245,8 +245,8 @@ export default function WashingServicesDetails() {
                   {/* Manage Cities */}
                   <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
                     <div>
-                      <h4 className="text-sm font-semibold text-slate-700">Manage Cities</h4>
-                      <p className="text-xs text-slate-500">Add or remove service cities</p>
+                      <h4 className="text-sm font-semibold text-slate-700">{t('Manage Cities')}</h4>
+                      <p className="text-xs text-slate-500">{t('Add or remove service cities')}</p>
                     </div>
                     <CitiesDialoge
                       buttonElement={

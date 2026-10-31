@@ -43,7 +43,7 @@ export default function AddOnsList() {
           <Button onClick={() => setOpenSheet(true)}>{t('addNewAddOns')}</Button>
         </div>
       </div>
-      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
+      <div>
         {isLoading && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>
@@ -65,7 +65,7 @@ export default function AddOnsList() {
                     navigate(generatePath(ROUTES.ADD_ONS_DETAILS, { addOnsId: addOns._id }))
                   }>
                   <TableCell>
-                    <div className="flex gap-x-10">
+                    <div className="flex items-center gap-3">
                       <img className="h-10 w-10 rounded-full " src={addOns?.icon?.iconLink} />
                       <p className="pt-2">{addOns?.name?.[lang] || addOns?.name}</p>
                     </div>

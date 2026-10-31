@@ -153,7 +153,7 @@ export default function BikersList() {
               </div>
               <div>
                 <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikers')}</h1>
-                <p className="mt-1 text-sm text-slate-500">Manage and view all bikers</p>
+                <p className="mt-1 text-sm text-slate-500">{t('manageBikers')}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -193,35 +193,35 @@ export default function BikersList() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-slate-200">
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('name')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('phone')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('nationalId')}
                     </TableHead>
 
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('totalDeliveries')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('totalTimeWorked')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('commissionType')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('commission')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('ordersBeforeCommission')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('status')}
                     </TableHead>
-                    <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                    <TableHead className="sticky end-0 border-s border-slate-200 bg-slate-50">
                       {t('actions') || 'Actions'}
                     </TableHead>
                   </TableRow>
@@ -244,8 +244,8 @@ export default function BikersList() {
                             <div
                               className={`w-fit whitespace-nowrap rounded-full px-4 py-0.5 text-sm font-medium ${
                                 biker.commissionType === 'PERCENTAGE'
-                                  ? 'bg-primary/30 text-primary'
-                                  : 'bg-purple-500/30 text-purple-700'
+                                  ? 'bg-brandTint text-primary'
+                                  : 'bg-slate-100 text-slate-700'
                               }`}>
                               {t(biker.commissionType)}
                             </div>
@@ -269,7 +269,7 @@ export default function BikersList() {
                         <TableCell>
                           <AdminStatus status={biker.status} />
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="sticky end-0 border-s border-slate-100 bg-white">
                           <div className="flex items-center gap-2">
                             {/* View Button */}
                             <Button

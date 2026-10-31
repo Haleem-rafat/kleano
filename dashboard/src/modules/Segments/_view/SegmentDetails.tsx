@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { formatDate } from '@app/utils/helper';
 import segmentsService from '@services/segments.service';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -30,6 +31,7 @@ import {
 } from '@/shadecn/components/ui/table';
 
 const SegmentDetails = () => {
+  const { t } = useTranslation();
   const [openSheet, setOpenSheet] = useState(false);
 
   const { segmenId } = useParams();
@@ -84,7 +86,7 @@ const SegmentDetails = () => {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('segmentsInfo')}</h2>
-                      <p className="text-sm text-slate-500">Segment details and information</p>
+                      <p className="text-sm text-slate-500">{t('Segment details and information')}</p>
                     </div>
                   </div>
                 </div>
@@ -92,13 +94,13 @@ const SegmentDetails = () => {
                 <div className="p-6">
                   <div className="space-y-4">
                     <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <h4 className="mb-2 text-xs font-medium text-slate-500">
                         {t('segmentName')}
                       </h4>
                       <p className="text-sm font-semibold text-slate-900">{data?.name || '—'}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+                      <h4 className="mb-2 text-xs font-medium text-slate-500">
                         {t('createddate')}
                       </h4>
                       <p className="text-sm font-semibold text-slate-900">
@@ -132,7 +134,7 @@ const SegmentDetails = () => {
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <IoPeopleOutline className="h-8 w-8 text-slate-400" />
                       </div>
-                      <h3 className="mb-1 text-lg font-medium text-slate-900">No users found</h3>
+                      <h3 className="mb-1 text-lg font-medium text-slate-900">{t('No users found')}</h3>
                       <p className="text-slate-500">
                         This segment doesn&apos;t have any users assigned
                       </p>
@@ -142,10 +144,10 @@ const SegmentDetails = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
-                            <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            <TableHead className="text-xs font-medium text-slate-500">
                               {t('users')}
                             </TableHead>
-                            <TableHead className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                            <TableHead className="text-xs font-medium text-slate-500">
                               {t('email')}
                             </TableHead>
                           </TableRow>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState } from 'react';
 import { Button, ThreeDotsLoader } from '@UI/Index';
 import useSWR from 'swr';
@@ -61,6 +62,7 @@ const convertSprintsToEvents = (sprints: EnhancedSprint[]) => {
 };
 
 const BookingCalendarFixed = () => {
+  const { t } = useTranslation();
   // State management
   const [currentView, setCurrentView] = useState<CalendarView>('dayGridMonth');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
@@ -130,7 +132,7 @@ const BookingCalendarFixed = () => {
       {/* Header with filters and controls */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">Booking Calendar</h1>
+          <h1 className="text-2xl font-bold">{t('Booking Calendar')}</h1>
           <div className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
             FullCalendar Enabled
           </div>
@@ -154,7 +156,7 @@ const BookingCalendarFixed = () => {
                     dateRange.from.toLocaleDateString()
                   )
                 ) : (
-                  <span>Pick a date range</span>
+                  <span>{t('Pick a date range')}</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -175,11 +177,11 @@ const BookingCalendarFixed = () => {
         <div className="flex items-center gap-2">
           <Dialog open={sprintModalOpen} onOpenChange={setSprintModalOpen}>
             <DialogTrigger asChild>
-              <Button>Create Sprint</Button>
+              <Button>{t('Create Sprint')}</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Create New Sprint</DialogTitle>
+                <DialogTitle>{t('Create New Sprint')}</DialogTitle>
                 <DialogDescription>
                   Create a new 14-day booking sprint with available time slots.
                 </DialogDescription>

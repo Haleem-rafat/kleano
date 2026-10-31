@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import termsService from '@services/terms.service';
 import { Textarea } from '@shadecn/components/ui/textarea';
 import { Button } from '@UI/Index';
@@ -6,6 +7,7 @@ import { toast } from 'react-toastify';
 import useSWR from 'swr';
 
 const Terms = () => {
+  const { t } = useTranslation();
   const [termsEn, setTermsEn] = useState<string>('');
   const [termsAr, setTermsAr] = useState<string>('');
   const [isEdit, setIsEdit] = useState(false);
@@ -58,7 +60,7 @@ const Terms = () => {
           <label className="mb-2 block text-sm font-semibold text-slate-700">English (EN)</label>
           <Textarea
             rows={10}
-            className="overflow-y-scroll border-2 border-primary"
+            className="overflow-y-scroll border-slate-200"
             disabled={!isEdit}
             placeholder="Type English terms & conditions here."
             value={termsEn}
@@ -69,7 +71,7 @@ const Terms = () => {
           <label className="mb-2 block text-sm font-semibold text-slate-700">Arabic (AR)</label>
           <Textarea
             rows={10}
-            className="overflow-y-scroll border-2 border-primary"
+            className="overflow-y-scroll border-slate-200"
             disabled={!isEdit}
             placeholder="اكتب الشروط والأحكام العربية هنا"
             value={termsAr}
@@ -84,7 +86,7 @@ const Terms = () => {
         </Button>
         {isEdit && (
           <Button onClick={() => setIsEdit(false)} variant="secondary">
-            Cancel
+            {t('Cancel')}
           </Button>
         )}
       </div>

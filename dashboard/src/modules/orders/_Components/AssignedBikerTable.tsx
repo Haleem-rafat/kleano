@@ -43,7 +43,7 @@ const AssignedBikerTable = ({ orderId, setOpenSheet, areaId }) => {
   };
 
   return (
-    <div className="relative h-[calc(100vh-100px)] overflow-y-scroll">
+    <div className="relative">
       {isLoading && <ThreeDotsLoader />}
       <Table className="table-fixed">
         <TableHeader>

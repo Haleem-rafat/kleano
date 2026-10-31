@@ -62,7 +62,7 @@ export function Earningchart() {
     <div className="h-full">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h4 className="text-xs font-medium text-slate-500">Total Revenue</h4>
+          <h4 className="text-xs font-medium text-slate-500">{t('Total Revenue')}</h4>
           <p className="text-2xl font-semibold tracking-tight text-slate-900">{data?.yearTotalRevenue || 0}</p>
         </div>
       </div>

@@ -107,7 +107,7 @@ export default function PlansDetails() {
                     </div>
                     <div>
                       <h2 className="text-sm font-semibold text-slate-900">{t('planInfo')}</h2>
-                      <p className="text-sm text-slate-500">Plan details and configuration</p>
+                      <p className="text-sm text-slate-500">{t('Plan details and configuration')}</p>
                     </div>
                   </div>
                 </div>
@@ -208,7 +208,7 @@ export default function PlansDetails() {
                       <h2 className="text-sm font-semibold text-slate-900">
                         {t('washingServicesPlan')}
                       </h2>
-                      <p className="text-sm text-slate-500">Included services</p>
+                      <p className="text-sm text-slate-500">{t('Included services')}</p>
                     </div>
                   </div>
                 </div>
@@ -230,8 +230,8 @@ export default function PlansDetails() {
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <IoWaterOutline className="h-8 w-8 text-slate-400" />
                       </div>
-                      <h3 className="mb-1 text-lg font-medium text-slate-900">No Services</h3>
-                      <p className="text-slate-500">No washing services assigned to this plan</p>
+                      <h3 className="mb-1 text-lg font-medium text-slate-900">{t('No Services')}</h3>
+                      <p className="text-slate-500">{t('No washing services assigned to this plan')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -247,8 +247,8 @@ export default function PlansDetails() {
                       <IoCalendarOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Plan Description</h2>
-                      <p className="text-sm text-slate-500">Plan features and details</p>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('Plan Description')}</h2>
+                      <p className="text-sm text-slate-500">{t('Plan features and details')}</p>
                     </div>
                   </div>
                 </div>
@@ -272,8 +272,8 @@ export default function PlansDetails() {
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <IoCalendarOutline className="h-8 w-8 text-slate-400" />
                       </div>
-                      <h3 className="mb-1 text-lg font-medium text-slate-900">No Description</h3>
-                      <p className="text-slate-500">No description available for this plan</p>
+                      <h3 className="mb-1 text-lg font-medium text-slate-900">{t('No Description')}</h3>
+                      <p className="text-slate-500">{t('No description available for this plan')}</p>
                     </div>
                   )}
                 </CardContent>
@@ -291,7 +291,7 @@ export default function PlansDetails() {
                       </div>
                       <div>
                         <h2 className="text-sm font-semibold text-slate-900">{t('planCities')}</h2>
-                        <p className="text-sm text-slate-500">Available locations</p>
+                        <p className="text-sm text-slate-500">{t('Available locations')}</p>
                       </div>
                     </div>
                     <CitiesDialoge
@@ -334,8 +334,8 @@ export default function PlansDetails() {
                       <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
                         <IoLocationOutline className="h-8 w-8 text-slate-400" />
                       </div>
-                      <h3 className="mb-1 text-lg font-medium text-slate-900">No Cities</h3>
-                      <p className="text-slate-500">No cities assigned to this plan</p>
+                      <h3 className="mb-1 text-lg font-medium text-slate-900">{t('No Cities')}</h3>
+                      <p className="text-slate-500">{t('No cities assigned to this plan')}</p>
                     </div>
                   )}
                 </CardContent>

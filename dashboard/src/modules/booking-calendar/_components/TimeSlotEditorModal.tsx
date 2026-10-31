@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
 import { Button } from '@UI/Index';
@@ -36,6 +37,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
   sprint,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [selectedHours, setSelectedHours] = useState<string[]>([]);
   const [sprintActive, setSprintActive] = useState(sprint.isActive);
@@ -126,8 +128,8 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
           {/* Sprint Status Toggle */}
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
-              <h3 className="font-medium">Sprint Status</h3>
-              <p className="text-sm text-gray-600">Enable or disable the entire sprint</p>
+              <h3 className="font-medium">{t('Sprint Status')}</h3>
+              <p className="text-sm text-gray-600">{t('Enable or disable the entire sprint')}</p>
             </div>
             <div className="flex items-center space-x-2">
               <Switch
@@ -142,7 +144,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
           {/* Time Slot Selection */}
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="font-medium">Available Time Slots</h3>
+              <h3 className="font-medium">{t('Available Time Slots')}</h3>
               <div className="text-sm text-gray-600">Selected: {selectedHours.length} slots</div>
             </div>
 
@@ -182,7 +184,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
               size="sm"
               onClick={() => setSelectedHours([])}
               disabled={loading}>
-              Clear All
+              {t('Clear All')}
             </Button>
             <Button
               type="button"
@@ -197,7 +199,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
                 setSelectedHours(businessHours);
               }}
               disabled={loading}>
-              Business Hours
+              {t('Business Hours')}
             </Button>
             <Button
               type="button"
@@ -205,17 +207,17 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
               size="sm"
               onClick={() => setSelectedHours(allTimeSlots)}
               disabled={loading}>
-              Select All
+              {t('Select All')}
             </Button>
           </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-2 border-t pt-4">
             <Button variant="secondary" onClick={onClose} disabled={loading}>
-              Cancel
+              {t('Cancel')}
             </Button>
             <Button loading={loading} onClick={handleSave}>
-              Save Changes
+              {t('Save Changes')}
             </Button>
           </div>
         </div>

@@ -94,12 +94,12 @@ export function DatePickerWithPresets({
           </SelectTrigger>
           <SelectContent position="popper" className="bg-white">
             <SelectItem value="reset" className="cursor-pointer text-red-700">
-              Reset
+              {t('Reset')}
             </SelectItem>
-            <SelectItem value="0">Today</SelectItem>
-            <SelectItem value="1">Tomorrow</SelectItem>
+            <SelectItem value="0">{t('Today')}</SelectItem>
+            <SelectItem value="1">{t('Tomorrow')}</SelectItem>
             <SelectItem value="3">In 3 days</SelectItem>
-            <SelectItem value="7">In a week</SelectItem>
+            <SelectItem value="7">{t('In a week')}</SelectItem>
           </SelectContent>
         </Select>
         <div className="rounded-md border">

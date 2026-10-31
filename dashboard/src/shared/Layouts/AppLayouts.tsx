@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { GoSidebarCollapse } from 'react-icons/go';
-import { AnimatePresence, motion } from 'framer-motion';
 import { FiUser } from 'react-icons/fi';
 import { FaBiking } from 'react-icons/fa';
 import { RiCarWashingLine } from 'react-icons/ri';
@@ -114,8 +113,8 @@ export default function AppLayouts({ children }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const crumbItem = [...navItems]
-    .sort((a, b) => b.link.length - a.link.length)
-    .find((item) => pathname.startsWith(item.link));
+    .filter((item) => pathname.startsWith(item.link))
+    .sort((x, y) => y.link.length - x.link.length)[0];
   const crumbGroup = navGroups.find((group) => group.labels.includes(crumbItem?.label));
   useEffect(() => {
     const handleResize = () => {
@@ -196,21 +195,12 @@ export default function AppLayouts({ children }) {
           </div>
         </div>
       </div>
-      <AnimatePresence>
         {isOpen && (
           <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="fixed inset-0 z-20  bg-black md:hidden"
-              onClick={() => setIsOpen(false)}></motion.div>
-            <motion.aside
-              initial={{ x: lang === 'ar' ? '100%' : '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: lang === 'ar' ? '100%' : '-100%' }}
-              transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+            <div
+              className="fixed inset-0 z-20 bg-black/50 md:hidden"
+              onClick={() => setIsOpen(false)}></div>
+            <aside
               className={classNames(
                 'flex shrink-0 grow-0 flex-col bg-[#1A1220]',
                 'fixed z-20 h-screen w-60'
@@ -253,10 +243,9 @@ export default function AppLayouts({ children }) {
                   </div>
                 </div>
               </div>
-            </motion.aside>
+            </aside>
           </>
         )}
-      </AnimatePresence>
 
       <div className="min-h-screen bg-background ltr:md:ml-60 rtl:md:mr-60">
         <main className="pt-14">
