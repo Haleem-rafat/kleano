@@ -161,7 +161,8 @@ ThemeData kleanoTheme({required Brightness brightness}) {
         ? glass.appBarTheme
         : glass.appBarTheme.copyWith(
             scrolledUnderElevation: 3,
-            surfaceTintColor: c.brand,
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: c.background,
           ),
     // Android keeps Material's own switch instead of the iOS-style override.
     switchTheme: ios ? glass.switchTheme : const SwitchThemeData(),

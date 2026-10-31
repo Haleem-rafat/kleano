@@ -1,3 +1,4 @@
+import 'package:thewhsherbiker/core/design/components/k_auth_scaffold.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -21,6 +22,7 @@ Future<void> bootstrap(Flavor flavor, {required String fallbackLocale}) async {
 
   await Firebase.initializeApp();
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  KAuthScaffold.headerPhoto = 'assets/images/photo_onboard_three.png';
   ServiceLocator().init();
 
   // All orientations: required for foldables (folded/unfolded) and large

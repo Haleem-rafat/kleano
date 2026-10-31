@@ -9,7 +9,7 @@ import '../tokens.dart';
 
 /// Layout for every auth / entry screen (approved design):
 ///
-///  * brand header: purple gradient, white logo, optional [badge] ("Biker"),
+///  * photo header ([headerPhoto], the app's own), white logo, optional [badge],
 ///    optional glass back button; it shrinks while the keyboard is open,
 ///  * a sheet with a large [title], [subtitle] and the form [children]
 ///    (scrollable),
@@ -39,6 +39,9 @@ class KAuthScaffold extends StatelessWidget {
   final String logoAsset;
   final String? badge;
 
+  /// The app's real car-wash photo behind the logo. Each app sets it at launch.
+  static String? headerPhoto;
+
   static const double _sheetOverlap = 28;
   static const double _collapsedHeader = 96;
 
@@ -49,7 +52,7 @@ class KAuthScaffold extends StatelessWidget {
     final bool keyboard = mq.viewInsets.bottom > 0;
     final double header = keyboard
         ? _collapsedHeader
-        : (mq.size.height * 0.26).clamp(160.0, 220.0);
+        : (mq.size.height * 0.34).clamp(180.0, 300.0);
     final double headerTotal = header + mq.padding.top;
     final double bottom =
         math.max(mq.viewInsets.bottom, mq.viewPadding.bottom) + KSpace.l;
@@ -73,17 +76,23 @@ class KAuthScaffold extends StatelessWidget {
                 duration: motion,
                 curve: KMotion.curve,
                 height: headerTotal,
-                decoration: const BoxDecoration(
-                  gradient: RadialGradient(
-                    center: Alignment(0.7, -0.9),
-                    radius: 1.4,
-                    colors: <Color>[
-                      Color(0xFF8E5BA6),
-                      Color(0xFF543063),
-                      Color(0xFF2D1838),
-                    ],
-                    stops: <double>[0, 0.55, 1],
-                  ),
+                clipBehavior: Clip.hardEdge,
+                decoration: BoxDecoration(
+                  color: c.brand,
+                  image: headerPhoto == null
+                      ? null
+                      : DecorationImage(
+                          image: ResizeImage(
+                            AssetImage(headerPhoto!),
+                            width: (mq.size.width * mq.devicePixelRatio)
+                                .round(),
+                          ),
+                          fit: BoxFit.cover,
+                          colorFilter: const ColorFilter.mode(
+                            Color(0x40000000),
+                            BlendMode.darken,
+                          ),
+                        ),
                 ),
                 child: SafeArea(
                   bottom: false,
