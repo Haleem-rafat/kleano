@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewhsherbiker/api/shared.dart';
 import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/components/k_dialog.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
@@ -12,8 +13,26 @@ import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class LogOutWidget extends StatelessWidget {
   const LogOutWidget({super.key});
-  Future<void> _logOut() async {
-    sl<AuthBloc>().add(BikerLogOut());
+  Future<void> _confirmLogOut(BuildContext context) async {
+    final bool? yes = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialog) => KDialog(
+        title: tr(dialog, AppStrings.logOut),
+        actions: <Widget>[
+          KButton(
+            label: tr(dialog, AppStrings.logOut),
+            variant: KButtonVariant.destructive,
+            onPressed: () => Navigator.of(dialog).pop(true),
+          ),
+          KButton(
+            label: tr(dialog, AppStrings.cancel),
+            variant: KButtonVariant.text,
+            onPressed: () => Navigator.of(dialog).pop(false),
+          ),
+        ],
+      ),
+    );
+    if (yes == true) sl<AuthBloc>().add(BikerLogOut());
   }
 
   @override
@@ -32,7 +51,7 @@ class LogOutWidget extends StatelessWidget {
           variant: KButtonVariant.text,
           color: KColors.of(context).error,
           loading: sl<AuthBloc>().logout,
-          onPressed: _logOut,
+          onPressed: () => _confirmLogOut(context),
         );
       },
     );

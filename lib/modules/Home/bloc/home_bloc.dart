@@ -191,7 +191,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         if (completePageNumber <= completeTotalPage) {
           final GenericResponse<OrderModel> response =
               await HomeRepo.bikerOrders(
-                  activePageNumber, BikerOrderStatus.COMPLETED.name);
+                  completePageNumber, BikerOrderStatus.COMPLETED.name);
           if (response.success) {
             completePageNumber++;
             completeTotalLength = response.totalItems;

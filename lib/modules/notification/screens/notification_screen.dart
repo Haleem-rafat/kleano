@@ -144,8 +144,8 @@ class _NotificationRow extends StatelessWidget {
   final int index;
 
   void _onTap(BuildContext context, NotificationModel item) {
-    // Some notifications are not about an order: only mark those as read.
-    if (item.clickableItem == null) return;
+    // Some notifications are not about an order: tapping only marks them read.
+    if (item.isRead! && item.clickableItem == null) return;
     item.isRead!
         ? sl<HomeBloc>().add(
             BikerOrder(orderId: item.clickableItem!, context: context),

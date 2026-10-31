@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
@@ -10,7 +11,10 @@ import 'package:thewhsherbiker/modules/Home/screens/earnings_screen.dart';
 import 'package:thewhsherbiker/modules/Home/screens/home_screen.dart';
 import 'package:thewhsherbiker/modules/Home/screens/orders_screen.dart';
 import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
+import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/modules/profile/screens/profile_screen.dart';
+import 'package:thewhsherbiker/shared/components/snack_bar.dart';
+import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
 /// The app's four tabs. Today stays mounted, because what it sends on open must
 /// be sent once and it listens for notifications. The other tabs are built when
@@ -83,53 +87,62 @@ class _BikerShellState extends State<BikerShell> {
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: _onBack,
-      child: Scaffold(
-        backgroundColor: c.background,
-        extendBody: true,
-        body: IndexedStack(
-          index: _index == _today ? 0 : 1,
-          sizing: StackFit.expand,
-          children: <Widget>[
-            const HomeScreen(),
-            switch (_index) {
-              _today => const SizedBox.shrink(),
-              _orders => OrdersScreen(segment: _segment),
-              _earnings => const EarningsScreen(),
-              _ => const ProfileScreen(isTab: true),
-            },
-          ],
-        ),
-        bottomNavigationBar: GlassTabBar(
-          currentIndex: _index,
-          activeColor: c.brand,
-          inactiveColor: c.textSecondary,
-          labelStyle: KType.caption,
-          onTap: (int index) => setState(() => _index = index),
-          items: <GlassTabItem>[
-            _tab(
-              tr(context, AppStrings.today),
-              ImageAssets.tabBarHomeIconLogo,
-              ImageAssets.tabBarHomeSelectedIconLogo,
-            ),
-            _tab(
-              tr(context, AppStrings.ordersTab),
-              ImageAssets.bookingsIconLogo,
-              ImageAssets.bookingsSelectedIconLogo,
-            ),
-            _tab(
-              tr(context, AppStrings.earnings),
-              ImageAssets.serviceCoinSvg,
-              ImageAssets.serviceCoinSvg,
-            ),
-            _tab(
-              tr(context, AppStrings.profile),
-              ImageAssets.profileIconLogo,
-              ImageAssets.profileSelectedIconLogo,
-            ),
-          ],
+    return BlocListener<ProfileBloc, ProfileState>(
+      bloc: sl<ProfileBloc>(),
+      listenWhen: (ProfileState _, ProfileState current) =>
+          current is BikerUpdateStatusFailed,
+      listener: (BuildContext context, ProfileState _) => showSnackBar(
+        buildContext: context,
+        message: translate('defaultError'),
+      ),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: _onBack,
+        child: Scaffold(
+          backgroundColor: c.background,
+          extendBody: true,
+          body: IndexedStack(
+            index: _index == _today ? 0 : 1,
+            sizing: StackFit.expand,
+            children: <Widget>[
+              const HomeScreen(),
+              switch (_index) {
+                _today => const SizedBox.shrink(),
+                _orders => OrdersScreen(segment: _segment),
+                _earnings => const EarningsScreen(),
+                _ => const ProfileScreen(isTab: true),
+              },
+            ],
+          ),
+          bottomNavigationBar: GlassTabBar(
+            currentIndex: _index,
+            activeColor: c.brand,
+            inactiveColor: c.textSecondary,
+            labelStyle: KType.caption,
+            onTap: (int index) => setState(() => _index = index),
+            items: <GlassTabItem>[
+              _tab(
+                tr(context, AppStrings.today),
+                ImageAssets.tabBarHomeIconLogo,
+                ImageAssets.tabBarHomeSelectedIconLogo,
+              ),
+              _tab(
+                tr(context, AppStrings.ordersTab),
+                ImageAssets.bookingsIconLogo,
+                ImageAssets.bookingsSelectedIconLogo,
+              ),
+              _tab(
+                tr(context, AppStrings.earnings),
+                ImageAssets.serviceCoinSvg,
+                ImageAssets.serviceCoinSvg,
+              ),
+              _tab(
+                tr(context, AppStrings.profile),
+                ImageAssets.profileIconLogo,
+                ImageAssets.profileSelectedIconLogo,
+              ),
+            ],
+          ),
         ),
       ),
     );

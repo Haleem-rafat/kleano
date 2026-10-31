@@ -103,13 +103,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     AppStrings.settings,
                     () => pushPage(context, const SettingScreen()),
                   ),
-                  Divider(height: 1, color: c.separator),
-                  _menuRow(
-                    context,
-                    Icons.info_outline,
-                    AppStrings.aboutUs,
-                    () {},
-                  ),
                 ],
               ),
             ),

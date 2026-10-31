@@ -152,11 +152,12 @@ class NotificationBloc extends Bloc<NotificationEvent, NotificationState> {
         if (response) {
           notificationList[event.notificationIndex].isRead = true;
           totalUnRead--;
-          if (event.context.mounted) {
-            sl<HomeBloc>().add(BikerOrder(
-            orderId: notificationList[event.notificationIndex].clickableItem!,
-            context: event.context,
-          ));
+          final String? orderId =
+              notificationList[event.notificationIndex].clickableItem;
+          if (orderId != null && event.context.mounted) {
+            sl<HomeBloc>().add(
+              BikerOrder(orderId: orderId, context: event.context),
+            );
           }
           emit(MakeNotificationIsReadSuccess());
         } else {
