@@ -172,7 +172,10 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             // Hidden until the real support number has loaded.
             return screenIndex == 0 || whatsappNumber.isEmpty
                 ? const SizedBox()
-                : FloatingActionButton(
+                : GlassIconButton(
+                    icon: Icons.chat_rounded,
+                    size: KSpace.tapTarget + KSpace.m,
+                    tooltip: 'WhatsApp',
                     onPressed: () async {
                       final Uri whatsappUri = Uri.parse(
                         "https://wa.me/$whatsappNumber",
@@ -188,13 +191,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                         await urlLauncher.launchUrl(whatsappWebUri);
                       }
                     },
-                    backgroundColor: const Color(0xFF25D366),
                     child: SvgPicture.asset(
                       'assets/svg/whatsapp_icon.svg',
                       height: 24,
                       width: 24,
                       colorFilter: ColorFilter.mode(
-                        Colors.white,
+                        KColors.of(context).success,
                         BlendMode.srcIn,
                       ),
                     ),

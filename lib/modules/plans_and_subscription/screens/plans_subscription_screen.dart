@@ -112,7 +112,7 @@ class _PlansAndSubscriptionScreenState
         },
         builder: (BuildContext context, PlansAndSubscriptionState state) {
           if (state is PlansAndSubscriptionLoadingState) {
-            return const KLoadingState();
+            return const KSkeleton.list();
           }
           if (state is PlansAndSubscriptionConnectionError) {
             return KErrorState(

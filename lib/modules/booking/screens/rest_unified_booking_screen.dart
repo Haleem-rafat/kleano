@@ -150,7 +150,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
       },
       builder: (context, state) {
         if (state is GetVehiclesLoading || state is GetCarModelLoading) {
-          return const KLoadingState();
+          return const KSkeleton.details();
         }
         if (state is GetVehiclesEmpty) {
           return EmptyVehiclesScreen(

@@ -64,7 +64,7 @@ class _ActivePromoCodeState extends State<ActivePromoCode> {
       bloc: promoBloc,
       builder: (context, state) {
         if (state is GetActivePromoLoading) {
-          return const KLoadingState();
+          return const KSkeleton.list();
         } else if (state is GetActivePromoEmpty) {
           return const EmptyPromoWidget();
         } else if (state is GetActivePromoError) {

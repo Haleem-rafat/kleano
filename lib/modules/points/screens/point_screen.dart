@@ -45,7 +45,7 @@ class _PointScreenState extends State<PointScreen> {
             );
           }
           if (state is! PointLoaded) {
-            return const KLoadingState();
+            return const KSkeleton.details();
           }
           return const _PointsBody();
         },

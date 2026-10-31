@@ -297,6 +297,7 @@ class NativeGlassButton extends StatefulWidget {
     this.foreground,
     this.fontSize = 17,
     this.iconSize = 17,
+    this.semanticLabel,
   });
 
   final VoidCallback? onPressed;
@@ -309,6 +310,9 @@ class NativeGlassButton extends StatefulWidget {
   final double fontSize;
   final double iconSize;
 
+  /// Read by VoiceOver; needed when the button has no [title].
+  final String? semanticLabel;
+
   @override
   State<NativeGlassButton> createState() => _NativeGlassButtonState();
 }
@@ -318,6 +322,7 @@ class _NativeGlassButtonState extends State<NativeGlassButton> {
 
   Map<String, Object?> get _params => <String, Object?>{
     'title': widget.title,
+    'label': widget.semanticLabel ?? widget.title,
     'symbol': widget.sfSymbol,
     'style': widget.style.name,
     'tint': widget.tint?.toARGB32(),
@@ -355,7 +360,7 @@ class _NativeGlassButtonState extends State<NativeGlassButton> {
   Widget _native() {
     return Semantics(
       button: true,
-      label: widget.title,
+      label: widget.semanticLabel ?? widget.title,
       child: UiKitView(
         viewType: 'kleano/glass_button',
         creationParams: _params,
@@ -384,9 +389,17 @@ class GlassIconButton extends StatelessWidget {
     this.size = 44,
     this.iconSize = 20,
     this.tooltip,
+    this.style = GlassButtonStyle.glass,
+    this.child,
   });
 
   final IconData icon;
+
+  /// Apple's clear glass ([GlassButtonStyle.clear]) suits a photo behind it.
+  final GlassButtonStyle style;
+
+  /// The app's own artwork (an SVG) instead of [icon].
+  final Widget? child;
 
   /// SF Symbol name used on iOS (e.g. `chevron.backward`, `xmark`, `plus`).
   final String? sfSymbol;
@@ -400,16 +413,24 @@ class GlassIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color iconColor = color ?? Theme.of(context).colorScheme.onSurface;
-    if (GlassTokens.useNative && sfSymbol != null) {
+    if (GlassTokens.useNative && (sfSymbol != null || child != null)) {
       return SizedBox.square(
         dimension: size,
-        child: NativeGlassButton(
-          onPressed: onPressed,
-          sfSymbol: sfSymbol,
-          foreground: iconColor,
-          tint: tint,
-          iconSize: iconSize,
-          fallback: const SizedBox.shrink(),
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            NativeGlassButton(
+              onPressed: onPressed,
+              sfSymbol: child == null ? sfSymbol : null,
+              style: style,
+              foreground: iconColor,
+              tint: tint,
+              iconSize: iconSize,
+              semanticLabel: tooltip,
+              fallback: const SizedBox.shrink(),
+            ),
+            if (child != null) IgnorePointer(child: Center(child: child)),
+          ],
         ),
       );
     }
@@ -430,7 +451,7 @@ class GlassIconButton extends StatelessWidget {
             capsule: true,
             tint: tint,
             child: Center(
-              child: Icon(icon, size: iconSize, color: iconColor),
+              child: child ?? Icon(icon, size: iconSize, color: iconColor),
             ),
           ),
         ),
@@ -450,8 +471,10 @@ class GlassBarButton extends StatelessWidget {
     required this.tooltip,
     required this.onPressed,
     this.color,
+    this.style = GlassButtonStyle.glass,
   });
 
+  final GlassButtonStyle style;
   final IconData icon;
   final String sfSymbol;
   final String tooltip;
@@ -464,6 +487,7 @@ class GlassBarButton extends StatelessWidget {
     sfSymbol: sfSymbol,
     size: 40,
     color: color,
+    style: style,
     tooltip: tooltip,
     onPressed: onPressed,
   );

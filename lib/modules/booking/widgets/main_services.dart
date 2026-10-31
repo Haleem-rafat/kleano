@@ -87,7 +87,9 @@ class _MainServicesState extends State<MainServices> {
         if (state is OffersInitial ||
             state is GetServicesLoading ||
             state is GetGuestServicesLoading) {
-          return const KLoadingState();
+          return widget.onOpen == null
+              ? const KSkeleton.list(padding: EdgeInsets.zero)
+              : const KSkeleton.grid(padding: EdgeInsets.zero);
         }
 
         if (widget.mainServices.isEmpty) {

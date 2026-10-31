@@ -69,7 +69,7 @@ class _AllNotificationsState extends State<AllNotifications> {
       },
       builder: (BuildContext context, NotificationsState state) {
         if (state is NotificationsLoading) {
-          return const KLoadingState();
+          return const KSkeleton.list();
         } else if (state is NotificationsConnectionError) {
           return KErrorState(
             message: translate('somethingWentWrong'),

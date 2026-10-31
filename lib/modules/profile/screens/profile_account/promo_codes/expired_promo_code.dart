@@ -64,7 +64,7 @@ class _ExpiredPromoCodeState extends State<ExpiredPromoCode> {
       bloc: promoBloc,
       builder: (context, state) {
         if (state is GetExpiredPromoLoading) {
-          return const KLoadingState();
+          return const KSkeleton.list();
         } else if (state is GetExpiredPromoEmpty) {
           return const EmptyPromoWidget();
         } else if (state is GetExpiredPromoError) {
