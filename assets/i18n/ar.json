@@ -498,16 +498,7 @@
   "themeLight": "فاتح",
   "themeDark": "داكن",
   "themeSystem": "مثل الهاتف",
-  "homeStyle": "شكل الرئيسية",
-  "homeStyle_current": "الحالي",
-  "homeStyle_quickRebook": "إعادة الحجز السريع",
-  "homeStyle_serviceFirst": "الخدمات أولًا",
-  "homeStyle_liveStatus": "الحالة المباشرة",
-  "homeStyle_offersFirst": "العروض أولًا",
-  "homeStyle_photoHero": "صورة رئيسية",
-  "homeStyle_serviceGrid": "شبكة الخدمات",
   "searchServices": "ابحث عن خدمة",
-  "homeStyle_mix": "المزيج",
   "seeAll": "عرض الكل",
   "mostBooked": "الأكثر حجزًا"
 }
