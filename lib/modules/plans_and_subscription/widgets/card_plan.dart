@@ -14,8 +14,8 @@ import 'package:thewasher/modules/plans_and_subscription/widgets/subscribe_butto
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 
-/// A subscription plan: icon, name and chips, opening to show what it includes,
-/// its price and the subscribe button. The colour comes from the plan's data
+/// A subscription plan: icon, name, washes and price at a glance, opening to
+/// show what it includes and the subscribe button. The colour comes from the plan's data
 /// and only tints its icons and its outline.
 class CardOfPlan extends StatefulWidget {
   final Plan plan;
@@ -39,7 +39,7 @@ class CardOfPlan extends StatefulWidget {
 
 class _CardOfPlanState extends State<CardOfPlan> {
   static const double _iconTileSize = 56;
-  static const double _iconSize = 36;
+  static const double _iconSize = KSpace.xxxl;
   static const double _bulletSize = 20;
 
   bool _isExpanded = false;
@@ -91,6 +91,13 @@ class _CardOfPlanState extends State<CardOfPlan> {
                 ),
             ],
           ),
+          const SizedBox(height: KSpace.m),
+          PriceAndPoints(
+            price: widget.plan.price!,
+            durationUnit: widget.plan.durationUnit!,
+            pointsToPay: widget.plan.pointsToPay!,
+            duration: widget.plan.duration!,
+          ),
           AnimatedSize(
             duration: duration,
             curve: KMotion.curve,
@@ -134,6 +141,11 @@ class _CardOfPlanState extends State<CardOfPlan> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(widget.plan.type!, style: KType.headline.copyWith(color: c.text)),
+        if (widget.plan.usageCount != null)
+          Text(
+            '${widget.plan.usageCount} ${translate(AppStrings.washes)}',
+            style: KType.subhead.copyWith(color: c.textSecondary),
+          ),
         if (points > 0 || isSubscribed) ...<Widget>[
           const SizedBox(height: KSpace.xs),
           Wrap(
@@ -163,25 +175,7 @@ class _CardOfPlanState extends State<CardOfPlan> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Divider(height: KSpace.xxxl, color: c.separator),
-        Row(
-          children: <Widget>[
-            SvgPicture.asset(
-              AssetsManager.carWash,
-              width: KSpace.xxl,
-              height: KSpace.xxl,
-              colorFilter: ColorFilter.mode(planColor, BlendMode.srcIn),
-            ),
-            const SizedBox(width: KSpace.m),
-            Expanded(
-              child: Text(
-                '${plan.usageCount!} ${translate(AppStrings.washes)}',
-                style: KType.headline.copyWith(color: c.text),
-              ),
-            ),
-          ],
-        ),
         if (plan.description?.isNotEmpty == true) ...<Widget>[
-          const SizedBox(height: KSpace.l),
           _sectionLabel(c, translate(AppStrings.description)),
           for (final String description in plan.description!)
             _bulletRow(
@@ -204,13 +198,6 @@ class _CardOfPlanState extends State<CardOfPlan> {
               ),
             ),
         ],
-        const SizedBox(height: KSpace.xl),
-        PriceAndPoints(
-          price: plan.price!,
-          durationUnit: plan.durationUnit!,
-          pointsToPay: plan.pointsToPay!,
-          duration: plan.duration!,
-        ),
         const SizedBox(height: KSpace.l),
         SubscribeButton(
           createdAt: plan.createdAt ?? "",
@@ -275,7 +262,7 @@ class _PlanIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final String? link = plan.icon?.iconLink;
     final Widget fallback = SvgPicture.asset(
-      AssetsManager.planColor,
+      AssetsManager.carWash,
       width: iconSize,
       height: iconSize,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),

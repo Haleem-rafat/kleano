@@ -23,8 +23,6 @@ Future<void> bootstrap(Flavor flavor) async {
   // In-app HTTP inspector (Chucker) for the dev flavor, also in release/
   // TestFlight builds, so testers can share the exact request/response.
   ChuckerFlutter.showOnRelease = flavor == Flavor.DEV;
-  // Keep the log, without a pop-up over the screen on every request.
-  ChuckerFlutter.showNotification = false;
   // Timezone database for scheduled local notifications.
   tz.initializeTimeZones();
 
