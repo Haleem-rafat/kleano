@@ -56,6 +56,7 @@ class BookingMainScreen extends StatefulWidget {
 }
 
 const double _heroCardOverlap = KSpace.xxxl * 2;
+const double _statusStripAfter = KSpace.xxxl * 2;
 
 class _BookingMainScreenState extends State<BookingMainScreen> {
   int indexPage = 0;
@@ -72,6 +73,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   final MyBookingBloc _activeOrders = MyBookingBloc();
   final MyBookingBloc _pastOrders = MyBookingBloc();
   StreamSubscription<MyBookingState>? _pastOrdersSub;
+  final ValueNotifier<bool> _scrolledPastHero = ValueNotifier<bool>(false);
 
   String _guestAuthMessage(BuildContext context) {
     final String languageCode = Localizations.localeOf(context).languageCode;
@@ -380,6 +382,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     _isNotesFocused.dispose();
     _activeOrders.close();
     _pastOrdersSub?.cancel();
+    _scrolledPastHero.dispose();
     _pastOrders.close();
     super.dispose();
   }
@@ -477,19 +480,42 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
             ],
             child: Stack(
               children: [
-                SmartRefresher(
-                  controller: refreshController,
-                  enablePullDown: indexPage == 0 ? true : false,
-                  header: const ClassicHeader(),
-                  onRefresh: _handleRefresh,
-                  child: ValueListenableBuilder<HomeStyle>(
-                    valueListenable: HomeStyleSetting.style,
-                    builder: (BuildContext _, HomeStyle _, Widget? _) =>
-                        CustomScrollView(
-                          slivers: indexPage == 0
-                              ? _homeSlivers(c)
-                              : _reviewSlivers(c),
-                        ),
+                NotificationListener<ScrollUpdateNotification>(
+                  onNotification: (ScrollUpdateNotification update) {
+                    _scrolledPastHero.value =
+                        update.metrics.axis == Axis.vertical &&
+                        update.metrics.pixels > _statusStripAfter;
+                    return false;
+                  },
+                  child: SmartRefresher(
+                    controller: refreshController,
+                    enablePullDown: indexPage == 0 ? true : false,
+                    header: const ClassicHeader(),
+                    onRefresh: _handleRefresh,
+                    child: ValueListenableBuilder<HomeStyle>(
+                      valueListenable: HomeStyleSetting.style,
+                      builder: (BuildContext _, HomeStyle _, Widget? _) =>
+                          CustomScrollView(
+                            slivers: indexPage == 0
+                                ? _homeSlivers(c)
+                                : _reviewSlivers(c),
+                          ),
+                    ),
+                  ),
+                ),
+                // The photo Homes have no top bar: keeps scrolled content
+                // from running under the clock.
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: MediaQuery.paddingOf(context).top,
+                  child: ValueListenableBuilder<bool>(
+                    valueListenable: _scrolledPastHero,
+                    builder: (BuildContext _, bool scrolled, Widget? _) =>
+                        scrolled
+                        ? ColoredBox(color: c.background)
+                        : const SizedBox.shrink(),
                   ),
                 ),
                 _buildBookingAction(),
@@ -530,11 +556,10 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         _buildTopBar(c),
       const SliverToBoxAdapter(child: HomeStyleChips()),
       if (style == HomeStyle.mix) ...<Widget>[
-        if (!_isGuest) cars,
         services,
-        box(const HomeReassurance(tiles: true)),
         box(const HomePlansCard(gradient: true)),
         offers,
+        box(const HomeReassurance(tiles: true)),
       ] else if (style == HomeStyle.photoHero) ...<Widget>[
         if (!_isGuest) cars,
         services,
@@ -664,8 +689,8 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                         end: Alignment.bottomCenter,
                         stops: const <double>[0, 0.55, 1],
                         colors: <Color>[
+                          KColors.light.brand.withValues(alpha: 0.72),
                           KColors.light.brand.withValues(alpha: 0.55),
-                          KColors.light.brand.withValues(alpha: 0.35),
                           c.background,
                         ],
                       )
@@ -816,7 +841,13 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         );
         return Align(
           alignment: AlignmentDirectional.centerStart,
-          child: onPhoto ? LiquidGlass(capsule: true, child: control) : control,
+          child: onPhoto
+              ? LiquidGlass(
+                  capsule: true,
+                  tint: KColors.light.brand.withValues(alpha: 0.4),
+                  child: control,
+                )
+              : control,
         );
       },
     );

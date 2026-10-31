@@ -1,3 +1,4 @@
+import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:flutter/material.dart';
 import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
@@ -284,11 +285,21 @@ class _ServicesListState extends State<ServicesList> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(
-                translate(AppStrings.chooseYourMainService),
-                style: KType.title.copyWith(color: c.text),
+              // Mix puts this title on one line with See all, in the grid.
+              ValueListenableBuilder<HomeStyle>(
+                valueListenable: HomeStyleSetting.style,
+                builder: (BuildContext _, HomeStyle style, Widget? title) =>
+                    style == HomeStyle.mix && widget.onContinue != null
+                    ? const SizedBox.shrink()
+                    : title!,
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: KSpace.xs),
+                  child: Text(
+                    translate(AppStrings.chooseYourMainService),
+                    style: KType.title.copyWith(color: c.text),
+                  ),
+                ),
               ),
-              const SizedBox(height: KSpace.xs),
               MainServices(
                 mainServices: mainServicesData,
                 onOpen: widget.onContinue == null
