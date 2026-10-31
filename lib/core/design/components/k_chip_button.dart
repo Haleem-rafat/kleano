@@ -14,6 +14,7 @@ class KChipButton extends StatelessWidget {
     required this.onTap,
     this.leading,
     this.semanticLabel,
+    this.onPhoto = false,
   });
 
   final String label;
@@ -24,11 +25,15 @@ class KChipButton extends StatelessWidget {
   final Widget? leading;
   final String? semanticLabel;
 
+  /// Liquid Glass with white text, for a chip floating over a photo.
+  final bool onPhoto;
+
   static const double height = 40;
 
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
+    final Color fg = onPhoto ? Colors.white : c.brand;
     final Widget content = Padding(
       padding: const EdgeInsets.symmetric(horizontal: 14),
       child: Row(
@@ -36,7 +41,7 @@ class KChipButton extends StatelessWidget {
         children: <Widget>[
           if (leading != null) ...<Widget>[
             IconTheme.merge(
-              data: IconThemeData(color: c.brand, size: 18),
+              data: IconThemeData(color: fg, size: 18),
               child: leading!,
             ),
             const SizedBox(width: 6),
@@ -47,7 +52,7 @@ class KChipButton extends StatelessWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: KType.subhead.copyWith(
-                color: c.brand,
+                color: fg,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -55,13 +60,18 @@ class KChipButton extends StatelessWidget {
         ],
       ),
     );
-    final Widget chip = Material(
-      color: c.surface,
-      elevation: GlassTokens.useNative ? 0 : 1,
-      shadowColor: Colors.black26,
-      shape: const StadiumBorder(),
-      child: Center(widthFactor: 1, child: content),
-    );
+    final Widget chip = onPhoto
+        ? LiquidGlass(
+            capsule: true,
+            child: Center(widthFactor: 1, child: content),
+          )
+        : Material(
+            color: c.surface,
+            elevation: GlassTokens.useNative ? 0 : 1,
+            shadowColor: Colors.black26,
+            shape: const StadiumBorder(),
+            child: Center(widthFactor: 1, child: content),
+          );
     return Semantics(
       button: true,
       label: semanticLabel ?? label,
