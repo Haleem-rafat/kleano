@@ -21,6 +21,7 @@ import 'package:thewasher/modules/my_booking/widgets/biker_details.dart';
 import 'package:thewasher/modules/my_booking/widgets/my_booking_card.dart';
 import 'package:thewasher/modules/my_booking/widgets/show_service_and_addons/tabs_service_and_addons.dart';
 import 'package:thewasher/modules/my_booking/widgets/vechilce_details.dart';
+import 'package:thewasher/modules/my_booking/widgets/wash_photos.dart';
 import 'package:thewasher/modules/my_booking/widgets/wash_section.dart';
 import 'package:thewasher/modules/my_booking/widgets/your_rating.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
@@ -107,6 +108,10 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
         spacing: KSpace.xl,
         children: <Widget>[
           _OrderHeader(order: order, onCancelled: _load),
+          WashPhotos(
+            before: order.beforeWashImage,
+            after: order.afterWashImage,
+          ),
           if (order.biker != null)
             BikerDetails(biker: order.biker!, location: order.location!),
           if (order.location != null) _ServiceLocationCard(order: order),
