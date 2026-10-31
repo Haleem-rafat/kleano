@@ -37,8 +37,9 @@ class AddressModel {
 
   AddressModel.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
-    latitude = json['latitude'];
-    longitude = json['longitude'];
+    // JSON has one number type: a whole coordinate arrives as an int.
+    latitude = (json['latitude'] as num?)?.toDouble();
+    longitude = (json['longitude'] as num?)?.toDouble();
     streetName = json['streetName'];
     subAdministrativeArea = json['subAdministrativeArea'];
     country = json['country'];

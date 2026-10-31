@@ -11,6 +11,9 @@ import 'package:thewasher/flavors.dart';
 class ApiService {
   static final Dio _dio = _createDio();
 
+  @visibleForTesting
+  static Dio get dio => _dio;
+
   static Dio _createDio() {
     final dio = Dio(
       BaseOptions(

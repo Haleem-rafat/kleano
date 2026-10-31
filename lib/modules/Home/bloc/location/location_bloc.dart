@@ -40,27 +40,35 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         emit(GetSavedLocationLoading());
         final SavedResponse response = await HomeRepo.getSavedLocations();
         if (response.success) {
-          savedLocation = <AddressModel>[];
-          // Find the default location from saved locations
-          final defaultLocation = response.results!.firstWhere(
-            (location) => location.isDefault == true,
-            orElse: () => response.results!.first,
-          );
-          blcoPosition =
-              LatLng(defaultLocation.latitude!, defaultLocation.longitude!);
-          debugPrint("dsdsaaddaadsdsdas: $blcoPosition");
-          justLocationName = defaultLocation.savedName!;
-          fullLocationName =
-              "${defaultLocation.streetName!} ${defaultLocation.subAdministrativeArea!} ${defaultLocation.country!} ${defaultLocation.savedName!}";
-          blcoCountry = defaultLocation.country!;
-          blcoSubAdministrativeArea = defaultLocation.subAdministrativeArea!;
-          blcoLocationName = defaultLocation.streetName!;
-          cityId = defaultLocation.cityId ?? "";
-          areaId = defaultLocation.areaId ?? "";
-          savedLocation = response.results!;
+          // No addresses is a valid answer, not a failure: callers tell the
+          // two apart (a new user adds one; a failed check offers a retry).
+          final List<AddressModel> results =
+              response.results ?? <AddressModel>[];
+          if (results.isNotEmpty) {
+            // Find the default location from saved locations
+            final AddressModel defaultLocation = results.firstWhere(
+              (location) => location.isDefault == true,
+              orElse: () => results.first,
+            );
+            blcoPosition = LatLng(
+              defaultLocation.latitude ?? blcoPosition.latitude,
+              defaultLocation.longitude ?? blcoPosition.longitude,
+            );
+            justLocationName = defaultLocation.savedName ?? "";
+            fullLocationName =
+                "${defaultLocation.streetName ?? ""} ${defaultLocation.subAdministrativeArea ?? ""} ${defaultLocation.country ?? ""} ${defaultLocation.savedName ?? ""}";
+            blcoCountry = defaultLocation.country ?? "";
+            blcoSubAdministrativeArea =
+                defaultLocation.subAdministrativeArea ?? "";
+            blcoLocationName = defaultLocation.streetName ?? "";
+            cityId = defaultLocation.cityId ?? "";
+            areaId = defaultLocation.areaId ?? "";
+          }
+          savedLocation = results;
           emit(GetSavedLocationSuccess(savedLocation: savedLocation));
         } else {
-          emit(GetSavedLocationFailed(error: response.error!.first.message));
+          emit(GetSavedLocationFailed(
+              error: response.error?.first.message ?? "Error"));
         }
       } catch (e) {
         emit(GetSavedLocationFailed(error: e.toString()));
