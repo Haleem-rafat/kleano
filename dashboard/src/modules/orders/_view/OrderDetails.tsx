@@ -35,6 +35,9 @@ export default function OrderDetails() {
 
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
+  // Backend text may be plain or { en, ar }; never render the object itself.
+  const localized = (value) =>
+    typeof value === 'string' ? value : value?.[lang] || value?.en || value?.ar || '';
 
   const { data, isLoading } = useSWR(
     ['get-all-order-details', orderId],
@@ -155,7 +158,7 @@ export default function OrderDetails() {
                           {t('User Notes')}
                         </label>
                         <div className="rounded-lg bg-slate-50 p-4">
-                          <p className="text-sm text-slate-700">{data?.description[lang]}</p>
+                          <p className="text-sm text-slate-700">{localized(data?.description)}</p>
                         </div>
                       </div>
                     )}
@@ -585,13 +588,13 @@ export default function OrderDetails() {
                             <div className="mb-3 flex items-center gap-3">
                               <ImageModal
                                 src={service?.icon?.iconLink}
-                                alt={`${service?.name[lang]} service icon`}
+                                alt={`${localized(service?.name)} service icon`}
                                 className="h-8 w-8 rounded"
                                 showExpandIcon={false}
                                 fallbackText="Service icon"
                               />
                               <h4 className="text-sm font-semibold text-slate-900">
-                                {service?.name[lang]}
+                                {localized(service?.name)}
                               </h4>
                             </div>
                             <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
@@ -613,7 +616,7 @@ export default function OrderDetails() {
                                   {service.description.map((desc, index) => (
                                     <li key={index} className="flex items-start gap-2">
                                       <span className="mt-1 text-primary">•</span>
-                                      <span>{desc[lang] || desc}</span>
+                                      <span>{localized(desc)}</span>
                                     </li>
                                   ))}
                                 </ul>
@@ -648,12 +651,12 @@ export default function OrderDetails() {
                               <div className="flex items-center gap-3">
                                 <ImageModal
                                   src={addon?.icon?.iconLink}
-                                  alt={`${addon?.name} add-on icon`}
+                                  alt={`${localized(addon?.name)} add-on icon`}
                                   className="h-6 w-6 rounded"
                                   showExpandIcon={false}
                                   fallbackText="Add-on icon"
                                 />
-                                <span className="font-medium text-slate-900">{addon?.name}</span>
+                                <span className="font-medium text-slate-900">{localized(addon?.name)}</span>
                               </div>
                               <span className="font-semibold text-green-600">{addon?.price}</span>
                             </div>
