@@ -73,3 +73,17 @@ async function main() {
 }
 
 main();
+
+// A missing image shows a neutral tile instead of the browser's broken icon.
+const IMAGE_PLACEHOLDER =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23ECECEE'/%3E%3Cpath d='M12 26l5-6 4 4 3-3 4 5z' fill='%235C5C62'/%3E%3C/svg%3E";
+window.addEventListener(
+  'error',
+  (event) => {
+    const target = event.target;
+    if (target instanceof HTMLImageElement && target.src !== IMAGE_PLACEHOLDER) {
+      target.src = IMAGE_PLACEHOLDER;
+    }
+  },
+  true
+);

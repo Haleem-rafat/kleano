@@ -56,12 +56,12 @@ const BannerList = () => {
   };
   return (
     <div className="relative">
-      <div className="flex items-center justify-between pb-10">
-        <p className="text-2xl font-semibold">{t('banners')}</p>
+      <div className="flex items-center justify-between pb-6">
+        <p className="text-2xl font-semibold capitalize text-slate-900">{t('banners')}</p>
 
         <Button onClick={() => setOpen(true)}>Add banner</Button>
       </div>
-      <div className="h-[calc(100vh-300px)] overflow-y-scroll rounded-lg bg-white p-4 shadow">
+      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
         {isLoading && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>

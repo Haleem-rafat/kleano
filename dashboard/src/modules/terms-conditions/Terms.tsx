@@ -50,7 +50,7 @@ const Terms = () => {
   };
   return (
     <div className="flex h-full min-h-[600px] w-full flex-col items-center justify-start gap-6 ">
-      <h2 className="border-b border-primary pb-3   ">
+      <h2 className="text-2xl font-semibold text-slate-900">
         {!isEdit ? 'Terms & Conditions' : 'Edit Terms & Conditions'}
       </h2>
       <div className="w-[60%] space-y-4">

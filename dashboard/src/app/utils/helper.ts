@@ -2,6 +2,7 @@ import i18n from '@app/locales/i18n';
 
 export const formatDate = (isoString) => {
   const date = new Date(isoString);
+  if (!isoString || Number.isNaN(date.getTime())) return '—';
   // here i want to add the day name ex friday, saturday, sunday, monday, tuesday, wednesday, thursday
   const day = date.toLocaleDateString('en-US', { weekday: 'long' });
 

@@ -51,8 +51,8 @@ export default function Pointes() {
     <div className="relative flex h-full w-full flex-col gap-3 rounded-lg  p-4  shadow">
       {isLoading && <ThreeDotsLoader />}
 
-      <div className="flex items-center justify-between pb-10">
-        <p className="text-2xl font-semibold">{t('pointes')}</p>
+      <div className="flex items-center justify-between pb-6">
+        <p className="text-2xl font-semibold capitalize text-slate-900">{t('pointes')}</p>
       </div>
 
       {/* Form Section */}

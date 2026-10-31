@@ -53,13 +53,13 @@ export default function Icons() {
 
   return (
     <div className="relative">
-      <div className="flex items-center justify-between pb-10">
-        <p className="text-2xl font-semibold">{t('Icons')}</p>
+      <div className="flex items-center justify-between pb-6">
+        <p className="text-2xl font-semibold capitalize text-slate-900">{t('Icons')}</p>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('AddNewIcons')}</Button>
         </div>
       </div>
-      <div className="h-[calc(100vh-300px)] overflow-y-scroll rounded-lg bg-white p-4 shadow">
+      <div className="max-h-[calc(100vh-200px)] overflow-auto rounded-xl border border-slate-200 bg-white p-2">
         {loadingiconsOptions && <ThreeDotsLoader />}
         <Table className="scrollbar-hide">
           <TableHeader>
@@ -74,7 +74,7 @@ export default function Icons() {
               <TableRow key={e.value} className="cursor-pointer hover:bg-primary/10">
                 <TableCell className="font-medium">{e.label}</TableCell>
                 <TableCell className="font-medium">
-                  <Button loading={isloading} onClick={() => handelDelete(e?.value)}>
+                  <Button variant="danger" size="sm" loading={isloading} onClick={() => handelDelete(e?.value)}>
                     {t("Deleteimg")}
                   </Button>
                 </TableCell>

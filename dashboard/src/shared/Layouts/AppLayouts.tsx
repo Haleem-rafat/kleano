@@ -88,6 +88,23 @@ const navItems = [
   { icon: <AiOutlineTransaction size={20} />, label: 'transaction', link: ROUTES.TRANSCTION },
 ];
 
+const navGroups: { title: string; labels: string[] }[] = [
+  { title: 'Overview', labels: ['dashboard'] },
+  { title: 'People', labels: ['users', 'bikers', 'admins'] },
+  {
+    title: 'Operations',
+    labels: ['orders', 'Booking', 'Booking Calendar', 'transaction', 'notification'],
+  },
+  {
+    title: 'Catalog',
+    labels: ['washingServices', 'plans', 'addOns', 'promoCode', 'segments', 'pointes'],
+  },
+  {
+    title: 'Content & settings',
+    labels: ['App Banner', 'Icons', 'Terms & Conditions', 'Contact Info', 'Profile'],
+  },
+];
+
 export default function AppLayouts({ children }) {
   const [isOpen, setIsOpen] = useState(true);
   const user = getLocalStorageItem(ELocalStorageKeys.USER) as ILoginData;
@@ -199,16 +216,21 @@ export default function AppLayouts({ children }) {
 
               {/* Scrollable Navigation Items */}
               <div className="flex-1 overflow-y-auto scrollbar-hide">
-                <div className="px-4 py-6">
-                  <div className="space-y-2">
-                    {navItems?.map((item) => (
-                      <NavLink
+                <div className="px-3 py-4">
+                  <div className="space-y-5">
+                    {navGroups.map((group) => (
+                      <div key={group.title} className="space-y-1">
+                        <p className="px-3 pb-1 text-xs font-medium text-slate-400">{group.title}</p>
+                        {navItems
+                          .filter((item) => group.labels.includes(item.label))
+                          .map((item) => (
+                            <NavLink
                         to={item.link}
                         key={item.label}
                         onClick={() => handleOverlayClick()}
                         className={({ isActive }): string =>
                           classNames(
-                            'flex cursor-pointer items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium capitalize transition-all duration-200',
+                            'flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium capitalize transition-all duration-200',
                             { 'bg-brandTint font-semibold text-primary': isActive },
                             {
                               'text-slate-600 hover:bg-slate-100 hover:text-slate-900':
@@ -219,6 +241,8 @@ export default function AppLayouts({ children }) {
                         <span className="flex-shrink-0">{item.icon}</span>
                         <span className="truncate">{t(item.label)}</span>
                       </NavLink>
+                          ))}
+                      </div>
                     ))}
                   </div>
                 </div>
