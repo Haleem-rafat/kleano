@@ -52,7 +52,7 @@ const BookingCalendarFallback = () => {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">Enhanced Booking Calendar</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900">Booking Calendar</h1>
           <div className="rounded bg-brandTint px-2 py-1 text-xs text-primary">
             Phase 1 - Basic Implementation
           </div>
