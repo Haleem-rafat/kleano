@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/components/k_swipe_action.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/widget/event_stepper.dart';
 import 'package:thewhsherbiker/modules/notification/bloc/notification_bloc.dart';
@@ -39,77 +40,102 @@ void main() {
   setUp(setUpSpies);
 
   group('change status panel', () {
-    testWidgets('first Done says on the way; one primary', (
-      WidgetTester t,
-    ) async {
+    Future<void> swipe(WidgetTester t) async {
+      await t.drag(find.byType(KSwipeAction), const Offset(600, 0));
+      await settle(t);
+    }
+
+    void tallPhone(WidgetTester t) {
       t.view.devicePixelRatio = 3;
       t.view.physicalSize = const Size(375, 1000) * 3;
       addTearDown(t.view.reset);
-      await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
-      expect(primaries(t), 1);
-      expect(
-        t
-            .widget<KButton>(find.widgetWithText(KButton, 'Complete Wash'))
-            .onPressed,
-        isNull,
-      );
+    }
 
-      await t.tap(find.widgetWithText(KButton, 'Done').first);
+    testWidgets('first swipe says on the way', (WidgetTester t) async {
+      tallPhone(t);
+      await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
+      expect(find.text('On the way to client'), findsOneWidget);
+      await swipe(t);
       expect(home.sent.single, isA<BikerOnTheWayOrder>());
     });
 
-    testWidgets('steps can still be skipped, as before', (
+    testWidgets('a short drag sends nothing', (WidgetTester t) async {
+      tallPhone(t);
+      await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
+      await t.drag(find.byType(KSwipeAction), const Offset(60, 0));
+      await settle(t);
+      expect(home.sent, isEmpty);
+    });
+
+    testWidgets('a tap sends nothing', (WidgetTester t) async {
+      tallPhone(t);
+      await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
+      await t.tap(find.byType(KSwipeAction));
+      await settle(t);
+      expect(home.sent, isEmpty);
+    });
+
+    testWidgets('swiping works the other way in Arabic layout', (
       WidgetTester t,
     ) async {
-      t.view.devicePixelRatio = 3;
-      t.view.physicalSize = const Size(375, 1000) * 3;
-      addTearDown(t.view.reset);
-      await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
-      await t.tap(find.widgetWithText(KButton, 'Done').at(1));
-      expect(home.sent.single, isA<BikerArrivedOrder>());
+      tallPhone(t);
+      home.orderDetails = order('o', status: 'ACCEPTED_BY_BIKER')
+        ..user = User(userName: 'Sam');
+      home.orderStep = -1;
+      await t.pumpWidget(
+        app(
+          Directionality(
+            textDirection: TextDirection.rtl,
+            child: Scaffold(
+              body: StatusOrderBottomSheet(order: home.orderDetails, index: 0),
+            ),
+          ),
+        ),
+      );
+      await settle(t);
+      await t.drag(find.byType(KSwipeAction), const Offset(-600, 0));
+      await settle(t);
+      expect(home.sent.single, isA<BikerOnTheWayOrder>());
     });
 
     testWidgets('start washing asks for a photo in a sheet', (
       WidgetTester t,
     ) async {
-      t.view.devicePixelRatio = 3;
-      t.view.physicalSize = const Size(375, 1000) * 3;
-      addTearDown(t.view.reset);
+      tallPhone(t);
       await pumpPanel(t, 'BIKER_ARRIVED', 1);
-      await t.tap(find.widgetWithText(KButton, 'Done'));
-      await settle(t);
+      await swipe(t);
       expect(find.byType(PhotoSourceSheet), findsOneWidget);
       expect(home.sent, isEmpty);
     });
 
-    testWidgets('washing: complete is the primary and asks for a photo', (
+    testWidgets('washing: the swipe completes, after a photo', (
       WidgetTester t,
     ) async {
-      t.view.devicePixelRatio = 3;
-      t.view.physicalSize = const Size(375, 1000) * 3;
-      addTearDown(t.view.reset);
+      tallPhone(t);
       await pumpPanel(t, 'ON_WASHING', 2);
-      expect(primaries(t), 1);
-      expect(find.widgetWithText(KButton, 'Done'), findsNothing);
-
-      await t.tap(find.widgetWithText(KButton, 'Complete Wash'));
-      await settle(t);
+      expect(find.text('Complete Wash'), findsOneWidget);
+      await swipe(t);
       expect(find.byType(PhotoSourceSheet), findsOneWidget);
     });
 
     testWidgets('a step moves on when the bloc says so', (
       WidgetTester t,
     ) async {
-      t.view.devicePixelRatio = 3;
-      t.view.physicalSize = const Size(375, 1000) * 3;
-      addTearDown(t.view.reset);
+      tallPhone(t);
       await pumpPanel(t, 'ACCEPTED_BY_BIKER', -1);
-      expect(find.widgetWithText(KButton, 'Done'), findsNWidgets(3));
-
       home.orderStep = 0;
       home.push(BikerOnTheWayOrderSuccess(orderId: 'o'));
       await settle(t);
-      expect(find.widgetWithText(KButton, 'Done'), findsNWidgets(2));
+      expect(find.text('Arrive to client'), findsOneWidget);
+    });
+
+    testWidgets('a completed wash has nothing to swipe', (
+      WidgetTester t,
+    ) async {
+      tallPhone(t);
+      await pumpPanel(t, 'COMPLETED', 3);
+      expect(find.byType(KSwipeAction), findsNothing);
+      expect(find.text('Wash completed'), findsOneWidget);
     });
 
     test('other screens\' states do not touch the steps', () {

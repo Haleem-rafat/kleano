@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:thewhsherbiker/core/design/components/k_states.dart';
+import 'package:thewhsherbiker/core/design/components/k_swipe_action.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
@@ -155,6 +157,11 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
     final double screenHeight = MediaQuery.sizeOf(context).height;
+    // Tall enough closed that the swipe for the next step is always on screen.
+    final double minPanelHeight = math.min(
+      KSwipeAction.height * 5 + MediaQuery.paddingOf(context).bottom,
+      screenHeight * .75,
+    );
     return Scaffold(
       backgroundColor: c.background,
       body: BlocConsumer<HomeBloc, HomeState>(
@@ -188,8 +195,8 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
           } else if (state is! BikerOrderFailed) {
             return SlidingUpPanel(
               controller: panelController,
-              maxHeight: screenHeight * .60,
-              minHeight: screenHeight * .21,
+              maxHeight: math.max(screenHeight * .60, minPanelHeight),
+              minHeight: minPanelHeight,
               parallaxEnabled: true,
               parallaxOffset: .3,
               color: c.surface,

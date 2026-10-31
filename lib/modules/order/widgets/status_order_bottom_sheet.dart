@@ -5,10 +5,9 @@ import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/widget/event_stepper.dart';
 import 'package:thewhsherbiker/modules/Home/widget/order_user_details.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
-import 'package:thewhsherbiker/modules/order/widgets/button_complete_wash.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
-/// The panel over the map: order summary, wash steps, complete button.
+/// The panel over the map: order summary, wash progress and the next step.
 class StatusOrderBottomSheet extends StatelessWidget {
   final OrderModel order;
   final int index;
@@ -53,8 +52,6 @@ class StatusOrderBottomSheet extends StatelessWidget {
         ),
         const SizedBox(height: KSpace.xl),
         EventsStepper(order: order, orderIndex: index),
-        const SizedBox(height: KSpace.xl),
-        ButtonCompleteWashWidget(orderId: order.sId!, index: index),
       ],
     );
   }

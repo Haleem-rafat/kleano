@@ -65,6 +65,7 @@ class AppStrings {
   static const String onTheWayClient = "onTheWayClient";
   static const String arriveToClient = "arriveToClient";
   static const String startWashing = "startWashing";
+  static const String washing = "washing";
   static const String estimatedTime = "estimatedTime";
   static const String done = "done";
   static const String completeWash = "completeWash";

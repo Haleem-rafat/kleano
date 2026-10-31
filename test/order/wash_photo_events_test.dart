@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image_picker_platform_interface/image_picker_platform_interface.dart';
+import 'package:thewhsherbiker/core/design/components/k_swipe_action.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/order/widgets/photo_source_sheet.dart';
 import 'package:thewhsherbiker/modules/order/widgets/status_order_bottom_sheet.dart';
@@ -27,6 +28,9 @@ class FakePicker extends ImagePickerPlatform {
 Future<void> pumpPanel(WidgetTester t, String status, int step) async {
   home.orderDetails = order('o', status: status)..user = User(userName: 'Sam');
   home.orderStep = step;
+  t.view.devicePixelRatio = 3;
+  t.view.physicalSize = const Size(375, 1000) * 3;
+  addTearDown(t.view.reset);
   await t.pumpWidget(
     app(
       Scaffold(
@@ -65,7 +69,7 @@ void main() {
       WidgetTester t,
     ) async {
       await pumpPanel(t, 'BIKER_ARRIVED', 1);
-      await t.tap(find.text('Done'));
+      await t.drag(find.byType(KSwipeAction), const Offset(600, 0));
       await settle(t);
       await pick(t, row);
       final BikerOnWashingOrder event = home.sent
@@ -79,7 +83,7 @@ void main() {
       WidgetTester t,
     ) async {
       await pumpPanel(t, 'ON_WASHING', 2);
-      await t.tap(find.text('Complete Wash'));
+      await t.drag(find.byType(KSwipeAction), const Offset(600, 0));
       await settle(t);
       await pick(t, row);
       final BikerCompleteOrder event = home.sent
@@ -92,7 +96,7 @@ void main() {
   testWidgets('cancelling the picker sends nothing', (WidgetTester t) async {
     ImagePickerPlatform.instance = FakePicker(null);
     await pumpPanel(t, 'ON_WASHING', 2);
-    await t.tap(find.text('Complete Wash'));
+    await t.drag(find.byType(KSwipeAction), const Offset(600, 0));
     await settle(t);
     await pick(t, 0);
     expect(home.sent.whereType<BikerCompleteOrder>(), isEmpty);
