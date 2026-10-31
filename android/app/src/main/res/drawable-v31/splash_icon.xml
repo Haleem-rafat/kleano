@@ -9,8 +9,8 @@
         </shape>
     </item>
     <item
-        android:width="173dp"
-        android:height="114dp"
+        android:width="96dp"
+        android:height="63dp"
         android:gravity="center"
         android:drawable="@drawable/launch_logo" />
 </layer-list>
