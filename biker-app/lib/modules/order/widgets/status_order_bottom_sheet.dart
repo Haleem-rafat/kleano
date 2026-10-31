@@ -48,7 +48,8 @@ class StatusOrderBottomSheet extends StatelessWidget {
           buildWhen: (HomeState previous, HomeState current) =>
               affectsOrderSteps(current),
           builder: (BuildContext context, HomeState state) =>
-              const OrderUserDetails(),
+              // Not const: the status chip must follow each step.
+              OrderUserDetails(),
         ),
         const SizedBox(height: KSpace.xl),
         EventsStepper(order: order, orderIndex: index),
