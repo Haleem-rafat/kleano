@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/components/k_text_field.dart';
+import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/resources/assets_manager.dart';
+import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
 import 'package:thewasher/modules/booking/data/models/booking_available_model.dart';
 import 'package:thewasher/modules/profile/blocs/promo_code/promo_bloc.dart';
-import 'package:thewasher/modules/booking/widgets/add_ons/card_addons.dart';
 import 'package:thewasher/modules/booking/widgets/calender_time_slots_widget.dart';
 import 'package:thewasher/modules/booking/widgets/location/fixed_map.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/car_model/cars_bloc.dart';
@@ -19,10 +24,7 @@ import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
 import 'package:thewasher/modules/my_vehicles/data/model/color_model.dart';
 import 'package:thewasher/modules/my_vehicles/screens/edit_vehicles_screen.dart';
 import 'package:thewasher/modules/my_vehicles/screens/empty_vehicles_screen.dart';
-import 'package:thewasher/shared/components/buttons.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
-import 'package:thewasher/shared/components/text-form-shared.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/shared/widget/vehicle_shared.dart';
@@ -39,12 +41,11 @@ class RestUnifiedBookingScreen extends StatefulWidget {
 
 class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
   List<CalenderAvailableModel> _cachedCalender = [];
-  String? _lastRequestedDate;
-  bool _isCalendarLoading = false;
 
   late CarsBloc carsBloc;
   final GeneralSingleton singleton = GeneralSingleton();
   late final FocusNode _notesFocusNode;
+  late final TextEditingController _notesController;
 
   @override
   void initState() {
@@ -55,12 +56,13 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
 
     final today = DateTime.now();
     final todayString = today.toIso8601String().split('T')[0];
-    _lastRequestedDate = todayString;
 
-    context
-        .read<BookingOrderBloc>()
-        .add(GetCalenderAvalible(date: todayString));
+    context.read<BookingOrderBloc>().add(
+      GetCalenderAvalible(date: todayString),
+    );
 
+    _notesController = TextEditingController(text: singleton.nearByDescription)
+      ..addListener(() => singleton.nearByDescription = _notesController.text);
     _notesFocusNode = FocusNode();
     _notesFocusNode.addListener(() {
       widget.onNotesFocusChanged?.call(_notesFocusNode.hasFocus);
@@ -70,6 +72,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
   @override
   void dispose() {
     _notesFocusNode.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -104,279 +107,256 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
       },
       child: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
-        child: Column(
-          children: [
-            SizedBox(height: 12.h),
-            _buildAddOnsSection(),
-            16.verticalSpace,
-            _buildVehiclesSection(),
-            16.verticalSpace,
-            _buildCarFreshenedSection(),
-            16.verticalSpace,
-            _buildLocationSection(),
-            16.verticalSpace,
-            _buildTimeSection(),
-            SizedBox(height: 200.h),
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: KSpace.l),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildVehiclesSection(),
+              const SizedBox(height: KSpace.xxl),
+              _buildTimeSection(),
+              const SizedBox(height: KSpace.xxl),
+              _buildLocationSection(),
+              const SizedBox(height: KSpace.xxl),
+              _buildExtrasSection(),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildAddOnsSection() {
+  Widget _title(String text) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            translate(AppStrings.addOns),
-            style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
-          ),
-          SizedBox(height: 12.h),
-          BlocBuilder<OffersBloc, OffersState>(
-            builder: (context, state) {
-              final offersBloc = sl<OffersBloc>();
-              if (offersBloc.addOnsList.isEmpty) {
-                return Center(
-                  child: Text(
-                    translate(AppStrings.noAddonsRequested),
-                    style: AppStyles.subtext14Regular,
-                  ),
-                );
-              }
-              return SizedBox(
-                height: 150.h,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: offersBloc.addOnsList.length,
-                  itemBuilder: (context, index) {
-                    return SizedBox(
-                      width: 100.w,
-                      child: CardAddOns(
-                        index: index,
-                        onTap: () {
-                          if (offersBloc.cartAddOnsList
-                              .contains(offersBloc.addOnsList[index])) {
-                            final i = offersBloc.cartAddOnsList
-                                .indexOf(offersBloc.addOnsList[index]);
-                            offersBloc.add(DeleteExtraCart(
-                              index: i,
-                              extra: offersBloc.addOnsList[index],
-                            ));
-                          } else {
-                            offersBloc.add(
-                              AddExtraCart(extra: offersBloc.addOnsList[index]),
-                            );
-                          }
-                        },
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
-        ],
+      padding: const EdgeInsets.only(bottom: KSpace.m),
+      child: Text(
+        text,
+        style: KType.title.copyWith(color: KColors.of(context).text),
       ),
     );
   }
 
   Widget _buildVehiclesSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: BlocConsumer<VehiclesBloc, VehiclesState>(
-        bloc: sl<VehiclesBloc>(),
-        listener: (context, state) {
-          if (state is GetVehiclesError) {
-            showSnackBar(
-              buildContext: context,
-              message: translate(AppStrings.errorSomethingWrong),
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is GetVehiclesLoading || state is GetCarModelLoading) {
-            return const LoadingWidget();
-          }
-          if (state is GetVehiclesEmpty) {
-            return EmptyVehiclesScreen(
+    return BlocConsumer<VehiclesBloc, VehiclesState>(
+      bloc: sl<VehiclesBloc>(),
+      listener: (context, state) {
+        if (state is GetVehiclesError) {
+          showSnackBar(
+            buildContext: context,
+            message: translate(AppStrings.errorSomethingWrong),
+          );
+        }
+      },
+      builder: (context, state) {
+        if (state is GetVehiclesLoading || state is GetCarModelLoading) {
+          return const KLoadingState();
+        }
+        if (state is GetVehiclesEmpty) {
+          return EmptyVehiclesScreen(
+            onPressed: () {
+              pushPage(context, EditVehiclesScreen(create: true));
+            },
+          );
+        }
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _title(translate(AppStrings.selectYourCar)),
+            SizedBox(
+              height: 120,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: sl<VehiclesBloc>().vehiclesList.length,
+                separatorBuilder: (_, _) => const SizedBox(width: KSpace.m),
+                itemBuilder: (context, index) {
+                  final selectedColor = colorList.indexWhere(
+                    (e) =>
+                        e.colorName ==
+                        sl<VehiclesBloc>().vehiclesList[index].color!,
+                  );
+                  return InkWell(
+                    borderRadius: BorderRadius.circular(KRadius.card),
+                    onTap: () {
+                      sl<VehiclesBloc>().add(
+                        SelectCar(
+                          vehicle: sl<VehiclesBloc>().vehiclesList[index],
+                        ),
+                      );
+                    },
+                    child: VehiclesCard(
+                      cardWidth: 200,
+                      index: index,
+                      selectedColor: selectedColor,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: KSpace.s),
+            KButton(
+              label: translate(AppStrings.addNewVehicles),
+              variant: KButtonVariant.text,
               onPressed: () {
                 pushPage(context, EditVehiclesScreen(create: true));
               },
-            );
-          }
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                translate(AppStrings.selectYourCar),
-                style:
-                    AppStyles.title16Bold.copyWith(color: ColorManager.black),
-              ),
-              SizedBox(height: 12.h),
-              SizedBox(
-                height: 110.h,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: sl<VehiclesBloc>().vehiclesList.length,
-                  separatorBuilder: (_, _) => SizedBox(width: 10.w),
-                  itemBuilder: (context, index) {
-                    final selectedColor = colorList.indexWhere(
-                      (e) =>
-                          e.colorName ==
-                          sl<VehiclesBloc>().vehiclesList[index].color!,
-                    );
-                    return InkWell(
-                      onTap: () {
-                        sl<VehiclesBloc>().add(
-                          SelectCar(
-                            vehicle: sl<VehiclesBloc>().vehiclesList[index],
-                          ),
-                        );
-                      },
-                      child: VehiclesCard(
-                        cardWidth: 200,
-                        index: index,
-                        selectedColor: selectedColor,
-                      ),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 12.h),
-              Center(
-                child: ButtonDottedShared(
-                  onPressed: () {
-                    pushPage(context, EditVehiclesScreen(create: true));
-                  },
-                  text: translate(AppStrings.addNewVehicles),
-                ),
-              ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildLocationSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            translate(AppStrings.carLocation),
-            style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
-          ),
-          SizedBox(height: 10.h),
-          BlocBuilder<LocationBloc, LocationState>(
-            builder: (_, _) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    final KColors c = KColors.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _title(translate(AppStrings.carLocation)),
+        BlocBuilder<LocationBloc, LocationState>(
+          builder: (_, _) {
+            return KCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12.r),
-                    child: SizedBox(
-                      height: 130.h,
-                      width: double.infinity,
-                      child: FixedMap(
-                        latLng: LatLng(
-                          blcoPosition.latitude,
-                          blcoPosition.longitude,
-                        ),
-                      ),
+                  FixedMap(
+                    height: 130,
+                    latLng: LatLng(
+                      blcoPosition.latitude,
+                      blcoPosition.longitude,
                     ),
                   ),
-                  SizedBox(height: 12.h),
-                  Text(
-                    translate(AppStrings.location),
-                    style: AppStyles.title16Bold
-                        .copyWith(color: ColorManager.black),
-                  ),
-                  SizedBox(height: 6.h),
-                  Text(
-                    fullLocationName,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppStyles.title16Regular
-                        .copyWith(color: ColorManager.black),
-                  ),
-                  SizedBox(height: 8.h),
-                  TextFormShared(
-                    initialValue: singleton.nearByDescription,
-                    focusNode: _notesFocusNode,
-                    onChanged: (v) => singleton.nearByDescription = v,
-                    hintText: translate(AppStrings.notes),
+                  KListRow(
+                    leading: SvgPicture.asset(
+                      AssetsManager.locationIconLogo,
+                      colorFilter: ColorFilter.mode(c.brand, BlendMode.srcIn),
+                    ),
+                    title: translate(AppStrings.location),
+                    subtitle: fullLocationName,
                   ),
                 ],
-              );
-            },
-          ),
-        ],
-      ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: KSpace.m),
+        KTextField(
+          label: translate(AppStrings.notes),
+          hint: translate(AppStrings.notes),
+          controller: _notesController,
+          focusNode: _notesFocusNode,
+          textInputAction: TextInputAction.done,
+        ),
+      ],
     );
   }
 
-  Widget _buildCarFreshenedSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            translate(AppStrings.carFreshened),
-            style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
+  Widget _buildExtrasSection() {
+    final KColors c = KColors.of(context);
+    final OffersBloc offersBloc = sl<OffersBloc>();
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _title(translate(AppStrings.addOns)),
+        BlocBuilder<OffersBloc, OffersState>(
+          builder: (context, state) {
+            return KCard(
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  for (
+                    int index = 0;
+                    index < offersBloc.addOnsList.length;
+                    index++
+                  ) ...[
+                    _buildAddOnRow(c, offersBloc, index),
+                    Divider(
+                      height: 1,
+                      indent: KSpace.l + 44 + KSpace.m,
+                      color: c.separator,
+                    ),
+                  ],
+                  SwitchListTile.adaptive(
+                    value: singleton.isCarFreshened,
+                    activeTrackColor: c.brand,
+                    title: Text(
+                      translate(AppStrings.addCarFreshenedService),
+                      style: KType.body.copyWith(color: c.text),
+                    ),
+                    subtitle: Text(
+                      translate(AppStrings.carFreshened),
+                      style: KType.subhead.copyWith(color: c.textSecondary),
+                    ),
+                    onChanged: (v) {
+                      setState(() => singleton.isCarFreshened = v);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAddOnRow(KColors c, OffersBloc offersBloc, int index) {
+    final addOn = offersBloc.addOnsList[index];
+    final bool selected = offersBloc.cartAddOnsList.contains(addOn);
+    void toggle() {
+      if (selected) {
+        offersBloc.add(
+          DeleteExtraCart(
+            index: offersBloc.cartAddOnsList.indexOf(addOn),
+            extra: addOn,
           ),
-          SizedBox(height: 12.h),
-          SwitchListTile(
-            value: singleton.isCarFreshened,
-            activeThumbColor: ColorManager.primary,
-            title: Text(
-              translate(AppStrings.addCarFreshenedService),
-              style: AppStyles.subtext14Regular,
-            ),
-            onChanged: (v) {
-              setState(() => singleton.isCarFreshened = v);
-            },
+        );
+      } else {
+        offersBloc.add(AddExtraCart(extra: addOn));
+      }
+    }
+
+    return KListRow(
+      leading: ClipRRect(
+        borderRadius: BorderRadius.circular(KRadius.field),
+        child: ColoredBox(
+          color: c.fill,
+          child: ImageShared(
+            image: addOn.icon?.iconLink ?? '',
+            height: 44,
+            width: 44,
           ),
-        ],
+        ),
       ),
+      title: addOn.name ?? '',
+      subtitle: '+ ${addOn.price ?? ''}',
+      trailing: Checkbox.adaptive(
+        value: selected,
+        activeColor: c.brand,
+        onChanged: (_) => toggle(),
+      ),
+      onTap: toggle,
     );
   }
 
   Widget _buildTimeSection() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16.w),
-      child: BlocListener<BookingOrderBloc, BookingOrderState>(
-        listener: (context, state) {
-          if (state is CalenderAvailableLoading) {
-            setState(() => _isCalendarLoading = true);
-          }
-          if (state is CalenderAvailableFailed) {
-            setState(() => _isCalendarLoading = false);
-            showSnackBar(
-              buildContext: context,
-              message: state.errorModel?.en ?? '',
-            );
-          }
-          if (state is CalenderAvailableSuccess) {
-            setState(() {
-              _mergeCalendar(state.calenderAvailableModel);
-              _isCalendarLoading = false;
-              _lastRequestedDate = null;
-            });
-          }
-        },
-        child: Stack(
-          children: [
-            CalenderTimeSlotsWidget(
-              key: const ValueKey('calendar_time_slots'),
-              calender: _cachedCalender,
-            ),
-          ],
-        ),
+    return BlocListener<BookingOrderBloc, BookingOrderState>(
+      listener: (context, state) {
+        if (state is CalenderAvailableFailed) {
+          showSnackBar(
+            buildContext: context,
+            message: state.errorModel?.en ?? '',
+          );
+        }
+        if (state is CalenderAvailableSuccess) {
+          setState(() {
+            _mergeCalendar(state.calenderAvailableModel);
+          });
+        }
+      },
+      child: CalenderTimeSlotsWidget(
+        key: const ValueKey('calendar_time_slots'),
+        calender: _cachedCalender,
       ),
     );
   }

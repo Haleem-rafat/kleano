@@ -3,15 +3,13 @@
 
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/booking/data/models/booking_available_model.dart';
 import 'package:thewasher/modules/booking/widgets/time_slot_item.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -50,11 +48,8 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
   void _updateTimeSlotsForDate(DateTime date) {
     final dayData = widget.calender.firstWhere(
       (d) => isSameDay(d.date, date),
-      orElse: () => CalenderAvailableModel(
-        date: date,
-        timeSlots: [],
-        isActive: false,
-      ),
+      orElse: () =>
+          CalenderAvailableModel(date: date, timeSlots: [], isActive: false),
     );
 
     setState(() {
@@ -63,8 +58,11 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
   }
 
   void _handleDateChange(DateTime selectedDate) {
-    final normalizedDate =
-        DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+    final normalizedDate = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+    );
 
     if (isSameDay(_focusedDay, normalizedDate)) return;
 
@@ -83,9 +81,9 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
 
     if (!hasCachedData && _lastRequestedDate != dateString) {
       _lastRequestedDate = dateString;
-      context
-          .read<BookingOrderBloc>()
-          .add(GetCalenderAvalible(date: dateString));
+      context.read<BookingOrderBloc>().add(
+        GetCalenderAvalible(date: dateString),
+      );
     }
 
     if (hasCachedData) {
@@ -110,43 +108,26 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDateTimeline(context),
-        20.verticalSpace,
-        _buildAvailableAppointmentsTitle(),
-        20.verticalSpace,
-        _buildTimeSlotsList(),
-      ],
-    );
-  }
-
-  Widget _buildDateTimeline(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: ColorManager.divider2,
-        borderRadius: BorderRadius.circular(8.r),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: EasyInfiniteDateTimeLine(
+        EasyInfiniteDateTimeLine(
           firstDate: DateTime.now(),
           lastDate: DateTime.now().add(const Duration(days: 13)),
           focusDate: _focusedDay,
           locale: Localizations.localeOf(context).languageCode,
+          activeColor: c.brand,
           onDateChange: _handleDateChange,
         ),
-      ),
-    );
-  }
-
-  Widget _buildAvailableAppointmentsTitle() {
-    return Text(
-      translate(AppStrings.availableAppointmentsBooking),
-      style: AppStyles.subtext14Regular.copyWith(
-        color: ColorManager.darkGrey,
-      ),
+        const SizedBox(height: KSpace.l),
+        Text(
+          translate(AppStrings.availableAppointmentsBooking),
+          style: KType.headline.copyWith(color: c.text),
+        ),
+        const SizedBox(height: KSpace.s),
+        _buildTimeSlotsList(),
+      ],
     );
   }
 
@@ -154,10 +135,10 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
     return BlocBuilder<BookingOrderBloc, BookingOrderState>(
       builder: (_, state) {
         if (state is CalenderAvailableLoading) {
-          return const LoadingWidget();
+          return const KLoadingState();
         }
         return SizedBox(
-          height: 40.h,
+          height: KSpace.tapTarget,
           child: _buildTimeSlotListView(),
         );
       },
@@ -185,7 +166,7 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
     return ListView.separated(
       scrollDirection: Axis.horizontal,
       itemCount: slots.length,
-      separatorBuilder: (_, _) => 10.horizontalSpace,
+      separatorBuilder: (_, _) => const SizedBox(width: KSpace.s),
       itemBuilder: (_, i) {
         final slot = slots[i];
         return TimeSlotItem(
@@ -199,12 +180,11 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
   }
 
   Widget _buildEmptyTimeSlotsState() {
-    return Center(
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
       child: Text(
         translate(AppStrings.noAvailableTimeSlots),
-        style: AppStyles.subtext14Regular.copyWith(
-          color: ColorManager.medGray,
-        ),
+        style: KType.subhead.copyWith(color: KColors.of(context).textSecondary),
       ),
     );
   }
