@@ -145,15 +145,25 @@ class _HomeScreenState extends State<HomeScreen> {
             builder: _buildScrollView,
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _openSupportWhatsApp,
-          backgroundColor: c.success,
-          tooltip: 'WhatsApp',
-          child: SvgPicture.asset(
-            "assets/svg/whatsapp_icon.svg",
-            width: KSpace.xxl,
-            height: KSpace.xxl,
-            colorFilter: ColorFilter.mode(c.surface, BlendMode.srcIn),
+        // The shell's floating tab bar is in padding, not viewPadding, and the
+        // FAB location only reads viewPadding: lift it above the bar here.
+        floatingActionButton: Padding(
+          padding: EdgeInsets.only(
+            bottom:
+                (MediaQuery.paddingOf(context).bottom -
+                        MediaQuery.viewPaddingOf(context).bottom)
+                    .clamp(0.0, double.infinity),
+          ),
+          child: FloatingActionButton(
+            onPressed: _openSupportWhatsApp,
+            backgroundColor: c.success,
+            tooltip: 'WhatsApp',
+            child: SvgPicture.asset(
+              "assets/svg/whatsapp_icon.svg",
+              width: KSpace.xxl,
+              height: KSpace.xxl,
+              colorFilter: ColorFilter.mode(c.surface, BlendMode.srcIn),
+            ),
           ),
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

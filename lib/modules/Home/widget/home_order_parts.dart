@@ -91,10 +91,8 @@ class HomeAvatar extends StatelessWidget {
       child: Center(
         child: Text(
           letter.toUpperCase(),
-          style: KType.subhead.copyWith(
-            color: c.brand,
-            fontWeight: FontWeight.w600,
-          ),
+          style: (size >= KSpace.xxxl * 2 ? KType.largeTitle : KType.subhead)
+              .copyWith(color: c.brand, fontWeight: FontWeight.w600),
         ),
       ),
     );

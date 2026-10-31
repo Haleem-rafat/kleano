@@ -211,9 +211,9 @@ void main() {
       onlineWithStats();
       await pumpEarnings(t);
 
-      final double allTime = t.getTopLeft(find.text('980')).dy;
-      final double today = t.getTopLeft(find.text('15')).dy;
-      final double weekends = t.getTopLeft(find.text('200')).dy;
+      final double allTime = t.getTopLeft(find.text('980 SAR')).dy;
+      final double today = t.getTopLeft(find.text('15 SAR')).dy;
+      final double weekends = t.getTopLeft(find.text('200 SAR')).dy;
       final double washes = t.getTopLeft(find.text('120')).dy;
       expect(allTime, lessThan(today));
       expect(today, lessThan(weekends));

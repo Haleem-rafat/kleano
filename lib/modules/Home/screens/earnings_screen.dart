@@ -116,7 +116,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                       fit: BoxFit.scaleDown,
                       alignment: AlignmentDirectional.centerStart,
                       child: Text(
-                        '${commission?.allTime.totalCommission ?? _unknown}',
+                        _amount(context, commission?.allTime),
                         maxLines: 1,
                         style: KType.largeTitle.copyWith(color: c.text),
                       ),
@@ -177,12 +177,25 @@ class _EarningsScreenState extends State<EarningsScreen> {
       ),
       title: tr(context, label),
       subtitle: period == null ? null : _ordersLine(context, period),
-      trailing: Text(
-        '${period?.totalCommission ?? _unknown}',
-        style: KType.headline.copyWith(color: KColors.of(context).text),
+      trailing: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: KSpace.xxxl * 3),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: AlignmentDirectional.centerEnd,
+          child: Text(
+            _amount(context, period),
+            maxLines: 1,
+            style: KType.headline.copyWith(color: KColors.of(context).text),
+          ),
+        ),
       ),
     );
   }
+
+  String _amount(BuildContext context, CommissionPeriod? period) =>
+      period == null
+      ? _unknown
+      : '${period.totalCommission} ${tr(context, AppStrings.sar)}';
 
   String _ordersLine(BuildContext context, CommissionPeriod period) =>
       '${period.ordersCount} ${tr(context, AppStrings.orders)}';
