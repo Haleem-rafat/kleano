@@ -323,6 +323,8 @@ class AppStrings {
   static const bikerOnTheWay = "bikerOnTheWay";
   static const bikerArrived = "bikerArrived";
   static const startWashing = "startWashing";
+  static const washing = "washing";
+  static const completed = "completed";
   static const yourCarIsCleanNow = "yourCarIsCleanNow";
   static const estimatedTime = "estimatedTime";
   static const estimatedTimeForWash = "estimatedTimeForWash";

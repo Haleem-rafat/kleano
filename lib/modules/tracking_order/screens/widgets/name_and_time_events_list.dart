@@ -8,10 +8,8 @@ import 'package:thewasher/utilties/app_date_formatter.dart';
 
 class NameAndTimeEventsList extends StatelessWidget {
   final OrderModel? orderModel;
-  NameAndTimeEventsList({
-    super.key,
-    this.orderModel,
-  });
+  final int step;
+  NameAndTimeEventsList({super.key, this.orderModel, required this.step});
   final GeneralSingleton generalSingleton = GeneralSingleton();
   final String estimatedTimeLabel = translate(AppStrings.estimatedTime);
 
@@ -23,7 +21,12 @@ class NameAndTimeEventsList extends StatelessWidget {
   ];
   @override
   Widget build(BuildContext context) {
-    String getEstimatedTimeText(String time, String? timeValue, [String label = '', String unit = '']) {
+    String getEstimatedTimeText(
+      String time,
+      String? timeValue, [
+      String label = '',
+      String unit = '',
+    ]) {
       if (time.isNotEmpty) {
         return '$estimatedTimeLabel : $time';
       } else if (timeValue != null) {
@@ -34,17 +37,24 @@ class NameAndTimeEventsList extends StatelessWidget {
     }
 
     List<String> estimatedTimeBikerStates = <String>[
-      getEstimatedTimeText(generalSingleton.timeOnTheWay, orderModel!.onTheWayAt),
+      getEstimatedTimeText(
+        generalSingleton.timeOnTheWay,
+        orderModel!.onTheWayAt,
+      ),
       generalSingleton.timeArrived.isNotEmpty
           ? '${translate(AppStrings.estimatedTimeForWash)} : ${generalSingleton.timeArrived} ${translate(AppStrings.min)}'
           : orderModel != null && orderModel!.totalDuration != null
-              ? '${translate(AppStrings.estimatedTimeForWash)} : ${orderModel!.totalDuration} ${translate(AppStrings.min)}'
-              : '',
-      getEstimatedTimeText(generalSingleton.timeWashing, orderModel!.onWashingAt),
+          ? '${translate(AppStrings.estimatedTimeForWash)} : ${orderModel!.totalDuration} ${translate(AppStrings.min)}'
+          : '',
+      getEstimatedTimeText(
+        generalSingleton.timeWashing,
+        orderModel!.onWashingAt,
+      ),
       getEstimatedTimeText(generalSingleton.timeComplete, orderModel!.endTime),
     ];
 
     return OrderStutesNamesAndTime(
+      step: step,
       bikerStatesName: bikerStatesName,
       estimatedTimeBikerStates: estimatedTimeBikerStates,
     );

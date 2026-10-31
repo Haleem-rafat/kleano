@@ -5,7 +5,13 @@ class AcceptedOrderByBikerModel {
   Biker? biker;
   String? time;
 
-  AcceptedOrderByBikerModel({this.success, this.sId, this.status, this.biker, this.time});
+  AcceptedOrderByBikerModel({
+    this.success,
+    this.sId,
+    this.status,
+    this.biker,
+    this.time,
+  });
 
   AcceptedOrderByBikerModel.fromJson(Map<String, dynamic> json) {
     success = json['success'];

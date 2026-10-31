@@ -56,8 +56,9 @@ class _TrackingOrderMainScreenState extends State<TrackingOrderMainScreen> {
       ),
       body: SlidingUpPanel(
         controller: panelController,
-        maxHeight: screenHeight * .60,
-        minHeight: screenHeight * .16,
+        maxHeight: screenHeight * .62,
+        // Closed, it still shows the biker and the stage bar.
+        minHeight: screenHeight * .28,
         parallaxEnabled: true,
         parallaxOffset: .3,
         color: KColors.of(context).surface,

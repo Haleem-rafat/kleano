@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewasher/core/design/components/k_stage_bar.dart';
 import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
 import 'package:thewasher/modules/tracking_order/blocs/socket_bloc.dart';
 import 'package:thewasher/modules/tracking_order/data/models/accepted_biker_model.dart';
 import 'package:thewasher/modules/tracking_order/screens/widgets/biker_info.dart';
-import 'package:thewasher/modules/tracking_order/screens/widgets/events_stepper.dart';
+import 'package:thewasher/modules/tracking_order/screens/widgets/functions/check_step_data.dart';
 import 'package:thewasher/modules/tracking_order/screens/widgets/name_and_time_events_list.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
 
@@ -80,6 +83,7 @@ class _StatusOrderBottomSheetState extends State<StatusOrderBottomSheet> {
                 }
               },
               builder: (BuildContext context, SocketState socketState) {
+                final int step = getStepData(widget.orderModel!.status!).step;
                 return Column(
                   children: <Widget>[
                     BikerInformation(
@@ -92,17 +96,27 @@ class _StatusOrderBottomSheetState extends State<StatusOrderBottomSheet> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: KSpace.xxl,
+                        horizontal: KSpace.xl,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          EventsStepper(status: widget.orderModel!.status!),
-                          const SizedBox(width: KSpace.m),
-                          Expanded(
-                            child: NameAndTimeEventsList(
-                              orderModel: widget.orderModel,
-                            ),
+                          KStageBar(
+                            step: step,
+                            semanticLabel: getStepData(
+                              widget.orderModel!.status!,
+                            ).label,
+                            stages: <String>[
+                              translate(AppStrings.onTheWay),
+                              translate(AppStrings.arrived),
+                              translate(AppStrings.washing),
+                              translate(AppStrings.completed),
+                            ],
+                          ),
+                          const SizedBox(height: KSpace.xl),
+                          NameAndTimeEventsList(
+                            orderModel: widget.orderModel,
+                            step: step,
                           ),
                         ],
                       ),

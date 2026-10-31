@@ -25,14 +25,13 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
     on<OpenSocketIo>((OpenSocketIo event, Emitter<SocketState> emit) async {
       try {
         socketIo = socket.io(
-            url,
-            socket.OptionBuilder()
-                .setTransports(['websocket'])
-                .disableAutoConnect()
-                .setExtraHeaders({
-                  "authorization": "Bearer ${AppShared.token}",
-                })
-                .build());
+          url,
+          socket.OptionBuilder()
+              .setTransports(['websocket'])
+              .disableAutoConnect()
+              .setExtraHeaders({"authorization": "Bearer ${AppShared.token}"})
+              .build(),
+        );
         socketIo!.connect();
         socketIo!.onConnect((_) {
           debugPrint('Connection established ${socketIo!.connected}');
@@ -60,32 +59,34 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
               );
               generalSingleton.timeOnTheWay =
                   AppDateFormatter.dateToStringHHMMA(
-                DateTime.parse(baseModelSocketStatus.time!).toLocal(),
-              );
+                    DateTime.parse(baseModelSocketStatus.time!).toLocal(),
+                  );
             }
           } else if (event == AppConstants.bikerMove) {
             CameraPosition cameraPosition = CameraPosition(
               target: LatLng(data['latitude'], data['longitude']),
               zoom: 14,
             );
-            add(NotifyEventBikerOnTheWay(
-              cameraPosition: cameraPosition,
-            ));
+            add(NotifyEventBikerOnTheWay(cameraPosition: cameraPosition));
           } else if (event == AppConstants.orderArrived) {
             if (generalSingleton.orderId == data['_id']) {
               baseModelSocketStatus = BaseModelSocketStatus.fromJson(data);
-              add(NotifySocketIoListenersOfEvent(
-                baseModelSocketStatus: baseModelSocketStatus,
-              ));
-              generalSingleton.timeArrived =
-                  baseModelSocketStatus.duration!.toString();
+              add(
+                NotifySocketIoListenersOfEvent(
+                  baseModelSocketStatus: baseModelSocketStatus,
+                ),
+              );
+              generalSingleton.timeArrived = baseModelSocketStatus.duration!
+                  .toString();
             }
           } else if (event == AppConstants.orderOnWashing) {
             if (generalSingleton.orderId == data['_id']) {
               baseModelSocketStatus = BaseModelSocketStatus.fromJson(data);
-              add(NotifySocketIoListenersOfEvent(
-                baseModelSocketStatus: baseModelSocketStatus,
-              ));
+              add(
+                NotifySocketIoListenersOfEvent(
+                  baseModelSocketStatus: baseModelSocketStatus,
+                ),
+              );
               generalSingleton.timeWashing = AppDateFormatter.dateToStringHHMMA(
                 DateTime.parse(baseModelSocketStatus.time!).toLocal(),
               );
@@ -100,11 +101,11 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
               );
               generalSingleton.timeComplete =
                   AppDateFormatter.dateToStringHHMMA(
-                DateTime.parse(baseModelSocketStatus.time!).toLocal(),
+                    DateTime.parse(baseModelSocketStatus.time!).toLocal(),
+                  );
+              sl.call<MyBookingBloc>.call().add(
+                FetchMyBookingActive(isRefresh: false),
               );
-              sl.call<MyBookingBloc>.call().add(FetchMyBookingActive(
-                isRefresh: false,
-              ));
               add(RatingYourWash(orderId: data['_id']));
             }
           }
@@ -113,14 +114,20 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
         emit(SocketFailed(error: e.toString()));
       }
     });
-    on<NotifyBikerAcceptedOrder>(
-        (NotifyBikerAcceptedOrder event, Emitter<SocketState> emit) {
-      emit(BikerAcceptedSuccess(
-        acceptedOrderByBikerModel: event.orderAcceptedModel,
-      ));
+    on<NotifyBikerAcceptedOrder>((
+      NotifyBikerAcceptedOrder event,
+      Emitter<SocketState> emit,
+    ) {
+      emit(
+        BikerAcceptedSuccess(
+          acceptedOrderByBikerModel: event.orderAcceptedModel,
+        ),
+      );
     });
-    on<NotifySocketIoListenersOfEvent>(
-        (NotifySocketIoListenersOfEvent event, Emitter<SocketState> emit) {
+    on<NotifySocketIoListenersOfEvent>((
+      NotifySocketIoListenersOfEvent event,
+      Emitter<SocketState> emit,
+    ) {
       emit(
         SocketIoReceivedAnUpdateState(
           baseModelSocketStatus: event.baseModelSocketStatus,
@@ -128,8 +135,10 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
         ),
       );
     });
-    on<NotifyEventBikerOnTheWay>(
-        (NotifyEventBikerOnTheWay event, Emitter<SocketState> emit) {
+    on<NotifyEventBikerOnTheWay>((
+      NotifyEventBikerOnTheWay event,
+      Emitter<SocketState> emit,
+    ) {
       emit(
         ReceivedAnUpdateBikerOnTheWayState(
           cameraPosition: event.cameraPosition,
@@ -138,9 +147,7 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
     });
 
     on<RatingYourWash>((RatingYourWash event, Emitter<SocketState> emit) {
-      emit(
-        ReceivedOrderCompletedSuccess(orderId: event.orderId!),
-      );
+      emit(ReceivedOrderCompletedSuccess(orderId: event.orderId!));
     });
   }
 }

@@ -250,6 +250,8 @@
   "bikerOnTheWay": "الكابتن في الطريق",
   "bikerArrived": "الكابتن وصل",
   "startWashing": "بداية الغسلة",
+  "washing": "جارٍ الغسيل",
+  "completed": "مكتمل",
   "yourCarIsCleanNow": "تم تنظيف سيارتك",
   "estimatedTime": "الوقت المقدر",
   "estimatedTimeForWash": "الوقت المقدر للغسلة",
