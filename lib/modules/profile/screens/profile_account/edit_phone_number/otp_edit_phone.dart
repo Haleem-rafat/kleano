@@ -41,24 +41,27 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
     super.initState();
     updateProfileBloc = BlocProvider.of<UpdateProfileBloc>(context);
     textEditingController = TextEditingController();
-    countdownTimerController = CountdownTimerController(
-      endTime: DateTime.now()
-          .add(const Duration(seconds: 120))
-          .millisecondsSinceEpoch,
-    )..addListener(() {
-        setState(() {});
-      });
+    countdownTimerController =
+        CountdownTimerController(
+          endTime: DateTime.now()
+              .add(const Duration(seconds: 120))
+              .millisecondsSinceEpoch,
+        )..addListener(() {
+          setState(() {});
+        });
 
     updatePhoneBloc = UpdatePhoneBloc()
       ..stream.listen((UpdatePhoneState updateState) {
         if (updateState is UpdatePhoneSuccess) {
           if (!mounted) return;
           showSnackBar(
-              buildContext: context,
-              message: translate(AppStrings.updatedSuccessfully));
+            buildContext: context,
+            message: translate(AppStrings.updatedSuccessfully),
+          );
           if (!mounted) return;
-          BlocProvider.of<GetUserProfileBloc>(context)
-              .add(GetUserProfileEvent());
+          BlocProvider.of<GetUserProfileBloc>(
+            context,
+          ).add(GetUserProfileEvent());
           if (!mounted) return;
           pop(context);
         } else if (updateState is UpdatePhoneFailed) {
@@ -102,8 +105,7 @@ class _OtpEditPhoneScreenState extends State<OtpEditPhoneScreen> {
         ),
         secondaryAction: CountdownTimer(
           controller: countdownTimerController,
-          widgetBuilder:
-              (BuildContext context, CurrentRemainingTime? remaining) {
+          widgetBuilder: (BuildContext context, CurrentRemainingTime? remaining) {
             return KButton(
               variant: KButtonVariant.text,
               label: remaining == null

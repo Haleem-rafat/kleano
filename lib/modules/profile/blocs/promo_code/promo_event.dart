@@ -12,10 +12,7 @@ class ApplyPromoCode extends PromoEvent {
   final String orderId;
   final String code;
 
-  ApplyPromoCode({
-    required this.orderId,
-    required this.code,
-  });
+  ApplyPromoCode({required this.orderId, required this.code});
 }
 
 class GetPromoCodeDetail extends PromoEvent {

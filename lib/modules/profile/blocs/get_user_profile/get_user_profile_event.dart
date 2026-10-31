@@ -5,4 +5,4 @@ class GetUserProfileEvent {
   GetUserProfileEvent({this.isRefresh = true});
 }
 
-class FetchPersonalInfo extends GetUserProfileEvent{}
+class FetchPersonalInfo extends GetUserProfileEvent {}

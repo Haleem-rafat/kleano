@@ -44,10 +44,16 @@ class KSegmented<T extends Object> extends StatelessWidget {
         ),
       );
     }
+    final KColors c = KColors.of(context);
     return SizedBox(
       width: double.infinity,
       child: SegmentedButton<T>(
         showSelectedIcon: false,
+        style: SegmentedButton.styleFrom(
+          selectedBackgroundColor: c.brandTint,
+          selectedForegroundColor: c.onBrandTint,
+          foregroundColor: c.text,
+        ),
         segments: <ButtonSegment<T>>[
           for (final MapEntry<T, String> e in segments.entries)
             ButtonSegment<T>(

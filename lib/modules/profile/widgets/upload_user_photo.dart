@@ -16,7 +16,15 @@ import 'package:thewasher/utilties/navigator.dart';
 class UserPhoto extends StatefulWidget {
   final bool isEdit;
   final String? userPhoto;
-  const UserPhoto({super.key, required this.userPhoto, required this.isEdit});
+
+  /// Gives the initial when the app has no stored one.
+  final String? name;
+  const UserPhoto({
+    super.key,
+    required this.userPhoto,
+    required this.isEdit,
+    this.name,
+  });
 
   @override
   State<UserPhoto> createState() => _UserPhotoState();
@@ -37,9 +45,10 @@ class _UserPhotoState extends State<UserPhoto> {
           imageQuality: 75,
         )
         .then((XFile? image) {
+          if (image == null || !mounted) return;
           setState(() {
             generalSingleton.userImage = image;
-            userPhoto = image!.path;
+            userPhoto = image.path;
           });
         });
   }
@@ -53,9 +62,10 @@ class _UserPhotoState extends State<UserPhoto> {
           imageQuality: 75,
         )
         .then((XFile? image) {
+          if (image == null || !mounted) return;
           setState(() {
             generalSingleton.userImage = image;
-            userPhoto = image!.path;
+            userPhoto = image.path;
           });
         });
   }
@@ -67,7 +77,7 @@ class _UserPhotoState extends State<UserPhoto> {
         ? widget.userPhoto!
         : generalSingleton.userImage != null
         ? generalSingleton.userImage!.path
-        : generalSingleton.characterUserName!;
+        : '';
   }
 
   @override
@@ -86,20 +96,18 @@ class _UserPhotoState extends State<UserPhoto> {
               dimension: _size,
               child: CircleAvatar(
                 backgroundColor: c.brandTint,
-                child: userPhoto != generalSingleton.characterUserName
+                child: userPhoto == generalSingleton.userImage?.path
                     ? DecoratedBox(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                            image: FileImage(
-                              File(generalSingleton.userImage!.path),
-                            ),
+                            image: FileImage(File(userPhoto)),
                             fit: BoxFit.cover,
                           ),
                         ),
                         child: const SizedBox.square(dimension: _size),
                       )
-                    : userPhoto == widget.userPhoto
+                    : userPhoto.isNotEmpty
                     ? ImageShared(
                         image: userPhoto,
                         height: _size,
@@ -107,7 +115,13 @@ class _UserPhotoState extends State<UserPhoto> {
                         raduis: _size / 2,
                       )
                     : Text(
-                        generalSingleton.characterUserName!,
+                        generalSingleton.characterUserName ??
+                            (widget.name ?? '')
+                                .trim()
+                                .characters
+                                .take(1)
+                                .toString()
+                                .toUpperCase(),
                         style: KType.largeTitle.copyWith(color: c.onBrandTint),
                       ),
               ),

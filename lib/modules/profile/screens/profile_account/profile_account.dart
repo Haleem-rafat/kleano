@@ -77,6 +77,7 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
                 UserPhoto(
                   isEdit: false,
                   userPhoto: user.imageLink != null ? user.imageLink! : 'null',
+                  name: user.userName,
                 ),
                 const SizedBox(height: KSpace.xxl),
                 SectionCard(
@@ -130,8 +131,10 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
   }
 
   Widget buildFormattedPhoneNumber(KColors c, String phoneNumber) {
-    String countryCode = phoneNumber.substring(0, 4);
-    String restOfNumber = phoneNumber.substring(4);
+    final String code = countryCode ?? '';
+    final String restOfNumber = phoneNumber.startsWith(code)
+        ? phoneNumber.substring(code.length)
+        : phoneNumber;
 
     return Align(
       alignment: AlignmentDirectional.centerStart,
@@ -140,7 +143,7 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
         TextSpan(
           style: KType.body.copyWith(color: c.text),
           children: <InlineSpan>[
-            TextSpan(text: '($countryCode) '),
+            TextSpan(text: '($code) '),
             TextSpan(text: restOfNumber),
           ],
         ),

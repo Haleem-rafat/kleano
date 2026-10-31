@@ -20,14 +20,14 @@ class UpdateProfileBloc extends Bloc<UpdateProfile, UpdateProfileState> {
       try {
         emit(UpdateProfileLoading());
 
-        final ProfileResponse response = await ProfileRepo.updateProfile(request: event.updateProfileRequest);
+        final ProfileResponse response = await ProfileRepo.updateProfile(
+          request: event.updateProfileRequest,
+        );
 
         if (response.success) {
           emit(UpdateProfileSuccess(userProfile: response.result!));
         } else {
-          emit(UpdateProfileFailed(
-            error: response.errorModel,
-          ));
+          emit(UpdateProfileFailed(error: response.errorModel));
         }
       } catch (e) {
         emit(UpdateProfileFailed());
@@ -44,10 +44,12 @@ class UpdateProfileBloc extends Bloc<UpdateProfile, UpdateProfileState> {
         if (response.success) {
           emit(ChangeUserLanguageSuccess());
         } else {
-          emit(ChangeUserLanguageFailed(
-            errorModel: response.errorModel,
-            error: response.errorMessage,
-          ));
+          emit(
+            ChangeUserLanguageFailed(
+              errorModel: response.errorModel,
+              error: response.errorMessage,
+            ),
+          );
         }
       } catch (e) {
         emit(UpdateProfileFailed());

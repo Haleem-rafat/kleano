@@ -12,70 +12,78 @@ class HeaderProfileGuestWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 180.h,
-        width: 1.sw,
-        color: Colors.transparent,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: 110.h,
-              width: 1.sw,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(12),
+      height: 180.h,
+      width: 1.sw,
+      color: Colors.transparent,
+      child: Stack(
+        children: <Widget>[
+          Container(
+            height: 110.h,
+            width: 1.sw,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(12),
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: ColorManager.black.withValues(alpha: .05),
+                  blurRadius: 3.r,
+                  offset: const Offset(0, 6),
                 ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: ColorManager.black.withValues(alpha: .05),
-                      blurRadius: 3.r,
-                      offset: const Offset(0, 6))
-                ],
-                color: ColorManager.primary,
+              ],
+              color: ColorManager.primary,
+            ),
+          ),
+          Positioned(
+            bottom: 35.h,
+            left: 150.w,
+            right: 150.w,
+            child: Container(
+              height: 73.39.h,
+              width: 73.39.w,
+              padding: EdgeInsets.all(8.r),
+              decoration: BoxDecoration(
+                color: ColorManager.primaryLight2,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.person,
+                color: ColorManager.secondary,
+                size: 50,
               ),
             ),
-            Positioned(
-                bottom: 35.h,
-                left: 150.w,
-                right: 150.w,
-                child: Container(
-                  height: 73.39.h,
-                  width: 73.39.w,
-                  padding: EdgeInsets.all(8.r),
-                  decoration: BoxDecoration(
-                      color: ColorManager.primaryLight2,
-                      shape: BoxShape.circle),
-                  child: Icon(
-                    Icons.person,
-                    color: ColorManager.secondary,
-                    size: 50,
-                  ),
-                )),
-            Positioned(
-                bottom: 0.h,
-                left: 125.w,
-                right: 125.w,
-                child: GestureDetector(
-                  onTap: () {
-                    popALlAndPushPage(context, ChooseRegisterView());
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    height: 26.h,
-                    decoration: BoxDecoration(
-                        color: ColorManager.white,
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(color: ColorManager.primary)),
-                    child: Center(
-                      child: Text(
-                        translate(AppStrings.signUpNow),
-                        textAlign: TextAlign.center,
-                        style: AppStyles.title16Bold.copyWith(
-                            color: ColorManager.primary, fontSize: 10.sp),
-                      ),
+          ),
+          Positioned(
+            bottom: 0.h,
+            left: 125.w,
+            right: 125.w,
+            child: GestureDetector(
+              onTap: () {
+                popALlAndPushPage(context, ChooseRegisterView());
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                height: 26.h,
+                decoration: BoxDecoration(
+                  color: ColorManager.white,
+                  borderRadius: BorderRadius.circular(8.r),
+                  border: Border.all(color: ColorManager.primary),
+                ),
+                child: Center(
+                  child: Text(
+                    translate(AppStrings.signUpNow),
+                    textAlign: TextAlign.center,
+                    style: AppStyles.title16Bold.copyWith(
+                      color: ColorManager.primary,
+                      fontSize: 10.sp,
                     ),
                   ),
-                ))
-          ],
-        ));
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

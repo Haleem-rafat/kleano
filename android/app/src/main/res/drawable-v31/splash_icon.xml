@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ splash icon: the whole logo inside the system's circular mask. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:width="128dp"
+        android:height="84dp"
+        android:gravity="center"
+        android:drawable="@drawable/launch_logo" />
+</layer-list>

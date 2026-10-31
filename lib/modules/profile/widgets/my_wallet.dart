@@ -11,10 +11,7 @@ import 'package:thewasher/utilties/navigator.dart';
 
 class MyWalletWidget extends StatefulWidget {
   final double money;
-  const MyWalletWidget({
-    super.key,
-    required this.money,
-  });
+  const MyWalletWidget({super.key, required this.money});
 
   @override
   State<MyWalletWidget> createState() => _MyWalletWidgetState();
@@ -144,7 +141,10 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                           ),
                           child: SvgPicture.asset(
                             AssetsManager.wallet,
-                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(
+                              ColorManager.white,
+                              BlendMode.srcIn,
+                            ),
                             height: 20.h,
                             width: 20.w,
                           ),
@@ -190,7 +190,10 @@ class _MyWalletWidgetState extends State<MyWalletWidget>
                                 AssetsManager.saudiRiyalSymbol,
                                 height: 15.h,
                                 width: 15.w,
-                                colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
+                                colorFilter: ColorFilter.mode(
+                                  ColorManager.white,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                             ),
                           ],

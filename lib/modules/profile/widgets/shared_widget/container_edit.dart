@@ -9,11 +9,7 @@ import 'package:thewasher/core/resources/values_manager.dart';
 class ContainerEdit extends StatelessWidget {
   final String title;
   final VoidCallback onTap;
-  const ContainerEdit({
-    super.key,
-    required this.onTap,
-    required this.title,
-  });
+  const ContainerEdit({super.key, required this.onTap, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +17,16 @@ class ContainerEdit extends StatelessWidget {
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: Container(
-        margin:
-            EdgeInsets.only(top: AppPadding.p16.h, bottom: AppPadding.p12.h),
-        padding: EdgeInsets.fromLTRB(AppPadding.p15.w, AppPadding.p10.h,
-            AppPadding.p10.w, AppPadding.p9.h),
+        margin: EdgeInsets.only(
+          top: AppPadding.p16.h,
+          bottom: AppPadding.p12.h,
+        ),
+        padding: EdgeInsets.fromLTRB(
+          AppPadding.p15.w,
+          AppPadding.p10.h,
+          AppPadding.p10.w,
+          AppPadding.p9.h,
+        ),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5.r),
           color: ColorManager.gray,

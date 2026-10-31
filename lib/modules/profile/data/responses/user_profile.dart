@@ -8,11 +8,7 @@ class ProfileResponse {
   UserProfile? result;
   ErrorModel? errorModel;
 
-
-  ProfileResponse({
-    Map<String, dynamic>? json,
-    required int statusCode,
-  }) {
+  ProfileResponse({Map<String, dynamic>? json, required int statusCode}) {
     if (statusCode >= 200 && statusCode <= 307) {
       if (json != null) {
         result = UserProfile.fromJson(json);

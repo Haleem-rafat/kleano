@@ -8,10 +8,7 @@ class PromoCodeResponse {
   PromoCodeModel? result;
   List<PromoCodeModel>? results;
 
-  PromoCodeResponse({
-    Map<String, dynamic>? json,
-    bool isList = false,
-  }) {
+  PromoCodeResponse({Map<String, dynamic>? json, bool isList = false}) {
     if (json != null) {
       success = resultSuccess(json) as bool;
 
@@ -28,8 +25,9 @@ class PromoCodeResponse {
             return PromoCodeModel.fromJson(e as Map<String, dynamic>);
           }).toList();
         } else {
-          result =
-              PromoCodeModel.fromJson(resultMap(json) as Map<String, dynamic>);
+          result = PromoCodeModel.fromJson(
+            resultMap(json) as Map<String, dynamic>,
+          );
         }
       } else {
         result = null;

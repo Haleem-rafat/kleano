@@ -12,10 +12,7 @@ class PromoCodesRepo {
       isAuth: true,
     );
 
-    return PromoCodeResponse(
-      json: response?.data,
-      isList: true,
-    );
+    return PromoCodeResponse(json: response?.data, isList: true);
   }
 
   static Future<ApplyPromoCodeResponse> applyPromoCode({
@@ -23,12 +20,10 @@ class PromoCodesRepo {
     required String orderId,
   }) async {
     final Response<dynamic>? response = await ApiService.patchApi(
-        ApiPaths.applyPromoCode,
-        isAuth: true,
-        body: <String, dynamic>{
-          'code': code,
-          'order': orderId,
-        });
+      ApiPaths.applyPromoCode,
+      isAuth: true,
+      body: <String, dynamic>{'code': code, 'order': orderId},
+    );
 
     return ApplyPromoCodeResponse(
       statusCode: response!.statusCode!,

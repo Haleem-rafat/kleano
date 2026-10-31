@@ -11,10 +11,7 @@ import 'package:thewasher/utilties/navigator.dart';
 
 class MyPointsWidget extends StatefulWidget {
   final String numberOfPoints;
-  const MyPointsWidget({
-    super.key,
-    required this.numberOfPoints,
-  });
+  const MyPointsWidget({super.key, required this.numberOfPoints});
 
   @override
   State<MyPointsWidget> createState() => _MyPointsWidgetState();
@@ -140,7 +137,10 @@ class _MyPointsWidgetState extends State<MyPointsWidget>
                           ),
                           child: SvgPicture.asset(
                             AssetsManager.coin,
-                            colorFilter: ColorFilter.mode(ColorManager.white, BlendMode.srcIn),
+                            colorFilter: ColorFilter.mode(
+                              ColorManager.white,
+                              BlendMode.srcIn,
+                            ),
                             height: 20.h,
                             width: 20.w,
                           ),
@@ -187,7 +187,9 @@ class _MyPointsWidgetState extends State<MyPointsWidget>
                                 child: Text(
                                   translate(AppStrings.point),
                                   style: TextStyle(
-                                    color: ColorManager.white.withValues(alpha: 0.9),
+                                    color: ColorManager.white.withValues(
+                                      alpha: 0.9,
+                                    ),
                                     fontSize: 11.sp,
                                     fontWeight: FontWeight.w500,
                                   ),

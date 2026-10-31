@@ -4,9 +4,7 @@ class UpdateProfile {}
 
 class UpdateProfileEvent extends UpdateProfile {
   final UpdateProfileRequest updateProfileRequest;
-  UpdateProfileEvent({
-    required this.updateProfileRequest,
-  });
+  UpdateProfileEvent({required this.updateProfileRequest});
 }
 
 class UpdateUserLanguage extends UpdateProfile {

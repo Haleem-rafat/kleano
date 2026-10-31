@@ -17,17 +17,14 @@ class TextEdit extends StatelessWidget {
         width: 60.w,
         child: Row(
           children: <Widget>[
-            Icon(
-              Icons.edit_outlined,
-              size: 14.r,
-              color: ColorManager.medGray,
-            ),
+            Icon(Icons.edit_outlined, size: 14.r, color: ColorManager.medGray),
             Text(
               translate(AppStrings.editProfile),
               style: AppStyles.titleGray16Regular.copyWith(
-                  fontSize: 14.sp,
-                  fontWeight: FontWeight.w500,
-                  decoration: TextDecoration.underline),
+                fontSize: 14.sp,
+                fontWeight: FontWeight.w500,
+                decoration: TextDecoration.underline,
+              ),
             ),
           ],
         ),

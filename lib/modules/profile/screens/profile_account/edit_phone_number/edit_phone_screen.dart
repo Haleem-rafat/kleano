@@ -39,8 +39,9 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
     super.initState();
     updateProfileBloc = BlocProvider.of<UpdateProfileBloc>(context);
     countryCodeSelected = widget.countryCodeSelected;
-    updateProfileBloc!.phoneController =
-        TextEditingController(text: widget.phoneNumber);
+    updateProfileBloc!.phoneController = TextEditingController(
+      text: widget.phoneNumber,
+    );
   }
 
   Future<void> _selectCountryCode() async {
@@ -82,9 +83,7 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
                   AutofillHints.telephoneNumberNational,
                 ],
                 textInputAction: TextInputAction.done,
-                inputFormatters: <TextInputFormatter>[
-                  PhoneDigitsFormatter(),
-                ],
+                inputFormatters: <TextInputFormatter>[PhoneDigitsFormatter()],
                 prefix: TextButton(
                   onPressed: _selectCountryCode,
                   child: Text(
@@ -96,7 +95,8 @@ class _EditPhoneScreenState extends State<EditPhoneScreen> {
               const Spacer(),
               Padding(
                 padding: EdgeInsets.only(
-                  bottom: math.max(mq.viewInsets.bottom, mq.viewPadding.bottom) +
+                  bottom:
+                      math.max(mq.viewInsets.bottom, mq.viewPadding.bottom) +
                       KSpace.l,
                 ),
                 // TODO(kleano): saving a new number is not wired to the API

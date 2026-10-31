@@ -17,7 +17,10 @@ class PhoneNumberWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppPadding.p16.w, vertical: AppSize.s4.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppPadding.p16.w,
+        vertical: AppSize.s4.h,
+      ),
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: Row(
@@ -29,10 +32,7 @@ class PhoneNumberWidget extends StatelessWidget {
               ),
             ),
             AppPadding.p10.pw,
-            Text(
-              phoneNumber,
-              style: AppStyles.titleGray16Regular,
-            ),
+            Text(phoneNumber, style: AppStyles.titleGray16Regular),
           ],
         ),
       ),

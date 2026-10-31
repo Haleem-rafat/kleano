@@ -18,8 +18,9 @@ class ProfileRepo {
     );
   }
 
-  static Future<ProfileResponse> updateProfile(
-      {required UpdateProfileRequest request}) async {
+  static Future<ProfileResponse> updateProfile({
+    required UpdateProfileRequest request,
+  }) async {
     final Map<String, dynamic> body = {
       'userName': request.userName,
       'email': request.email,
@@ -33,11 +34,7 @@ class ProfileRepo {
     final Response<dynamic>? response = await ApiService.putMultiPartApi(
       ApiPaths.users,
       body: body,
-      files: request.image != null
-          ? <File>[
-              request.image!,
-            ]
-          : null,
+      files: request.image != null ? <File>[request.image!] : null,
       filesName: request.image != null ? ['image'] : null,
       hasUserId: false,
       isAuth: true,
@@ -53,10 +50,7 @@ class ProfileRepo {
       ApiPaths.users,
       isAuth: true,
     );
-    return BaseResponse(
-      statusCode: response!.statusCode!,
-      json: response.data,
-    );
+    return BaseResponse(statusCode: response!.statusCode!, json: response.data);
   }
 
   static Future<BaseResponse> updatePhoneNumber({required String phone}) async {
@@ -65,23 +59,18 @@ class ProfileRepo {
       body: {'phone': phone},
       isAuth: true,
     );
-    return BaseResponse(
-      statusCode: response!.statusCode!,
-      json: response.data,
-    );
+    return BaseResponse(statusCode: response!.statusCode!, json: response.data);
   }
 
-  static Future<BaseResponse> updateUserLanguage(
-      {required String language}) async {
+  static Future<BaseResponse> updateUserLanguage({
+    required String language,
+  }) async {
     final Response<dynamic>? response = await ApiService.patchApi(
       ApiPaths.userLanguage,
       body: {'language': language},
       isAuth: true,
     );
-    return BaseResponse(
-      statusCode: response!.statusCode!,
-      json: response.data,
-    );
+    return BaseResponse(statusCode: response!.statusCode!, json: response.data);
   }
 
   static Future<BaseResponseWithoutResponse> topupWallet({

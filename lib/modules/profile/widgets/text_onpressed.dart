@@ -25,8 +25,10 @@ class TextOnPressed extends StatelessWidget {
         text,
         style: textColor != null
             ? AppStyles.titleGray16Regular.copyWith(color: textColor)
-            : AppStyles.titleGray16Regular
-                .copyWith(decoration: textDecoration, fontSize: fontSize),
+            : AppStyles.titleGray16Regular.copyWith(
+                decoration: textDecoration,
+                fontSize: fontSize,
+              ),
       ),
     );
   }

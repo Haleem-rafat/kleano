@@ -29,10 +29,7 @@ import 'package:thewasher/utilties/navigator.dart';
 /// the end, confirmed in a [KDialog].
 class UserProfileScreen extends StatefulWidget {
   final bool? openAnother;
-  const UserProfileScreen({
-    super.key,
-    this.openAnother = false,
-  });
+  const UserProfileScreen({super.key, this.openAnother = false});
 
   @override
   State<UserProfileScreen> createState() => _UserProfileScreenState();
@@ -56,8 +53,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final bool? yes = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) => KDialog(
-        icon: Icon(Icons.logout_rounded,
-            size: 36, color: KColors.of(context).error),
+        icon: Icon(
+          Icons.logout_rounded,
+          size: 36,
+          color: KColors.of(context).error,
+        ),
         title: translate(AppStrings.logout),
         actions: <Widget>[
           KButton(
@@ -86,7 +86,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         } else if (state.logoutStatus == RequestStatus.failure) {
           showSnackBar(
             buildContext: context,
-            message: state.logoutErrorMessage ??
+            message:
+                state.logoutErrorMessage ??
                 'Failed to logout. Please try again.',
             icon: Icons.error_outline,
             backgroundColor: c.error,
@@ -97,8 +98,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         if (isGuestUser) {
           return const Scaffold(body: ProfileGuestViewScreen());
         }
-        final bool loggingOut =
-            authState.logoutStatus == RequestStatus.loading;
+        final bool loggingOut = authState.logoutStatus == RequestStatus.loading;
         return Scaffold(
           backgroundColor: c.background,
           body: AppShared.token.isEmpty
@@ -145,37 +145,46 @@ class _ProfileBody extends StatelessWidget {
     final String name = profile.userName ?? '';
     final String? image =
         (profile.imageLink == null || profile.imageLink == 'null')
-            ? null
-            : profile.imageLink;
+        ? null
+        : profile.imageLink;
     Widget tile(IconData icon, Color color) => DecoratedBox(
-          decoration: ShapeDecoration(
-            color: color,
-            shape: RoundedSuperellipseBorder(
-                borderRadius: BorderRadius.circular(8)),
-          ),
-          child: SizedBox.square(
-              dimension: 30, child: Icon(icon, size: 18, color: Colors.white)),
-        );
+      decoration: ShapeDecoration(
+        color: color,
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: SizedBox.square(
+        dimension: 30,
+        child: Icon(icon, size: 18, color: Colors.white),
+      ),
+    );
     Widget group(List<Widget> rows) => Card(
-          child: Column(
-            children: <Widget>[
-              for (int i = 0; i < rows.length; i++) ...<Widget>[
-                if (i > 0) Divider(height: 1, indent: 58, color: c.separator),
-                rows[i],
-              ],
-            ],
-          ),
-        );
-    Widget value(String text) => Text(text,
-        style: KType.subhead.copyWith(color: c.textSecondary),
-        textDirection: TextDirection.ltr);
+      child: Column(
+        children: <Widget>[
+          for (int i = 0; i < rows.length; i++) ...<Widget>[
+            if (i > 0) Divider(height: 1, indent: 58, color: c.separator),
+            rows[i],
+          ],
+        ],
+      ),
+    );
+    Widget value(String text) => Text(
+      text,
+      style: KType.subhead.copyWith(color: c.textSecondary),
+      textDirection: TextDirection.ltr,
+    );
 
     return SafeArea(
       bottom: false,
       child: ListView(
         // Clears the floating glass tab bar.
         padding: const EdgeInsets.fromLTRB(
-            KSpace.xl, KSpace.xxl, KSpace.xl, 120),
+          KSpace.xl,
+          KSpace.xxl,
+          KSpace.xl,
+          120,
+        ),
         children: <Widget>[
           Row(
             children: <Widget>[
@@ -193,12 +202,13 @@ class _ProfileBody extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(name,
-                        style: KType.title.copyWith(color: c.text),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
-                    if ((profile.phone ?? '').isNotEmpty)
-                      value(profile.phone!),
+                    Text(
+                      name,
+                      style: KType.title.copyWith(color: c.text),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    if ((profile.phone ?? '').isNotEmpty) value(profile.phone!),
                   ],
                 ),
               ),
@@ -209,8 +219,7 @@ class _ProfileBody extends StatelessWidget {
             KListRow(
               title: translate(AppStrings.wallet),
               leading: tile(Icons.account_balance_wallet_rounded, c.success),
-              trailing:
-                  value((profile.walletBalance ?? 0).toStringAsFixed(2)),
+              trailing: value((profile.walletBalance ?? 0).toStringAsFixed(2)),
               showChevron: true,
               onTap: () => pushPage(context, const WalletTopupScreen()),
             ),

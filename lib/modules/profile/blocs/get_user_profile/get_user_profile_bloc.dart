@@ -7,19 +7,21 @@ import 'package:thewasher/modules/profile/data/repo/profile_repo.dart';
 import 'package:thewasher/modules/profile/data/responses/user_profile.dart';
 part 'get_user_profile_event.dart';
 part 'get_user_profile_state.dart';
+
 String? userId;
 num? walletBalance;
 num? points;
 bool? isAllowedNotifications;
+
 class GetUserProfileBloc
     extends Bloc<GetUserProfileEvent, GetUserProfileState> {
-   Profile profile = Profile();
+  Profile profile = Profile();
 
   GetUserProfileBloc() : super(GetUserProfileInitial()) {
     on<GetUserProfileEvent>((event, emit) async {
       try {
-        if(event.isRefresh){
-           emit(GetUserProfileLoading());
+        if (event.isRefresh) {
+          emit(GetUserProfileLoading());
         }
         ProfileResponse response = await ProfileRepo.getUserProfile();
 
@@ -48,5 +50,5 @@ class GetUserProfileBloc
         }
       }
     });
- }
+  }
 }

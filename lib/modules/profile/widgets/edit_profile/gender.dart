@@ -13,11 +13,7 @@ import 'package:thewasher/shared/singleton.dart';
 class SelectGender extends StatefulWidget {
   final bool isEdit;
   final String gender;
-  const SelectGender({
-    super.key,
-    required this.isEdit,
-    required this.gender,
-  });
+  const SelectGender({super.key, required this.isEdit, required this.gender});
 
   @override
   State<SelectGender> createState() => _SelectGenderState();
@@ -37,8 +33,8 @@ class _SelectGenderState extends State<SelectGender> {
     gender = widget.gender.isNotEmpty
         ? widget.gender
         : generalSingleton.gender != null
-            ? generalSingleton.gender!
-            : '---';
+        ? generalSingleton.gender!
+        : '---';
     generalSingleton = GeneralSingleton();
   }
 
@@ -66,18 +62,18 @@ class _SelectGenderState extends State<SelectGender> {
           padding: EdgeInsets.only(top: AppPadding.p25.h),
           child: !widget.isEdit
               ? widget.gender.isEmpty
-                  ? DottedLine(
-                      lineLength: 40.w,
-                      dashColor: ColorManager.medGray,
-                      dashGapLength: 2.0,
-                    )
-                  : Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 19.w),
-                      child: Text(
-                        widget.gender,
-                        style: AppStyles.titleGray16Regular,
-                      ),
-                    )
+                    ? DottedLine(
+                        lineLength: 40.w,
+                        dashColor: ColorManager.medGray,
+                        dashGapLength: 2.0,
+                      )
+                    : Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 19.w),
+                        child: Text(
+                          widget.gender,
+                          style: AppStyles.titleGray16Regular,
+                        ),
+                      )
               : CustomDropdown(
                   hintText: widget.gender.isNotEmpty ? widget.gender : '----',
                   items: genderType,
@@ -97,8 +93,9 @@ class _SelectGenderState extends State<SelectGender> {
                       updateProfileBloc.gender = val;
                       gender = val!;
                     });
-                  }),
-        )
+                  },
+                ),
+        ),
       ],
     );
   }

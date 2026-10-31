@@ -41,79 +41,79 @@ class _HeaderProfileWidgetState extends State<HeaderProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 201.h,
-        width: 1.sw,
-        color: Colors.transparent,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              height: 110.h,
-              width: 1.sw,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(
-                  bottom: Radius.circular(12),
+      height: 201.h,
+      width: 1.sw,
+      color: Colors.transparent,
+      child: Stack(
+        children: <Widget>[
+          Container(
+            height: 110.h,
+            width: 1.sw,
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(12),
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: ColorManager.black.withValues(alpha: .05),
+                  blurRadius: 3.r,
+                  offset: const Offset(0, 6),
                 ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: ColorManager.black.withValues(alpha: .05),
-                      blurRadius: 3.r,
-                      offset: const Offset(0, 6))
-                ],
-                color: ColorManager.primary,
+              ],
+              color: ColorManager.primary,
+            ),
+          ),
+          if (widget.comeAnotherScreen!)
+            Positioned(
+              top: 50.h,
+              left: 20.w,
+              child: GestureDetector(
+                onTap: () => pop(context),
+                child: const Icon(
+                  Icons.arrow_back_ios,
+                  color: ColorManager.white,
+                  size: AppSize.s24,
+                ),
               ),
             ),
-            if (widget.comeAnotherScreen!)
-              Positioned(
-                top: 50.h,
-                left: 20.w,
-                child: GestureDetector(
-                  onTap: () => pop(context),
-                  child: const Icon(
-                    Icons.arrow_back_ios,
-                    color: ColorManager.white,
-                    size: AppSize.s24,
-                  ),
-                ),
-              ),
-            Positioned(
-              bottom: 55.h,
-              left: 150.w,
-              right: 150.w,
-              child: SizedBox(
-                height: 73.25.h,
-                width: 73.25.w,
-                child: CircleAvatar(
-                  backgroundColor: ColorManager.primaryLight2,
-                  child: image != 'null'
-                      ? ImageShared(
-                          image: image,
-                          height: 73.25.h,
-                          width: 73.25.w,
-                          raduis: 50,
-                        )
-                      : Text(
-                          characterUserName,
-                          style: AppStyles.title16Bold.copyWith(
-                            color: ColorManager.secondary,
-                            fontSize: 30.sp,
-                          ),
+          Positioned(
+            bottom: 55.h,
+            left: 150.w,
+            right: 150.w,
+            child: SizedBox(
+              height: 73.25.h,
+              width: 73.25.w,
+              child: CircleAvatar(
+                backgroundColor: ColorManager.primaryLight2,
+                child: image != 'null'
+                    ? ImageShared(
+                        image: image,
+                        height: 73.25.h,
+                        width: 73.25.w,
+                        raduis: 50,
+                      )
+                    : Text(
+                        characterUserName,
+                        style: AppStyles.title16Bold.copyWith(
+                          color: ColorManager.secondary,
+                          fontSize: 30.sp,
                         ),
-                ),
+                      ),
               ),
             ),
-            Positioned(
-              bottom: 25.h,
-              left: 0.w,
-              right: 0.w,
-              child: Text(
-                name,
-                textAlign: TextAlign.center,
-                style: AppStyles.title16Bold.copyWith(
-                  color: ColorManager.black,
-                ),
-              ),
-            )
-          ],
-        ));
+          ),
+          Positioned(
+            bottom: 25.h,
+            left: 0.w,
+            right: 0.w,
+            child: Text(
+              name,
+              textAlign: TextAlign.center,
+              style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

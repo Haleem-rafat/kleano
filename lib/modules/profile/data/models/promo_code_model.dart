@@ -30,7 +30,8 @@ class PromoCodeModel {
     code = json['code'];
     expiryDate = json['expiryDate'] != null
         ? AppDateFormatter.dateToStringFormat(
-            DateTime.parse(json['expiryDate']).toLocal())
+            DateTime.parse(json['expiryDate']).toLocal(),
+          )
         : null;
     discountPercentage = json['discountPercentage'];
     discountFixedNumber = json['discountFixedNumber'];

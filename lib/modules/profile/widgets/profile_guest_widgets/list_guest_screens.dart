@@ -41,9 +41,7 @@ class _ScreensInGuestProfileState extends State<ScreensInGuestProfile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: AppPadding.p26.h,
-      ),
+      padding: EdgeInsets.symmetric(vertical: AppPadding.p26.h),
       child: Column(
         children: profileScreens.asMap().keys.map((int index) {
           return ContainerShadow(

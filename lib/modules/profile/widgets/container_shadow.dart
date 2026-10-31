@@ -53,7 +53,7 @@ class _ContainerShadowState extends State<ContainerShadow> {
                     color: ColorManager.black.withValues(alpha: .04),
                     blurRadius: 8.r,
                     offset: const Offset(0, 2),
-                  )
+                  ),
                 ],
         ),
         child: Row(
@@ -87,7 +87,7 @@ class _ContainerShadowState extends State<ContainerShadow> {
               Icons.arrow_forward_ios_rounded,
               size: 16.r,
               color: ColorManager.darkGrey.withValues(alpha: 0.4),
-            )
+            ),
           ],
         ),
       ),

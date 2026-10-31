@@ -26,7 +26,8 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
         debugPrint("Get All Active Promo Code");
         emit(GetActivePromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
-            PromoCodeTypes.active.name.toUpperCase());
+          PromoCodeTypes.active.name.toUpperCase(),
+        );
         if (response.success) {
           activeList = <PromoCodeModel>[];
           activeList = response.results!;
@@ -42,13 +43,16 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
         emit(GetActivePromoError(error: e.toString()));
       }
     });
-    on<GetExpiredPromo>(
-        (GetExpiredPromo event, Emitter<PromoState> emit) async {
+    on<GetExpiredPromo>((
+      GetExpiredPromo event,
+      Emitter<PromoState> emit,
+    ) async {
       try {
         debugPrint("Get All Expired Promo Code");
         emit(GetExpiredPromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
-            PromoCodeTypes.expired.name.toUpperCase());
+          PromoCodeTypes.expired.name.toUpperCase(),
+        );
         if (response.success) {
           expiredList = <PromoCodeModel>[];
           expiredList = response.results!;
@@ -69,7 +73,8 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
         debugPrint("Get All Used Promo Code");
         emit(GetUsedPromoLoading());
         final PromoCodeResponse response = await PromoCodesRepo.getPromoCodes(
-            PromoCodeTypes.used.name.toUpperCase());
+          PromoCodeTypes.used.name.toUpperCase(),
+        );
         if (response.success) {
           usedList = <PromoCodeModel>[];
           usedList = response.results!;
@@ -91,29 +96,31 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
         emit(ApplyPromoLoading());
         final ApplyPromoCodeResponse response =
             await PromoCodesRepo.applyPromoCode(
-          code: event.code,
-          orderId: event.orderId,
-        );
+              code: event.code,
+              orderId: event.orderId,
+            );
         if (response.success) {
           totalPayModel = response.result!;
           code = '';
           emit(ApplyPromoSuccess(totalPayModel: totalPayModel));
         } else {
-          emit(ApplyPromoError(
-            errorModel: response.errorModel,
-          ));
+          emit(ApplyPromoError(errorModel: response.errorModel));
         }
       } catch (e) {
         emit(ApplyPromoError(error: e.toString()));
       }
     });
-    on<GetPromoCodeDetail>(
-        (GetPromoCodeDetail event, Emitter<PromoState> emit) async {
+    on<GetPromoCodeDetail>((
+      GetPromoCodeDetail event,
+      Emitter<PromoState> emit,
+    ) async {
       try {
         emit(GetPromoCodeDetailLoading());
         final NewPromoCodeModel response =
             await PromoCodesRepo.getPromoCodeDetailById(
-                promoCode: event.promoCode, totalPrice: event.totalPrice);
+              promoCode: event.promoCode,
+              totalPrice: event.totalPrice,
+            );
         // Store the promo code when successfully applied
         code = event.promoCode;
         emit(GetPromoCodeDetailSuccess(promoCodeDetail: response));
@@ -124,8 +131,9 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
           if (responseData is Map<String, dynamic> &&
               responseData['message'] != null) {
             try {
-              final ErrorModel errorModel =
-                  ErrorModel.fromJson(responseData['message']);
+              final ErrorModel errorModel = ErrorModel.fromJson(
+                responseData['message'],
+              );
               emit(GetPromoCodeDetailError(errorModel: errorModel));
             } catch (parseError) {
               debugPrint('Error parsing error message: $parseError');
@@ -141,8 +149,10 @@ class PromoBloc extends Bloc<PromoEvent, PromoState> {
         emit(GetPromoCodeDetailError(error: e.toString()));
       }
     });
-    on<ClearPromoCodeDetail>(
-        (ClearPromoCodeDetail event, Emitter<PromoState> emit) {
+    on<ClearPromoCodeDetail>((
+      ClearPromoCodeDetail event,
+      Emitter<PromoState> emit,
+    ) {
       code = ''; // Clear the stored promo code
       emit(PromoCodeDetailCleared());
     });

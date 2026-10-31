@@ -11,8 +11,10 @@ part 'delete_user_account_state.dart';
 class DeleteUserAccountBloc
     extends Bloc<DeleteUserAccountEvent, DeleteUserAccountState> {
   DeleteUserAccountBloc() : super(DeleteAccountInitial()) {
-    on<DeleteUserAccountEvent>((DeleteUserAccountEvent event,
-        Emitter<DeleteUserAccountState> emit) async {
+    on<DeleteUserAccountEvent>((
+      DeleteUserAccountEvent event,
+      Emitter<DeleteUserAccountState> emit,
+    ) async {
       try {
         emit(DeleteAccountLoading());
         BaseResponse? response = await ProfileRepo.deleteUserAccount();
@@ -25,17 +27,13 @@ class DeleteUserAccountBloc
         if (e.message!.contains('SocketException')) {
           emit(DeleteAccountConnectionError());
         } else {
-          emit(DeleteAccountFailed(
-            error: e.message ?? '',
-          ));
+          emit(DeleteAccountFailed(error: e.message ?? ''));
         }
       } catch (e) {
         if (e is SocketException) {
           emit(DeleteAccountConnectionError());
         } else {
-          emit(DeleteAccountFailed(
-            error: e.toString(),
-          ));
+          emit(DeleteAccountFailed(error: e.toString()));
         }
       }
     });

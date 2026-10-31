@@ -59,10 +59,7 @@ class _ScreensInProfileState extends State<ScreensInProfile> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.only(
-        top: AppPadding.p20.h,
-        bottom: AppPadding.p20.h,
-      ),
+      padding: EdgeInsets.only(top: AppPadding.p20.h, bottom: AppPadding.p20.h),
       itemCount: _screens.length,
       itemBuilder: (BuildContext context, int index) {
         final entry = _screens.entries.elementAt(index);
@@ -80,8 +77,5 @@ class _ScreenItem {
   final Widget screen;
   final IconData icon;
 
-  _ScreenItem({
-    required this.screen,
-    required this.icon,
-  });
+  _ScreenItem({required this.screen, required this.icon});
 }

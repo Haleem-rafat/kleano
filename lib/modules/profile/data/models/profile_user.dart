@@ -63,7 +63,9 @@ class Profile {
   });
 
   Profile.fromJson(Map<String, dynamic> json) {
-    location = json['location'] != null ? Location.fromJson(json['location']) : null;
+    location = json['location'] != null
+        ? Location.fromJson(json['location'])
+        : null;
     sId = json['_id'];
     userName = json['userName'];
     phone = json['phone'];
@@ -125,7 +127,14 @@ class Location {
   String? subAdministrativeArea;
   String? city;
 
-  Location({this.country, this.latitude, this.longitude, this.streetName, this.subAdministrativeArea, this.city});
+  Location({
+    this.country,
+    this.latitude,
+    this.longitude,
+    this.streetName,
+    this.subAdministrativeArea,
+    this.city,
+  });
 
   Location.fromJson(Map<String, dynamic> json) {
     country = json['country'];
