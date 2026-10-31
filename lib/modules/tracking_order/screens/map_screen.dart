@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:thewasher/core/utilis/marker_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +31,7 @@ class _MapScreenState extends State<MapScreen> {
   final Set<Marker> _markers = <Marker>{};
   late SocketBloc socketBloc;
   GoogleMapController? _mapController;
+  StreamSubscription<SocketState>? _socketUpdates;
   BitmapDescriptor? markerDestinationLocation, markerCurrentLocation;
   // GoogleMapPolyline googleMapPolyline =
   //     GoogleMapPolyline(apiKey: AppConfig.kApiKey);
@@ -45,49 +48,49 @@ class _MapScreenState extends State<MapScreen> {
       widget.orderLocation.longitude!,
     );
 
-    socketBloc = BlocProvider.of<SocketBloc>(context)
-      ..stream.listen((SocketState socketState) {
-        if (socketState is ReceivedAnUpdateBikerOnTheWayState) {
-          bikerLocation = LatLng(
-            socketState.cameraPosition!.target.latitude,
-            socketState.cameraPosition!.target.longitude,
+    socketBloc = BlocProvider.of<SocketBloc>(context);
+    _socketUpdates = socketBloc.stream.listen((SocketState socketState) {
+      if (socketState is ReceivedAnUpdateBikerOnTheWayState) {
+        bikerLocation = LatLng(
+          socketState.cameraPosition!.target.latitude,
+          socketState.cameraPosition!.target.longitude,
+        );
+        setState(() {
+          _polylines.clear();
+          _markers.clear();
+          setPolyline(
+            LatLng(
+              socketState.cameraPosition!.target.latitude,
+              socketState.cameraPosition!.target.longitude,
+            ),
           );
-          setState(() {
-            _polylines.clear();
-            _markers.clear();
-            setPolyline(
-              LatLng(
-                socketState.cameraPosition!.target.latitude,
-                socketState.cameraPosition!.target.longitude,
-              ),
-            );
-            _polylines.add(
-              Polyline(
-                polylineId: const PolylineId('polyline'),
-                points: routes,
-                width: 3,
-                color: KColors.of(context).brand,
-                patterns: [PatternItem.dash(15), PatternItem.gap(5)],
-              ),
-            );
-            _markers.add(
-              Marker(
-                markerId: const MarkerId("currentLocation"),
-                position: orderLocation,
-                icon: markerCurrentLocation!,
-                flat: true,
-              ),
-            );
-            _markers.add(
-              Marker(
-                markerId: const MarkerId("destination"),
-                position: bikerLocation,
-                icon: markerDestinationLocation!,
-              ),
-            );
-          });
-        }
-      });
+          _polylines.add(
+            Polyline(
+              polylineId: const PolylineId('polyline'),
+              points: routes,
+              width: 3,
+              color: KColors.of(context).brand,
+              patterns: [PatternItem.dash(15), PatternItem.gap(5)],
+            ),
+          );
+          _markers.add(
+            Marker(
+              markerId: const MarkerId("currentLocation"),
+              position: orderLocation,
+              icon: markerCurrentLocation!,
+              flat: true,
+            ),
+          );
+          _markers.add(
+            Marker(
+              markerId: const MarkerId("destination"),
+              position: bikerLocation,
+              icon: markerDestinationLocation!,
+            ),
+          );
+        });
+      }
+    });
     Future.delayed(Duration.zero, () {
       addMarker();
     });
@@ -160,6 +163,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    _socketUpdates?.cancel();
     super.dispose();
     _mapController?.dispose();
   }

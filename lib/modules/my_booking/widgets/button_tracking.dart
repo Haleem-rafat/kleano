@@ -19,7 +19,8 @@ class ButtonTrackingOrder extends StatelessWidget {
 
   void _onPressed(BuildContext context) {
     if (orderModel.status == AppConstants.active ||
-        orderModel.status == AppConstants.waitingForBikerByAdmin) {
+        orderModel.status == AppConstants.waitingForBikerByAdmin ||
+        orderModel.biker == null) {
       showSnackBar(
         buildContext: context,
         message: translate(AppStrings.connectingYouToNearestBiker),

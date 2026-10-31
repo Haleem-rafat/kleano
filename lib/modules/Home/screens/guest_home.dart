@@ -46,13 +46,15 @@ class _GuestHomeState extends State<GuestHome> {
   void _currentLocation() async {
     final GoogleMapController controller = await _controller.future;
 
-    controller.animateCamera(CameraUpdate.newCameraPosition(
-      CameraPosition(
-        bearing: 0,
-        target: LatLng(currentPosition.latitude, currentPosition.longitude),
-        zoom: zoom,
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          bearing: 0,
+          target: LatLng(currentPosition.latitude, currentPosition.longitude),
+          zoom: zoom,
+        ),
       ),
-    ));
+    );
   }
 
   void _getUserLocation() async {
@@ -69,7 +71,8 @@ class _GuestHomeState extends State<GuestHome> {
     }
     if (permission == LocationPermission.deniedForever) {}
     var position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high));
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+    );
 
     setState(() {
       currentPosition = LatLng(position.latitude, position.longitude);
@@ -99,23 +102,31 @@ class _GuestHomeState extends State<GuestHome> {
                         onMapCreated: (GoogleMapController controller) async {
                           List<Placemark> placemarks =
                               await placemarkFromCoordinates(
-                                  currentPosition.latitude,
-                                  currentPosition.longitude);
-                          currentAddress = placemarks.first.street!;
+                                currentPosition.latitude,
+                                currentPosition.longitude,
+                              );
+                          if (placemarks.isEmpty) return;
+                          currentAddress = placemarks.first.street ?? '';
                           administrativeArea =
-                              placemarks.first.administrativeArea!;
+                              placemarks.first.administrativeArea ?? '';
                           GeneralSingleton().country = placemarks.first.country;
                           sl<OffersBloc>()
-                            ..add(GetGuestServices(
+                            ..add(
+                              GetGuestServices(
                                 lat: currentPosition.latitude,
                                 lng: currentPosition.longitude,
-                                country: placemarks.first.country!))
+                                country: placemarks.first.country ?? '',
+                              ),
+                            )
                             ..stream.listen((state) {
                               if (state is GetGuestServicesSuccess) {
-                                sl<OffersBloc>().add(GetGuestAddOns(
+                                sl<OffersBloc>().add(
+                                  GetGuestAddOns(
                                     lat: currentPosition.latitude,
                                     lng: currentPosition.longitude,
-                                    country: placemarks.first.country!));
+                                    country: placemarks.first.country ?? '',
+                                  ),
+                                );
                               }
                             });
                           _controller.complete(controller);
@@ -128,161 +139,162 @@ class _GuestHomeState extends State<GuestHome> {
                           zoom: zoom,
                         ),
                       ),
-              )
+              ),
             ],
           ),
           Positioned(
             top: 150.h,
             child: SizedBox(
-                height: 182.h,
-                width: 1.sw,
-                child: guestHomeTapIndex == 0
-                    ? const OfferWidget()
-                    : guestHomeTapIndex == 1
-                        ? Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 29.w),
-                            child: Container(
-                              height: 200.h,
-                              width: 316.w,
-                              decoration: BoxDecoration(
-                                color: ColorManager.white,
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  AppPadding.p8.ph,
-                                  Lottie.asset(
-                                    'assets/empty.json',
-                                    repeat: true,
-                                    width: 103.w,
-                                    height: 69.h,
-                                  ),
-                                  AppPadding.p8.ph,
-                                  Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 50.w),
-                                    child: Text(
-                                      translate(AppStrings.enjoyServicesNow),
-                                      style: AppStyles.captionGray12Medium,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                  17.ph,
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.of(context).push(createRoute());
-                                    },
-                                    child: Container(
-                                      height: 26.h,
-                                      width: 84.w,
-                                      decoration: BoxDecoration(
-                                          color: ColorManager.white,
-                                          borderRadius:
-                                              BorderRadius.circular(12.r),
-                                          border: Border.all(
-                                              color: ColorManager.black)),
-                                      child: Center(
-                                        child: Text(
-                                          translate(AppStrings.explore),
-                                          style: AppStyles.titleWhite16Bold
-                                              .copyWith(
-                                                  color: ColorManager.darkGrey,
-                                                  fontSize: FontSize.s10),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
+              height: 182.h,
+              width: 1.sw,
+              child: guestHomeTapIndex == 0
+                  ? const OfferWidget()
+                  : guestHomeTapIndex == 1
+                  ? Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 29.w),
+                      child: Container(
+                        height: 200.h,
+                        width: 316.w,
+                        decoration: BoxDecoration(
+                          color: ColorManager.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            AppPadding.p8.ph,
+                            Lottie.asset(
+                              'assets/empty.json',
+                              repeat: true,
+                              width: 103.w,
+                              height: 69.h,
+                            ),
+                            AppPadding.p8.ph,
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 50.w),
+                              child: Text(
+                                translate(AppStrings.enjoyServicesNow),
+                                style: AppStyles.captionGray12Medium,
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                          )
-                        : Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 30.w),
-                            child: Container(
-                              height: 182.h,
-                              width: 316.w,
-                              decoration: BoxDecoration(
-                                color: ColorManager.white,
-                                borderRadius: BorderRadius.circular(12.r),
-                                boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                      color:
-                                          ColorManager.black.withValues(alpha: .08),
-                                      blurRadius: 6.r,
-                                      offset: const Offset(0, 3))
-                                ],
+                            17.ph,
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context).push(createRoute());
+                              },
+                              child: Container(
+                                height: 26.h,
+                                width: 84.w,
+                                decoration: BoxDecoration(
+                                  color: ColorManager.white,
+                                  borderRadius: BorderRadius.circular(12.r),
+                                  border: Border.all(color: ColorManager.black),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    translate(AppStrings.explore),
+                                    style: AppStyles.titleWhite16Bold.copyWith(
+                                      color: ColorManager.darkGrey,
+                                      fontSize: FontSize.s10,
+                                    ),
+                                  ),
+                                ),
                               ),
-                              padding: EdgeInsets.fromLTRB(
-                                AppPadding.p10.w,
-                                AppPadding.p10.h,
-                                AppPadding.p20.w,
-                                0,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30.w),
+                      child: Container(
+                        height: 182.h,
+                        width: 316.w,
+                        decoration: BoxDecoration(
+                          color: ColorManager.white,
+                          borderRadius: BorderRadius.circular(12.r),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: ColorManager.black.withValues(alpha: .08),
+                              blurRadius: 6.r,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        padding: EdgeInsets.fromLTRB(
+                          AppPadding.p10.w,
+                          AppPadding.p10.h,
+                          AppPadding.p20.w,
+                          0,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            SvgPicture.asset(AssetsManager.emptyLogoSvg),
+                            Transform.translate(
+                              offset: const Offset(0, -60),
+                              child: Center(
+                                child: SvgPicture.asset(
+                                  AssetsManager.emptyRecentWashesSvg,
+                                  width: 33.w,
+                                  height: 33.h,
+                                ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  SvgPicture.asset(AssetsManager.emptyLogoSvg),
-                                  Transform.translate(
-                                    offset: const Offset(0, -60),
+                            ),
+                            Transform.translate(
+                              offset: const Offset(0, -50),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 60.w),
+                                child: Text(
+                                  translate(AppStrings.joinUs),
+                                  style: AppStyles.caption12Regular.copyWith(
+                                    color: ColorManager.medGray,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            AppPadding.p10.ph,
+                            Transform.translate(
+                              offset: const Offset(0, -40),
+                              child: InkWell(
+                                onTap: () {
+                                  popALlAndPushPage(
+                                    context,
+                                    ChooseRegisterView(),
+                                  );
+                                },
+                                child: Center(
+                                  child: Container(
+                                    height: 26.h,
+                                    width: 84.w,
+                                    decoration: BoxDecoration(
+                                      color: ColorManager.white,
+                                      borderRadius: BorderRadius.circular(12.r),
+                                      border: Border.all(
+                                        color: ColorManager.black,
+                                      ),
+                                    ),
                                     child: Center(
-                                      child: SvgPicture.asset(
-                                        AssetsManager.emptyRecentWashesSvg,
-                                        width: 33.w,
-                                        height: 33.h,
-                                      ),
-                                    ),
-                                  ),
-                                  Transform.translate(
-                                    offset: const Offset(0, -50),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 60.w),
                                       child: Text(
-                                        translate(AppStrings.joinUs),
-                                        style: AppStyles.caption12Regular
+                                        translate(AppStrings.signUpNow),
+                                        style: AppStyles.titleWhite16Bold
                                             .copyWith(
-                                                color: ColorManager.medGray),
-                                        textAlign: TextAlign.center,
+                                              color: ColorManager.darkGrey,
+                                              fontSize: FontSize.s10,
+                                            ),
                                       ),
                                     ),
                                   ),
-                                  AppPadding.p10.ph,
-                                  Transform.translate(
-                                    offset: const Offset(0, -40),
-                                    child: InkWell(
-                                      onTap: () {
-                                        popALlAndPushPage(
-                                            context, ChooseRegisterView());
-                                      },
-                                      child: Center(
-                                        child: Container(
-                                          height: 26.h,
-                                          width: 84.w,
-                                          decoration: BoxDecoration(
-                                              color: ColorManager.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(12.r),
-                                              border: Border.all(
-                                                  color: ColorManager.black)),
-                                          child: Center(
-                                            child: Text(
-                                              translate(AppStrings.signUpNow),
-                                              style: AppStyles.titleWhite16Bold
-                                                  .copyWith(
-                                                      color:
-                                                          ColorManager.darkGrey,
-                                                      fontSize: FontSize.s10),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
+                                ),
                               ),
                             ),
-                          )),
+                          ],
+                        ),
+                      ),
+                    ),
+            ),
           ),
           Positioned(
             top: 400.h,
@@ -297,13 +309,11 @@ class _GuestHomeState extends State<GuestHome> {
                     height: 40.h,
                     width: 40.w,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorManager.primary.withValues(alpha: 0.7)),
+                      shape: BoxShape.circle,
+                      color: ColorManager.primary.withValues(alpha: 0.7),
+                    ),
                     child: const Center(
-                      child: Icon(
-                        Icons.my_location,
-                        color: ColorManager.white,
-                      ),
+                      child: Icon(Icons.my_location, color: ColorManager.white),
                     ),
                   ),
                 ),
@@ -328,13 +338,11 @@ class _GuestHomeState extends State<GuestHome> {
                     height: 40.h,
                     width: 40.w,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorManager.primary.withValues(alpha: 0.7)),
+                      shape: BoxShape.circle,
+                      color: ColorManager.primary.withValues(alpha: 0.7),
+                    ),
                     child: const Center(
-                      child: Icon(
-                        Icons.add,
-                        color: ColorManager.white,
-                      ),
+                      child: Icon(Icons.add, color: ColorManager.white),
                     ),
                   ),
                 ),
@@ -359,13 +367,11 @@ class _GuestHomeState extends State<GuestHome> {
                     height: 40.h,
                     width: 40.w,
                     decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: ColorManager.primary.withValues(alpha: 0.7)),
+                      shape: BoxShape.circle,
+                      color: ColorManager.primary.withValues(alpha: 0.7),
+                    ),
                     child: const Center(
-                      child: Icon(
-                        Icons.remove,
-                        color: ColorManager.white,
-                      ),
+                      child: Icon(Icons.remove, color: ColorManager.white),
                     ),
                   ),
                 ),
@@ -376,11 +382,12 @@ class _GuestHomeState extends State<GuestHome> {
             child: Container(
               height: 110.h,
               decoration: BoxDecoration(
-                  color: ColorManager.primary,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(12.r),
-                    bottomRight: Radius.circular(12.r),
-                  )),
+                color: ColorManager.primary,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12.r),
+                  bottomRight: Radius.circular(12.r),
+                ),
+              ),
               child: Padding(
                 padding: EdgeInsets.fromLTRB(5.w, 25.h, 5.w, 0.h),
                 child: Row(
@@ -416,14 +423,13 @@ class _GuestHomeState extends State<GuestHome> {
                         ),
                         13.pw,
                         GestureDetector(
-                            onTap: () {
-                              pushPage(
-                                  context, const GuestNotificationScreen());
-                            },
-                            child:
-                                SvgPicture.asset(AssetsManager.notification)),
+                          onTap: () {
+                            pushPage(context, const GuestNotificationScreen());
+                          },
+                          child: SvgPicture.asset(AssetsManager.notification),
+                        ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -443,7 +449,9 @@ class _GuestHomeState extends State<GuestHome> {
                   borderRadius: BorderRadius.circular(12.r),
                 ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: AppPadding.p8, vertical: AppPadding.p14),
+                  horizontal: AppPadding.p8,
+                  vertical: AppPadding.p14,
+                ),
                 child: Text(
                   "Search location...",
                   style: AppStyles.titleGray16Regular,

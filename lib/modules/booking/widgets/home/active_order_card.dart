@@ -22,6 +22,11 @@ class ActiveOrderCard extends StatelessWidget {
   final OrderModel order;
 
   void _track(BuildContext context) {
+    // Nothing to track until a biker has taken the order.
+    if (order.biker == null) {
+      pushPage(context, WashDetailsScreen(orderId: order.sId!));
+      return;
+    }
     final GeneralSingleton singleton = GeneralSingleton();
     singleton.orderId = order.sId;
     singleton.timeOnTheWay = '';
