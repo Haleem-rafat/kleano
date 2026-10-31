@@ -40,7 +40,11 @@ Future<void> pumpPanel(WidgetTester t, String status, int step) async {
 Future<void> pick(WidgetTester t, int row) async {
   final PhotoSourceSheet sheet = t.widget(find.byType(PhotoSourceSheet));
   row == 0 ? sheet.onGallery() : sheet.onCamera();
-  await t.pump(const Duration(seconds: 1));
+  // Frame by frame, so the sheet is gone before the picker returns.
+  for (int i = 0; i < 10; i++) {
+    await t.pump(const Duration(milliseconds: 100));
+  }
+  expect(find.byType(PhotoSourceSheet), findsNothing);
   await t.pump(const Duration(seconds: 3));
   await settle(t);
 }
