@@ -30,6 +30,9 @@ import GoogleMaps
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     KleanoNative.register(with: engineBridge.pluginRegistry)
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "WashLiveActivity") {
+      WashLiveActivityBridge.register(messenger: registrar.messenger())
+    }
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/modules/my_booking/blocs/my_booking/my_booking_bloc.dart';
 import 'package:thewasher/modules/tracking_order/data/models/accepted_biker_model.dart';
 import 'package:thewasher/modules/tracking_order/data/models/base_model_socket.dart';
+import 'package:thewasher/modules/tracking_order/services/wash_live_status.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/app_date_formatter.dart';
@@ -41,6 +42,7 @@ class SocketBloc extends Bloc<SocketEvent, SocketState> {
         socketIo!.onError((err) => debugPrint("eeeeee $err"));
 
         socketIo!.onAny((String event, dynamic data) {
+          WashLiveStatus.instance.onSocketEvent(event, data);
           if (event == AppConstants.orderAccepted) {
             if (generalSingleton.orderId == data['_id']) {
               add(

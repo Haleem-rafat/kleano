@@ -7,6 +7,8 @@ import 'package:thewasher/core/design/components/k_chip_button.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
+import 'package:thewasher/core/utilis/enums.dart';
+import 'package:thewasher/modules/tracking_order/services/wash_live_status.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
 import 'package:thewasher/modules/booking/widgets/home/active_order_card.dart';
 import 'package:thewasher/modules/booking/widgets/home/home_sections.dart';
@@ -68,6 +70,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   late final RefreshController refreshController;
   Key _offerWidgetKey = UniqueKey();
   final MyBookingBloc _activeOrders = MyBookingBloc();
+  StreamSubscription<MyBookingState>? _liveStatusSub;
   final MyBookingBloc _pastOrders = MyBookingBloc();
   final ValueNotifier<bool> _scrolledPastHero = ValueNotifier<bool>(false);
 
@@ -292,6 +295,13 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   void initState() {
     super.initState();
     clearAllOrderDetails();
+    _liveStatusSub = _activeOrders.stream.listen((MyBookingState state) {
+      if (!mounted || state.myBookingStatus != RequestStatus.success) return;
+      WashLiveStatus.instance.showOrder(
+        state.activeList.isEmpty ? null : state.activeList.first,
+        arabic: Localizations.localeOf(context).languageCode == 'ar',
+      );
+    });
     refreshController = RefreshController();
     bookingScreen = [
       AddServices(onContinue: _continueFromSheet),
@@ -368,6 +378,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   void dispose() {
     refreshController.dispose();
     _isNotesFocused.dispose();
+    _liveStatusSub?.cancel();
     _activeOrders.close();
     _scrolledPastHero.dispose();
     _pastOrders.close();
