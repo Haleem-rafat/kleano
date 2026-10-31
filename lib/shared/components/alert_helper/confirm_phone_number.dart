@@ -23,7 +23,8 @@ class ConfirmPhoneNumber extends StatelessWidget {
   Widget build(BuildContext context) {
     return KDialog(
       // The phone number is isolated so it stays left-to-right in Arabic.
-      title: '${translate(AppStrings.sendVerificationCode)} \u2066$phoneNumber\u2069 ?',
+      title:
+          '${translate(AppStrings.sendVerificationCode)} \u2066$phoneNumber\u2069 ?',
       actions: <Widget>[
         KButton(
           label: translate(AppStrings.changeNumber),

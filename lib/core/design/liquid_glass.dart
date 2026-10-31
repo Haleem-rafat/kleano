@@ -227,9 +227,9 @@ class _FlutterGlass extends StatelessWidget {
         shape: shape,
         shadows: const <BoxShadow>[
           BoxShadow(
-            color: Color(0x14000000),
-            blurRadius: 16,
-            offset: Offset(0, 6),
+            color: Color(0x0F000000),
+            blurRadius: 6,
+            offset: Offset(0, 2),
           ),
         ],
       ),

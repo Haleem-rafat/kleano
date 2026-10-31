@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:thewasher/core/design/components/k_dialog.dart';
 import 'package:thewasher/core/design/components/k_list_row.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
@@ -24,9 +25,8 @@ import 'package:thewasher/modules/profile/widgets/wallet_topup_bottom_sheet.dart
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-/// Profile tab (design: ProfileFlow · Profile): avatar and name, then grouped
-/// lists — money (wallet, points, promo codes), account, and log out alone at
-/// the end, confirmed in a [KDialog].
+/// Profile tab: who you are, your wallet and points at a glance, one list of
+/// everything else, and log out at the end, confirmed in a [KDialog].
 class UserProfileScreen extends StatefulWidget {
   final bool? openAnother;
   const UserProfileScreen({super.key, this.openAnother = false});
@@ -147,32 +147,28 @@ class _ProfileBody extends StatelessWidget {
         (profile.imageLink == null || profile.imageLink == 'null')
         ? null
         : profile.imageLink;
-    Widget tile(IconData icon, Color color) => DecoratedBox(
-      decoration: ShapeDecoration(
-        color: color,
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-      ),
+    Widget icon(IconData icon) => DecoratedBox(
+      decoration: BoxDecoration(shape: BoxShape.circle, color: c.brandTint),
       child: SizedBox.square(
-        dimension: 30,
-        child: Icon(icon, size: 18, color: Colors.white),
+        dimension: KSpace.xxxl + KSpace.xs,
+        child: Icon(icon, size: KSpace.xl, color: c.onBrandTint),
       ),
     );
-    Widget group(List<Widget> rows) => Card(
+    Widget group(List<Widget> rows) => KCard(
+      padding: EdgeInsets.zero,
       child: Column(
         children: <Widget>[
           for (int i = 0; i < rows.length; i++) ...<Widget>[
-            if (i > 0) Divider(height: 1, indent: 58, color: c.separator),
+            if (i > 0)
+              Divider(
+                height: 1,
+                indent: KSpace.l * 2 + KSpace.xxxl + KSpace.xs,
+                color: c.separator,
+              ),
             rows[i],
           ],
         ],
       ),
-    );
-    Widget value(String text) => Text(
-      text,
-      style: KType.subhead.copyWith(color: c.textSecondary),
-      textDirection: TextDirection.ltr,
     );
 
     return SafeArea(
@@ -181,100 +177,165 @@ class _ProfileBody extends StatelessWidget {
         // Clears the floating glass tab bar.
         padding: const EdgeInsets.fromLTRB(
           KSpace.xl,
-          KSpace.xxl,
+          KSpace.xl,
           KSpace.xl,
           120,
         ),
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: c.brand.withValues(alpha: 0.14),
-                foregroundImage: image == null ? null : NetworkImage(image),
-                child: Text(
-                  name.isEmpty ? '' : name.characters.first.toUpperCase(),
-                  style: KType.title.copyWith(color: c.brand),
-                ),
-              ),
-              const SizedBox(width: KSpace.l),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      name,
-                      style: KType.title.copyWith(color: c.text),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+          Semantics(
+            button: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => pushPage(context, const ProfileAccountScreen()),
+              child: Row(
+                children: <Widget>[
+                  CircleAvatar(
+                    radius: KSpace.xxxl + KSpace.xs,
+                    backgroundColor: c.brandTint,
+                    foregroundImage: image == null ? null : NetworkImage(image),
+                    child: Text(
+                      name.isEmpty ? '' : name.characters.first.toUpperCase(),
+                      style: KType.largeTitle.copyWith(color: c.onBrandTint),
                     ),
-                    if ((profile.phone ?? '').isNotEmpty) value(profile.phone!),
+                  ),
+                  const SizedBox(width: KSpace.l),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          name,
+                          style: KType.title.copyWith(color: c.text),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        if ((profile.phone ?? '').isNotEmpty)
+                          Text(
+                            profile.phone!,
+                            textDirection: TextDirection.ltr,
+                            style: KType.subhead.copyWith(
+                              color: c.textSecondary,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, color: c.textSecondary),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: KSpace.xl),
+          KCard(
+            padding: const EdgeInsets.all(KSpace.l),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _Balance(
+                        label: translate(AppStrings.wallet),
+                        value: (profile.walletBalance ?? 0).toStringAsFixed(2),
+                        onTap: () =>
+                            pushPage(context, const WalletTopupScreen()),
+                      ),
+                    ),
+                    SizedBox(
+                      height: KSpace.xxxl + KSpace.l,
+                      child: VerticalDivider(width: 1, color: c.separator),
+                    ),
+                    const SizedBox(width: KSpace.l),
+                    Expanded(
+                      child: _Balance(
+                        label: translate(AppStrings.points),
+                        value: '${profile.points ?? 0}',
+                        onTap: () => pushPage(context, const PointScreen()),
+                      ),
+                    ),
                   ],
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-          const SizedBox(height: KSpace.xxl),
+          const SizedBox(height: KSpace.l),
           group(<Widget>[
             KListRow(
-              title: translate(AppStrings.wallet),
-              leading: tile(Icons.account_balance_wallet_rounded, c.success),
-              trailing: value((profile.walletBalance ?? 0).toStringAsFixed(2)),
-              showChevron: true,
-              onTap: () => pushPage(context, const WalletTopupScreen()),
-            ),
-            KListRow(
-              title: translate(AppStrings.points),
-              leading: tile(Icons.stars_rounded, c.warning),
-              trailing: value('${profile.points ?? 0}'),
-              showChevron: true,
-              onTap: () => pushPage(context, const PointScreen()),
-            ),
-            KListRow(
               title: translate(AppStrings.promoCodes),
-              leading: tile(Icons.local_offer_rounded, c.brandLight),
+              leading: icon(Icons.local_offer_outlined),
               showChevron: true,
               onTap: () => pushPage(context, const PromoCodeScreen()),
             ),
-          ]),
-          const SizedBox(height: KSpace.xl),
-          group(<Widget>[
             KListRow(
               title: translate(AppStrings.account),
-              leading: tile(Icons.person_rounded, c.brand),
+              leading: icon(Icons.person_outline_rounded),
               showChevron: true,
               onTap: () => pushPage(context, const ProfileAccountScreen()),
             ),
             KListRow(
               title: translate(AppStrings.settings),
-              leading: tile(Icons.settings_rounded, c.textSecondary),
+              leading: icon(Icons.settings_outlined),
               showChevron: true,
               onTap: () => pushPage(context, const SettingScreen()),
             ),
             KListRow(
               title: translate(AppStrings.aboutUs),
-              leading: tile(Icons.info_rounded, c.textSecondary),
+              leading: icon(Icons.info_outline_rounded),
               showChevron: true,
               onTap: () => pushPage(context, const AboutUsScreen()),
             ),
           ]),
-          const SizedBox(height: KSpace.xl),
-          group(<Widget>[
-            KListRow(
-              title: translate(AppStrings.logout),
-              leading: loggingOut
-                  ? const SizedBox.square(
-                      dimension: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : tile(Icons.logout_rounded, c.error),
-              onTap: loggingOut ? null : onLogout,
-            ),
-          ]),
+          const SizedBox(height: KSpace.l),
+          KButton(
+            label: translate(AppStrings.logout),
+            variant: KButtonVariant.text,
+            color: c.error,
+            loading: loggingOut,
+            onPressed: loggingOut ? null : onLogout,
+          ),
         ],
+      ),
+    );
+  }
+}
+
+/// One money figure on the profile: the label above, the number below.
+class _Balance extends StatelessWidget {
+  const _Balance({
+    required this.label,
+    required this.value,
+    required this.onTap,
+  });
+
+  final String label;
+  final String value;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onTap,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(label, style: KType.footnote.copyWith(color: c.textSecondary)),
+            const SizedBox(height: KSpace.xs),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                value,
+                maxLines: 1,
+                textDirection: TextDirection.ltr,
+                style: KType.title.copyWith(color: c.text),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

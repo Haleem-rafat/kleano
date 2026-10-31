@@ -4,8 +4,9 @@ import '../liquid_glass.dart';
 import '../tokens.dart';
 import 'k_panel.dart';
 
-/// A Kleano alert: optional [icon], [title], optional [message] and up to
-/// three [actions] (usually `KButton`s, the main one first).
+/// A Kleano alert: optional [icon], [title], optional [message], optional
+/// [content] such as stars, and up to three [actions] (usually `KButton`s, the
+/// main one first). A plain `Icon` sits on a soft circle of its own colour.
 ///
 /// iOS: centred text with stacked buttons, like Apple's alerts. Android: a
 /// Material 3 dialog with start-aligned text and buttons along the bottom end.
@@ -16,13 +17,33 @@ class KDialog extends StatelessWidget {
     this.icon,
     required this.title,
     this.message,
+    this.content,
     this.actions = const <Widget>[],
   });
 
   final Widget? icon;
   final String title;
   final String? message;
+  final Widget? content;
   final List<Widget> actions;
+
+  static const double _badge = 64;
+
+  Widget _icon(KColors c) {
+    final Widget? given = icon;
+    if (given is! Icon) return given!;
+    final Color color = given.color ?? c.brand;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: color.withValues(alpha: 0.12),
+      ),
+      child: SizedBox.square(
+        dimension: _badge,
+        child: Icon(given.icon, size: KSpace.xxxl, color: color),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,13 +73,19 @@ class KDialog extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 if (icon != null) ...<Widget>[
-                  Center(child: icon),
+                  if (ios)
+                    Center(child: _icon(c))
+                  else
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: _icon(c),
+                    ),
                   const SizedBox(height: KSpace.l),
                 ],
                 Text(
                   title,
                   textAlign: align,
-                  style: KType.headline.copyWith(color: c.text),
+                  style: KType.title.copyWith(color: c.text),
                 ),
                 if (message != null) ...<Widget>[
                   const SizedBox(height: KSpace.s),
@@ -67,6 +94,10 @@ class KDialog extends StatelessWidget {
                     textAlign: align,
                     style: KType.subhead.copyWith(color: c.textSecondary),
                   ),
+                ],
+                if (content != null) ...<Widget>[
+                  const SizedBox(height: KSpace.l),
+                  content!,
                 ],
                 if (actions.isNotEmpty) const SizedBox(height: KSpace.xl),
                 if (ios)
