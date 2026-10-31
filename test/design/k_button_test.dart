@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:thewasher/core/design/kleano_theme.dart';
@@ -76,39 +75,38 @@ void main() {
   });
 
   group('iOS', () {
-    setUp(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(SystemChannels.platform_views, (MethodCall _) async => null);
+    testWidgets('buttons in content are solid, never glass', (WidgetTester t) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      for (final KButtonVariant v in KButtonVariant.values) {
+        await t.pumpWidget(host(KButton(label: 'Go', variant: v, onPressed: () {})));
+        expect(find.byType(NativeGlassButton), findsNothing);
+        expect(find.byType(UiKitView), findsNothing);
+        expect(find.byType(CupertinoButton), findsOneWidget);
+      }
+      debugDefaultTargetPlatformOverride = null;
     });
 
-    testWidgets('primary is Apple prominent glass', (WidgetTester t) async {
+    testWidgets('primary is a brand-filled capsule with a white label',
+        (WidgetTester t) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       await t.pumpWidget(host(KButton(label: 'Log in', onPressed: () {})));
-      final NativeGlassButton b = t.widget(find.byType(NativeGlassButton));
-      expect(b.style, GlassButtonStyle.prominent);
-      expect(b.title, 'Log in');
+      expect(t.widget<CupertinoButton>(find.byType(CupertinoButton)).color,
+          KColors.light.brand);
+      expect(t.widget<Text>(find.text('Log in')).style?.color, Colors.white);
       debugDefaultTargetPlatformOverride = null;
     });
 
-    testWidgets('secondary is Apple glass', (WidgetTester t) async {
+    testWidgets('loading shows the iOS activity indicator and ignores taps',
+        (WidgetTester t) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      await t.pumpWidget(host(KButton(
-          label: 'Details', variant: KButtonVariant.secondary, onPressed: () {})));
-      expect(t.widget<NativeGlassButton>(find.byType(NativeGlassButton)).style,
-          GlassButtonStyle.glass);
-      debugDefaultTargetPlatformOverride = null;
-    });
-
-    testWidgets('loading shows the iOS activity indicator', (WidgetTester t) async {
-      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-      await t.pumpWidget(host(KButton(label: 'Log in', loading: true, onPressed: () {})));
+      int taps = 0;
+      await t.pumpWidget(host(KButton(label: 'Log in', loading: true, onPressed: () => taps++)));
       expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
-      expect(find.byType(NativeGlassButton), findsNothing);
+      await t.tap(find.byType(KButton), warnIfMissed: false);
+      expect(taps, 0);
       debugDefaultTargetPlatformOverride = null;
     });
 
-    // Regression: a native view with unbounded width crashes iOS
-    // ("CALayer position contains NaN") on the onboarding screen.
     testWidgets('a hugging button in a Row gets a finite width from its label',
         (WidgetTester t) async {
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
@@ -122,7 +120,7 @@ void main() {
         KButton(label: 'العربية', expand: false, onPressed: () {}),
       ])));
       expect(t.takeException(), isNull);
-      for (final Element e in find.byType(NativeGlassButton).evaluate()) {
+      for (final Element e in find.byType(KButton).evaluate()) {
         final Size s = (e.renderObject! as RenderBox).size;
         expect(s.width.isFinite, isTrue);
         expect(s.width, greaterThan(KSpace.tapTarget));

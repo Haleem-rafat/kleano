@@ -19,7 +19,7 @@ void main() {
       expect(t.useMaterial3, isTrue);
       expect(t.colorScheme.brightness, Brightness.light);
       expect(t.colorScheme.primary, const Color(0xFF543063));
-      expect(t.scaffoldBackgroundColor, const Color(0xFFF2F2F7));
+      expect(t.scaffoldBackgroundColor, isNot(const Color(0xFFF2F2F7)));
     });
 
     test('iOS uses Apple system fonts, not the old bundled Roboto/Cairo', () {
@@ -40,8 +40,8 @@ void main() {
 
     test('Android uses the system font, never the bundled Cairo', () {
       expect(t.textTheme.bodyLarge?.fontFamily, isNot('Cairo'));
-      expect(t.textTheme.displaySmall?.fontSize, 34);
-      expect(t.textTheme.bodyLarge?.fontSize, 17);
+      expect(t.textTheme.displaySmall?.fontSize, 32);
+      expect(t.textTheme.bodyLarge?.fontSize, 16);
     });
 
     test('buttons are capsules at least 44pt tall', () {
@@ -50,9 +50,9 @@ void main() {
       expect(s.minimumSize!.resolve(<WidgetState>{})!.height, greaterThanOrEqualTo(44));
     });
 
-    test('fields are filled with radius 14 and a 2px brand focus border', () {
+    test('Android fields are outlined with radius 14 and a 2px brand focus border', () {
       final InputDecorationThemeData d = t.inputDecorationTheme;
-      expect(d.filled, isTrue);
+      expect(d.filled, isFalse);
       final InputBorder? focused = d.focusedBorder;
       expect(focused, isA<OutlineInputBorder>());
       expect((focused! as OutlineInputBorder).borderRadius, BorderRadius.circular(14));
@@ -69,7 +69,25 @@ void main() {
   test('dark theme', () {
     final ThemeData t = kleanoTheme(brightness: Brightness.dark);
     expect(t.colorScheme.brightness, Brightness.dark);
-    expect(t.scaffoldBackgroundColor, Colors.black);
     expect(t.colorScheme.primary, const Color(0xFFB88CD0));
+  });
+
+  test('iOS is Apple: grouped background, filled fields, centred titles', () {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    try {
+      final ThemeData ios = kleanoTheme(brightness: Brightness.light);
+      expect(ios.scaffoldBackgroundColor, const Color(0xFFF2F2F7));
+      expect(ios.inputDecorationTheme.filled, isTrue);
+      expect(ios.appBarTheme.centerTitle, isTrue);
+      expect(kleanoTheme(brightness: Brightness.dark).scaffoldBackgroundColor,
+          Colors.black);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
+  });
+
+  test('Android is Material: start-aligned titles', () {
+    expect(kleanoTheme(brightness: Brightness.light).appBarTheme.centerTitle,
+        isFalse);
   });
 }

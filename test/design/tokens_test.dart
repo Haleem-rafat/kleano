@@ -1,8 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:thewasher/core/design/tokens.dart';
 
 void main() {
+  tearDown(() => debugDefaultTargetPlatformOverride = null);
+
   group('KColors', () {
     test('light palette matches the approved design system', () {
       const KColors c = KColors.light;
@@ -17,7 +20,8 @@ void main() {
       expect(c.error, const Color(0xFFFF3B30));
     });
 
-    testWidgets('of() follows the theme brightness', (WidgetTester tester) async {
+    testWidgets('of() follows the theme brightness on iOS', (WidgetTester tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       late KColors light, dark;
       await tester.pumpWidget(Column(children: <Widget>[
         Theme(
@@ -37,11 +41,36 @@ void main() {
       ]));
       expect(identical(light, KColors.light), isTrue);
       expect(identical(dark, KColors.dark), isTrue);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('Android uses Material tonal surfaces and keeps the exact brand', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      final KColors c = KColors.forBrightness(Brightness.light);
+      expect(identical(c, KColors.materialLight), isTrue);
+      expect(c.brand, const Color(0xFF543063));
+      // Not Apple's grouped-background grey.
+      expect(c.background, isNot(const Color(0xFFF2F2F7)));
+      debugDefaultTargetPlatformOverride = null;
     });
   });
 
   group('KType', () {
-    test('scale matches the approved sizes and weights', () {
+    test('Android uses the Material 3 type scale', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      expect(KType.largeTitle.fontSize, 32);
+      expect(KType.title.fontSize, 22);
+      expect(KType.title.fontWeight, FontWeight.w500);
+      expect(KType.headline.fontSize, 16);
+      expect(KType.body.fontSize, 16);
+      expect(KType.subhead.fontSize, 14);
+      expect(KType.footnote.fontSize, 12);
+      expect(KType.caption.fontSize, 11);
+      debugDefaultTargetPlatformOverride = null;
+    });
+
+    test('iOS uses the Apple type scale', () {
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
       expect(KType.largeTitle.fontSize, 34);
       expect(KType.largeTitle.fontWeight, FontWeight.w800);
       expect(KType.title.fontSize, 22);
@@ -52,6 +81,7 @@ void main() {
       expect(KType.subhead.fontSize, 15);
       expect(KType.footnote.fontSize, 13);
       expect(KType.caption.fontSize, 12);
+      debugDefaultTargetPlatformOverride = null;
     });
 
     test('uses platform fonts (no fontFamily) and no baked-in colour', () {

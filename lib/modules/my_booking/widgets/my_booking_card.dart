@@ -75,7 +75,7 @@ class MyBookingCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12.r),
                   ),
                   child: Text(
-                    _getStatusText(order.status ?? ''),
+                    statusText(order.status ?? ''),
                     style: AppStyles.caption12Regular.copyWith(
                       color: _getStatusTextColor(order.status ?? ''),
                       fontSize: 10.sp,
@@ -194,7 +194,7 @@ class MyBookingCard extends StatelessWidget {
     }
   }
 
-  String _getStatusText(String status) {
+  static String statusText(String status) {
     switch (status) {
       case 'PENDING_USER_PAYMENT':
         return translate(AppStrings.pendingPayment);

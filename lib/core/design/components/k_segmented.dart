@@ -33,10 +33,12 @@ class KSegmented<T extends Object> extends StatelessWidget {
             for (final MapEntry<T, String> e in segments.entries)
               e.key: Padding(
                 padding: const EdgeInsets.symmetric(vertical: KSpace.s),
-                child: Text(e.value,
-                    style: KType.subhead.copyWith(fontWeight: FontWeight.w600),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis),
+                child: Text(
+                  e.value,
+                  style: KType.subhead.copyWith(fontWeight: FontWeight.w600),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
           },
         ),
@@ -50,7 +52,11 @@ class KSegmented<T extends Object> extends StatelessWidget {
           for (final MapEntry<T, String> e in segments.entries)
             ButtonSegment<T>(
               value: e.key,
-              label: Text(e.value, maxLines: 1, overflow: TextOverflow.ellipsis),
+              label: Text(
+                e.value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
         ],
         selected: <T>{selected},

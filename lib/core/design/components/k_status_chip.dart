@@ -15,11 +15,17 @@ class KStatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    final bool dark = identical(c, KColors.dark);
+    final bool dark = Theme.of(context).brightness == Brightness.dark;
     final (Color base, Color label) = switch (status) {
       KStatus.brand => (c.brand, c.brand),
-      KStatus.success => (c.success, dark ? c.success : const Color(0xFF1F8A3D)),
-      KStatus.warning => (c.warning, dark ? c.warning : const Color(0xFFC25E00)),
+      KStatus.success => (
+        c.success,
+        dark ? c.success : const Color(0xFF1F8A3D),
+      ),
+      KStatus.warning => (
+        c.warning,
+        dark ? c.warning : const Color(0xFFC25E00),
+      ),
       KStatus.error => (c.error, dark ? c.error : const Color(0xFFD70015)),
       KStatus.neutral => (c.textSecondary, c.textSecondary),
     };
@@ -29,10 +35,16 @@ class KStatusChip extends StatelessWidget {
         color: base.withValues(alpha: 0.12),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: KSpace.xs),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: KSpace.xs,
+        ),
         child: Text(
           this.label,
-          style: KType.footnote.copyWith(color: label, fontWeight: FontWeight.w600),
+          style: KType.footnote.copyWith(
+            color: label,
+            fontWeight: FontWeight.w600,
+          ),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
         ),

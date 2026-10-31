@@ -4,8 +4,8 @@ import '../liquid_glass.dart';
 import '../tokens.dart';
 
 /// A small tappable capsule that floats over content: the saved address,
-/// the coins balance. iOS: real Liquid Glass. Android: Material 3 tonal chip
-/// on `surface` (no imitation glass). Brand-coloured label, 40pt tall.
+/// the coins balance. A solid surface capsule with a brand-coloured label on
+/// both platforms (raised on Android), 40pt tall.
 class KChipButton extends StatelessWidget {
   const KChipButton({
     super.key,
@@ -42,22 +42,22 @@ class KChipButton extends StatelessWidget {
               label,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: KType.subhead
-                  .copyWith(color: c.brand, fontWeight: FontWeight.w600),
+              style: KType.subhead.copyWith(
+                color: c.brand,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],
       ),
     );
-    final Widget chip = GlassTokens.useNative
-        ? LiquidGlass(capsule: true, child: Center(widthFactor: 1, child: content))
-        : Material(
-            color: c.surface,
-            elevation: 1,
-            shadowColor: Colors.black26,
-            shape: const StadiumBorder(),
-            child: Center(widthFactor: 1, child: content),
-          );
+    final Widget chip = Material(
+      color: c.surface,
+      elevation: GlassTokens.useNative ? 0 : 1,
+      shadowColor: Colors.black26,
+      shape: const StadiumBorder(),
+      child: Center(widthFactor: 1, child: content),
+    );
     return Semantics(
       button: true,
       label: semanticLabel ?? label,

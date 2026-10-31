@@ -1,13 +1,10 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thewasher/core/resources/app_indicator.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/modules/Home/bloc/banners/bloc/banner_bloc.dart';
 import 'package:thewasher/modules/Home/data/model/banner_model.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
-import 'package:thewasher/shared/components/loading.dart';
 import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
 import 'package:thewasher/modules/profile/screens/profile_account/promo_codes/pormo_codes_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
@@ -22,43 +19,18 @@ class OfferWidget extends StatefulWidget {
 
 class _OfferWidgetState extends State<OfferWidget> {
   int currentIndex = 0;
-  late PageController _pageController;
-  Timer? _timer;
-  int bannerCount = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: 0);
-  }
-
-  void _startAutoScroll() {
-    _timer?.cancel();
-
-    if (bannerCount > 1) {
-      _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
-        if (_pageController.hasClients) {
-          int nextPage = (currentIndex + 1) % bannerCount;
-
-          _pageController.animateToPage(
-            nextPage,
-            duration: const Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-          );
-        }
-      });
-    }
-  }
+  // Swiped by hand: research and accessibility rules advise against auto-advance.
+  final PageController _pageController = PageController(viewportFraction: 0.92);
 
   @override
   void dispose() {
-    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return BlocProvider<BannerBloc>(
       create: (context) {
         final bloc = BannerBloc();
@@ -67,113 +39,83 @@ class _OfferWidgetState extends State<OfferWidget> {
       },
       child: BlocBuilder<BannerBloc, BannerState>(
         builder: (context, state) {
-          if (state.status == BannerStatus.loading) {
-            return const Center(child: LoadingWidget());
+          if (state.status != BannerStatus.success) {
+            return const SizedBox.shrink();
           }
+          final List<BannerModel> banners = state.banners ?? <BannerModel>[];
+          if (banners.isEmpty) return const SizedBox.shrink();
 
-          if (state.status == BannerStatus.success) {
-            final banners = state.banners ?? [];
-            bannerCount = banners.length;
-
-            if (bannerCount == 0) return const SizedBox();
-
-            _startAutoScroll();
-
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.w),
-              child: SizedBox(
-                height: 190.h,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20.r),
-                  child: PageView.builder(
-                    controller: _pageController,
-                    itemCount: bannerCount,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () async =>
-                            _handleBannerTap(context, banners[index]),
-                        child: _buildOfferCard(context, index, banners),
-                      );
-                    },
-                    onPageChanged: (index) {
-                      setState(() => currentIndex = index);
-                    },
-                  ),
+          final bool arabic =
+              Localizations.localeOf(context).languageCode == 'ar';
+          return Column(
+            children: <Widget>[
+              AspectRatio(
+                aspectRatio: 1.9,
+                child: PageView.builder(
+                  controller: _pageController,
+                  itemCount: banners.length,
+                  onPageChanged: (int index) {
+                    setState(() => currentIndex = index);
+                  },
+                  itemBuilder: (BuildContext context, int index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: KSpace.xs,
+                      ),
+                      child: KCard(
+                        padding: EdgeInsets.zero,
+                        onTap: () => _handleBannerTap(context, banners[index]),
+                        child: ImageShared(
+                          image: arabic
+                              ? banners[index].imageLinkAr ?? ''
+                              : banners[index].imageLink ?? '',
+                          height: double.infinity,
+                          width: double.infinity,
+                          raduis: KRadius.card,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-            );
-          }
-
-          return const SizedBox.shrink();
+              if (banners.length > 1) ...<Widget>[
+                const SizedBox(height: KSpace.s),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    for (int i = 0; i < banners.length; i++)
+                      Container(
+                        width: 6,
+                        height: 6,
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: KSpace.xs / 2,
+                        ),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: i == currentIndex ? c.brand : c.separator,
+                        ),
+                      ),
+                  ],
+                ),
+              ],
+            ],
+          );
         },
       ),
     );
   }
 
-  Widget _buildOfferCard(
-      BuildContext context, int index, List<BannerModel> banners) {
-    return DecoratedBox(
-      decoration: _cardDecoration(),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _buildCardContent(Localizations.localeOf(context).languageCode == 'ar'
-              ? banners[index].imageLinkAr ?? ''
-              : banners[index].imageLink ?? ''),
-          Positioned(
-            bottom: 12.h,
-            left: 15.w,
-            right: 15.w,
-            child: AppIndicator(
-              currentIndex: currentIndex,
-              length: banners.length,
-              selectedWidth: 8.w,
-              innerPadding: 2.w,
-              selectedColor: ColorManager.primary,
-              unselectedColor: ColorManager.lightGray,
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  BoxDecoration _cardDecoration() {
-    return BoxDecoration(
-      color: ColorManager.white,
-      borderRadius: BorderRadius.circular(20.r),
-      border: Border.all(color: ColorManager.lightGray, width: 1.w),
-      boxShadow: const [
-        BoxShadow(
-          color: Color.fromRGBO(99, 99, 99, 0.1),
-          blurRadius: 20,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCardContent(String imageBanner) {
-    return ImageShared(
-      image: imageBanner,
-      height: 182.h,
-      width: 316.w,
-      raduis: 20.r,
-      fit: BoxFit.cover,
-    );
-  }
-
   Future<void> _handleBannerTap(
-      BuildContext context, BannerModel banner) async {
+    BuildContext context,
+    BannerModel banner,
+  ) async {
     final launched = await _launchExternalLink(banner.externalLink);
     if (launched || !context.mounted) return;
 
     switch (banner.resource?.toUpperCase()) {
       case 'PROMO_CODE':
-        pushPage(
-          context,
-          PromoCodeScreen(highlightPromoId: banner.resourceId),
-        );
+        pushPage(context, PromoCodeScreen(highlightPromoId: banner.resourceId));
         break;
 
       case 'PLAN':

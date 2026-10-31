@@ -18,9 +18,10 @@ class ButtonChangeLocation extends StatelessWidget {
         height: 26.h,
         width: 98.w,
         decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.r),
-            border: Border.all(color: ColorManager.darkGrey),
-            color: Colors.transparent),
+          borderRadius: BorderRadius.circular(8.r),
+          border: Border.all(color: ColorManager.darkGrey),
+          color: Colors.transparent,
+        ),
         child: Center(
           child: Text(
             translate(AppStrings.changeLocation),

@@ -30,7 +30,10 @@ class KListRow extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(minHeight: KSpace.tapTarget),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: KSpace.l, vertical: KSpace.m),
+          padding: const EdgeInsets.symmetric(
+            horizontal: KSpace.l,
+            vertical: KSpace.m,
+          ),
           child: Row(
             children: <Widget>[
               if (leading != null) ...<Widget>[
@@ -44,7 +47,10 @@ class KListRow extends StatelessWidget {
                   children: <Widget>[
                     Text(title, style: KType.body.copyWith(color: c.text)),
                     if (subtitle != null)
-                      Text(subtitle!, style: KType.subhead.copyWith(color: c.textSecondary)),
+                      Text(
+                        subtitle!,
+                        style: KType.subhead.copyWith(color: c.textSecondary),
+                      ),
                   ],
                 ),
               ),

@@ -42,8 +42,8 @@ class KPickerField<T> extends StatelessWidget {
         items: items,
         itemLabel: itemLabel,
         selected: value,
-        searchHint: searchHint ??
-            MaterialLocalizations.of(context).searchFieldLabel,
+        searchHint:
+            searchHint ?? MaterialLocalizations.of(context).searchFieldLabel,
       ),
     );
     if (picked != null) onSelected(picked);
@@ -59,10 +59,14 @@ class KPickerField<T> extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Padding(
-          padding:
-              const EdgeInsetsDirectional.only(start: KSpace.xs, bottom: 6),
-          child: Text(label,
-              style: KType.footnote.copyWith(color: c.textSecondary)),
+          padding: const EdgeInsetsDirectional.only(
+            start: KSpace.xs,
+            bottom: 6,
+          ),
+          child: Text(
+            label,
+            style: KType.footnote.copyWith(color: c.textSecondary),
+          ),
         ),
         Semantics(
           button: true,
@@ -71,7 +75,8 @@ class KPickerField<T> extends StatelessWidget {
           child: Material(
             color: c.fill,
             shape: RoundedSuperellipseBorder(
-                borderRadius: BorderRadius.circular(KRadius.field)),
+              borderRadius: BorderRadius.circular(KRadius.field),
+            ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: enabled ? () => _open(context) : null,
@@ -87,7 +92,8 @@ class KPickerField<T> extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: KType.body.copyWith(
-                              color: empty ? c.textSecondary : c.text),
+                            color: empty ? c.textSecondary : c.text,
+                          ),
                         ),
                       ),
                       if (loading)
@@ -96,10 +102,12 @@ class KPickerField<T> extends StatelessWidget {
                           child: CircularProgressIndicator(strokeWidth: 2),
                         )
                       else
-                        Icon(Icons.unfold_more_rounded,
-                            color: enabled
-                                ? c.textSecondary
-                                : c.textSecondary.withValues(alpha: 0.4)),
+                        Icon(
+                          Icons.unfold_more_rounded,
+                          color: enabled
+                              ? c.textSecondary
+                              : c.textSecondary.withValues(alpha: 0.4),
+                        ),
                     ],
                   ),
                 ),
@@ -140,19 +148,23 @@ class _PickerSheetState<T> extends State<_PickerSheet<T>> {
     final List<T> shown = _query.isEmpty
         ? widget.items
         : widget.items
-            .where((T i) => widget
-                .itemLabel(i)
-                .toLowerCase()
-                .contains(_query.toLowerCase()))
-            .toList();
+              .where(
+                (T i) => widget
+                    .itemLabel(i)
+                    .toLowerCase()
+                    .contains(_query.toLowerCase()),
+              )
+              .toList();
     return SizedBox(
       height: MediaQuery.sizeOf(context).height * 0.7,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Text(widget.title,
-              textAlign: TextAlign.center,
-              style: KType.headline.copyWith(color: c.text)),
+          Text(
+            widget.title,
+            textAlign: TextAlign.center,
+            style: KType.headline.copyWith(color: c.text),
+          ),
           const SizedBox(height: KSpace.m),
           KSearchField(
             autofocus: widget.items.length > 12,

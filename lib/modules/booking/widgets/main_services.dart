@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
@@ -33,46 +30,42 @@ class _MainServicesState extends State<MainServices> {
   Widget _buildDetailItem({
     required String icon,
     required String text,
+    required KColors c,
     Color? color,
     Widget? suffix,
   }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SvgPicture.asset(icon, height: 14.h, width: 14.w, colorFilter: color == null ? null : ColorFilter.mode(color, BlendMode.srcIn)),
-        SizedBox(width: 6.w),
-        Text(
-          text,
-          style: AppStyles.caption12Medium.copyWith(color: ColorManager.black),
+        SvgPicture.asset(
+          icon,
+          height: 14,
+          width: 14,
+          colorFilter: color == null
+              ? null
+              : ColorFilter.mode(color, BlendMode.srcIn),
         ),
-        if (suffix != null) ...[SizedBox(width: 2.w), suffix],
+        const SizedBox(width: KSpace.xs),
+        Text(text, style: KType.footnote.copyWith(color: c.text)),
+        if (suffix != null) ...[const SizedBox(width: 2), suffix],
       ],
     );
   }
 
-  Widget _buildDescriptionItem(String text) {
+  Widget _buildDescriptionItem(String text, KColors c) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 4.h),
+      padding: const EdgeInsets.only(bottom: KSpace.xs),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            margin: EdgeInsets.only(top: 6.h, right: 8.w),
-            height: 4.h,
-            width: 4.w,
-            decoration: BoxDecoration(
-              color: ColorManager.primary,
-              shape: BoxShape.circle,
-            ),
+            margin: const EdgeInsetsDirectional.only(top: 6, end: KSpace.s),
+            height: 4,
+            width: 4,
+            decoration: BoxDecoration(color: c.brand, shape: BoxShape.circle),
           ),
           Expanded(
-            child: Text(
-              text,
-              style: AppStyles.caption12Medium.copyWith(
-                color: ColorManager.black,
-                height: 1.4,
-              ),
-            ),
+            child: Text(text, style: KType.footnote.copyWith(color: c.text)),
           ),
         ],
       ),
@@ -88,19 +81,7 @@ class _MainServicesState extends State<MainServices> {
         if (state is OffersInitial ||
             state is GetServicesLoading ||
             state is GetGuestServicesLoading) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: AppMargin.m16.h),
-            child: Center(
-              child: SizedBox(
-                width: 28.w,
-                height: 28.w,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  valueColor: AlwaysStoppedAnimation(ColorManager.primary),
-                ),
-              ),
-            ),
-          );
+          return const KLoadingState();
         }
 
         if (widget.mainServices.isEmpty) {
@@ -155,8 +136,8 @@ class _MainServicesState extends State<MainServices> {
                   duration: KMotion.of(context, KMotion.fast),
                   decoration: ShapeDecoration(
                     color: c.surface,
-                    shape: RoundedSuperellipseBorder(
-                      borderRadius: BorderRadius.circular(KRadius.card),
+                    shape: KRadius.shape(
+                      BorderRadius.circular(KRadius.card),
                       side: BorderSide(
                         color: isSelected ? c.brand : Colors.transparent,
                         width: 2,
@@ -173,8 +154,8 @@ class _MainServicesState extends State<MainServices> {
                   child: Material(
                     type: MaterialType.transparency,
                     child: InkWell(
-                      customBorder: RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.circular(KRadius.card),
+                      customBorder: KRadius.shape(
+                        BorderRadius.circular(KRadius.card),
                       ),
                       onTap: toggle,
                       child: Padding(
@@ -184,8 +165,10 @@ class _MainServicesState extends State<MainServices> {
                           children: <Widget>[
                             Row(
                               children: <Widget>[
-                                ClipRSuperellipse(
-                                  borderRadius: BorderRadius.circular(14),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    KRadius.field,
+                                  ),
                                   child: ColoredBox(
                                     color: c.fill,
                                     child: ImageShared(
@@ -203,8 +186,9 @@ class _MainServicesState extends State<MainServices> {
                                     children: <Widget>[
                                       Text(
                                         service.name ?? '',
-                                        style: KType.headline
-                                            .copyWith(color: c.text),
+                                        style: KType.headline.copyWith(
+                                          color: c.text,
+                                        ),
                                         maxLines: 2,
                                         overflow: TextOverflow.ellipsis,
                                       ),
@@ -215,12 +199,14 @@ class _MainServicesState extends State<MainServices> {
                                         children: <Widget>[
                                           if (service.duration != null)
                                             _buildDetailItem(
+                                              c: c,
                                               color: c.textSecondary,
                                               icon: AssetsManager.timeIconLogo,
                                               text:
                                                   "${service.duration} ${translate(service.durationUnit ?? '')}",
                                             ),
                                           _buildDetailItem(
+                                            c: c,
                                             color: c.text,
                                             icon: AssetsManager.serviceCoinSvg,
                                             text: "${service.price ?? ''} ",
@@ -243,9 +229,7 @@ class _MainServicesState extends State<MainServices> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
-                                      color: isSelected
-                                          ? c.brand
-                                          : c.separator,
+                                      color: isSelected ? c.brand : c.separator,
                                       width: isSelected ? 7 : 2,
                                     ),
                                   ),
@@ -280,7 +264,7 @@ class _MainServicesState extends State<MainServices> {
                                           expanded
                                               ? Icons.keyboard_arrow_up_rounded
                                               : Icons
-                                                  .keyboard_arrow_down_rounded,
+                                                    .keyboard_arrow_down_rounded,
                                           size: 18,
                                           color: c.brand,
                                         ),
@@ -291,7 +275,10 @@ class _MainServicesState extends State<MainServices> {
                               ),
                               if (expanded)
                                 for (final dynamic item in description!)
-                                  _buildDescriptionItem(item?.toString() ?? ''),
+                                  _buildDescriptionItem(
+                                    item?.toString() ?? '',
+                                    c,
+                                  ),
                             ],
                           ],
                         ),

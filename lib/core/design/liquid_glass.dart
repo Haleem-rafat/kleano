@@ -9,20 +9,21 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// Liquid Glass design system following Apple's HIG (iOS 26/27):
+/// The glass navigation controls of both apps:
 ///
-///  * Glass is the *controls layer* (tab bar, toolbar buttons, floating
-///    controls) floating above content; content itself stays opaque.
-///  * On iOS the material is Apple's real `UIGlassEffect`, rendered natively
-///    (platform view `kleano/liquid_glass`) underneath the Flutter content, so
-///    refraction, adaptive tint, the iOS 27 transparency setting and Reduce
-///    Transparency are handled by the system.
-///  * On Android (and in tests) a Flutter-drawn approximation is used.
-///  * Brand colour goes on the tint of controls, not on bar backgrounds.
+///  * Glass is only the navigation layer: the tab bar, back and top-bar buttons,
+///    and controls floating over a map. Content, buttons in content, sheets and
+///    dialogs stay solid.
+///  * iOS: Apple's real `UIGlassEffect`, rendered natively (platform view
+///    `kleano/liquid_glass`), so refraction, tint and Reduce Transparency are
+///    handled by the system.
+///  * Android: a Flutter-drawn glass tuned for cost. All panes on a screen share
+///    one blur pass through [BackdropGroup], and each is its own repaint layer.
 class GlassTokens {
   GlassTokens._();
 
-  static const double blurSigma = 22;
+  /// Blur cost grows with the radius; 14 still reads as frosted over content.
+  static const double blurSigma = 14;
   static const double radius = 26;
   static const double sheetRadius = 34;
   static const double dialogRadius = 30;
@@ -161,8 +162,9 @@ class _NativeGlassViewState extends State<NativeGlassView> {
   }
 }
 
-/// Flutter-drawn approximation for Android: blur, tint, specular rim and
-/// continuous corners. Opaque when transparency is reduced.
+/// Flutter-drawn glass for Android: blur, tint, specular rim. Opaque when
+/// transparency is reduced. Kept cheap: no layout builder, one shadow, and a
+/// repaint boundary so the blur is not redrawn when the child alone changes.
 class _FlutterGlass extends StatelessWidget {
   const _FlutterGlass({
     required this.child,
@@ -189,71 +191,49 @@ class _FlutterGlass extends StatelessWidget {
             tint!.withValues(alpha: tint!.a * 0.85),
             GlassTokens.tintLightLow,
           );
+    final BorderRadius borderRadius = BorderRadius.circular(
+      capsule ? 999 : radius,
+    );
+    final ShapeBorder shape = capsule
+        ? const StadiumBorder()
+        : RoundedRectangleBorder(borderRadius: borderRadius);
 
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints c) {
-        final double r = capsule && c.hasBoundedHeight
-            ? c.maxHeight / 2
-            : radius;
-        final BorderRadius borderRadius = BorderRadius.circular(
-          capsule ? 999 : r,
-        );
-        final ShapeBorder shape = capsule
-            ? const StadiumBorder()
-            : RoundedSuperellipseBorder(borderRadius: borderRadius);
+    Widget surface = DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: shape,
+        color: opaque
+            ? Color.alphaBlend(base, GlassTokens.opaqueSurface)
+            : base,
+      ),
+      child: CustomPaint(
+        foregroundPainter: _SpecularEdgePainter(borderRadius),
+        child: RepaintBoundary(child: child),
+      ),
+    );
 
-        Widget surface = DecoratedBox(
-          decoration: ShapeDecoration(
-            shape: shape,
-            color: opaque
-                ? Color.alphaBlend(base, GlassTokens.opaqueSurface)
-                : null,
-            gradient: opaque
-                ? null
-                : LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: <Color>[
-                      base,
-                      base.withValues(alpha: base.a * 0.72),
-                    ],
-                  ),
-          ),
-          child: CustomPaint(
-            foregroundPainter: _SpecularEdgePainter(borderRadius),
-            child: child,
-          ),
-        );
-
-        if (!opaque) {
-          surface = ClipRSuperellipse(
-            borderRadius: borderRadius,
-            child: BackdropFilter.grouped(
-              filter: ui.ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-              child: surface,
-            ),
-          );
-        }
-        if (!shadow) return surface;
-        return DecoratedBox(
-          decoration: ShapeDecoration(
-            shape: shape,
-            shadows: const <BoxShadow>[
-              BoxShadow(
-                color: Color(0x14000000),
-                blurRadius: 24,
-                offset: Offset(0, 8),
-              ),
-              BoxShadow(
-                color: Color(0x0A000000),
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
+    if (!opaque) {
+      surface = ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter.grouped(
+          filter: ui.ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
           child: surface,
-        );
-      },
+        ),
+      );
+    }
+    final Widget glass = RepaintBoundary(child: surface);
+    if (!shadow) return glass;
+    return DecoratedBox(
+      decoration: ShapeDecoration(
+        shape: shape,
+        shadows: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x14000000),
+            blurRadius: 16,
+            offset: Offset(0, 6),
+          ),
+        ],
+      ),
+      child: glass,
     );
   }
 }
@@ -453,6 +433,34 @@ class GlassIconButton extends StatelessWidget {
 }
 
 /// Apple-style back button: a chevron on a glass circle. Mirrors in RTL.
+/// An action in a top bar: a glass circle.
+class GlassBarButton extends StatelessWidget {
+  const GlassBarButton({
+    super.key,
+    required this.icon,
+    required this.sfSymbol,
+    required this.tooltip,
+    required this.onPressed,
+    this.color,
+  });
+
+  final IconData icon;
+  final String sfSymbol;
+  final String tooltip;
+  final VoidCallback? onPressed;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) => GlassIconButton(
+    icon: icon,
+    sfSymbol: sfSymbol,
+    size: 40,
+    color: color,
+    tooltip: tooltip,
+    onPressed: onPressed,
+  );
+}
+
 class GlassBackButton extends StatelessWidget {
   const GlassBackButton({super.key, this.onPressed, this.color});
 

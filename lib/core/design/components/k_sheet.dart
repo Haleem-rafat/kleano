@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../liquid_glass.dart';
 import '../tokens.dart';
-import 'k_glass_panel.dart';
+import 'k_panel.dart';
 
 /// Shows [builder]'s content in a Kleano bottom sheet.
 ///
-/// iOS: a floating Liquid Glass sheet inset from the screen edges (iOS 26).
+/// iOS: a solid floating sheet inset from the screen edges (iOS 26 shape).
 /// Android: a Material 3 sheet on `surface` with a drag handle.
 /// The content scrolls itself if it can be taller than the screen.
 Future<T?> showKSheet<T>({
@@ -55,7 +55,7 @@ class KSheet extends StatelessWidget {
         right: inset,
         bottom: mq.viewInsets.bottom + (floating ? bottom : 0),
       ),
-      child: KGlassPanel(
+      child: KPanel(
         radius: radius,
         child: Padding(
           padding: EdgeInsets.fromLTRB(

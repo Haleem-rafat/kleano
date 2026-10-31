@@ -8,10 +8,11 @@ enum KButtonVariant { primary, secondary, text, destructive }
 
 /// The Kleano button.
 ///
-/// iOS: Apple's real glass `UIButton` (primary = prominent glass tinted with
-/// the brand, destructive = prominent glass tinted `error`, secondary = glass,
-/// text = plain). Android: Material 3 `FilledButton` (error-coloured when
-/// destructive) / tonal `FilledButton` / `TextButton`.
+/// iOS: a solid capsule like Apple's filled buttons (primary = brand,
+/// destructive = `error`, secondary = tinted, text = plain). Buttons in content
+/// are not glass; Liquid Glass stays on tabs and navigation. Android: Material 3
+/// `FilledButton` (error-coloured when destructive) / tonal `FilledButton` /
+/// `TextButton`.
 /// While [loading], the button shows progress and ignores taps.
 class KButton extends StatelessWidget {
   const KButton({
@@ -22,7 +23,6 @@ class KButton extends StatelessWidget {
     this.loading = false,
     this.expand = true,
     this.icon,
-    this.sfSymbol,
     this.color,
   });
 
@@ -35,11 +35,8 @@ class KButton extends StatelessWidget {
   final bool expand;
   final IconData? icon;
 
-  /// SF Symbol shown on iOS instead of [icon].
-  final String? sfSymbol;
-
-  /// Label colour for text and secondary glass buttons (e.g. white over
-  /// photos). Defaults to brand.
+  /// Label colour for text and secondary buttons (e.g. white over photos).
+  /// Defaults to brand.
   final Color? color;
 
   static const double _iosHeight = 50;
@@ -54,35 +51,13 @@ class KButton extends StatelessWidget {
       enabled: onPressed != null && !loading,
       label: loading ? '$label…' : null,
       child: SizedBox(
-        width: expand
-            ? double.infinity
-            : (ios && variant != KButtonVariant.text
-                  ? _hugWidth(context)
-                  : null),
+        width: expand ? double.infinity : null,
         height: variant == KButtonVariant.text
             ? KSpace.tapTarget
             : (ios ? _iosHeight : _androidHeight),
         child: button,
       ),
     );
-  }
-
-  /// Width of a content-hugging glass button. The native `UIButton` is a
-  /// platform view with no intrinsic size, so it must be measured here:
-  /// unbounded, it gets an infinite frame and iOS crashes.
-  double _hugWidth(BuildContext context) {
-    final TextPainter painter = TextPainter(
-      text: TextSpan(text: label, style: KType.headline),
-      textScaler: MediaQuery.textScalerOf(context),
-      textDirection: Directionality.of(context),
-      maxLines: 1,
-    )..layout();
-    final double symbol = sfSymbol == null
-        ? 0
-        : KType.headline.fontSize! + KSpace.s;
-    final double width = painter.width + symbol + 2 * KSpace.xl;
-    painter.dispose();
-    return width < KSpace.tapTarget ? KSpace.tapTarget : width.ceilToDouble();
   }
 
   bool get _prominent =>
@@ -106,26 +81,39 @@ class KButton extends StatelessWidget {
         ),
       );
     }
-    if (loading) {
-      return LiquidGlass(
-        capsule: true,
-        tint: _prominent ? _fill(c) : null,
-        child: Center(
-          child: CupertinoActivityIndicator(
-            color: _prominent ? Colors.white : c.brand,
-          ),
-        ),
-      );
-    }
-    return NativeGlassButton(
-      onPressed: onPressed,
-      title: label,
-      sfSymbol: sfSymbol,
-      style: _prominent ? GlassButtonStyle.prominent : GlassButtonStyle.glass,
-      tint: _prominent ? _fill(c) : null,
-      foreground: _prominent ? Colors.white : (color ?? c.brand),
-      fontSize: KType.headline.fontSize!,
-      fallback: const SizedBox.shrink(),
+    final Color foreground = onPressed == null
+        ? c.textSecondary
+        : (_prominent ? Colors.white : (color ?? c.brand));
+    return IgnorePointer(
+      ignoring: loading,
+      child: CupertinoButton(
+        padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
+        color: _prominent
+            ? _fill(c)
+            : (color ?? c.brand).withValues(alpha: 0.14),
+        disabledColor: Color.alphaBlend(c.fill, c.surface),
+        borderRadius: BorderRadius.circular(_iosHeight / 2),
+        onPressed: onPressed,
+        child: loading
+            ? CupertinoActivityIndicator(color: foreground)
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  if (icon != null) ...<Widget>[
+                    Icon(icon, size: 20, color: foreground),
+                    const SizedBox(width: KSpace.s),
+                  ],
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: KType.headline.copyWith(color: foreground),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+      ),
     );
   }
 
@@ -157,7 +145,19 @@ class KButton extends StatelessWidget {
           );
     switch (variant) {
       case KButtonVariant.primary:
-        return FilledButton(onPressed: tap, child: content);
+        // Material's disabled fill is translucent: content scrolling behind a
+        // floating button would show through it.
+        final ThemeData theme = Theme.of(context);
+        return FilledButton(
+          onPressed: tap,
+          style: FilledButton.styleFrom(
+            disabledBackgroundColor: Color.alphaBlend(
+              theme.colorScheme.onSurface.withValues(alpha: 0.12),
+              theme.colorScheme.surface,
+            ),
+          ),
+          child: content,
+        );
       case KButtonVariant.destructive:
         return FilledButton(
           onPressed: tap,

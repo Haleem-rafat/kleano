@@ -15,8 +15,9 @@ class SubscriptionNotAvalibleLocation extends StatelessWidget {
     return Container(
       padding: EdgeInsets.fromLTRB(20.w, 25.h, 20.w, 25.h),
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16.r),
-          color: ColorManager.red.withValues(alpha: .07)),
+        borderRadius: BorderRadius.circular(16.r),
+        color: ColorManager.red.withValues(alpha: .07),
+      ),
       child: Column(
         children: <Widget>[
           SizedBox(
@@ -29,10 +30,8 @@ class SubscriptionNotAvalibleLocation extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          SizedBox(
-            height: AppPadding.p16.h,
-          ),
-          const ButtonChangeLocation()
+          SizedBox(height: AppPadding.p16.h),
+          const ButtonChangeLocation(),
         ],
       ),
     );

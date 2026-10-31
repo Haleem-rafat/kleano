@@ -52,9 +52,14 @@ class _KTextFieldState extends State<KTextField> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsetsDirectional.only(start: KSpace.xs, bottom: 6),
-          child: Text(widget.label,
-              style: KType.footnote.copyWith(color: c.textSecondary)),
+          padding: const EdgeInsetsDirectional.only(
+            start: KSpace.xs,
+            bottom: 6,
+          ),
+          child: Text(
+            widget.label,
+            style: KType.footnote.copyWith(color: c.textSecondary),
+          ),
         ),
         TextFormField(
           controller: widget.controller,

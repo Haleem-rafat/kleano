@@ -1,11 +1,12 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/design/components/k_chip_button.dart';
+import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/modules/booking/widgets/home/active_order_card.dart';
+import 'package:thewasher/modules/my_booking/blocs/my_booking/my_booking_bloc.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/utilis/geocoding_helper.dart';
@@ -13,13 +14,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewasher/api/shared.dart';
-import 'package:thewasher/core/resources/app_sized_box.dart';
-import 'package:thewasher/core/resources/app_styles.dart';
 import 'package:thewasher/core/resources/assets_manager.dart';
-import 'package:thewasher/core/resources/color_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
-import 'package:thewasher/core/resources/values_manager.dart';
-import 'package:thewasher/modules/Home/widget/doted_widget.dart';
 import 'package:thewasher/modules/Home/widget/offer_widget.dart';
 import 'package:thewasher/modules/booking/screens/order_detalis_screen.dart';
 import 'package:thewasher/modules/booking/widgets/functions/check_value_method_to_navigate_pages.dart';
@@ -37,8 +33,6 @@ import 'package:thewasher/modules/booking/widgets/functions/create_order_data_re
 import 'package:thewasher/modules/plans_and_subscription/bloc/plans_and_subscription/plans_and_subscription_bloc.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewasher/shared/components/loading.dart';
-import 'package:thewasher/shared/components/shimmering/basic_container_shimmering.dart';
 import 'package:thewasher/shared/components/snack_bar.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
@@ -64,6 +58,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   String _currentCountry = "";
   late final RefreshController refreshController;
   Key _offerWidgetKey = UniqueKey();
+  final MyBookingBloc _activeOrders = MyBookingBloc();
 
   String _guestAuthMessage(BuildContext context) {
     final String languageCode = Localizations.localeOf(context).languageCode;
@@ -174,6 +169,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         ),
       );
     } else {
+      _activeOrders.add(FetchMyBookingActive());
       sl<LocationBloc>().add(GetSavedLocation());
       sl<GetUserProfileBloc>().add(GetUserProfileEvent());
       sl<PlansAndSubscriptionBloc>().add(
@@ -206,6 +202,30 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         _offerWidgetKey = UniqueKey();
       });
     }
+  }
+
+  void _loadOffersForAddress() {
+    sl<PlansAndSubscriptionBloc>().add(
+      GetSubscriptionUserByLocation(
+        latitude: blcoPosition.latitude,
+        longitude: blcoPosition.longitude,
+        country: "saudi arabia",
+      ),
+    );
+    sl<OffersBloc>().add(
+      GetServices(
+        lat: blcoPosition.latitude,
+        lng: blcoPosition.longitude,
+        country: "saudi arabia",
+      ),
+    );
+    sl<OffersBloc>().add(
+      GetAddOns(
+        lat: blcoPosition.latitude,
+        lng: blcoPosition.longitude,
+        country: "saudi arabia",
+      ),
+    );
   }
 
   void _backButtonSteps() {
@@ -271,34 +291,24 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         });
       } else {
         // For authenticated users, use existing logic
+        _activeOrders.add(FetchMyBookingActive());
         sl<LocationBloc>().add(GetSavedLocation());
         sl<GetUserProfileBloc>().add(GetUserProfileEvent());
 
-        Future.delayed(const Duration(seconds: 2), () {
-          sl<PlansAndSubscriptionBloc>().add(
-            GetSubscriptionUserByLocation(
-              latitude: blcoPosition.latitude,
-              longitude: blcoPosition.longitude,
-              country: "saudi arabia",
-            ),
-          );
-
-          sl<OffersBloc>().add(
-            GetServices(
-              lat: blcoPosition.latitude,
-              lng: blcoPosition.longitude,
-              country: "saudi arabia",
-            ),
-          );
-
-          sl<OffersBloc>().add(
-            GetAddOns(
-              lat: blcoPosition.latitude,
-              lng: blcoPosition.longitude,
-              country: "saudi arabia",
-            ),
-          );
-        });
+        // The address check already set the position: load straight away. Only
+        // wait for the saved address when arriving here without one.
+        if (blcoPosition.latitude != 0 || blcoPosition.longitude != 0) {
+          _loadOffersForAddress();
+        } else {
+          sl<LocationBloc>().stream
+              .firstWhere(
+                (LocationState s) =>
+                    s is GetSavedLocationSuccess || s is GetSavedLocationFailed,
+              )
+              .then((_) {
+                if (mounted) _loadOffersForAddress();
+              });
+        }
       }
     });
 
@@ -309,6 +319,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   void dispose() {
     refreshController.dispose();
     _isNotesFocused.dispose();
+    _activeOrders.close();
     super.dispose();
   }
 
@@ -362,11 +373,14 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion(
-      value: AppStyles.darkStatusBarIconsWithTransparentColorStyle.copyWith(
+    final KColors c = KColors.of(context);
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark.copyWith(
+        statusBarColor: Colors.transparent,
         systemNavigationBarColor: Colors.transparent,
       ),
       child: Scaffold(
+        backgroundColor: c.background,
         body: PopScope(
           canPop: false,
           child: MultiBlocListener(
@@ -408,610 +422,344 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                   header: const ClassicHeader(),
                   onRefresh: _handleRefresh,
                   child: CustomScrollView(
-                    slivers: [
-                      SliverAppBar(
-                        automaticallyImplyLeading: false,
-                        // Safe-area aware: works with notches, the Dynamic
-                        // Island and iPhone Duo's side camera island.
-                        expandedHeight: indexPage == 0
-                            ? MediaQuery.paddingOf(context).top +
-                                  8 +
-                                  (Platform.isAndroid ? 220.h : 200.h) +
-                                  24
-                            : 70.h,
-                        floating: false,
-                        pinned: true,
-                        // iOS 26/27: no coloured bar; title on the content.
-                        backgroundColor: ColorManager.white,
-                        surfaceTintColor: Colors.transparent,
-                        elevation: 0,
-                        leading: indexPage == 0
-                            ? null
-                            : GlassBackButton(
-                                color: ColorManager.primary,
-                                onPressed: _backButtonSteps,
-                              ),
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.only(
-                                  top: MediaQuery.paddingOf(context).top + 8,
-                                  left:
-                                      16.w + MediaQuery.paddingOf(context).left,
-                                  right:
-                                      16.w +
-                                      MediaQuery.paddingOf(context).right,
-                                  bottom: 2.h,
-                                ),
-                                child: indexPage == 0
-                                    ? Row(
-                                        children: <Widget>[
-                                          // Greeting section
-                                          Expanded(
-                                            flex: 2,
-                                            child: Row(
-                                              children: [
-                                                Text(
-                                                  translate(AppStrings.hello),
-                                                  style: KType.title.copyWith(color: KColors.of(context).text),
-                                                ),
-                                                AppSize.s1_5.pw,
-                                                _isGuest
-                                                    ? Text(
-                                                        '...',
-                                                        style: KType.title.copyWith(color: KColors.of(context).text),
-                                                      )
-                                                    : (context
-                                                                  .read<
-                                                                    GetUserProfileBloc
-                                                                  >()
-                                                                  .profile
-                                                                  .userName ==
-                                                              ""
-                                                          ? const DotedWidget()
-                                                          : BlocBuilder<
-                                                              GetUserProfileBloc,
-                                                              GetUserProfileState
-                                                            >(
-                                                              builder: (context, state) {
-                                                                if (state
-                                                                    is GetUserProfileLoading) {
-                                                                  return const DotedWidget();
-                                                                } else if (state
-                                                                    is GetUserProfileSuccess) {
-                                                                  return Text(
-                                                                    ' ${(state.userProfile.data?.userName ?? '').split(' ').first}',
-                                                                    style: KType.title.copyWith(color: KColors.of(context).text),
-                                                                  );
-                                                                }
-                                                                return const SizedBox();
-                                                              },
-                                                            )),
-                                              ],
-                                            ),
-                                          ),
-                                          // Coins section
-                                          _isGuest
-                                              ? GestureDetector(
-                                                  onTap: () {
-                                                    AlertHelper.pointAlert(
-                                                      context,
-                                                    );
-                                                  },
-                                                  child: Container(
-                                                    height: 24.h,
-                                                    width: 24.w,
-                                                    decoration: BoxDecoration(
-                                                      color: ColorManager
-                                                          .primary
-                                                          .withValues(
-                                                            alpha: 0.10,
-                                                          ),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                            15.r,
-                                                          ),
-                                                    ),
-                                                    child: SvgPicture.asset(
-                                                      AssetsManager.walletCoin,
-                                                      height: 12.h,
-                                                      width: 12.w,
-                                                      fit: BoxFit.none,
-                                                    ),
-                                                  ),
-                                                )
-                                              : BlocBuilder<
-                                                  GetUserProfileBloc,
-                                                  GetUserProfileState
-                                                >(
-                                                  builder: (context, state) {
-                                                    if (state
-                                                        is GetUserProfileLoading) {
-                                                      return const DotedWidget();
-                                                    } else if (state
-                                                        is GetUserProfileSuccess) {
-                                                      return KChipButton(
-                                                        leading: SvgPicture.asset(
-                                                          AssetsManager
-                                                              .walletCoin,
-                                                          height: 16,
-                                                          width: 16,
-                                                        ),
-                                                        label:
-                                                            "${state.userProfile.data?.points ?? 0}",
-                                                        semanticLabel: translate(
-                                                          AppStrings.points,
-                                                        ),
-                                                        onTap: () =>
-                                                            AlertHelper.pointAlert(
-                                                              context,
-                                                            ),
-                                                      );
-                                                    }
-                                                    return const SizedBox();
-                                                  },
-                                                ),
-                                          // Notifications section
-                                          SizedBox(width: 8.w),
-                                          Stack(
-                                            clipBehavior: Clip.none,
-                                            children: <Widget>[
-                                              GlassIconButton(
-                                                icon: Icons
-                                                    .notifications_none_rounded,
-                                                sfSymbol: 'bell',
-                                                size: KChipButton.height,
-                                                color: KColors.of(context).brand,
-                                                tooltip: translate(
-                                                  AppStrings.notifications,
-                                                ),
-                                                onPressed: () {
-                                                  pushPage(
-                                                    context,
-                                                    _isGuest
-                                                        ? const GuestNotificationScreen()
-                                                        : const NotificationsScreen(),
-                                                  );
-                                                  if (mounted) {
-                                                    setState(() {
-                                                      generalSingleton
-                                                              .hasUnreadNotification =
-                                                          false;
-                                                    });
-                                                  }
-                                                },
-                                              ),
-                                              if (generalSingleton
-                                                  .hasUnreadNotification)
-                                                PositionedDirectional(
-                                                  top: 4,
-                                                  end: 4,
-                                                  child: IgnorePointer(
-                                                    child: Container(
-                                                      width: 9,
-                                                      height: 9,
-                                                      decoration: BoxDecoration(
-                                                        color: KColors.of(
-                                                          context,
-                                                        ).error,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                            ],
-                                          ),
-                                          // Location chip section
-                                          if (!_isGuest) ...[
-                                            SizedBox(width: 8.w),
-                                            BlocBuilder<
-                                              LocationBloc,
-                                              LocationState
-                                            >(
-                                              builder: (context, state) {
-                                                if (state
-                                                    is GetSavedLocationSuccess) {
-                                                  // Find the default address
-                                                  AddressModel? defaultAddress;
-                                                  try {
-                                                    defaultAddress = state
-                                                        .savedLocation
-                                                        .firstWhere(
-                                                          (address) =>
-                                                              address
-                                                                  .isDefault ==
-                                                              true,
-                                                        );
-                                                  } catch (e) {
-                                                    if (state
-                                                        .savedLocation
-                                                        .isNotEmpty) {
-                                                      defaultAddress = state
-                                                          .savedLocation
-                                                          .first;
-                                                    }
-                                                  }
-
-                                                  if (defaultAddress != null) {
-                                                    return KChipButton(
-                                                      leading: const Icon(
-                                                        Icons.location_on_rounded,
-                                                      ),
-                                                      label:
-                                                          defaultAddress
-                                                                  .savedName
-                                                                  ?.isNotEmpty ==
-                                                              true
-                                                          ? defaultAddress
-                                                                .savedName!
-                                                          : defaultAddress
-                                                                    .streetName ??
-                                                                translate(
-                                                                  AppStrings
-                                                                      .defaultAddress,
-                                                                ),
-                                                      onTap: () => pushPage(
-                                                        context,
-                                                        SetBookingLocationScreen(),
-                                                      ),
-                                                    );
-                                                  }
-                                                }
-
-                                                return SizedBox();
-                                              },
-                                            ),
-                                          ],
-                                        ],
-                                      )
-                                    : Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          SizedBox(height: 10.h),
-                                          Text(
-                                            translate(AppStrings.bookingOrder),
-                                            style: AppStyles.titleWhite16Bold
-                                                .copyWith(
-                                                  color: ColorManager.black,
-                                                  fontSize: 22.sp,
-                                                )
-                                                .copyWith(
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                          ),
-                                        ],
-                                      ),
-                              ),
-                              // Offer widget section - only show on first screen
-                              if (indexPage == 0) ...[
-                                OfferWidget(key: _offerWidgetKey),
-                              ],
-                            ],
-                          ),
-                        ),
-                      ),
-                      // Main content as sliver
-                      SliverToBoxAdapter(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight:
-                                MediaQuery.of(context).size.height -
-                                250.h, // Account for app bar height
-                          ),
-                          child: isLoading
-                              ? Padding(
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: 24.w,
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      16.verticalSpace,
-                                      // Title shimmer
-                                      BasicContainerShemmering(
-                                        height: 20.h,
-                                        width: 200.w,
-                                        radius: 8,
-                                      ),
-                                      16.verticalSpace,
-                                      // Main services shimmer
-                                      BasicContainerShemmering(
-                                        height: 80.h,
-                                        width: double.infinity,
-                                        radius: 15,
-                                      ),
-                                      16.verticalSpace,
-                                      // Extra services title shimmer
-                                      BasicContainerShemmering(
-                                        height: 20.h,
-                                        width: 180.w,
-                                        radius: 8,
-                                      ),
-                                      2.verticalSpace,
-                                      // Extra services list shimmer
-                                      ...List.generate(3, (index) {
-                                        return Container(
-                                          margin: EdgeInsets.symmetric(
-                                            vertical: 18.h,
-                                          ),
-                                          padding: EdgeInsets.fromLTRB(
-                                            12.5.w,
-                                            11.5.h,
-                                            12.5.w,
-                                            13.5.h,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              15.r,
-                                            ),
-                                            color: ColorManager.white,
-                                            boxShadow: <BoxShadow>[
-                                              BoxShadow(
-                                                color: ColorManager.black
-                                                    .withValues(alpha: .05),
-                                                blurRadius: 3.r,
-                                                offset: const Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              // Checkbox shimmer
-                                              BasicContainerShemmering(
-                                                height: 24.h,
-                                                width: 24.w,
-                                                radius: 6,
-                                              ),
-                                              SizedBox(width: 8.w),
-                                              // Icon shimmer
-                                              BasicContainerShemmering(
-                                                height: 50.h,
-                                                width: 50.w,
-                                                radius: 10,
-                                              ),
-                                              SizedBox(width: 8.w),
-                                              // Text content shimmer
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    BasicContainerShemmering(
-                                                      height: 16.h,
-                                                      width: 120.w,
-                                                      radius: 4,
-                                                    ),
-                                                    8.verticalSpace,
-                                                    BasicContainerShemmering(
-                                                      height: 12.h,
-                                                      width: 80.w,
-                                                      radius: 4,
-                                                    ),
-                                                    4.verticalSpace,
-                                                    BasicContainerShemmering(
-                                                      height: 12.h,
-                                                      width: 100.w,
-                                                      radius: 4,
-                                                    ),
-                                                    4.verticalSpace,
-                                                    BasicContainerShemmering(
-                                                      height: 12.h,
-                                                      width: 60.w,
-                                                      radius: 4,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      }),
-                                    ],
-                                  ),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(
-                                    bottom: 100.h,
-                                  ), // Add bottom padding for FAB
-                                  child: bookingScreen[indexPage],
-                                ),
-                        ),
-                      ),
-                    ],
+                    slivers: indexPage == 0
+                        ? _homeSlivers(c)
+                        : _reviewSlivers(c),
                   ),
                 ),
-                // Positioned button at bottom (hidden while notes field focused)
-                ValueListenableBuilder<bool>(
-                  valueListenable: _isNotesFocused,
-                  builder: (context, isFocused, child) {
-                    if (isFocused && indexPage == 1) {
-                      return const SizedBox.shrink();
-                    }
-                    return isLoading
-                        ? const SizedBox.shrink()
-                        : Positioned(
-                            bottom: 90.h,
-                            left: 0,
-                            right: 0,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (_isGuest)
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: 12.h),
-                                    child: Text(
-                                      _guestAuthMessage(context),
-                                      style: AppStyles.subtext14Regular
-                                          .copyWith(color: ColorManager.white),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                Opacity(
-                                  opacity: _isGuest ? 0.6 : 1,
-                                  // The button inside TotalPayCard handles the tap; a
-                                  // second handler here would fire it twice.
-                                  child: GestureDetector(
-                                    child: BlocConsumer<BookingOrderBloc, BookingOrderState>(
-                                      listener:
-                                          (
-                                            BuildContext context,
-                                            BookingOrderState state,
-                                          ) {
-                                            if (state is CreateOrderSuccess) {
-                                              generalSingleton.orderId = state
-                                                  .reviewOrderModel
-                                                  .data!
-                                                  .sId!;
-
-                                              if (state
-                                                          .reviewOrderModel
-                                                          .data!
-                                                          .totalPay ==
-                                                      0.0 ||
-                                                  state
-                                                          .reviewOrderModel
-                                                          .data!
-                                                          .totalPay ==
-                                                      0) {
-                                                AlertHelper.createOrderSuccess(
-                                                  context,
-                                                );
-                                              }
-                                            } else if (state
-                                                is CreateOrderFailed) {
-                                              if (state.errorModel!.en ==
-                                                      AppStrings
-                                                          .yourWalletBalanceIsNotValid ||
-                                                  state.errorModel!.ar ==
-                                                      AppStrings
-                                                          .yourWalletBalanceIsNotValid) {
-                                                AlertHelper.payWithWalletNotEnoughAmount(
-                                                  context,
-                                                );
-                                              } else {
-                                                showSnackBar(
-                                                  buildContext: context,
-                                                  message:
-                                                      Localizations.localeOf(
-                                                            context,
-                                                          ).languageCode ==
-                                                          'en'
-                                                      ? state.errorModel!.en!
-                                                      : state.errorModel!.ar!,
-                                                );
-                                              }
-                                            }
-                                          },
-                                      builder:
-                                          (
-                                            BuildContext context,
-                                            BookingOrderState state,
-                                          ) {
-                                            if (state is CreateOrderLoading) {
-                                              return const LoadingWidget();
-                                            }
-
-                                            // Hide button when services are loading
-                                            return BlocBuilder<
-                                              OffersBloc,
-                                              OffersState
-                                            >(
-                                              builder: (context, offersState) {
-                                                if (offersState
-                                                        is OffersInitial ||
-                                                    offersState
-                                                        is GetServicesLoading ||
-                                                    offersState
-                                                        is GetAddOnsLoading ||
-                                                    offersState
-                                                        is AddServiceCartLoading ||
-                                                    offersState
-                                                        is DeleteServiceCartLoading ||
-                                                    offersState
-                                                        is AddExtraCartLoading ||
-                                                    offersState
-                                                        is DeleteExtraCartLoading ||
-                                                    offersState
-                                                        is ClearCartLoading ||
-                                                    offersState
-                                                        is ClearAllSelectedServicesLoading ||
-                                                    offersState
-                                                        is GetGuestServicesLoading ||
-                                                    offersState
-                                                        is GetGuestAddOnsLoading) {
-                                                  return const SizedBox.shrink();
-                                                }
-
-                                                final offersBloc = context
-                                                    .read<OffersBloc>();
-
-                                                final int servicesCount =
-                                                    offersBloc
-                                                        .cartServicesList
-                                                        .length;
-                                                final int addOnsCount =
-                                                    offersBloc
-                                                        .cartAddOnsList
-                                                        .length;
-                                                final num servicesTotal =
-                                                    offersBloc.cartServicesList
-                                                        .fold<num>(
-                                                          0,
-                                                          (sum, service) =>
-                                                              sum +
-                                                              (service.price ??
-                                                                  0),
-                                                        );
-                                                final num addOnsTotal =
-                                                    offersBloc.cartAddOnsList
-                                                        .fold<num>(
-                                                          0,
-                                                          (sum, addon) =>
-                                                              sum +
-                                                              (addon.price ??
-                                                                  0),
-                                                        );
-                                                final num totalPrice =
-                                                    servicesTotal + addOnsTotal;
-
-                                                return TotalPayCard(
-                                                  onTap: _nextButtonSteps,
-                                                  text: indexPage == 0
-                                                      ? translate(
-                                                          AppStrings.nextButton,
-                                                        )
-                                                      : translate(
-                                                          AppStrings
-                                                              .confirmButton,
-                                                        ),
-                                                  servicesCount: servicesCount,
-                                                  addOnsCount: addOnsCount,
-                                                  servicesTotal: servicesTotal,
-                                                  addOnsTotal: addOnsTotal,
-                                                  totalPrice: totalPrice,
-                                                );
-                                              },
-                                            );
-                                          },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                  },
-                ),
+                _buildBookingAction(),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Home, ordered by the layout research: where and what first, a wash in
+  /// progress next, then the service choice; offers come after the task.
+  List<Widget> _homeSlivers(KColors c) {
+    return <Widget>[
+      _buildTopBar(c),
+      if (!_isGuest) SliverToBoxAdapter(child: _buildGreeting(c)),
+      if (!_isGuest) SliverToBoxAdapter(child: _buildActiveOrder()),
+      SliverToBoxAdapter(
+        child: isLoading ? const KLoadingState() : bookingScreen[0],
+      ),
+      SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.only(top: KSpace.xl),
+          child: OfferWidget(key: _offerWidgetKey),
+        ),
+      ),
+      _buildActionClearance(),
+    ];
+  }
+
+  List<Widget> _reviewSlivers(KColors c) {
+    return <Widget>[
+      SliverAppBar(
+        pinned: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: c.background,
+        leading: GlassBackButton(onPressed: _backButtonSteps),
+        title: Text(translate(AppStrings.bookingOrder)),
+      ),
+      SliverToBoxAdapter(
+        child: isLoading ? const KLoadingState() : bookingScreen[indexPage],
+      ),
+      _buildActionClearance(),
+    ];
+  }
+
+  /// Keeps the last content clear of the floating booking action and tab bar.
+  Widget _buildActionClearance() {
+    return SliverToBoxAdapter(
+      child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 96),
+    );
+  }
+
+  Widget _buildTopBar(KColors c) {
+    return SliverAppBar(
+      pinned: true,
+      automaticallyImplyLeading: false,
+      backgroundColor: c.background,
+      centerTitle: false,
+      titleSpacing: KSpace.s,
+      title: _isGuest
+          ? Padding(
+              padding: const EdgeInsetsDirectional.only(start: KSpace.s),
+              child: Text(translate(AppStrings.hello)),
+            )
+          : _buildAddress(c),
+      actions: <Widget>[
+        _buildPoints(),
+        const SizedBox(width: KSpace.s),
+        _buildNotifications(c),
+        const SizedBox(width: KSpace.s),
+      ],
+    );
+  }
+
+  /// The saved address the booking goes to, always one tap from changing.
+  Widget _buildAddress(KColors c) {
+    return BlocBuilder<LocationBloc, LocationState>(
+      builder: (BuildContext context, LocationState state) {
+        final List<AddressModel> saved = context
+            .read<LocationBloc>()
+            .savedLocation;
+        if (saved.isEmpty) return const SizedBox.shrink();
+        final AddressModel address = saved.firstWhere(
+          (AddressModel a) => a.isDefault == true,
+          orElse: () => saved.first,
+        );
+        final String label = address.savedName?.isNotEmpty == true
+            ? address.savedName!
+            : address.streetName ?? translate(AppStrings.defaultAddress);
+        return Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: Semantics(
+            button: true,
+            label: label,
+            excludeSemantics: true,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(KRadius.field),
+              onTap: () => pushPage(context, SetBookingLocationScreen()),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: KSpace.s,
+                  vertical: KSpace.m,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(Icons.location_on_rounded, size: 20, color: c.brand),
+                    const SizedBox(width: KSpace.xs),
+                    Flexible(
+                      child: Text(
+                        label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: KType.headline.copyWith(color: c.text),
+                      ),
+                    ),
+                    Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      size: 20,
+                      color: c.textSecondary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPoints() {
+    final Widget coin = SvgPicture.asset(
+      AssetsManager.walletCoin,
+      height: 16,
+      width: 16,
+    );
+    if (_isGuest) {
+      return KChipButton(
+        leading: coin,
+        label: '0',
+        semanticLabel: translate(AppStrings.points),
+        onTap: () => AlertHelper.pointAlert(context),
+      );
+    }
+    return BlocBuilder<GetUserProfileBloc, GetUserProfileState>(
+      builder: (BuildContext context, GetUserProfileState state) {
+        return KChipButton(
+          leading: coin,
+          label: '${points ?? 0}',
+          semanticLabel: translate(AppStrings.points),
+          onTap: () => AlertHelper.pointAlert(context),
+        );
+      },
+    );
+  }
+
+  Widget _buildNotifications(KColors c) {
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: Alignment.center,
+      children: <Widget>[
+        GlassBarButton(
+          icon: Icons.notifications_none_rounded,
+          sfSymbol: 'bell',
+          color: c.brand,
+          tooltip: translate(AppStrings.notifications),
+          onPressed: () {
+            pushPage(
+              context,
+              _isGuest
+                  ? const GuestNotificationScreen()
+                  : const NotificationsScreen(),
+            );
+            if (mounted) {
+              setState(() {
+                generalSingleton.hasUnreadNotification = false;
+              });
+            }
+          },
+        ),
+        if (generalSingleton.hasUnreadNotification)
+          PositionedDirectional(
+            top: KSpace.s,
+            end: KSpace.s,
+            child: IgnorePointer(
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: c.error,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildGreeting(KColors c) {
+    return BlocBuilder<GetUserProfileBloc, GetUserProfileState>(
+      builder: (BuildContext context, GetUserProfileState state) {
+        final String name = state is GetUserProfileSuccess
+            ? (state.userProfile.data?.userName ?? '').split(' ').first
+            : '';
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.m),
+          child: Text(
+            '${translate(AppStrings.hello)} $name'.trim(),
+            style: KType.largeTitle.copyWith(color: c.text),
+          ),
+        );
+      },
+    );
+  }
+
+  /// A wash in progress goes first. Uses its own bloc so this does not disturb
+  /// the lists on the Bookings tab.
+  Widget _buildActiveOrder() {
+    return BlocBuilder<MyBookingBloc, MyBookingState>(
+      bloc: _activeOrders,
+      builder: (BuildContext context, MyBookingState state) {
+        if (state.activeList.isEmpty) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
+          child: ActiveOrderCard(order: state.activeList.first),
+        );
+      },
+    );
+  }
+
+  /// One action, shown once there is something to book.
+  Widget _buildBookingAction() {
+    return ValueListenableBuilder<bool>(
+      valueListenable: _isNotesFocused,
+      builder: (BuildContext context, bool isFocused, Widget? child) {
+        if ((isFocused && indexPage == 1) || isLoading) {
+          return const SizedBox.shrink();
+        }
+        return Positioned(
+          left: 0,
+          right: 0,
+          bottom: MediaQuery.paddingOf(context).bottom + KSpace.m,
+          child: BlocConsumer<BookingOrderBloc, BookingOrderState>(
+            listener: (BuildContext context, BookingOrderState state) {
+              if (state is CreateOrderSuccess) {
+                generalSingleton.orderId = state.reviewOrderModel.data!.sId!;
+
+                if (state.reviewOrderModel.data!.totalPay == 0.0 ||
+                    state.reviewOrderModel.data!.totalPay == 0) {
+                  AlertHelper.createOrderSuccess(context);
+                }
+              } else if (state is CreateOrderFailed) {
+                if (state.errorModel!.en ==
+                        AppStrings.yourWalletBalanceIsNotValid ||
+                    state.errorModel!.ar ==
+                        AppStrings.yourWalletBalanceIsNotValid) {
+                  AlertHelper.payWithWalletNotEnoughAmount(context);
+                } else {
+                  showSnackBar(
+                    buildContext: context,
+                    message:
+                        Localizations.localeOf(context).languageCode == 'en'
+                        ? state.errorModel!.en!
+                        : state.errorModel!.ar!,
+                  );
+                }
+              }
+            },
+            builder: (BuildContext context, BookingOrderState state) {
+              if (state is CreateOrderLoading) {
+                return const KLoadingState();
+              }
+
+              // Hide button when services are loading
+              return BlocBuilder<OffersBloc, OffersState>(
+                builder: (context, offersState) {
+                  if (offersState is OffersInitial ||
+                      offersState is GetServicesLoading ||
+                      offersState is GetAddOnsLoading ||
+                      offersState is AddServiceCartLoading ||
+                      offersState is DeleteServiceCartLoading ||
+                      offersState is AddExtraCartLoading ||
+                      offersState is DeleteExtraCartLoading ||
+                      offersState is ClearCartLoading ||
+                      offersState is ClearAllSelectedServicesLoading ||
+                      offersState is GetGuestServicesLoading ||
+                      offersState is GetGuestAddOnsLoading) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final offersBloc = context.read<OffersBloc>();
+                  // Subscribers can book on their plan without choosing a
+                  // paid service.
+                  final bool subscribed =
+                      sl<GetUserProfileBloc>().profile.isSubscribed == true;
+                  if (indexPage == 0 &&
+                      !subscribed &&
+                      offersBloc.cartServicesList.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final int servicesCount = offersBloc.cartServicesList.length;
+                  final int addOnsCount = offersBloc.cartAddOnsList.length;
+                  final num servicesTotal = offersBloc.cartServicesList
+                      .fold<num>(
+                        0,
+                        (sum, service) => sum + (service.price ?? 0),
+                      );
+                  final num addOnsTotal = offersBloc.cartAddOnsList.fold<num>(
+                    0,
+                    (sum, addon) => sum + (addon.price ?? 0),
+                  );
+                  final num totalPrice = servicesTotal + addOnsTotal;
+
+                  return TotalPayCard(
+                    onTap: _nextButtonSteps,
+                    text: indexPage == 0
+                        ? translate(AppStrings.nextButton)
+                        : translate(AppStrings.confirmButton),
+                    servicesCount: servicesCount,
+                    addOnsCount: addOnsCount,
+                    servicesTotal: servicesTotal,
+                    addOnsTotal: addOnsTotal,
+                    totalPrice: totalPrice,
+                  );
+                },
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

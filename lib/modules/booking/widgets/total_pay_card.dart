@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:thewasher/core/design/tokens.dart';
 
-/// The Home booking action (design: CustomerHome): one primary [KButton] —
-/// Apple prominent glass on iOS, Material 3 filled on Android — that carries
-/// the total, e.g. "Next · 25". Replaces the old gradient card.
+/// The booking action, carrying the total ("Next · 25"): one solid primary
+/// button floating above the tab bar.
 class TotalPayCard extends StatelessWidget {
   final VoidCallback? onTap;
   final String text;
@@ -34,8 +33,7 @@ class TotalPayCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: KSpace.xl, vertical: KSpace.l),
+      padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
       child: KButton(
         label: totalPrice > 0 ? '$text · ${_formatPrice(totalPrice)}' : text,
         onPressed: onTap ?? () {},
