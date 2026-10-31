@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Android 12+ splash icon: the whole logo inside the system's circular mask. -->
+<!-- Android 12+ splash icon. The empty first layer sets the icon's full 288dp
+     size, so the system does not stretch the logo past its circular mask. -->
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <size android:width="288dp" android:height="288dp" />
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
     <item
-        android:width="128dp"
-        android:height="84dp"
+        android:width="173dp"
+        android:height="114dp"
         android:gravity="center"
         android:drawable="@drawable/launch_logo" />
 </layer-list>
