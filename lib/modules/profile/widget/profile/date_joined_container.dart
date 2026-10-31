@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:intl/intl.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/components/k_list_row.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
-import 'package:thewhsherbiker/core/resources/fonts_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:thewhsherbiker/core/resources/values_manager.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 
 class DateJoinedContainer extends StatelessWidget {
   final String timeCreateAt;
@@ -67,82 +66,20 @@ class DateJoinedContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final formattedDate = _formatDate(timeCreateAt);
-    final duration = _calculateDuration(context, timeCreateAt);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.white,
-        borderRadius: const BorderRadius.all(Radius.circular(AppSize.s12)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: ColorManager.black.withValues(alpha: .06),
-            blurRadius: 6.r,
-            offset: const Offset(0, 3),
-          )
-        ],
-      ),
-      padding: EdgeInsets.symmetric(vertical: 18.h, horizontal: 16.w),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SvgPicture.asset(ImageAssets.joinedLogo),
-              SizedBox(width: 6.w),
-              Text(
-                translate(AppStrings.dateJoined),
-                style: AppStyles.title16Regular.copyWith(
-                  color: ColorManager.medGray,
-                  fontSize: FontSize.s12.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          14.verticalSpace,
-          Container(
-            height: 1.h,
-            color: ColorManager.divider,
-            width: double.infinity,
-          ),
-          14.verticalSpace,
-          Column(
-            children: <Widget>[
-              Text(
-                formattedDate,
-                style: AppStyles.body14Medium.copyWith(
-                  color: ColorManager.darkGrey,
-                  fontSize: FontSize.s16.sp,
-                  fontWeight: FontWeight.w600,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              if (duration.isNotEmpty) ...[
-                6.verticalSpace,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Icon(
-                      Icons.access_time,
-                      size: 14.sp,
-                      color: ColorManager.medGray,
-                    ),
-                    4.horizontalSpace,
-                    Text(
-                      '${translate(AppStrings.memberSince)} $duration',
-                      style: AppStyles.title16Regular.copyWith(
-                        color: ColorManager.medGray,
-                        fontSize: FontSize.s10.sp,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ],
-          ),
-        ],
+    final String date = _formatDate(timeCreateAt);
+    final String duration = _calculateDuration(context, timeCreateAt);
+    return KCard(
+      padding: EdgeInsets.zero,
+      child: KListRow(
+        leading: SvgPicture.asset(
+          ImageAssets.joinedLogo,
+          width: KSpace.xxl,
+          height: KSpace.xxl,
+        ),
+        title: tr(context, AppStrings.dateJoined),
+        subtitle: duration.isEmpty
+            ? date
+            : '$date\n${tr(context, AppStrings.memberSince)} $duration',
       ),
     );
   }

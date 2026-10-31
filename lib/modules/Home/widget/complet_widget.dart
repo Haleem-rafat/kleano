@@ -12,8 +12,8 @@ import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
-/// The Completed tab (a sliver). Mounting it loads the list, so it reloads when
-/// the biker comes back to this tab.
+/// The Completed list of the Orders tab (a sliver). Mounting it loads the list,
+/// so it reloads when the biker comes back to it.
 class CompleteWidget extends StatefulWidget {
   const CompleteWidget({super.key, required this.refreshController});
 
@@ -45,9 +45,15 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         if (state is BikerGetOrdersCompleteSuccess ||
             state is BikerGetOrdersCompleteEmpty) {
           widget.refreshController.loadComplete();
+          if (widget.refreshController.isRefresh) {
+            widget.refreshController.refreshCompleted();
+          }
         } else if (state is BikerGetOrdersCompleteFailed) {
           if (widget.refreshController.isLoading) {
             widget.refreshController.loadFailed();
+          }
+          if (widget.refreshController.isRefresh) {
+            widget.refreshController.refreshFailed();
           }
         }
       },

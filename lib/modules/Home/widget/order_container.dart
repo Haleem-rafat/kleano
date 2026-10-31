@@ -1,156 +1,102 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
-import 'package:thewhsherbiker/core/resources/fonts_manager.dart';
+import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/Home/widget/user_details_widget.dart';
+import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/order/screens/order_details_screen.dart';
-import 'package:thewhsherbiker/shared/components/buttons.dart';
-import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/app_date_formatter.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
+/// A new request: when, who and where, with details and accept actions.
 class OrderContainer extends StatelessWidget {
   final int index;
   const OrderContainer({super.key, required this.index});
 
+  void _accept(BuildContext context, OrderModel order) {
+    if (sl<AuthBloc>().currentPosition != LatLng(0, 0)) {
+      sl<HomeBloc>().add(
+        BikerAcceptOrder(
+          context: context,
+          orderId: order.sId!,
+          orderIndex: index,
+          lat: sl<AuthBloc>().currentPosition.latitude.toString(),
+          lng: sl<AuthBloc>().currentPosition.longitude.toString(),
+          streetName: sl<AuthBloc>().currentAddress,
+          subAdministrativeArea: sl<AuthBloc>().administrativeArea,
+          details: false,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: ColorManager.darkGrey,
-        borderRadius: BorderRadius.all(Radius.circular(15.r)),
-      ),
+    final KColors c = KColors.of(context);
+    final OrderModel order = sl<HomeBloc>().orderList[index];
+    return KCard(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          SizedBox(
-            height: 11.h,
-          ),
           Text(
-            "${translate(AppStrings.arrivedTime)} ${sl<HomeBloc>().orderList[index].startTime != null ? '${AppDateFormatter.allDate(sl<HomeBloc>().orderList[index].startTime!)} ${AppDateFormatter.dateToStringHHMMA(sl<HomeBloc>().orderList[index].startTime!.toLocal())}' : ''}",
-            style: AppStyles.caption12Regular.copyWith(
-              color: ColorManager.white,
-              fontSize: FontSize.s10.sp,
+            '${tr(context, AppStrings.arrivedTime)} ${order.startTime != null ? '${AppDateFormatter.allDate(order.startTime!)} ${AppDateFormatter.dateToStringHHMMA(order.startTime!.toLocal())}' : ''}',
+            style: KType.footnote.copyWith(color: c.textSecondary),
+          ),
+          const SizedBox(height: KSpace.m),
+          UserDetailsWidget(userData: order),
+          if (order.bookingDate != null) ...<Widget>[
+            const SizedBox(height: KSpace.s),
+            RowInfoWidget(
+              title: tr(context, AppStrings.washingDate),
+              infoText:
+                  '${AppDateFormatter.allDateWithDayName(order.startTime!)} ${AppDateFormatter.dateToStringHHMMA(order.startTime!.toLocal())}',
             ),
-          ),
-          SizedBox(
-            height: 11.h,
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              decoration: BoxDecoration(
-                  color: ColorManager.white,
-                  borderRadius: BorderRadius.all(Radius.circular(15.r)),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                        color: ColorManager.black.withValues(alpha: .08),
-                        blurRadius: 6.r,
-                        offset: const Offset(0, 3))
-                  ]),
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: 24.h,
-                  ),
-                  UserDetailsWidget(
-                    userData: sl<HomeBloc>().orderList[index],
-                    textStyle: AppStyles.title16Bold,
-                  ),
-                  SizedBox(
-                    height: 11.h,
-                  ),
-                  if (sl<HomeBloc>().orderList[index].bookingDate != null)
-                    RowInfoWidget(
-                      title: translate(AppStrings.washingDate),
-                      infoText:
-                          '${AppDateFormatter.allDateWithDayName(sl<HomeBloc>().orderList[index].startTime!)} ${AppDateFormatter.dateToStringHHMMA(sl<HomeBloc>().orderList[index].startTime!.toLocal())}',
-                    ),
-                  SizedBox(
-                    height: 12.h,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Expanded(
-                        child: ButtonsShared(
-                          height: 30.h,
-                          // width: 128.w,
-                          showShadow: false,
-                          onPressed: () {
-                            pushPage(
-                                context,
-                                OrderDetailsScreen(
-                                    data: sl<HomeBloc>().orderList[index],
-                                    complete: false,
-                                    index: index));
-                          },
-                          text: translate(AppStrings.viewDetails),
-                          colorText: ColorManager.primary,
-                          colorButton: ColorManager.white,
-                          borderRadius: 8,
-                          textStyle: AppStyles.body14Medium,
-                        ),
+          ],
+          const SizedBox(height: KSpace.m),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: KButton(
+                  label: tr(context, AppStrings.viewDetails),
+                  variant: KButtonVariant.secondary,
+                  onPressed: () {
+                    pushPage(
+                      context,
+                      OrderDetailsScreen(
+                        data: order,
+                        complete: false,
+                        index: index,
                       ),
-                      15.horizontalSpace,
-                      BlocBuilder<HomeBloc, HomeState>(
-                        builder: (BuildContext context, HomeState state) {
-                          if ((state is BikerAcceptOrderLoading) &&
-                              (index == sl<HomeBloc>().selected)) {
-                            return LoadingWidget();
-                          } else {
-                            return Expanded(
-                              child: ButtonsShared(
-                                height: 30.h,
-                                // width: 128.w,
-                                showShadow: false,
-                                onPressed: () {
-                                  if (sl<AuthBloc>().currentPosition !=
-                                      LatLng(0, 0)) {
-                                    sl<HomeBloc>().add(BikerAcceptOrder(
-                                      context: context,
-                                      orderId:
-                                          sl<HomeBloc>().orderList[index].sId!,
-                                      orderIndex: index,
-                                      lat: sl<AuthBloc>()
-                                          .currentPosition
-                                          .latitude
-                                          .toString(),
-                                      lng: sl<AuthBloc>()
-                                          .currentPosition
-                                          .longitude
-                                          .toString(),
-                                      streetName: sl<AuthBloc>().currentAddress,
-                                      subAdministrativeArea:
-                                          sl<AuthBloc>().administrativeArea,
-                                      details: false,
-                                    ));
-                                  }
-                                },
-                                text: translate(AppStrings.accept),
-                                borderRadius: 8,
-                                textStyle: AppStyles.body14Medium,
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 24.h,
-                  ),
-                ],
+                    );
+                  },
+                ),
               ),
-            ),
+              const SizedBox(width: KSpace.s),
+              Expanded(
+                child: BlocBuilder<HomeBloc, HomeState>(
+                  bloc: sl<HomeBloc>(),
+                  buildWhen: (HomeState previous, HomeState current) =>
+                      current is BikerAcceptOrderLoading ||
+                      current is BikerAcceptOrderSuccess ||
+                      current is BikerAcceptOrderFailed,
+                  builder: (BuildContext context, HomeState state) => KButton(
+                    label: tr(context, AppStrings.accept),
+                    loading:
+                        state is BikerAcceptOrderLoading &&
+                        index == sl<HomeBloc>().selected,
+                    onPressed: () => _accept(context, order),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

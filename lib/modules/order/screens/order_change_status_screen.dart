@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:geolocator/geolocator.dart';
-// import 'package:google_map_polyline_new/google_map_polyline_new.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
-import 'package:thewhsherbiker/core/components/circle_image.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
+import 'package:thewhsherbiker/core/design/components/k_states.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/map_style.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart'
     as ord;
 import 'package:thewhsherbiker/modules/order/widgets/status_order_bottom_sheet.dart';
@@ -21,7 +21,6 @@ import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/modules/profile/screens/profile_screen.dart';
 import 'package:thewhsherbiker/modules/profile/widget/biker_status_switch.dart';
 import 'package:thewhsherbiker/shared/components/alert_helper/alert_helper_main.dart';
-import 'package:thewhsherbiker/shared/components/loading.dart';
 import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
@@ -45,10 +44,6 @@ class OrderChangeStatus extends StatefulWidget {
 }
 
 class _OrderChangeStatusState extends State<OrderChangeStatus> {
-  final double _initFabHeight = 120.h;
-  double fabHeight = 0;
-  double _panelHeightOpen = 0;
-  double _panelHeightClosed = 120.h;
   PanelController panelController = PanelController();
   //
   double zoom = 12.5;
@@ -97,7 +92,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
           points: routes,
           patterns: <PatternItem>[PatternItem.dot],
           width: 4,
-          color: ColorManager.medGray,
+          color: KColors.of(context).textSecondary,
           startCap: Cap.roundCap,
         ));
       });
@@ -123,7 +118,6 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
   @override
   void initState() {
     super.initState();
-    fabHeight = _initFabHeight;
     if (widget.notification) {
       _handleNotification();
     } else {
@@ -159,14 +153,17 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
 
   @override
   Widget build(BuildContext context) {
-    _panelHeightOpen = MediaQuery.of(context).size.height * .60;
-    _panelHeightClosed = MediaQuery.of(context).size.height * .21;
+    final KColors c = KColors.of(context);
+    final double screenHeight = MediaQuery.sizeOf(context).height;
     return Scaffold(
+      backgroundColor: c.background,
       body: BlocConsumer<HomeBloc, HomeState>(
         listener: (BuildContext context, HomeState state) {
           if (state is BikerOrderSuccess) {
             getCurrentLocation(
-                state.markerBikerLocation, state.markerUserLocation);
+              state.markerBikerLocation,
+              state.markerUserLocation,
+            );
           } else if (state is BikerCompleteOrderSuccess) {
             AlertHelper.ratingDialog(context, state.orderId);
           } else if (state is BikerCancelOrderSuccess) {
@@ -177,40 +174,45 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
             );
             pop(context);
           } else if (state is BikerCancelOrderFailed) {
-            showSnackBar(
-              buildContext: context,
-              message: state.error,
-            );
+            showSnackBar(buildContext: context, message: state.error);
           }
         },
+        // The panel's parts listen for their own states.
+        buildWhen: (HomeState previous, HomeState current) =>
+            current is BikerOrderLoading ||
+            current is BikerOrderSuccess ||
+            current is BikerOrderFailed,
         builder: (BuildContext context, HomeState state) {
           if (state is BikerOrderLoading) {
-            return Center(
-              child: LoadingWidget(),
-            );
+            return const KLoadingState();
           } else if (state is! BikerOrderFailed) {
             return SlidingUpPanel(
               controller: panelController,
-              maxHeight: _panelHeightOpen,
-              minHeight: _panelHeightClosed,
+              maxHeight: screenHeight * .60,
+              minHeight: screenHeight * .21,
               parallaxEnabled: true,
               parallaxOffset: .3,
-              panel: StatusOrderBottomSheet(
-                order: widget.order,
-                index: widget.index ?? -1,
-              ),
+              color: c.surface,
+              panelBuilder: (ScrollController scrollController) =>
+                  StatusOrderBottomSheet(
+                    order: widget.order,
+                    index: widget.index ?? -1,
+                    scrollController: scrollController,
+                  ),
               body: _mapbody(context),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.r),
-                topRight: Radius.circular(20.r),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(KRadius.sheet),
               ),
-              onPanelSlide: (double pos) => setState(() {
-                fabHeight = pos * (_panelHeightOpen - _panelHeightClosed) +
-                    _initFabHeight;
-              }),
             );
           } else {
-            return Container();
+            return Scaffold(
+              backgroundColor: c.background,
+              appBar: const GlassAppBar(),
+              body: KErrorState(
+                message: translate('defaultError'),
+                onRetry: _handleOrder,
+              ),
+            );
           }
         },
       ),
@@ -234,12 +236,12 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
             ),
           ),
         ),
-        Positioned(
-          top: 46.h,
-          right: 18.w,
-          left: 18.w,
-          child: _bikerDetailsHeader(context),
-        )
+        SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(KSpace.l),
+            child: _bikerDetailsHeader(context),
+          ),
+        ),
       ],
     );
   }
@@ -249,38 +251,26 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: <Widget>[
         InkWell(
+          customBorder: const CircleBorder(),
           onTap: () {
-            pushPage(context, ProfileScreen());
+            pushPage(context, const ProfileScreen());
           },
-          child: CircleImageShared(
-              imageUrl: sl<ProfileBloc>().profile.imageLink!,
-              radius: 20.r,
-              name: sl<ProfileBloc>().profile.userName!),
+          child: HomeAvatar(
+            imageUrl: sl<ProfileBloc>().profile.imageLink,
+            name: sl<ProfileBloc>().profile.userName,
+            size: KSpace.tapTarget,
+          ),
         ),
-        BikerStatusSwitchWidget(),
-        InkWell(
-          onTap: () {
+        const BikerStatusSwitchWidget(),
+        GlassIconButton(
+          icon: Icons.close,
+          sfSymbol: 'xmark',
+          color: KColors.of(context).brand,
+          tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+          onPressed: () {
             positionStream.cancel();
             pop(context);
           },
-          child: Container(
-            width: 40.w,
-            height: 40.h,
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: ColorManager.white,
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                      color: ColorManager.black.withValues(alpha: .07),
-                      blurRadius: 6.r,
-                      offset: const Offset(0, 3))
-                ]),
-            child: Icon(
-              Icons.close,
-              color: ColorManager.primary,
-              size: 18.r,
-            ),
-          ),
         ),
       ],
     );

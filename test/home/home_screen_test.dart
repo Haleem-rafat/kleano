@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
 import 'package:thewhsherbiker/core/design/components/k_card.dart';
 import 'package:thewhsherbiker/core/design/components/k_segmented.dart';
 import 'package:thewhsherbiker/core/design/components/k_states.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
-import 'package:thewhsherbiker/core/design/kleano_theme.dart';
 import 'package:thewhsherbiker/core/design/liquid_glass.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/screens/empty_screen.dart';
@@ -20,141 +14,14 @@ import 'package:thewhsherbiker/modules/notification/bloc/notification_bloc.dart'
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/modules/profile/data/model/profile_model.dart';
-import 'package:thewhsherbiker/modules/profile/data/model/total_commission_model.dart';
-import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
-/// Records what Home sends and never reaches the socket or the backend. It
-/// doesn't extend HomeBloc, whose fields open a socket client and audio player.
-class SpyHomeBloc extends Bloc<HomeEvent, HomeState> implements HomeBloc {
-  SpyHomeBloc() : super(HomeInitial());
-
-  final List<HomeEvent> sent = <HomeEvent>[];
-
-  @override
-  List<OrderModel> activeList = <OrderModel>[];
-  @override
-  List<OrderModel> completeList = <OrderModel>[];
-  @override
-  int completeTotalLength = 0;
-
-  @override
-  void add(HomeEvent event) => sent.add(event);
-
-  void push(HomeState state) => emit(state);
-
-  @override
-  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
-}
-
-class SpyProfileBloc extends ProfileBloc {
-  final List<ProfileEvent> sent = <ProfileEvent>[];
-
-  @override
-  void add(ProfileEvent event) => sent.add(event);
-
-  void push(ProfileState state) => emit(state);
-}
-
-class SpyNotificationBloc extends NotificationBloc {
-  final List<NotificationEvent> sent = <NotificationEvent>[];
-
-  @override
-  void add(NotificationEvent event) => sent.add(event);
-
-  void push(NotificationState state) => emit(state);
-}
-
-late LocalizationDelegate delegate;
-late SpyHomeBloc home;
-late SpyProfileBloc profile;
-late SpyNotificationBloc notifications;
-
-/// Rebuilds for a language change the way `lib/app.dart` does.
-Widget app(Widget screen) => LocalizedApp(
-  delegate,
-  Builder(
-    builder: (BuildContext context) {
-      LocalizationProvider.of(context);
-      return BlocProvider<NotificationBloc>.value(
-        value: notifications,
-        child: AdaptiveScreenUtil(
-          builder: (_) => MaterialApp(
-            theme: kleanoTheme(brightness: Brightness.light),
-            localizationsDelegates: <LocalizationsDelegate<dynamic>>[
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-              delegate,
-            ],
-            supportedLocales: delegate.supportedLocales,
-            locale: delegate.currentLocale,
-            home: screen,
-          ),
-        ),
-      );
-    },
-  ),
-);
-
-void phone(WidgetTester t, {double width = 375, double height = 812}) {
-  t.view.devicePixelRatio = 3;
-  t.view.physicalSize = Size(width, height) * 3;
-  addTearDown(t.view.reset);
-}
-
-OrderModel order(String id, {String status = 'ACCEPTED_BY_BIKER'}) =>
-    OrderModel(sId: id, status: status, isAssigned: false)
-      ..startTime = DateTime(2026, 10, 31, 9, 30)
-      ..createdAt = DateTime(2026, 10, 30);
-
-void onlineWithStats() {
-  profile.profile = ProfileModel(
-    status: 'ONLINE',
-    userName: 'Haleem',
-    rating: 4.5,
-    totalWashes: 120,
-    totalCommission: TotalCommissionModel(
-      today: CommissionPeriod(totalCommission: 15, ordersCount: 1),
-      allTime: CommissionPeriod(totalCommission: 980, ordersCount: 120),
-      allWeekends: CommissionPeriod(totalCommission: 200, ordersCount: 20),
-    ),
-  );
-}
-
-Future<void> pumpHome(WidgetTester t, {int initialIndex = 0}) async {
-  await t.pumpWidget(app(HomeScreen(initialIndex: initialIndex)));
-  await settle(t);
-}
-
-/// `pumpAndSettle` never returns while a platform spinner is on screen.
-Future<void> settle(WidgetTester t) async {
-  await t.pump();
-  for (int i = 0; i < 20; i++) {
-    await t.pump(const Duration(milliseconds: 100));
-  }
-}
+import 'home_test_support.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  setUpAll(() async {
-    SharedPreferences.setMockInitialValues(<String, Object>{});
-    delegate = await LocalizationDelegate.create(
-      fallbackLocale: 'en',
-      supportedLocales: <String>['en', 'ar'],
-    );
-  });
-
-  setUp(() async {
-    await delegate.changeLocale(const Locale('en'));
-    await sl.reset();
-    home = SpyHomeBloc();
-    profile = SpyProfileBloc();
-    notifications = SpyNotificationBloc();
-    sl.registerSingleton<HomeBloc>(home);
-    sl.registerSingleton<ProfileBloc>(profile);
-    sl.registerSingleton<NotificationBloc>(notifications);
-  });
+  setUpAll(setUpLanguages);
+  setUp(setUpSpies);
 
   group('calls', () {
     testWidgets('opening Home sends the same events as before', (
@@ -187,7 +54,7 @@ void main() {
     ) async {
       phone(t);
       onlineWithStats();
-      await pumpHome(t);
+      await pumpOrders(t);
       home.sent.clear();
 
       await t.tap(find.text('Completed'));
@@ -198,16 +65,6 @@ void main() {
       await t.tap(find.text('Active'));
       await settle(t);
       expect(home.sent.single, isA<BikerGetOrdersAccept>());
-    });
-
-    testWidgets('initial index 2 (from notifications) opens Completed', (
-      WidgetTester t,
-    ) async {
-      phone(t);
-      onlineWithStats();
-      await pumpHome(t, initialIndex: 2);
-      expect(t.takeException(), isNull);
-      expect(home.sent.last, isA<BikerGetOrdersComplete>());
     });
 
     testWidgets('going online also loads the active orders', (
@@ -257,7 +114,7 @@ void main() {
       home.completeList = <OrderModel>[
         for (int i = 0; i < 8; i++) order('done$i', status: 'COMPLETED'),
       ];
-      await pumpHome(t);
+      await pumpOrders(t);
       home.sent.clear();
 
       await t.fling(
@@ -294,7 +151,7 @@ void main() {
     ) async {
       phone(t, width: 320, height: 568);
       onlineWithStats();
-      await pumpHome(t);
+      await pumpOrders(t);
       home.sent.clear();
 
       await t.fling(
@@ -363,7 +220,7 @@ void main() {
       expect(find.byType(GlassBarButton), findsOneWidget);
     });
 
-    testWidgets('the current order comes first, then stats, then the tabs', (
+    testWidgets('the online switch, then the current order, then stats', (
       WidgetTester t,
     ) async {
       t.view.devicePixelRatio = 3;
@@ -378,14 +235,11 @@ void main() {
           .getTopLeft(find.byKey(const ValueKey<String?>('first')))
           .dy;
       final double stats = t.getTopLeft(find.text('Total Washes')).dy;
-      final double tabs = t.getTopLeft(find.text('Active')).dy;
-      final double rest = t
-          .getTopLeft(find.byKey(const ValueKey<String?>('second')))
-          .dy;
       expect(status, lessThan(focus));
       expect(focus, lessThan(stats));
-      expect(stats, lessThan(tabs));
-      expect(tabs, lessThan(rest));
+      // The other orders and the lists live on the Orders tab.
+      expect(find.byKey(const ValueKey<String?>('second')), findsNothing);
+      expect(find.text('Active'), findsNothing);
     });
 
     testWidgets('each order keeps its real index in the bloc list', (
@@ -396,7 +250,7 @@ void main() {
       addTearDown(t.view.reset);
       onlineWithStats();
       home.activeList = <OrderModel>[order('a'), order('b'), order('c')];
-      await pumpHome(t);
+      await pumpOrders(t);
 
       final Map<String?, int> indexes = <String?, int>{
         for (final AcceptContainer c in t.widgetList<AcceptContainer>(
@@ -431,7 +285,7 @@ void main() {
     ) async {
       phone(t);
       onlineWithStats();
-      await pumpHome(t);
+      await pumpOrders(t);
       home.push(BikerGetOrdersAcceptEmpty());
       await settle(t);
       expect(find.byType(KEmptyState), findsOneWidget);
@@ -448,7 +302,7 @@ void main() {
     ) async {
       phone(t, height: 1400);
       onlineWithStats();
-      await pumpHome(t);
+      await pumpOrders(t);
 
       home.push(BikerGetOrdersAcceptLoading());
       await settle(t);
@@ -469,7 +323,7 @@ void main() {
       phone(t);
       onlineWithStats();
       home.activeList = <OrderModel>[order('a')];
-      await pumpHome(t);
+      await pumpOrders(t);
 
       home.push(BikerGetOrdersAcceptLoading());
       await settle(t);
@@ -514,7 +368,7 @@ void main() {
       t.view.physicalSize = const Size(375, 1600) * 3;
       addTearDown(t.view.reset);
       onlineWithStats();
-      await pumpHome(t);
+      await pumpOrders(t);
       await t.tap(find.text('Completed'));
       await settle(t);
 
@@ -637,7 +491,7 @@ void main() {
       expect(find.text('Total Washes'), findsOneWidget);
 
       await delegate.changeLocale(const Locale('ar'));
-      await t.pumpWidget(app(const HomeScreen(initialIndex: 0)));
+      await t.pumpWidget(app(const HomeScreen()));
       await settle(t);
       expect(find.text('Total Washes'), findsNothing);
       expect(find.widgetWithText(KStatusChip, 'متصل'), findsOneWidget);
@@ -710,8 +564,3 @@ void main() {
   });
 }
 
-void onlineStatsOnly() {
-  final String? status = profile.profile.status;
-  onlineWithStats();
-  profile.profile.status = status;
-}

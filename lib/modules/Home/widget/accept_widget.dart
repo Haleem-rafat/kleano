@@ -27,9 +27,21 @@ bool affectsActiveOrders(HomeState state) =>
     state is BikerCompleteOrderSuccess ||
     state is BikerCancelOrderSuccess;
 
-/// The order to deal with now, shown above everything else (a sliver).
-class ActiveOrderFocus extends StatelessWidget {
+/// The order to deal with now, shown on Today (a sliver). Mounting it loads the
+/// active orders, so it loads on open and again when the biker goes online.
+class ActiveOrderFocus extends StatefulWidget {
   const ActiveOrderFocus({super.key});
+
+  @override
+  State<ActiveOrderFocus> createState() => _ActiveOrderFocusState();
+}
+
+class _ActiveOrderFocusState extends State<ActiveOrderFocus> {
+  @override
+  void initState() {
+    super.initState();
+    sl<HomeBloc>().add(BikerGetOrdersAccept());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,8 +69,8 @@ class ActiveOrderFocus extends StatelessWidget {
   }
 }
 
-/// The Active tab (a sliver): the orders after [ActiveOrderFocus]. Mounting it
-/// loads the list, so it reloads when the biker comes back to this tab.
+/// The Active list of the Orders tab (a sliver). Mounting it loads the list, so
+/// it reloads when the biker comes back to it.
 class AcceptWidget extends StatefulWidget {
   const AcceptWidget({super.key, required this.refreshController});
 
@@ -84,9 +96,15 @@ class _AcceptWidgetState extends State<AcceptWidget> {
         if (state is BikerGetOrdersAcceptSuccess ||
             state is BikerGetOrdersAcceptEmpty) {
           widget.refreshController.loadComplete();
+          if (widget.refreshController.isRefresh) {
+            widget.refreshController.refreshCompleted();
+          }
         } else if (state is BikerGetOrdersAcceptFailed) {
           if (widget.refreshController.isLoading) {
             widget.refreshController.loadFailed();
+          }
+          if (widget.refreshController.isRefresh) {
+            widget.refreshController.refreshFailed();
           }
         } else if (state is BikerCancelOrderSuccess) {
           showSnackBar(
@@ -113,9 +131,6 @@ class _AcceptWidgetState extends State<AcceptWidget> {
               ),
             );
           }
-        }
-        // The first order is already on screen in ActiveOrderFocus.
-        if (orders.length <= 1) {
           return SliverToBoxAdapter(
             child: EmptyScreen(
               notification: false,
@@ -124,17 +139,14 @@ class _AcceptWidgetState extends State<AcceptWidget> {
           );
         }
         return SliverList.separated(
-          itemCount: orders.length - 1,
+          itemCount: orders.length,
           separatorBuilder: (BuildContext context, int index) =>
               const SizedBox(height: KSpace.l),
-          itemBuilder: (BuildContext context, int index) {
-            final OrderModel order = orders[index + 1];
-            return AcceptContainer(
-              key: ValueKey<String?>(order.sId),
-              acceptOrder: order,
-              index: index + 1,
-            );
-          },
+          itemBuilder: (BuildContext context, int index) => AcceptContainer(
+            key: ValueKey<String?>(orders[index].sId),
+            acceptOrder: orders[index],
+            index: index,
+          ),
         );
       },
     );

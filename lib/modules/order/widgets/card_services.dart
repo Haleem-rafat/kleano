@@ -1,182 +1,129 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:thewhsherbiker/core/resources/values_manager.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 
+/// A washing service; tapping it shows what the service includes.
 class CardServices extends StatefulWidget {
   final WashingServices service;
-  const CardServices({
-    super.key,
-    required this.service,
-  });
+  const CardServices({super.key, required this.service});
 
   @override
   State<CardServices> createState() => _CardServicesState();
 }
 
-class _CardServicesState extends State<CardServices>
-    with SingleTickerProviderStateMixin {
-  bool showInfoPlan = true;
-  late AnimationController _controller;
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-      upperBound: 0.5,
-    );
-  }
+class _CardServicesState extends State<CardServices> {
+  static const double _iconSize = KSpace.xxxl + KSpace.l;
 
-  @override
-  void dispose() {
-    super.dispose();
-    _controller.dispose();
-  }
-
-  void _showInfo() {
-    setState(() {
-      showInfoPlan = !showInfoPlan;
-      if (_controller.isDismissed) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
-  }
+  bool _open = false;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: _showInfo,
-      behavior: HitTestBehavior.opaque,
+    final KColors c = KColors.of(context);
+    final String language = Localizations.localeOf(context).languageCode;
+    final String? icon = widget.service.iconWashingServices!.iconLink;
+    final int cacheSize = (_iconSize * MediaQuery.devicePixelRatioOf(context))
+        .round();
+    return KCard(
+      onTap: () => setState(() => _open = !_open),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Row(
             children: <Widget>[
-              Text(
-                widget.service.getLocalizedName(
-                      Localizations.localeOf(context).languageCode,
-                    ) ??
-                    '',
-                style: AppStyles.body14Medium
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-              const Spacer(),
-              GestureDetector(
-                onTap: _showInfo,
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  height: 32.h,
-                  width: 32.w,
-                  decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: ColorManager.white,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: const Color.fromRGBO(0, 0, 0, .16),
-                            blurRadius: 3.r,
-                            offset: const Offset(0, 3))
-                      ]),
-                  child: RotationTransition(
-                    turns: Tween(begin: 0.0, end: 0.5).animate(_controller),
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      color: ColorManager.primary,
-                      size: 18.w,
+              if (icon != null) ...<Widget>[
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(KRadius.field),
+                  child: SizedBox.square(
+                    dimension: _iconSize,
+                    child: ColoredBox(
+                      color: c.fill,
+                      child: Padding(
+                        padding: const EdgeInsets.all(KSpace.s),
+                        child: CachedNetworkImage(
+                          imageUrl: icon,
+                          memCacheWidth: cacheSize,
+                          errorWidget:
+                              (BuildContext context, String url, Object e) =>
+                                  const SizedBox.shrink(),
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          Divider(
-            color: ColorManager.divider,
-            thickness: 1,
-            endIndent: 85.w,
-          ),
-          Row(
-            children: <Widget>[
-              if (widget.service.iconWashingServices!.iconLink != null)
-                Container(
-                  height: 50.h,
-                  width: 50.w,
-                  decoration: BoxDecoration(
-                    color: ColorManager.gray,
-                    borderRadius: BorderRadius.circular(5.r),
-                  ),
-                  padding: const EdgeInsets.all(10),
-                  child: Image.network(
-                      widget.service.iconWashingServices!.iconLink!),
+                const SizedBox(width: KSpace.m),
+              ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(
+                      widget.service.getLocalizedName(language) ?? '',
+                      style: KType.headline.copyWith(color: c.text),
+                    ),
+                    const SizedBox(height: KSpace.xs),
+                    Row(
+                      children: <Widget>[
+                        SvgPicture.asset(
+                          ImageAssets.serviceCoinSvg,
+                          width: KSpace.l,
+                          height: KSpace.l,
+                          colorFilter: ColorFilter.mode(
+                            c.textSecondary,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        const SizedBox(width: KSpace.xs),
+                        Text(
+                          '${widget.service.duration!} '
+                          '${tr(context, AppStrings.min)}',
+                          style: KType.footnote.copyWith(
+                            color: c.textSecondary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              5.horizontalSpace,
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      SvgPicture.asset(
-                        ImageAssets.serviceCoinSvg,
-                        colorFilter: ColorFilter.mode(ColorManager.black, BlendMode.srcIn),
-                      ),
-                      5.horizontalSpace,
-                      Text(
-                        "${widget.service.duration!} ${translate(AppStrings.min)}",
-                        style: AppStyles.caption12Medium
-                            .copyWith(color: ColorManager.black),
-                      ),
-                    ],
-                  ),
-                  AppPadding.p8.verticalSpace,
-                ],
+              ),
+              const SizedBox(width: KSpace.s),
+              AnimatedRotation(
+                turns: _open ? 0.5 : 0,
+                duration: KMotion.of(context, KMotion.normal),
+                curve: KMotion.curve,
+                child: Icon(Icons.expand_more_rounded, color: c.brand),
               ),
             ],
           ),
-          AppPadding.p8.verticalSpace,
-          if (!showInfoPlan)
-            ..._buildServiceDescriptions(
-              widget.service.getLocalizedDescription(
-                Localizations.localeOf(context).languageCode,
+          if (_open)
+            for (final String line
+                in widget.service.getLocalizedDescription(language) ??
+                    const <String>[])
+              Padding(
+                padding: const EdgeInsets.only(top: KSpace.s),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(Icons.check, color: c.success, size: KSpace.l),
+                    const SizedBox(width: KSpace.s),
+                    Expanded(
+                      child: Text(
+                        line,
+                        style: KType.subhead.copyWith(color: c.text),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )
         ],
       ),
     );
-  }
-
-  List<Widget> _buildServiceDescriptions(List<String>? descriptions) {
-    if (descriptions == null || descriptions.isEmpty) {
-      return <Widget>[];
-    }
-
-    return descriptions.map((String description) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: 8.0), // Add space between items
-        child: Row(
-          children: <Widget>[
-            Icon(
-              Icons.check,
-              color: ColorManager.darkGrey,
-              size: 16.w,
-            ),
-            13.horizontalSpace,
-            Expanded(
-              child: Text(
-                description,
-                style: AppStyles.subtext14Regular
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-            ),
-          ],
-        ),
-      );
-    }).toList();
   }
 }

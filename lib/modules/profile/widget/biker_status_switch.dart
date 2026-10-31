@@ -1,68 +1,59 @@
-import 'package:action_slider/action_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:thewhsherbiker/core/components/swipe_button.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_status_card.dart';
 import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 
-class BikerStatusSwitchWidget extends StatefulWidget {
-  final bool? isHome;
-  const BikerStatusSwitchWidget({
-    super.key,
-    this.isHome = false,
-  });
-
-  @override
-  State<BikerStatusSwitchWidget> createState() =>
-      _BikerStatusSwitchWidgetState();
-}
-
-class _BikerStatusSwitchWidgetState extends State<BikerStatusSwitchWidget> {
-  late bool _isSuccess;
-
-  @override
-  void initState() {
-    super.initState();
-    _isSuccess = sl<ProfileBloc>().profile.status == BikerStatus.ONLINE.name;
-  }
+/// Online switch for the bar floating over the map: shows what the backend
+/// confirmed, because `ProfileBloc` changes the status only on success.
+class BikerStatusSwitchWidget extends StatelessWidget {
+  const BikerStatusSwitchWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final bool isOnline =
-        sl<ProfileBloc>().profile.status == BikerStatus.ONLINE.name;
-    final String buttonText = isOnline ? 'Online' : 'Offline';
-    final Color backgroundColor = isOnline
-        ? widget.isHome == true
-            ? ColorManager.secondary
-            : ColorManager.primary
-        : ColorManager.divider;
-    final TextDirection textDirection =
-        isOnline ? TextDirection.rtl : TextDirection.ltr;
-    return CustomSwipeButton(
-      isSuccess: _isSuccess,
-      initialText: buttonText,
-      initialBackgroundColor: backgroundColor,
-      textDirection: textDirection,
-      onChange: () {},
-      onSwipe: _handleSwipe,
+    return BlocSelector<ProfileBloc, ProfileState, bool>(
+      bloc: sl<ProfileBloc>(),
+      selector: (ProfileState state) => bikerIsOnline(),
+      builder: (BuildContext context, bool online) {
+        final String word = online
+            ? trOr(context, 'online', en: 'Online', ar: 'متصل')
+            : trOr(context, 'offline', en: 'Offline', ar: 'غير متصل');
+        return LiquidGlass(
+          capsule: true,
+          padding: const EdgeInsets.symmetric(horizontal: KSpace.s),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              KStatusChip(
+                label: word,
+                status: online ? KStatus.success : KStatus.neutral,
+              ),
+              const SizedBox(width: KSpace.xs),
+              Semantics(
+                label: word,
+                child: Switch.adaptive(
+                  value: online,
+                  activeTrackColor: KColors.of(context).success,
+                  onChanged: (bool value) {
+                    sl<ProfileBloc>().add(
+                      BikerUpdateStatus(
+                        status: value
+                            ? BikerStatus.ONLINE.name
+                            : BikerStatus.OFFLINE.name,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
-  }
-
-  Future<void> _handleSwipe(ActionSliderController controller) async {
-    controller.loading();
-    await Future.delayed(Duration(milliseconds: 100));
-    if (sl<ProfileBloc>().profile.status == BikerStatus.ONLINE.name) {
-      sl<ProfileBloc>()
-          .add(BikerUpdateStatus(status: BikerStatus.OFFLINE.name));
-    } else {
-      sl<ProfileBloc>().add(BikerUpdateStatus(status: BikerStatus.ONLINE.name));
-    }
-    if (sl<ProfileBloc>().state is BikerProfileSuccess) {
-      controller.reset();
-    }
-    setState(() {
-      _isSuccess = !_isSuccess;
-    });
   }
 }

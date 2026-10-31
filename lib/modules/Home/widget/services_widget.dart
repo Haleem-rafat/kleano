@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thewhsherbiker/core/resources/values_manager.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/order/widgets/card_services.dart';
 
+/// The order's services, inside the details screen's scroll view.
 class ServicesWidget extends StatelessWidget {
   final List<WashingServices>? services;
   const ServicesWidget({super.key, required this.services});
 
   @override
   Widget build(BuildContext context) {
-    final List<WashingServices> servicesList = services ?? <WashingServices>[];
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: services!.length,
-      separatorBuilder: (BuildContext context, int index) {
-        return index == servicesList.length - 1 ? 32.verticalSpace : AppPadding.p16.verticalSpace;
-      },
-      itemBuilder: (BuildContext context, int index) {
-        return CardServices(
-          service: servicesList[index],
-        );
-      },
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final WashingServices service in services!)
+          Padding(
+            padding: const EdgeInsets.only(bottom: KSpace.m),
+            child: CardServices(service: service),
+          ),
+      ],
     );
   }
 }

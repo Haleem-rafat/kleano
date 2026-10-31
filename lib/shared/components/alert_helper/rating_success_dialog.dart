@@ -8,7 +8,7 @@ import 'package:thewhsherbiker/core/resources/app_styles.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:thewhsherbiker/modules/Home/screens/home_screen.dart';
+import 'package:thewhsherbiker/modules/Home/screens/biker_shell.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class RatingSuccessDialog extends StatefulWidget {
@@ -27,7 +27,7 @@ class _RatingDialogState extends State<RatingSuccessDialog> {
       if (!mounted) return;
       pushReplacement(
           context,
-          HomeScreen(
+          BikerShell(
             initialIndex: 0,
           ));
     });

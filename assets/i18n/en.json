@@ -147,5 +147,20 @@
   "online": "Online",
   "offline": "Offline",
   "Go Online Now": "Go Online Now",
-  "defaultError": "Something went wrong. Please try again."
+  "defaultError": "Something went wrong. Please try again.",
+  "earnings": "Earnings",
+  "ordersTab": "Orders",
+  "profile": "Profile",
+  "completedWashes": "Completed washes",
+  "noSchedule": "No schedule yet",
+  "weekend": "Weekend",
+  "noImageAvailable": "No image available",
+  "saturday": "Saturday",
+  "sunday": "Sunday",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "Car Freshener": "Car Freshener"
 }

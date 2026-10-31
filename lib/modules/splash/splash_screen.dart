@@ -8,7 +8,7 @@ import 'package:thewhsherbiker/core/resources/assets_manager.dart';
 import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Auth/screens/log_in_screen.dart';
-import 'package:thewhsherbiker/modules/Home/screens/home_screen.dart';
+import 'package:thewhsherbiker/modules/Home/screens/biker_shell.dart';
 import 'package:thewhsherbiker/modules/on_boarding/on_boarding_screen.dart';
 import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
@@ -113,7 +113,7 @@ class _SplashScreenState extends State<SplashScreen>
             if (state is BikerProfileSuccess) {
               popALlAndPushPage(
                 context,
-                HomeScreen(
+                BikerShell(
                   initialIndex: 0,
                 ),
               );

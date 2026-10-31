@@ -117,19 +117,19 @@ class AcceptContainer extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: KSpace.s),
-              _OrderIconAction(
+              OrderIconAction(
                 label: tr(context, AppStrings.phoneNumber),
                 onTap: () {
                   launchUrl(Uri(scheme: 'tel', path: acceptOrder.user?.phone));
                 },
                 child: SvgPicture.asset(
                   ImageAssets.phoneLogo,
-                  width: _OrderIconAction.size,
-                  height: _OrderIconAction.size,
+                  width: OrderIconAction.size,
+                  height: OrderIconAction.size,
                 ),
               ),
               const SizedBox(width: KSpace.s),
-              _OrderIconAction(
+              OrderIconAction(
                 label: 'WhatsApp',
                 onTap: () => _openWhatsApp(acceptOrder.user?.phone),
                 child: SvgPicture.asset(
@@ -142,42 +142,6 @@ class AcceptContainer extends StatelessWidget {
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// A round icon button large enough to hit with a glove on.
-class _OrderIconAction extends StatelessWidget {
-  const _OrderIconAction({
-    required this.label,
-    required this.onTap,
-    required this.child,
-  });
-
-  static const double size = KSpace.xxxl + KSpace.l;
-
-  final String label;
-  final VoidCallback onTap;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      label: label,
-      excludeSemantics: true,
-      child: Material(
-        color: KColors.of(context).background,
-        shape: const CircleBorder(),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: SizedBox.square(
-            dimension: size,
-            child: Center(child: child),
-          ),
-        ),
       ),
     );
   }

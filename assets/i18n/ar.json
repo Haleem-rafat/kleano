@@ -147,5 +147,20 @@
   "online": "متصل",
   "offline": "غير متصل",
   "Go Online Now": "اتصل الآن",
-  "defaultError": "حدث خطأ ما. حاول مرة أخرى."
+  "defaultError": "حدث خطأ ما. حاول مرة أخرى.",
+  "earnings": "الأرباح",
+  "ordersTab": "الطلبات",
+  "profile": "الملف الشخصي",
+  "completedWashes": "الغسلات المكتملة",
+  "noSchedule": "لا يوجد جدول بعد",
+  "weekend": "عطلة نهاية الأسبوع",
+  "noImageAvailable": "لا توجد صورة",
+  "saturday": "السبت",
+  "sunday": "الأحد",
+  "monday": "الإثنين",
+  "tuesday": "الثلاثاء",
+  "wednesday": "الأربعاء",
+  "thursday": "الخميس",
+  "friday": "الجمعة",
+  "Car Freshener": "معطر السيارة"
 }

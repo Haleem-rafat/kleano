@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/design/components/k_status_chip.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
@@ -28,6 +29,37 @@ String trOr(
   if (text != key) return text;
   return Localizations.localeOf(context).languageCode == 'ar' ? ar : en;
 }
+
+/// Height of the pull-to-refresh and load-more indicators.
+const double orderIndicatorHeight = KSpace.xxxl * 2;
+
+/// Pull-to-refresh indicator for the order and notification lists.
+Widget orderRefreshHeader(BuildContext context, RefreshStatus? mode) =>
+    SizedBox(
+      height: orderIndicatorHeight,
+      child: mode == RefreshStatus.refreshing
+          ? const Center(child: CircularProgressIndicator.adaptive())
+          : null,
+    );
+
+/// Load-more indicator for the order and notification lists.
+Widget orderLoadMoreFooter(BuildContext context, LoadStatus? mode) => SizedBox(
+  height: orderIndicatorHeight,
+  child: switch (mode) {
+    LoadStatus.loading => const Center(
+      child: CircularProgressIndicator.adaptive(),
+    ),
+    LoadStatus.failed => Center(
+      child: Text(
+        MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
+        style: KType.footnote.copyWith(
+          color: KColors.of(context).textSecondary,
+        ),
+      ),
+    ),
+    _ => null,
+  },
+);
 
 /// Design-system status for a backend order status.
 KStatus orderChipStatus(String? status) => switch (status) {
@@ -158,6 +190,43 @@ class OrderLocationRow extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// A round icon button large enough to hit with a glove on.
+class OrderIconAction extends StatelessWidget {
+  const OrderIconAction({
+    super.key,
+    required this.label,
+    required this.onTap,
+    required this.child,
+  });
+
+  static const double size = KSpace.xxxl + KSpace.l;
+
+  final String label;
+  final VoidCallback onTap;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Material(
+        color: KColors.of(context).background,
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: SizedBox.square(
+            dimension: size,
+            child: Center(child: child),
+          ),
         ),
       ),
     );

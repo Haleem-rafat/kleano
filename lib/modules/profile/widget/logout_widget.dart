@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewhsherbiker/api/shared.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
+import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Auth/screens/log_in_screen.dart';
-import 'package:thewhsherbiker/shared/components/loading.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
@@ -29,21 +27,12 @@ class LogOutWidget extends StatelessWidget {
         }
       },
       builder: (BuildContext context, AuthState state) {
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: 47.w),
-          child: sl<AuthBloc>().logout
-              ? LoadingWidget()
-              : InkWell(
-                  onTap: _logOut,
-                  child: Text(
-                    translate(AppStrings.logOut),
-                    style: AppStyles.title16Regular.copyWith(
-                      color: ColorManager.red,
-                      decoration: TextDecoration.underline,
-                      decorationColor: ColorManager.red,
-                    ),
-                  ),
-                ),
+        return KButton(
+          label: tr(context, AppStrings.logOut),
+          variant: KButtonVariant.text,
+          color: KColors.of(context).error,
+          loading: sl<AuthBloc>().logout,
+          onPressed: _logOut,
         );
       },
     );

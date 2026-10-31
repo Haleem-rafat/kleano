@@ -1,182 +1,124 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewhsherbiker/core/components/circle_image.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
+import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/components/k_list_row.dart';
+import 'package:thewhsherbiker/core/design/liquid_glass.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/assets_manager.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:thewhsherbiker/core/resources/values_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/screens/update_password.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/modules/profile/data/model/profile_model.dart';
 import 'package:thewhsherbiker/modules/profile/screens/update_biker_data.dart';
-import 'package:thewhsherbiker/modules/profile/widget/profile/edit_account_container.dart';
-import 'package:thewhsherbiker/shared/components/app_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    final ProfileBloc profileBloc = context.read<ProfileBloc>();
-    final ProfileModel profile = profileBloc.profile;
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size(AppSize.s375, AppSize.s60.h),
-        child: AppBarWhiteShared(
-          titleText: translate(AppStrings.account),
-        ),
-      ),
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 22.h,
-              ),
-              BlocBuilder<ProfileBloc, ProfileState>(
-                bloc: sl<ProfileBloc>(),
-                builder: (BuildContext context, ProfileState state) {
-                  return GestureDetector(
-                    onTap: () {
-                      pushPage(context, UpdateBikerData());
-                    },
-                    child: Center(
-                      child: CircleImageShared(
-                        imageUrl: profile.imageLink ?? '',
-                        radius: 42.r,
-                        name: profile.userName ?? AppStrings.noName,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                height: 56.h,
-              ),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  pushPage(context, UpdateBikerData());
-                },
-                child: EditAccountContainer(
-                  edit: true,
-                  title: translate(AppStrings.username),
-                ),
-              ),
-              SizedBox(
-                height: 16.h,
-              ),
-              BlocBuilder<ProfileBloc, ProfileState>(
-                bloc: sl<ProfileBloc>(),
-                builder: (BuildContext context, ProfileState state) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 40.w),
-                    child: Text(
-                      profile.userName!,
-                      style: AppStyles.titleGray16Regular,
-                    ),
-                  );
-                },
-              ),
-              SizedBox(
-                height: 16.h,
-              ),
-              InkWell(
-                splashColor: Colors.transparent,
-                highlightColor: Colors.transparent,
-                onTap: () {
-                  pushPage(context, UpdatePassword(profile: true));
-                },
-                child: EditAccountContainer(
-                  edit: true,
-                  title: translate(AppStrings.password),
-                ),
-              ),
-              SizedBox(
-                height: 16.h,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 40.w,
-                ),
-                child: Text(
-                  "********",
-                  style: AppStyles.titleGray16Regular,
-                ),
-              ),
-              SizedBox(
-                height: 16.h,
-              ),
-              EditAccountContainer(
-                edit: false,
-                title: translate(AppStrings.phoneNumber),
-              ),
-              SizedBox(
-                height: 16.h,
-              ),
-              if (profile.phone != null)
-                buildFormattedPhoneNumber(profile.phone!),
-              SizedBox(
-                height: 102.h,
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 40.w),
-                child: Text(
-                  translate(AppStrings.deleteAccount),
-                  style: AppStyles.titleGray16Regular.copyWith(
-                    color: ColorManager.red,
-                    decoration: TextDecoration.underline,
-                    decorationColor: ColorManager.red,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Positioned(
-            top: 80.h,
-            right: 150.w,
-            child: SvgPicture.asset(
-              ImageAssets.cameraLogo,
-              height: 24.h,
-              width: 24.w,
-            ),
-          ),
-        ],
-      ),
-    );
+  static const double _photoSize = KSpace.xxxl * 2 + KSpace.xl;
+
+  /// `(+20) 1012345678`: country code, then the rest. Isolated left to right,
+  /// so the digits and brackets stay in order in Arabic.
+  String _formattedPhone(String phoneNumber) {
+    final String countryCode = phoneNumber.substring(0, 3);
+    final String restOfNumber = phoneNumber.substring(3);
+    return '\u2066($countryCode) $restOfNumber\u2069';
   }
 
-  Widget buildFormattedPhoneNumber(String phoneNumber) {
-    String countryCode = phoneNumber.substring(0, 3);
-    String restOfNumber = phoneNumber.substring(3);
-
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40.w),
-        child: Text.rich(
-          TextSpan(
-            children: <InlineSpan>[
-              TextSpan(
-                text: '($countryCode) ',
-                style: AppStyles.titleGray16Regular
-                    .copyWith(color: ColorManager.darkGrey),
-              ),
-              TextSpan(
-                text: restOfNumber,
-                style: AppStyles.titleGray16Regular,
-              ),
-            ],
-          ),
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    return Scaffold(
+      backgroundColor: c.background,
+      appBar: GlassAppBar(
+        title: Text(
+          tr(context, AppStrings.account),
+          style: KType.headline.copyWith(color: c.text),
+        ),
+      ),
+      body: AdaptiveContent(
+        child: BlocBuilder<ProfileBloc, ProfileState>(
+          bloc: sl<ProfileBloc>(),
+          buildWhen: (ProfileState previous, ProfileState current) =>
+              current is BikerProfileSuccess ||
+              current is BikerProfileEditSuccess,
+          builder: (BuildContext context, ProfileState state) {
+            final ProfileModel profile = sl<ProfileBloc>().profile;
+            return ListView(
+              padding: const EdgeInsets.all(KSpace.l),
+              children: <Widget>[
+                Center(
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () => pushPage(context, const UpdateBikerData()),
+                    child: SizedBox.square(
+                      dimension: _photoSize,
+                      child: Stack(
+                        children: <Widget>[
+                          HomeAvatar(
+                            imageUrl: profile.imageLink,
+                            name: profile.userName,
+                            size: _photoSize,
+                          ),
+                          PositionedDirectional(
+                            bottom: 0,
+                            end: 0,
+                            child: SvgPicture.asset(
+                              ImageAssets.cameraLogo,
+                              width: KSpace.xxl,
+                              height: KSpace.xxl,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: KSpace.xxl),
+                KCard(
+                  padding: EdgeInsets.zero,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      KListRow(
+                        title: tr(context, AppStrings.username),
+                        subtitle: profile.userName!,
+                        showChevron: true,
+                        onTap: () => pushPage(context, const UpdateBikerData()),
+                      ),
+                      Divider(height: 1, color: c.separator),
+                      KListRow(
+                        title: tr(context, AppStrings.password),
+                        subtitle: '********',
+                        showChevron: true,
+                        onTap: () => pushPage(
+                          context,
+                          UpdatePassword(profile: true),
+                        ),
+                      ),
+                      Divider(height: 1, color: c.separator),
+                      KListRow(
+                        title: tr(context, AppStrings.phoneNumber),
+                        subtitle: profile.phone == null
+                            ? null
+                            : _formattedPhone(profile.phone!),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: KSpace.xxl),
+                Text(
+                  tr(context, AppStrings.deleteAccount),
+                  textAlign: TextAlign.center,
+                  style: KType.body.copyWith(color: c.error),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

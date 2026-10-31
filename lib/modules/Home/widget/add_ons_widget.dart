@@ -1,73 +1,45 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
-import 'package:thewhsherbiker/core/resources/values_manager.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/components/k_list_row.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
-import 'package:thewhsherbiker/shared/components/cached_network_image.dart';
 
+/// The order's add-ons, inside the details screen's scroll view.
 class AddOnsWidget extends StatelessWidget {
   final List<AddOns>? addOns;
   const AddOnsWidget({super.key, required this.addOns});
 
+  static const double _iconSize = KSpace.xxxl + KSpace.s;
+
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: addOns!.length,
-      separatorBuilder: (BuildContext context, int index) {
-        return SizedBox(
-          height: 5.h,
-        );
-      },
-      itemBuilder: (BuildContext context, int index) {
-        return Column(
-          children: [
-            _cardAddOns(context, index),
-            if (index == addOns!.length - 1) AppPadding.p16.verticalSpace,
-          ],
-        );
-      },
-    );
-  }
-
-  Container _cardAddOns(BuildContext context, int index) {
-    return Container(
-      height: 82.h,
-      width: 327.w,
-      decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(15.r),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: ColorManager.black.withValues(alpha: .02),
-                blurRadius: 6.r,
-                offset: const Offset(0, 3))
-          ]),
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
-      child: Row(
-        children: <Widget>[
-          ImageShared(
-            image: addOns![index].iconAddons!.iconLink!,
-            height: 50.h,
-            width: 50.w,
-            raduis: 0,
-            errorFont: 30.sp,
-          ),
-          SizedBox(
-            width: 18.w,
-          ),
-          Text(
-            addOns![index].getLocalizedName(
-              Localizations.localeOf(context).languageCode,
-            ) ?? '',
-            style: AppStyles.subtext14Regular.copyWith(
-              color: ColorManager.darkGrey,
+    final String language = Localizations.localeOf(context).languageCode;
+    final int cacheSize = (_iconSize * MediaQuery.devicePixelRatioOf(context))
+        .round();
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        for (final AddOns addOn in addOns!)
+          Padding(
+            padding: const EdgeInsets.only(bottom: KSpace.m),
+            child: KCard(
+              padding: EdgeInsets.zero,
+              child: KListRow(
+                leading: SizedBox.square(
+                  dimension: _iconSize,
+                  child: CachedNetworkImage(
+                    imageUrl: addOn.iconAddons!.iconLink!,
+                    memCacheWidth: cacheSize,
+                    errorWidget: (BuildContext context, String url, Object e) =>
+                        const SizedBox.shrink(),
+                  ),
+                ),
+                title: addOn.getLocalizedName(language) ?? '',
+              ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

@@ -311,4 +311,17 @@ class AppStrings {
   static const String onboardBody2 = "onboardBody2";
   static const String onboardTitle3 = "onboardTitle3";
   static const String onboardBody3 = "onboardBody3";
+  static const String earnings = "earnings";
+  static const String ordersTab = "ordersTab";
+  static const String completedWashes = "completedWashes";
+  static const String noSchedule = "noSchedule";
+  static const String weekend = "weekend";
+  static const String noImageAvailable = "noImageAvailable";
+  static const String saturday = "saturday";
+  static const String sunday = "sunday";
+  static const String monday = "monday";
+  static const String tuesday = "tuesday";
+  static const String wednesday = "wednesday";
+  static const String thursday = "thursday";
+  static const String friday = "friday";
 }

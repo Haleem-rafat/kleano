@@ -12,7 +12,7 @@ import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/modules/Auth/bloc/auth/auth_bloc.dart';
 import 'package:thewhsherbiker/modules/Auth/screens/phone_number.dart';
-import 'package:thewhsherbiker/modules/Home/screens/home_screen.dart';
+import 'package:thewhsherbiker/modules/Home/screens/biker_shell.dart';
 import 'package:thewhsherbiker/modules/notification/helpers/notification_helper.dart';
 import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
@@ -90,7 +90,7 @@ class _LogInScreenState extends State<LogInScreen> {
         } else if (state is BikerLoginSuccess) {
           sl<AuthBloc>().getUserLocation().whenComplete(() {
             if (!context.mounted) return;
-            popALlAndPushPage(context, HomeScreen(initialIndex: 0));
+            popALlAndPushPage(context, BikerShell(initialIndex: 0));
           });
         }
       },

@@ -1,18 +1,13 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_translate/flutter_translate.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
-import 'package:thewhsherbiker/core/design/components/k_segmented.dart';
 import 'package:thewhsherbiker/core/design/tokens.dart';
-import 'package:thewhsherbiker/core/resources/strings_manager.dart';
 import 'package:thewhsherbiker/core/utilis/enums.dart';
 import 'package:thewhsherbiker/modules/Home/bloc/home_bloc.dart';
 import 'package:thewhsherbiker/modules/Home/widget/accept_widget.dart';
-import 'package:thewhsherbiker/modules/Home/widget/complet_widget.dart';
 import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/Home/widget/home_stats_card.dart';
 import 'package:thewhsherbiker/modules/Home/widget/home_status_card.dart';
@@ -27,50 +22,19 @@ import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-enum _OrdersTab { active, completed }
-
-const double _indicatorHeight = KSpace.xxxl * 2;
-
-Widget _refreshHeader(BuildContext context, RefreshStatus? mode) => SizedBox(
-  height: _indicatorHeight,
-  child: mode == RefreshStatus.refreshing
-      ? const Center(child: CircularProgressIndicator.adaptive())
-      : null,
-);
-
-Widget _loadMoreFooter(BuildContext context, LoadStatus? mode) => SizedBox(
-  height: _indicatorHeight,
-  child: switch (mode) {
-    LoadStatus.loading => const Center(
-      child: CircularProgressIndicator.adaptive(),
-    ),
-    LoadStatus.failed => Center(
-      child: Text(
-        MaterialLocalizations.of(context).refreshIndicatorSemanticLabel,
-        style: KType.footnote.copyWith(
-          color: KColors.of(context).textSecondary,
-        ),
-      ),
-    ),
-    _ => null,
-  },
-);
-
-/// The biker's home: online switch first, then the order to deal with, stats,
-/// and the Active / Completed lists. One scroll view, and each section listens
-/// to its own bloc states, so a socket event doesn't rebuild the whole screen.
+/// The Today tab: online switch first, then the order to deal with and stats.
+/// One scroll view, and each section listens to its own bloc states, so a socket
+/// event doesn't rebuild the whole screen. Stays mounted in [BikerShell], so what
+/// it sends on open is sent once, whichever tab the shell opens on.
 class HomeScreen extends StatefulWidget {
-  final int initialIndex;
-  const HomeScreen({super.key, required this.initialIndex});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  DateTime preBackPress = DateTime.now();
   late final FirebaseCloudMessagingService firebaseCloudMessagingService;
-  late final ValueNotifier<_OrdersTab> _tab;
   String whatsappNumber = "+966533720654";
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
@@ -79,11 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Callers pass 2 for "completed", from when there was a third tab.
-    _tab = ValueNotifier<_OrdersTab>(
-      widget.initialIndex == 0 ? _OrdersTab.active : _OrdersTab.completed,
-    );
-
     firebaseCloudMessagingService = FirebaseCloudMessagingService();
     // sl<NotificationBloc>().add(MakePushNotification());
     sl<NotificationBloc>().add(GetBikerNotification());
@@ -97,7 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
-    _tab.dispose();
     _refreshController.dispose();
     super.dispose();
   }
@@ -128,25 +86,6 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       if (mounted) {
         _refreshController.refreshFailed();
-      }
-    }
-  }
-
-  /// Next page of the list on screen. An empty list has no next page: the page
-  /// ends right after its empty state, so the footer can be reached there.
-  void _onLoadMore() {
-    final HomeBloc bloc = sl<HomeBloc>();
-    if (_tab.value == _OrdersTab.active) {
-      if (bloc.activeList.isEmpty) {
-        _refreshController.loadComplete();
-      } else {
-        bloc.add(BikerGetOrdersAcceptPagination());
-      }
-    } else {
-      if (bloc.completeList.isEmpty) {
-        _refreshController.loadComplete();
-      } else {
-        bloc.add(BikerGetOrdersCompletePagination());
       }
     }
   }
@@ -197,45 +136,27 @@ class _HomeScreenState extends State<HomeScreen> {
           });
         }
       },
-      child: PopScope(
-        canPop: false,
-        onPopInvokedWithResult: (bool didPop, Object? result) {
-          if (didPop) return;
-          final Duration timeGap = DateTime.now().difference(preBackPress);
-          final bool cantExit = timeGap >= const Duration(seconds: 2);
-          preBackPress = DateTime.now();
-          if (cantExit) {
-            final SnackBar snack = SnackBar(
-              content: Text(translate(AppStrings.backButton)),
-              duration: const Duration(seconds: 2),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snack);
-          } else {
-            SystemNavigator.pop();
-          }
-        },
-        child: Scaffold(
-          backgroundColor: c.background,
-          body: AdaptiveContent(
-            child: BlocSelector<ProfileBloc, ProfileState, bool>(
-              bloc: sl<ProfileBloc>(),
-              selector: (ProfileState state) => bikerIsOnline(),
-              builder: _buildScrollView,
-            ),
+      child: Scaffold(
+        backgroundColor: c.background,
+        body: AdaptiveContent(
+          child: BlocSelector<ProfileBloc, ProfileState, bool>(
+            bloc: sl<ProfileBloc>(),
+            selector: (ProfileState state) => bikerIsOnline(),
+            builder: _buildScrollView,
           ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: _openSupportWhatsApp,
-            backgroundColor: c.success,
-            tooltip: 'WhatsApp',
-            child: SvgPicture.asset(
-              "assets/svg/whatsapp_icon.svg",
-              width: KSpace.xxl,
-              height: KSpace.xxl,
-              colorFilter: ColorFilter.mode(c.surface, BlendMode.srcIn),
-            ),
-          ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _openSupportWhatsApp,
+          backgroundColor: c.success,
+          tooltip: 'WhatsApp',
+          child: SvgPicture.asset(
+            "assets/svg/whatsapp_icon.svg",
+            width: KSpace.xxl,
+            height: KSpace.xxl,
+            colorFilter: ColorFilter.mode(c.surface, BlendMode.srcIn),
+          ),
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       ),
     );
   }
@@ -245,16 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return SmartRefresher(
       controller: _refreshController,
       onRefresh: _onRefresh,
-      onLoading: _onLoadMore,
       enablePullDown: true,
-      enablePullUp: online,
       header: const CustomHeader(
-        builder: _refreshHeader,
-        height: _indicatorHeight,
-      ),
-      footer: const CustomFooter(
-        builder: _loadMoreFooter,
-        height: _indicatorHeight,
+        builder: orderRefreshHeader,
+        height: orderIndicatorHeight,
       ),
       child: CustomScrollView(
         slivers: <Widget>[
@@ -273,9 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (online) const ActiveOrderFocus(),
                 const SliverToBoxAdapter(child: HomeStatsCard()),
                 gap,
-                if (online)
-                  _buildOrders()
-                else
+                if (!online)
                   const SliverToBoxAdapter(child: HomeOfflinePrompt()),
               ],
             ),
@@ -288,34 +201,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildOrders() {
-    return ValueListenableBuilder<_OrdersTab>(
-      valueListenable: _tab,
-      builder: (BuildContext context, _OrdersTab tab, Widget? child) {
-        return SliverMainAxisGroup(
-          slivers: <Widget>[
-            SliverToBoxAdapter(
-              child: KSegmented<_OrdersTab>(
-                segments: <_OrdersTab, String>{
-                  _OrdersTab.active: tr(context, AppStrings.active),
-                  _OrdersTab.completed: tr(context, AppStrings.completed),
-                },
-                selected: tab,
-                onChanged: (_OrdersTab value) => _tab.value = value,
-              ),
-            ),
-            const SliverToBoxAdapter(child: SizedBox(height: KSpace.l)),
-            // Only the selected tab is mounted: each loads its list on mount.
-            if (tab == _OrdersTab.active)
-              AcceptWidget(refreshController: _refreshController)
-            else
-              CompleteWidget(refreshController: _refreshController),
-          ],
-        );
-      },
     );
   }
 }
