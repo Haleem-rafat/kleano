@@ -1,5 +1,4 @@
 import 'package:thewasher/modules/booking/widgets/home/home_service_layouts.dart';
-import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:flutter/material.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/design/tokens.dart';
@@ -32,22 +31,6 @@ class MainServices extends StatefulWidget {
 }
 
 class _MainServicesState extends State<MainServices> {
-  static const double _largePhotoHeight = KSpace.xxxl * 5;
-
-  void _onStyleChanged() => setState(() {});
-
-  @override
-  void initState() {
-    super.initState();
-    HomeStyleSetting.style.addListener(_onStyleChanged);
-  }
-
-  @override
-  void dispose() {
-    HomeStyleSetting.style.removeListener(_onStyleChanged);
-    super.dispose();
-  }
-
   Map<int, bool> expandedStates = {};
 
   Widget _buildDetailItem({
@@ -113,26 +96,7 @@ class _MainServicesState extends State<MainServices> {
 
         final ServiceOpen? open = widget.onOpen;
         if (open != null) {
-          switch (HomeStyleSetting.style.value) {
-            case HomeStyle.photoHero:
-              return HomePricedServices(
-                services: widget.mainServices,
-                onOpen: open,
-              );
-            case HomeStyle.mix:
-              return HomeServiceGrid(
-                services: widget.mainServices,
-                onOpen: open,
-                compact: true,
-              );
-            case HomeStyle.serviceGrid:
-              return HomeServiceGrid(
-                services: widget.mainServices,
-                onOpen: open,
-              );
-            default:
-              break;
-          }
+          return HomeServiceGrid(services: widget.mainServices, onOpen: open);
         }
 
         return ListView.builder(
@@ -152,9 +116,6 @@ class _MainServicesState extends State<MainServices> {
                 service.description as List<dynamic>?;
 
             final KColors c = KColors.of(context);
-            final bool large =
-                HomeStyleSetting.style.value == HomeStyle.serviceFirst &&
-                widget.onOpen != null;
             final bool expanded = expandedStates[index] == true;
             void toggle() {
               HapticFeedback.selectionClick();
@@ -219,37 +180,22 @@ class _MainServicesState extends State<MainServices> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            if (large) ...<Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  KRadius.field,
-                                ),
-                                child: ImageShared(
-                                  image: service.icon?.iconLink ?? '',
-                                  height: _largePhotoHeight,
-                                  width: double.infinity,
-                                ),
-                              ),
-                              const SizedBox(height: KSpace.m),
-                            ],
                             Row(
                               children: <Widget>[
-                                if (!large) ...<Widget>[
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(
-                                      KRadius.field,
-                                    ),
-                                    child: ColoredBox(
-                                      color: c.fill,
-                                      child: ImageShared(
-                                        image: service.icon?.iconLink ?? '',
-                                        height: 64,
-                                        width: 64,
-                                      ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(
+                                    KRadius.field,
+                                  ),
+                                  child: ColoredBox(
+                                    color: c.fill,
+                                    child: ImageShared(
+                                      image: service.icon?.iconLink ?? '',
+                                      height: 64,
+                                      width: 64,
                                     ),
                                   ),
-                                  const SizedBox(width: KSpace.m),
-                                ],
+                                ),
+                                const SizedBox(width: KSpace.m),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:

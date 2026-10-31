@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:thewasher/core/design/components/k_list_row.dart';
-import 'package:thewasher/core/design/components/k_search_field.dart';
 import 'package:thewasher/core/design/components/k_sheet.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
@@ -64,102 +63,17 @@ class MostBookedBadge extends StatelessWidget {
 
 typedef ServiceOpen = void Function(ServiceModel service, int index);
 
-/// Services with the price standing out at the end of each row (Photo hero).
-class HomePricedServices extends StatelessWidget {
-  const HomePricedServices({
-    super.key,
-    required this.services,
-    required this.onOpen,
-  });
-
-  static const double _photo = KSpace.xxxl + KSpace.xl;
-
-  final List<ServiceModel> services;
-  final ServiceOpen onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    final KColors c = KColors.of(context);
-    return Column(
-      spacing: KSpace.m,
-      children: <Widget>[
-        for (int i = 0; i < services.length; i++)
-          if (services[i].name != '1')
-            KCard(
-              padding: const EdgeInsets.all(KSpace.m),
-              onTap: () => onOpen(services[i], i),
-              child: Row(
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(KRadius.field),
-                    child: ColoredBox(
-                      color: c.fill,
-                      child: ImageShared(
-                        image: services[i].icon?.iconLink ?? '',
-                        height: _photo,
-                        width: _photo,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: KSpace.m),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        MostBookedBadge(serviceId: services[i].sId),
-                        Text(
-                          services[i].name ?? '',
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: KType.headline.copyWith(color: c.text),
-                        ),
-                        if (services[i].duration != null)
-                          Text(
-                            '${services[i].duration} ${translate(AppStrings.min)}',
-                            style: KType.footnote.copyWith(
-                              color: c.textSecondary,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: KSpace.s),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: <Widget>[
-                      Text(
-                        '${services[i].price ?? ''}',
-                        style: KType.title.copyWith(color: c.text),
-                      ),
-                      Text(
-                        translate(AppStrings.sAR),
-                        style: KType.caption.copyWith(color: c.textSecondary),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-      ],
-    );
-  }
-}
-
-/// A searchable grid of service tiles (Service grid).
+/// Home's services: a title with See all, then photo tiles. See all opens
+/// every service in a sheet.
 class HomeServiceGrid extends StatefulWidget {
   const HomeServiceGrid({
     super.key,
     required this.services,
     required this.onOpen,
-    this.compact = false,
   });
 
   final List<ServiceModel> services;
   final ServiceOpen onOpen;
-
-  /// Four across with no search, ending in a See all tile that opens every
-  /// service in a sheet.
-  final bool compact;
 
   @override
   State<HomeServiceGrid> createState() => _HomeServiceGridState();
@@ -168,9 +82,6 @@ class HomeServiceGrid extends StatefulWidget {
 class _HomeServiceGridState extends State<HomeServiceGrid> {
   static const int _columns = 3;
   static const int _compactRows = 2;
-  static const double _photo = KSpace.xxxl + KSpace.xl;
-
-  String _query = '';
 
   void _openAll(List<int> shown) {
     showKSheet<void>(
@@ -212,118 +123,47 @@ class _HomeServiceGridState extends State<HomeServiceGrid> {
     final KColors c = KColors.of(context);
     final List<int> shown = <int>[
       for (int i = 0; i < widget.services.length; i++)
-        if (widget.services[i].name != '1' &&
-            (widget.services[i].name ?? '').toLowerCase().contains(
-              _query.trim().toLowerCase(),
-            ))
-          i,
+        if (widget.services[i].name != '1') i,
     ];
-    if (widget.compact) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  translate(AppStrings.chooseYourMainService),
-                  style: KType.title.copyWith(color: c.text),
-                ),
-              ),
-              TextButton(
-                onPressed: () => _openAll(shown),
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(KSpace.xxxl, KSpace.xxxl + KSpace.m),
-                  padding: const EdgeInsets.symmetric(horizontal: KSpace.xs),
-                  foregroundColor: c.brand,
-                  textStyle: KType.subhead.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                child: Text(translate('seeAll')),
-              ),
-            ],
-          ),
-          const SizedBox(height: KSpace.xs),
-          GridView.count(
-            padding: EdgeInsets.zero,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: _columns,
-            crossAxisSpacing: KSpace.s,
-            mainAxisSpacing: KSpace.s,
-            childAspectRatio: 0.72,
-            children: <Widget>[
-              for (final int index in shown.take(_columns * _compactRows))
-                _PhotoTile(
-                  service: widget.services[index],
-                  onTap: () => widget.onOpen(widget.services[index], index),
-                ),
-            ],
-          ),
-        ],
-      );
-    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
-        KSearchField(
-          hint: translate('searchServices'),
-          onChanged: (String value) => setState(() => _query = value),
+        Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(
+                translate(AppStrings.chooseYourMainService),
+                style: KType.title.copyWith(color: c.text),
+              ),
+            ),
+            TextButton(
+              onPressed: () => _openAll(shown),
+              style: TextButton.styleFrom(
+                minimumSize: const Size(KSpace.xxxl, KSpace.xxxl + KSpace.m),
+                padding: const EdgeInsets.symmetric(horizontal: KSpace.xs),
+                foregroundColor: c.brand,
+                textStyle: KType.subhead.copyWith(fontWeight: FontWeight.w600),
+              ),
+              child: Text(translate('seeAll')),
+            ),
+          ],
         ),
-        const SizedBox(height: KSpace.m),
-        GridView.builder(
+        const SizedBox(height: KSpace.xs),
+        GridView.count(
           padding: EdgeInsets.zero,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: _columns,
-            crossAxisSpacing: KSpace.s,
-            mainAxisSpacing: KSpace.s,
-            childAspectRatio: 0.82,
-          ),
-          itemCount: shown.length,
-          itemBuilder: (BuildContext context, int position) {
-            final int index = shown[position];
-            final ServiceModel service = widget.services[index];
-            return KCard(
-              padding: const EdgeInsets.all(KSpace.s),
-              onTap: () => widget.onOpen(service, index),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  MostBookedBadge(serviceId: service.sId),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(KRadius.field),
-                    child: ColoredBox(
-                      color: c.fill,
-                      child: ImageShared(
-                        image: service.icon?.iconLink ?? '',
-                        height: _photo,
-                        width: _photo,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: KSpace.s),
-                  Text(
-                    service.name ?? '',
-                    maxLines: 2,
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    style: KType.footnote.copyWith(
-                      color: c.text,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    '${service.price ?? ''} ${translate(AppStrings.sAR)}',
-                    maxLines: 1,
-                    style: KType.caption.copyWith(color: c.textSecondary),
-                  ),
-                ],
+          crossAxisCount: _columns,
+          crossAxisSpacing: KSpace.s,
+          mainAxisSpacing: KSpace.s,
+          childAspectRatio: 0.72,
+          children: <Widget>[
+            for (final int index in shown.take(_columns * _compactRows))
+              _PhotoTile(
+                service: widget.services[index],
+                onTap: () => widget.onOpen(widget.services[index], index),
               ),
-            );
-          },
+          ],
         ),
       ],
     );

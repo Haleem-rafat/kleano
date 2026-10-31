@@ -164,21 +164,11 @@ class HomeCarChips extends StatelessWidget {
 }
 
 class HomeReassurance extends StatelessWidget {
-  const HomeReassurance({super.key, this.tiles = false});
-
-  /// Icon tiles instead of plain text.
-  final bool tiles;
+  const HomeReassurance({super.key});
 
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    Widget item(String key) => Expanded(
-      child: Text(
-        translate(key),
-        textAlign: TextAlign.center,
-        style: KType.footnote.copyWith(color: c.textSecondary),
-      ),
-    );
     Widget tile(IconData icon, String key) => Expanded(
       child: KCard(
         padding: const EdgeInsets.all(KSpace.m),
@@ -204,72 +194,44 @@ class HomeReassurance extends StatelessWidget {
         ),
       ),
     );
-    if (tiles) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: KSpace.s,
-            children: <Widget>[
-              tile(Icons.place_outlined, 'trustComeToYou'),
-              tile(Icons.account_balance_wallet_outlined, 'trustPayment'),
-              tile(Icons.chat_bubble_outline_rounded, 'trustSupport'),
-            ],
-          ),
-        ),
-      );
-    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          item('trustComeToYou'),
-          const SizedBox(width: KSpace.s),
-          item('trustPayment'),
-          const SizedBox(width: KSpace.s),
-          item('trustSupport'),
-        ],
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: KSpace.s,
+          children: <Widget>[
+            tile(Icons.place_outlined, 'trustComeToYou'),
+            tile(Icons.account_balance_wallet_outlined, 'trustPayment'),
+            tile(Icons.chat_bubble_outline_rounded, 'trustSupport'),
+          ],
+        ),
       ),
     );
   }
 }
 
 class HomePlansCard extends StatelessWidget {
-  const HomePlansCard({super.key, this.solid = false, this.gradient = false});
-
-  /// Brand fill with a white action, instead of the soft tint.
-  final bool solid;
-
-  /// Brand gradient behind a solid card (implies [solid]'s white action).
-  final bool gradient;
+  const HomePlansCard({super.key});
 
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    final bool strong = solid || gradient;
-    final Color fg = strong ? c.surface : c.onBrandTint;
+    final Color fg = c.surface;
     return Padding(
       padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
       child: Material(
-        color: gradient
-            ? Colors.transparent
-            : solid
-            ? c.brand
-            : c.brandTint,
+        color: Colors.transparent,
         shape: KRadius.shape(BorderRadius.circular(KRadius.card)),
         clipBehavior: Clip.antiAlias,
         child: Ink(
-          decoration: gradient
-              ? BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: AlignmentDirectional.centerStart,
-                    end: AlignmentDirectional.centerEnd,
-                    colors: <Color>[c.brand, c.brandLight],
-                  ),
-                )
-              : null,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: AlignmentDirectional.centerStart,
+              end: AlignmentDirectional.centerEnd,
+              colors: <Color>[c.brand, c.brandLight],
+            ),
+          ),
           child: InkWell(
             onTap: () => popALlAndPushPage(
               context,
@@ -298,17 +260,17 @@ class HomePlansCard extends StatelessWidget {
                   DecoratedBox(
                     decoration: ShapeDecoration(
                       shape: const StadiumBorder(),
-                      color: strong ? c.surface : Colors.transparent,
+                      color: c.surface,
                     ),
                     child: Padding(
                       padding: EdgeInsets.symmetric(
-                        horizontal: strong ? KSpace.l : 0,
-                        vertical: strong ? KSpace.s : 0,
+                        horizontal: KSpace.l,
+                        vertical: KSpace.s,
                       ),
                       child: Text(
                         translate('seePlans'),
                         style: KType.subhead.copyWith(
-                          color: strong ? c.brand : fg,
+                          color: c.brand,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
