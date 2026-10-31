@@ -174,9 +174,9 @@ class _PhotoTile extends StatelessWidget {
                         graphic,
                   ),
                 PositionedDirectional(
-                  top: KSpace.s,
-                  start: KSpace.s,
-                  end: KSpace.s,
+                  top: KSpace.xs,
+                  start: KSpace.xs,
+                  end: KSpace.xs,
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: _BadgeOnPhoto(serviceId: service.sId),
@@ -242,11 +242,13 @@ class _BadgeOnPhoto extends StatelessWidget {
                 Icon(Icons.star_rounded, size: KSpace.m, color: c.surface),
                 const SizedBox(width: KSpace.xs / 2),
                 Flexible(
-                  child: Text(
-                    translate('mostBooked'),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: KType.caption.copyWith(color: c.surface),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      translate('mostBooked'),
+                      maxLines: 1,
+                      style: KType.caption.copyWith(color: c.surface),
+                    ),
                   ),
                 ),
               ],
