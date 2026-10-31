@@ -197,8 +197,8 @@ const BookingCalendarV2 = () => {
     <div className="flex h-full w-full flex-col gap-4 p-4">
       {/* Header with filters and controls */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">Enhanced Booking Calendar</h1>
+        <div className="flex flex-wrap items-center gap-4">
+          <h1 className="text-xl font-semibold tracking-tight text-slate-900">Booking Calendar</h1>
 
           {/* Date Range Picker */}
           <Popover>
@@ -237,7 +237,7 @@ const BookingCalendarV2 = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Dialog open={sprintModalOpen} onOpenChange={setSprintModalOpen}>
             <DialogTrigger asChild>
               <Button>Create Sprint</Button>
