@@ -202,19 +202,18 @@ class _NotificationRow extends StatelessWidget {
                 ],
               ),
             ),
-            if (!item.isRead!) ...<Widget>[
-              const SizedBox(width: KSpace.s),
-              Padding(
-                padding: const EdgeInsets.only(top: KSpace.s),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: c.brand,
-                  ),
-                  child: const SizedBox.square(dimension: KSpace.s),
+            const SizedBox(width: KSpace.s),
+            // Read rows keep the dot's space so the times line up.
+            Padding(
+              padding: const EdgeInsets.only(top: KSpace.s),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: item.isRead! ? Colors.transparent : c.brand,
                 ),
+                child: const SizedBox.square(dimension: KSpace.s),
               ),
-            ],
+            ),
           ],
         ),
       ),
