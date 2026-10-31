@@ -35,12 +35,11 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {
               'h-[1.9375rem] px-[0.625rem] py-[0.3125rem] text-sm font-medium': inputSize === 'xs',
               'h-[2.375rem] px-[0.875rem] py-[0.375rem] text-sm font-medium': inputSize === 'sm',
-              'h-[2.625rem] px-[1.25rem] py-[0.5rem] text-sm font-medium': inputSize === 'md',
-              'h-[3rem] px-[1.5rem] py-[0.75rem] text-base font-medium': inputSize === 'lg',
+              'h-9 text-[13px]': inputSize === 'md' || inputSize === 'lg',
               'h-[3.5rem] px-[1.5rem] py-[1rem] text-base font-bold': inputSize === 'super',
             },
             { 'px-10': leftIcon },
-            { 'px-4': !leftIcon },
+            { 'px-3': !leftIcon },
             className
           )}
           ref={ref}

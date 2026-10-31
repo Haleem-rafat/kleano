@@ -73,7 +73,7 @@ const SegmentDetails = () => {
       </div>
 
       <div className="p-6">
-        <div className="mx-auto max-w-[95%]">
+        <div className="w-full">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div className="xl:col-span-2">
               <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">

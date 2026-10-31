@@ -75,8 +75,8 @@ export default function Plans() {
                     <p>{plan.type?.[lang] || plan.type}</p>
                   </div>
                 </TableCell>
-                <TableCell>{plan.duration} month</TableCell>
-                <TableCell>{plan.price} R.S</TableCell>
+                <TableCell>{plan.duration} {t('month')}</TableCell>
+                <TableCell>{plan.price} {t('SAR')}</TableCell>
                 <TableCell>{plan.usageCount}</TableCell>
                 <TableCell>{formatDate(plan.createdAt)}</TableCell>
               </TableRow>

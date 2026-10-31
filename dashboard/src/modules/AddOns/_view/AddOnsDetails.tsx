@@ -66,7 +66,7 @@ export default function AddOnsDetails() {
 
       {/* Main Content */}
       <div className="p-6">
-        <div className="mx-auto max-w-[95%]">
+        <div className="w-full">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             {/* AddOn Information Card */}
             <div className="xl:col-span-2">

@@ -199,9 +199,6 @@ const BookingCalendarV2 = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">Enhanced Booking Calendar</h1>
-          <div className="rounded bg-green-100 px-2 py-1 text-xs text-green-800">
-            FullCalendar Enabled
-          </div>
 
           {/* Date Range Picker */}
           <Popover>

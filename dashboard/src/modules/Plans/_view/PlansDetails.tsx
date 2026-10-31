@@ -87,7 +87,7 @@ export default function PlansDetails() {
 
       {/* Main Content */}
       <div className="p-6">
-        <div className="mx-auto max-w-[95%]">
+        <div className="w-full">
           <div className="grid grid-cols-1 gap-6">
             {/* Plan Information Card */}
             <div>

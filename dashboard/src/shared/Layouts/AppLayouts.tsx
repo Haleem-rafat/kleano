@@ -113,7 +113,9 @@ export default function AppLayouts({ children }) {
   const { isLoggedIn } = useLoaderData() as { isLoggedIn: boolean };
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const crumbItem = navItems.find((item) => pathname.startsWith(item.link));
+  const crumbItem = [...navItems]
+    .sort((a, b) => b.link.length - a.link.length)
+    .find((item) => pathname.startsWith(item.link));
   const crumbGroup = navGroups.find((group) => group.labels.includes(crumbItem?.label));
   useEffect(() => {
     const handleResize = () => {

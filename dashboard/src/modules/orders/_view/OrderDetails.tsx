@@ -82,9 +82,9 @@ export default function OrderDetails() {
       </div>
 
       {/* Main Dashboard Content */}
-      <div className="p-6">
+      <div className="pt-4">
         {data && (
-          <div className="mx-auto max-w-[95%]">
+          <div className="w-full">
             <div className="space-y-6">
               {/* First Row: User Info, Biker Info, Vehicle Info */}
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">

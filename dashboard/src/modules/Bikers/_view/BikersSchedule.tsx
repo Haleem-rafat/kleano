@@ -609,7 +609,7 @@ export default function BikersSchedule() {
 
       {/* Main Content */}
       <div className="p-6">
-        <div className="mx-auto max-w-[95%]">
+        <div className="w-full">
           {/* Weekend Selection Card */}
           <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
             <div className="border-b border-slate-100 bg-white px-5 py-3">

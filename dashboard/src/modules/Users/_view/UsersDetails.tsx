@@ -259,7 +259,7 @@ export default function UsersDetails() {
       {/* Main Dashboard Content */}
       <div className="p-6">
         {user && (
-          <div className="mx-auto max-w-[95%]">
+          <div className="w-full">
             <div className="mb-5 grid grid-cols-1 gap-6 xl:grid-cols-3">
               {/* User Profile Section */}
               <div className="colspa overflow-hidden rounded-xl border border-slate-200 bg-white">

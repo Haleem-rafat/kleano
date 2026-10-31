@@ -1,3 +1,4 @@
+import { ImageOff } from 'lucide-react';
 import { useState } from 'react';
 import { IoClose, IoExpandOutline } from 'react-icons/io5';
 import { Dialog, DialogContent, DialogHeader } from '@shadecn/components/ui/dialog';
@@ -48,7 +49,7 @@ export default function ImageModal({
     return (
       <div
         className={`${className} ${thumbnailClassName} flex items-center justify-center bg-gray-100 text-sm text-gray-500`}>
-        {fallbackText}
+        <ImageOff className="h-4 w-4" aria-label={fallbackText} />
       </div>
     );
   }
