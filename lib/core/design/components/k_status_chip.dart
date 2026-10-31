@@ -17,7 +17,7 @@ class KStatusChip extends StatelessWidget {
     final KColors c = KColors.of(context);
     final bool dark = Theme.of(context).brightness == Brightness.dark;
     final (Color base, Color label) = switch (status) {
-      KStatus.brand => (c.brand, c.brand),
+      KStatus.brand => (c.brand, c.onBrandTint),
       KStatus.success => (
         c.success,
         dark ? c.success : const Color(0xFF1F8A3D),
@@ -32,7 +32,9 @@ class KStatusChip extends StatelessWidget {
     return DecoratedBox(
       decoration: ShapeDecoration(
         shape: const StadiumBorder(),
-        color: base.withValues(alpha: 0.12),
+        color: status == KStatus.brand
+            ? c.brandTint
+            : base.withValues(alpha: 0.12),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(

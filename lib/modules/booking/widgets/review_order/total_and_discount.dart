@@ -60,25 +60,26 @@ class DiscountAndTotal extends StatelessWidget {
               children: <Widget>[
                 Text(
                   translate(AppStrings.total),
-                  style: AppStyles.subtextGray14Regular
-                      .copyWith(color: ColorManager.black),
+                  style: AppStyles.subtextGray14Regular.copyWith(
+                    color: ColorManager.black,
+                  ),
                 ),
                 const Spacer(),
                 sl<PromoBloc>().totalPayModel.discount != null
                     ? Text(
                         (sl<PromoBloc>().totalPayModel.totalPrice! -
-                                sl<PromoBloc>()
-                                    .totalPayModel
-                                    .discount!
+                                sl<PromoBloc>().totalPayModel.discount!
                                     .toDouble())
                             .toStringAsFixed(2),
-                        style: AppStyles.subtextGray14Regular
-                            .copyWith(color: ColorManager.black),
+                        style: AppStyles.subtextGray14Regular.copyWith(
+                          color: ColorManager.black,
+                        ),
                       )
                     : Text(
                         total.toStringAsFixed(2),
-                        style: AppStyles.subtextGray14Regular
-                            .copyWith(color: ColorManager.black),
+                        style: AppStyles.subtextGray14Regular.copyWith(
+                          color: ColorManager.black,
+                        ),
                       ),
                 AppPadding.p4.pw,
                 SvgPicture.asset(
@@ -87,7 +88,7 @@ class DiscountAndTotal extends StatelessWidget {
                   width: 14.w,
                 ),
               ],
-            )
+            ),
           ],
         );
       },

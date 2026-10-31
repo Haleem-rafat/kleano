@@ -37,13 +37,9 @@ class _SelectTimeBookingState extends State<SelectTimeBooking> {
         children: <Widget>[
           Text(
             translate(AppStrings.pickATime),
-            style: AppStyles.title16Bold.copyWith(
-              color: ColorManager.black,
-            ),
+            style: AppStyles.title16Bold.copyWith(color: ColorManager.black),
           ),
-          SizedBox(
-            height: AppPadding.p16.h,
-          ),
+          SizedBox(height: AppPadding.p16.h),
           BlocConsumer<BookingOrderBloc, BookingOrderState>(
             listener: (context, state) {
               if (state is CalenderAvailableFailed) {

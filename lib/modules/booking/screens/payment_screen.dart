@@ -24,11 +24,7 @@ import 'package:thewasher/utilties/navigator.dart';
 class PaymentScreen extends StatefulWidget {
   final String? subscriptionId;
   final bool? isBottomSheet;
-  const PaymentScreen({
-    super.key,
-    this.subscriptionId,
-    this.isBottomSheet,
-  });
+  const PaymentScreen({super.key, this.subscriptionId, this.isBottomSheet});
 
   @override
   _PaymentScreenState createState() => _PaymentScreenState();
@@ -183,7 +179,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   if (payState is PaySubscriptionSuccess) {
                     pop(context);
                     _onPaySubscriptionSuccess(
-                        transactionUrl: payState.paymentUrl);
+                      transactionUrl: payState.paymentUrl,
+                    );
                   }
                 },
                 builder: (context, payState) {
@@ -191,8 +188,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     return const LoadingWidget();
                   }
                   return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
                     child: ButtonsShared(
                       onPressed: _submitPayment,
                       text: translate(AppStrings.payNow),
@@ -213,8 +212,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           } else {
                             pop(context);
                             showSnackBar(
-                                buildContext: context,
-                                message: 'Payment Failed');
+                              buildContext: context,
+                              message: 'Payment Failed',
+                            );
                           }
                         },
                       ),
@@ -226,8 +226,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     return const LoadingWidget();
                   }
                   return Padding(
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 16.w,
+                      vertical: 16.h,
+                    ),
                     child: ButtonsShared(
                       onPressed: _submitPayment,
                       text: translate(AppStrings.payNow),
@@ -250,14 +252,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
               if (status == 'Payment success') {
                 Navigator.pop(context, true);
                 AlertHelper.paymentAddCardSuccess(context).then((value) {
-                  sl<PlansAndSubscriptionBloc>().add(GetSubscriptionAndPlans(
-                    latitude:
-                        sl<GetUserProfileBloc>().profile.location!.latitude!,
-                    longitude:
-                        sl<GetUserProfileBloc>().profile.location!.longitude!,
-                    country:
-                        sl<GetUserProfileBloc>().profile.location!.country!,
-                  ));
+                  sl<PlansAndSubscriptionBloc>().add(
+                    GetSubscriptionAndPlans(
+                      latitude:
+                          sl<GetUserProfileBloc>().profile.location!.latitude!,
+                      longitude:
+                          sl<GetUserProfileBloc>().profile.location!.longitude!,
+                      country:
+                          sl<GetUserProfileBloc>().profile.location!.country!,
+                    ),
+                  );
                 });
               } else {
                 pop(context);

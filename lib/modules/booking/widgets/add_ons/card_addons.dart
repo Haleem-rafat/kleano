@@ -12,37 +12,35 @@ import 'package:thewasher/shared/services/service_locator.dart';
 class CardAddOns extends StatelessWidget {
   final int index;
   final VoidCallback onTap;
-  const CardAddOns({
-    super.key,
-    required this.index,
-    required this.onTap,
-  });
+  const CardAddOns({super.key, required this.index, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     OffersBloc offersBloc = sl<OffersBloc>();
     return Container(
       decoration: BoxDecoration(
-          color: ColorManager.white,
-          borderRadius: BorderRadius.circular(12.r),
-          border: Border.all(
-              color: sl<OffersBloc>()
-                      .cartAddOnsList
-                      .contains(offersBloc.addOnsList[index])
-                  ? ColorManager.primary
-                  : ColorManager.white,
-              width: 2.w),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                color: ColorManager.black.withValues(alpha: .12),
-                blurRadius: 2.r,
-                offset: const Offset(0, 0))
-          ]),
+        color: ColorManager.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(
+          color:
+              sl<OffersBloc>().cartAddOnsList.contains(
+                offersBloc.addOnsList[index],
+              )
+              ? ColorManager.primary
+              : ColorManager.white,
+          width: 2.w,
+        ),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: ColorManager.black.withValues(alpha: .12),
+            blurRadius: 2.r,
+            offset: const Offset(0, 0),
+          ),
+        ],
+      ),
       child: Column(
         children: <Widget>[
-          SizedBox(
-            height: 24.h,
-          ),
+          SizedBox(height: 24.h),
           ImageShared(
             image: offersBloc.addOnsList[index].icon != null
                 ? offersBloc.addOnsList[index].icon!.iconLink!
@@ -50,27 +48,26 @@ class CardAddOns extends StatelessWidget {
             height: 50.h,
             width: 50.w,
           ),
-          SizedBox(
-            height: 10.h,
-          ),
+          SizedBox(height: 10.h),
           Text(
             offersBloc.addOnsList[index].name!,
             style: AppStyles.caption12Regular.copyWith(
-                overflow: TextOverflow.ellipsis,
-                color: ColorManager.darkGrey,
-                fontSize: FontSize.s10.sp),
+              overflow: TextOverflow.ellipsis,
+              color: ColorManager.darkGrey,
+              fontSize: FontSize.s10.sp,
+            ),
           ),
-          SizedBox(
-            height: 15.h,
-          ),
+          SizedBox(height: 15.h),
           InkWell(
             onTap: onTap,
             child: Container(
               width: 76.w,
               height: 20.h,
               decoration: BoxDecoration(
-                color: offersBloc.cartAddOnsList
-                        .contains(offersBloc.addOnsList[index])
+                color:
+                    offersBloc.cartAddOnsList.contains(
+                      offersBloc.addOnsList[index],
+                    )
                     ? ColorManager.primary
                     : ColorManager.white,
                 borderRadius: BorderRadius.circular(6.r),
@@ -83,8 +80,10 @@ class CardAddOns extends StatelessWidget {
                     Text(
                       "+ ${offersBloc.addOnsList[index].price}",
                       style: AppStyles.subtext14Regular.copyWith(
-                        color: offersBloc.cartAddOnsList
-                                .contains(offersBloc.addOnsList[index])
+                        color:
+                            offersBloc.cartAddOnsList.contains(
+                              offersBloc.addOnsList[index],
+                            )
                             ? ColorManager.white
                             : ColorManager.primary,
                         fontSize: FontSize.s10.sp,
@@ -95,10 +94,14 @@ class CardAddOns extends StatelessWidget {
                       AssetsManager.saudiRiyalSymbol,
                       height: 12.h,
                       width: 12.w,
-                      colorFilter: ColorFilter.mode(offersBloc.cartAddOnsList
-                              .contains(offersBloc.addOnsList[index])
-                          ? ColorManager.white
-                          : ColorManager.primary, BlendMode.srcIn),
+                      colorFilter: ColorFilter.mode(
+                        offersBloc.cartAddOnsList.contains(
+                              offersBloc.addOnsList[index],
+                            )
+                            ? ColorManager.white
+                            : ColorManager.primary,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ],
                 ),

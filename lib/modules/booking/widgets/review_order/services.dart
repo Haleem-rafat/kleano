@@ -12,10 +12,7 @@ import 'package:thewasher/modules/Home/data/model/services_model.dart';
 
 class ServicesDetails extends StatelessWidget {
   final List<ServiceModel> services;
-  const ServicesDetails({
-    super.key,
-    required this.services,
-  });
+  const ServicesDetails({super.key, required this.services});
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +34,16 @@ class ServicesDetails extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       service.name!,
-                      style: AppStyles.subtextGray14Regular
-                          .copyWith(color: ColorManager.black),
+                      style: AppStyles.subtextGray14Regular.copyWith(
+                        color: ColorManager.black,
+                      ),
                     ),
                     const Spacer(),
                     Text(
                       service.price!.toString(),
-                      style: AppStyles.subtextGray14Regular
-                          .copyWith(color: ColorManager.black),
+                      style: AppStyles.subtextGray14Regular.copyWith(
+                        color: ColorManager.black,
+                      ),
                     ),
                     AppPadding.p4.pw,
                     SvgPicture.asset(

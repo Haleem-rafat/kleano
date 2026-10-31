@@ -8,7 +8,6 @@ class ApplyPromoCodeResponse {
   TotalPayModel? result;
   ErrorModel? errorModel;
 
-
   ApplyPromoCodeResponse({
     Map<String, dynamic>? json,
     required int statusCode,

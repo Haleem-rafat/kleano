@@ -104,10 +104,12 @@ class OrderModel {
         addOns!.add(AddOnsModel.fromJson(v));
       });
     }
-    vehicle =
-        json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
-    location =
-        json['location'] != null ? Location.fromJson(json['location']) : null;
+    vehicle = json['vehicle'] != null
+        ? Vehicle.fromJson(json['vehicle'])
+        : null;
+    location = json['location'] != null
+        ? Location.fromJson(json['location'])
+        : null;
     isAssigned = json['isAssigned'];
     isScheduled = json['isScheduled'];
     startTime = json['startTime'];
@@ -130,8 +132,9 @@ class OrderModel {
     onTheWayAt = json['OnTheWayAt'];
     onWashingAt = json['onWashingAt'];
     endTime = json['endTime'];
-    ratingOfBiker =
-        json['ratingOfBiker'] != null ? json['ratingOfBiker'].toDouble() : 0.0;
+    ratingOfBiker = json['ratingOfBiker'] != null
+        ? json['ratingOfBiker'].toDouble()
+        : 0.0;
     points = json['points'];
     isCarFreshened = json['isCarFreshened'];
     beforeWashImage = json['carBeforeWashLink'];
@@ -194,13 +197,14 @@ class Vehicle {
   String? color;
   String? imageLink;
 
-  Vehicle(
-      {this.sId,
-      this.type,
-      this.brand,
-      this.model,
-      this.plateNumber,
-      this.color});
+  Vehicle({
+    this.sId,
+    this.type,
+    this.brand,
+    this.model,
+    this.plateNumber,
+    this.color,
+  });
 
   Vehicle.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -234,14 +238,15 @@ class Location {
   bool? isSaved;
   String? savedName;
 
-  Location(
-      {this.sId,
-      this.latitude,
-      this.longitude,
-      this.streetName,
-      this.subAdministrativeArea,
-      this.isSaved,
-      this.savedName});
+  Location({
+    this.sId,
+    this.latitude,
+    this.longitude,
+    this.streetName,
+    this.subAdministrativeArea,
+    this.isSaved,
+    this.savedName,
+  });
 
   Location.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

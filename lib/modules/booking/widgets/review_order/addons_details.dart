@@ -13,31 +13,27 @@ class AddOnsDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-        children: addons.map((AddOnsModel addons) {
-      return Padding(
-        padding: EdgeInsets.only(bottom: AppPadding.p4.h),
-        child: Row(
-          children: <Widget>[
-            Text(
-              addons.name!,
-              style: AppStyles.subtextGray14Regular,
-            ),
-            const Spacer(),
-            Text(
-              addons.price!.toString(),
-              style: AppStyles.subtextGray14Regular,
-            ),
-            SizedBox(
-              width: AppPadding.p4.w,
-            ),
-            SvgPicture.asset(
-              AssetsManager.saudiRiyalSymbol,
-              height: 14.h,
-              width: 14.w,
-            ),
-          ],
-        ),
-      );
-    }).toList());
+      children: addons.map((AddOnsModel addons) {
+        return Padding(
+          padding: EdgeInsets.only(bottom: AppPadding.p4.h),
+          child: Row(
+            children: <Widget>[
+              Text(addons.name!, style: AppStyles.subtextGray14Regular),
+              const Spacer(),
+              Text(
+                addons.price!.toString(),
+                style: AppStyles.subtextGray14Regular,
+              ),
+              SizedBox(width: AppPadding.p4.w),
+              SvgPicture.asset(
+                AssetsManager.saudiRiyalSymbol,
+                height: 14.h,
+                width: 14.w,
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    );
   }
 }

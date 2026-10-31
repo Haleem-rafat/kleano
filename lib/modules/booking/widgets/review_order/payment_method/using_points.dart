@@ -14,11 +14,7 @@ import 'package:thewasher/shared/services/service_locator.dart';
 class UsingPoints extends StatefulWidget {
   final String orderId;
   final num points;
-  const UsingPoints({
-    super.key,
-    required this.orderId,
-    required this.points,
-  });
+  const UsingPoints({super.key, required this.orderId, required this.points});
 
   @override
   State<UsingPoints> createState() => _UsingPointsState();
@@ -54,7 +50,8 @@ class _UsingPointsState extends State<UsingPoints> {
         if (state is PointLoading) {
           return const LoadingWidget();
         } else if (state is PointLoaded) {
-          checkPoints = sl.call<PointBloc>.call().pointResponse.points! >=
+          checkPoints =
+              sl.call<PointBloc>.call().pointResponse.points! >=
               sl.call<PointBloc>.call().pointResponse.redeemLimit!;
           return checkPoints
               ? Column(
@@ -64,21 +61,24 @@ class _UsingPointsState extends State<UsingPoints> {
                     AppPadding.p18.ph,
                     Text(
                       translate(AppStrings.paymentMethod),
-                      style: AppStyles.title16Bold
-                          .copyWith(color: ColorManager.darkGrey),
+                      style: AppStyles.title16Bold.copyWith(
+                        color: ColorManager.darkGrey,
+                      ),
                     ),
                     AppPadding.p8.ph,
                     Row(
                       children: <Widget>[
                         Text(
                           '${translate(AppStrings.points)} : ',
-                          style: AppStyles.body14Medium
-                              .copyWith(color: ColorManager.darkGrey),
+                          style: AppStyles.body14Medium.copyWith(
+                            color: ColorManager.darkGrey,
+                          ),
                         ),
                         Text(
                           '${sl.call<PointBloc>.call().pointResponse.points!} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
-                          style: AppStyles.body14Medium
-                              .copyWith(color: ColorManager.darkGrey),
+                          style: AppStyles.body14Medium.copyWith(
+                            color: ColorManager.darkGrey,
+                          ),
                         ),
                         const Spacer(),
                         IgnorePointer(
@@ -91,9 +91,9 @@ class _UsingPointsState extends State<UsingPoints> {
                                 toggleSelected = value;
                               });
                               if (value == true) {
-                                sl.call<PointBloc>.call().add(ApplyPoints(
-                                  orderId: widget.orderId,
-                                ));
+                                sl.call<PointBloc>.call().add(
+                                  ApplyPoints(orderId: widget.orderId),
+                                );
                               }
                             },
                           ),
@@ -110,13 +110,15 @@ class _UsingPointsState extends State<UsingPoints> {
                 children: <Widget>[
                   Text(
                     '${translate(AppStrings.points)} : ',
-                    style: AppStyles.body14Medium
-                        .copyWith(color: ColorManager.darkGrey),
+                    style: AppStyles.body14Medium.copyWith(
+                      color: ColorManager.darkGrey,
+                    ),
                   ),
                   Text(
                     '${sl<PointBloc>().pointResponse.points} ${translate(AppStrings.points).replaceFirst(RegExp(r'P'), 'p')}',
-                    style: AppStyles.body14Medium
-                        .copyWith(color: ColorManager.darkGrey),
+                    style: AppStyles.body14Medium.copyWith(
+                      color: ColorManager.darkGrey,
+                    ),
                   ),
                   const Spacer(),
                   BlocListener<PointBloc, PointState>(
@@ -127,26 +129,28 @@ class _UsingPointsState extends State<UsingPoints> {
                           toggleSelected = false;
                         });
                         showSnackBar(
-                            buildContext: context,
-                            message: state.errorModel!.en!);
+                          buildContext: context,
+                          message: state.errorModel!.en!,
+                        );
                       }
                     },
                     child: IgnorePointer(
-                        ignoring: checkPoints ? true : false,
-                        child: CupertinoSwitch(
-                          value: toggleSelected,
-                          activeTrackColor: ColorManager.secondary,
-                          onChanged: (bool value) {
-                            setState(() {
-                              toggleSelected = value;
-                            });
-                            if (value == true) {
-                              sl.call<PointBloc>.call().add(ApplyPoints(
-                                orderId: widget.orderId,
-                              ));
-                            }
-                          },
-                        )),
+                      ignoring: checkPoints ? true : false,
+                      child: CupertinoSwitch(
+                        value: toggleSelected,
+                        activeTrackColor: ColorManager.secondary,
+                        onChanged: (bool value) {
+                          setState(() {
+                            toggleSelected = value;
+                          });
+                          if (value == true) {
+                            sl.call<PointBloc>.call().add(
+                              ApplyPoints(orderId: widget.orderId),
+                            );
+                          }
+                        },
+                      ),
+                    ),
                   ),
                 ],
               )

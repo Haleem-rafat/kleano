@@ -25,10 +25,7 @@ class CityInfo {
   final String id;
   final LocalizedName name;
 
-  CityInfo({
-    required this.id,
-    required this.name,
-  });
+  CityInfo({required this.id, required this.name});
 
   factory CityInfo.fromJson(Map<String, dynamic> json) {
     return CityInfo(
@@ -65,15 +62,9 @@ class LocalizedName {
   final String ar;
   final String en;
 
-  LocalizedName({
-    required this.ar,
-    required this.en,
-  });
+  LocalizedName({required this.ar, required this.en});
 
   factory LocalizedName.fromJson(Map<String, dynamic> json) {
-    return LocalizedName(
-      ar: json['ar'] ?? '',
-      en: json['en'] ?? '',
-    );
+    return LocalizedName(ar: json['ar'] ?? '', en: json['en'] ?? '');
   }
 }

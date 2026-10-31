@@ -30,20 +30,14 @@ class GetOrderById extends BookingOrderEvent {
   final String orderId;
   final bool? refresh;
 
-  GetOrderById({
-    required this.orderId,
-    this.refresh = true,
-  });
+  GetOrderById({required this.orderId, this.refresh = true});
 }
 
 class RateOrder extends BookingOrderEvent {
   final String orderId;
   final double starsNum;
 
-  RateOrder({
-    required this.orderId,
-    required this.starsNum,
-  });
+  RateOrder({required this.orderId, required this.starsNum});
 }
 
 class GetCalenderAvalible extends BookingOrderEvent {
@@ -51,12 +45,7 @@ class GetCalenderAvalible extends BookingOrderEvent {
   final String? area;
   final String? day;
   final String? date;
-  GetCalenderAvalible({
-    this.city,
-    this.area,
-    this.day,
-    this.date,
-  });
+  GetCalenderAvalible({this.city, this.area, this.day, this.date});
 }
 
 class ClearSelectedTimeSlot extends BookingOrderEvent {}

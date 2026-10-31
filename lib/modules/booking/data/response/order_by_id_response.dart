@@ -8,7 +8,6 @@ class OrderResponse {
   OrderModel? result;
   ErrorModel? errorModel;
 
-
   OrderResponse({
     Map<String, dynamic>? json,
     required int statusCode,

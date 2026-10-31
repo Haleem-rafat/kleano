@@ -19,8 +19,7 @@ class CarDetails extends StatelessWidget {
       children: <Widget>[
         Text(
           translate(AppStrings.carDetails),
-          style:
-              AppStyles.titleWhite16Bold.copyWith(color: ColorManager.black),
+          style: AppStyles.titleWhite16Bold.copyWith(color: ColorManager.black),
         ),
         // AppPadding.p14.ph,
         8.verticalSpace,

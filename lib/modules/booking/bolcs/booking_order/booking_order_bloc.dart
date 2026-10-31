@@ -34,10 +34,12 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
           request: event.createOrderRequest,
         );
         if (response.success) {
-          emit(CreateOrderSuccess(
-            reviewOrderModel: response.result!,
-            redeemLimit: response.redeemLimit,
-          ));
+          emit(
+            CreateOrderSuccess(
+              reviewOrderModel: response.result!,
+              redeemLimit: response.redeemLimit,
+            ),
+          );
           orderLocation = response.result!.data!.location!;
         } else {
           emit(CreateOrderFailed(errorModel: response.errorModel));
@@ -57,8 +59,10 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
       }
     });
 
-    on<ClearCartOrder>(
-        (ClearCartOrder event, Emitter<BookingOrderState> emit) async {
+    on<ClearCartOrder>((
+      ClearCartOrder event,
+      Emitter<BookingOrderState> emit,
+    ) async {
       try {
         emit(ClearCartOrderLoading());
         sl.call<OffersBloc>.call().cartServicesList.clear();
@@ -82,9 +86,7 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
       try {
         emit(CancelOrderLoading());
         BaseResponseWithoutResponse response =
-            await BookingOrderRepo.userCancelOrder(
-          orderId: event.orderId,
-        );
+            await BookingOrderRepo.userCancelOrder(orderId: event.orderId);
         if (response.success) {
           emit(CancelOrderSuccess());
         } else {
@@ -111,10 +113,10 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
 
         BaseResponseWithoutResponse response =
             await BookingOrderRepo.userPayOrder(
-          applePayId: event.applePayId,
-          orderId: event.orderId,
-          paymentDetailsRequest: event.paymentDetailsRequest,
-        );
+              applePayId: event.applePayId,
+              orderId: event.orderId,
+              paymentDetailsRequest: event.paymentDetailsRequest,
+            );
         if (response.success) {
           emit(PlaceOrderSuccess(paymentUrl: response.result));
 
@@ -137,14 +139,17 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
       }
     });
 
-    on<GetOrderById>(
-        (GetOrderById event, Emitter<BookingOrderState> emit) async {
+    on<GetOrderById>((
+      GetOrderById event,
+      Emitter<BookingOrderState> emit,
+    ) async {
       try {
         if (event.refresh!) {
           emit(OrderByIdLoading());
         }
-        OrderResponse response =
-            await BookingOrderRepo.userViewOrderById(orderId: event.orderId);
+        OrderResponse response = await BookingOrderRepo.userViewOrderById(
+          orderId: event.orderId,
+        );
         if (response.success) {
           emit(OrderByIdSuccess(orderModel: response.result!));
         } else {
@@ -165,18 +170,22 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         if (response.success) {
           emit(RateOrderSuccess());
         } else {
-          emit(RateOrderFailed(
-            error: response.message,
-            errorModel: response.errorModel,
-          ));
+          emit(
+            RateOrderFailed(
+              error: response.message,
+              errorModel: response.errorModel,
+            ),
+          );
         }
       } on DioException catch (e) {
         emit(OrderByIdFailed(error: e.message));
       }
     });
 
-    on<GetCalenderAvalible>(
-        (GetCalenderAvalible event, Emitter<BookingOrderState> emit) async {
+    on<GetCalenderAvalible>((
+      GetCalenderAvalible event,
+      Emitter<BookingOrderState> emit,
+    ) async {
       try {
         emit(CalenderAvailableLoading());
 
@@ -187,7 +196,8 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         // Validate that city and area are available
         if (cityParam.isEmpty || areaParam.isEmpty) {
           debugPrint(
-              'Warning: cityId or areaId is empty. cityId: $cityParam, areaId: $areaParam');
+            'Warning: cityId or areaId is empty. cityId: $cityParam, areaId: $areaParam',
+          );
           // Emit empty result if location data is not available
           emit(CalenderAvailableSuccess(calenderAvailableModel: []));
           return;
@@ -195,8 +205,9 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
 
         // Get the specific date to fetch (single day)
         final DateTime now = DateTime.now();
-        final DateTime targetDate =
-            event.date != null ? DateTime.parse(event.date!) : now;
+        final DateTime targetDate = event.date != null
+            ? DateTime.parse(event.date!)
+            : now;
 
         String dayParam = _getDayName(targetDate);
         String dateParam = targetDate.toIso8601String().split('T')[0];
@@ -205,27 +216,33 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
           // Fetch time slots from API for this specific date
           List<CalenderAvalibleResponse> response =
               await BookingOrderRepo.getBookingCalenderAvalabile(
-            city: cityParam,
-            area: areaParam,
-            day: dayParam,
-            date: dateParam,
-          );
+                city: cityParam,
+                area: areaParam,
+                day: dayParam,
+                date: dateParam,
+              );
 
           // Transform API response to CalenderAvailableModel format
-          List<CalenderAvailableModel> dayModels =
-              _transformToCalenderModels(response, dateParam);
+          List<CalenderAvailableModel> dayModels = _transformToCalenderModels(
+            response,
+            dateParam,
+          );
 
           emit(CalenderAvailableSuccess(calenderAvailableModel: dayModels));
         } catch (e) {
           // If fetching for the day fails, emit empty model
           debugPrint('Error fetching time slots for $dateParam: $e');
-          emit(CalenderAvailableSuccess(calenderAvailableModel: [
-            CalenderAvailableModel(
-              date: targetDate,
-              timeSlots: [],
-              isActive: false,
-            )
-          ]));
+          emit(
+            CalenderAvailableSuccess(
+              calenderAvailableModel: [
+                CalenderAvailableModel(
+                  date: targetDate,
+                  timeSlots: [],
+                  isActive: false,
+                ),
+              ],
+            ),
+          );
         }
       } on DioException catch (e) {
         emit(CalenderAvailableFailed(error: e.message));
@@ -249,14 +266,16 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
       'THURSDAY',
       'FRIDAY',
       'SATURDAY',
-      'SUNDAY'
+      'SUNDAY',
     ];
     return days[date.weekday - 1];
   }
 
   /// Transform API response to CalenderAvailableModel format
   List<CalenderAvailableModel> _transformToCalenderModels(
-      List<CalenderAvalibleResponse> responses, String dateStr) {
+    List<CalenderAvalibleResponse> responses,
+    String dateStr,
+  ) {
     if (responses.isEmpty) return [];
 
     // Parse the date string
@@ -294,11 +313,13 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
         }
 
         // Add time slot
-        groupedSlots[dateKey]!.add(TimeSlot(
-          availableTime: slotDateTime,
-          isActive: response.isAvailable,
-          availableBikersCount: response.availableBikersCount ?? 0,
-        ));
+        groupedSlots[dateKey]!.add(
+          TimeSlot(
+            availableTime: slotDateTime,
+            isActive: response.isAvailable,
+            availableBikersCount: response.availableBikersCount ?? 0,
+          ),
+        );
       } catch (e) {
         debugPrint('Error parsing time slot: ${response.timeSlot}, error: $e');
       }
@@ -310,11 +331,13 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
       // Sort time slots by time
       slots.sort((a, b) => a.availableTime.compareTo(b.availableTime));
 
-      calenderModels.add(CalenderAvailableModel(
-        date: date,
-        timeSlots: slots,
-        isActive: slots.isNotEmpty,
-      ));
+      calenderModels.add(
+        CalenderAvailableModel(
+          date: date,
+          timeSlots: slots,
+          isActive: slots.isNotEmpty,
+        ),
+      );
     });
 
     // Sort by date
@@ -322,11 +345,9 @@ class BookingOrderBloc extends Bloc<BookingOrderEvent, BookingOrderState> {
 
     // If no models created, create one for the base date with empty slots
     if (calenderModels.isEmpty) {
-      calenderModels.add(CalenderAvailableModel(
-        date: baseDate,
-        timeSlots: [],
-        isActive: false,
-      ));
+      calenderModels.add(
+        CalenderAvailableModel(date: baseDate, timeSlots: [], isActive: false),
+      );
     }
 
     return calenderModels;

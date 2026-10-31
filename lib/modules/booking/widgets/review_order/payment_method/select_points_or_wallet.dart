@@ -22,10 +22,7 @@ class SelectPaymentMethodsPointsOrWallet extends StatelessWidget {
         // ),
         // AppPadding.p8.ph,
 
-        UsingPoints(
-          orderId: orderId,
-          points: points,
-        )
+        UsingPoints(orderId: orderId, points: points),
       ],
     );
   }

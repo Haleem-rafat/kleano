@@ -14,10 +14,15 @@ import 'package:thewasher/shared/services/service_locator.dart';
 class MainServices extends StatefulWidget {
   final List<ServiceModel> mainServices;
   final Function(int index)? addOrRemoveMainServices;
+
+  /// Tapping a wash opens its sheet (approved Home). Null keeps the selectable
+  /// radio list, used for subscribers adding to a plan.
+  final void Function(ServiceModel service, int index)? onOpen;
   const MainServices({
     super.key,
     required this.mainServices,
     this.addOrRemoveMainServices,
+    this.onOpen,
   });
 
   @override
@@ -123,7 +128,6 @@ class _MainServicesState extends State<MainServices> {
                   ),
                 );
               }
-              widget.addOrRemoveMainServices?.call(index);
             }
 
             // Design: CustomerHome — one card, brand ring when selected,
@@ -139,7 +143,9 @@ class _MainServicesState extends State<MainServices> {
                     shape: KRadius.shape(
                       BorderRadius.circular(KRadius.card),
                       side: BorderSide(
-                        color: isSelected ? c.brand : Colors.transparent,
+                        color: isSelected && widget.onOpen == null
+                            ? c.brand
+                            : Colors.transparent,
                         width: 2,
                       ),
                     ),
@@ -157,7 +163,12 @@ class _MainServicesState extends State<MainServices> {
                       customBorder: KRadius.shape(
                         BorderRadius.circular(KRadius.card),
                       ),
-                      onTap: toggle,
+                      onTap: widget.onOpen == null
+                          ? toggle
+                          : () {
+                              HapticFeedback.selectionClick();
+                              widget.onOpen!(service, index);
+                            },
                       child: Padding(
                         padding: const EdgeInsets.all(KSpace.m),
                         child: Column(
@@ -222,21 +233,33 @@ class _MainServicesState extends State<MainServices> {
                                   ),
                                 ),
                                 const SizedBox(width: KSpace.s),
-                                AnimatedContainer(
-                                  duration: KMotion.of(context, KMotion.fast),
-                                  width: 24,
-                                  height: 24,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: isSelected ? c.brand : c.separator,
-                                      width: isSelected ? 7 : 2,
+                                if (widget.onOpen != null)
+                                  Icon(
+                                    Directionality.of(context) ==
+                                            TextDirection.rtl
+                                        ? Icons.chevron_left_rounded
+                                        : Icons.chevron_right_rounded,
+                                    color: c.textSecondary,
+                                  )
+                                else
+                                  AnimatedContainer(
+                                    duration: KMotion.of(context, KMotion.fast),
+                                    width: 24,
+                                    height: 24,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? c.brand
+                                            : c.separator,
+                                        width: isSelected ? 7 : 2,
+                                      ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
-                            if (description?.isNotEmpty == true) ...<Widget>[
+                            if (widget.onOpen == null &&
+                                description?.isNotEmpty == true) ...<Widget>[
                               const SizedBox(height: KSpace.s),
                               Semantics(
                                 button: true,

@@ -79,44 +79,47 @@ class _VehiclesBookingScreenState extends State<VehiclesBookingScreen> {
               children: <Widget>[
                 Text(
                   translate(AppStrings.yourRecentCars),
-                  style:
-                      AppStyles.title16Bold.copyWith(color: ColorManager.black),
+                  style: AppStyles.title16Bold.copyWith(
+                    color: ColorManager.black,
+                  ),
                 ),
-                SizedBox(
-                  height: 16.h,
-                ),
+                SizedBox(height: 16.h),
                 SizedBox(
                   height: MediaQuery.of(context).size.height / 2.1,
                   child: ListView.separated(
                     itemCount: sl<VehiclesBloc>().vehiclesList.length,
                     separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(
-                        height: 7.h,
-                      );
+                      return SizedBox(height: 7.h);
                     },
                     itemBuilder: (context, int index) {
-                      selectedColor = colorList.indexWhere((element) =>
-                          element.colorName ==
-                          sl<VehiclesBloc>().vehiclesList[index].color!);
+                      selectedColor = colorList.indexWhere(
+                        (element) =>
+                            element.colorName ==
+                            sl<VehiclesBloc>().vehiclesList[index].color!,
+                      );
                       return Padding(
                         padding: EdgeInsets.symmetric(
-                            horizontal: 8.w, vertical: 5.h),
+                          horizontal: 8.w,
+                          vertical: 5.h,
+                        ),
                         child: InkWell(
                           onTap: () {
-                            sl<VehiclesBloc>().add(SelectCar(
-                                vehicle:
-                                    sl<VehiclesBloc>().vehiclesList[index]));
+                            sl<VehiclesBloc>().add(
+                              SelectCar(
+                                vehicle: sl<VehiclesBloc>().vehiclesList[index],
+                              ),
+                            );
                           },
                           child: VehiclesCard(
-                              index: index, selectedColor: selectedColor),
+                            index: index,
+                            selectedColor: selectedColor,
+                          ),
                         ),
                       );
                     },
                   ),
                 ),
-                SizedBox(
-                  height: 16.h,
-                ),
+                SizedBox(height: 16.h),
                 Center(
                   child: ButtonDottedShared(
                     onPressed: () {
@@ -124,7 +127,7 @@ class _VehiclesBookingScreenState extends State<VehiclesBookingScreen> {
                     },
                     text: translate(AppStrings.addNewVehicles),
                   ),
-                )
+                ),
               ],
             ),
           );

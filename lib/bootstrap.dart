@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:thewasher/core/design/components/k_auth_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/app.dart';
@@ -25,6 +26,7 @@ Future<void> bootstrap(Flavor flavor) async {
   // Timezone database for scheduled local notifications.
   tz.initializeTimeZones();
 
+  KAuthScaffold.headerPhoto = 'assets/images/on_boarding_3.png';
   ServiceLocator().init();
   await Firebase.initializeApp();
   AppsFlyerService.init();

@@ -58,7 +58,8 @@ class CreateOrderFunction {
     type = userProfileBloc.profile.isSubscribed == true
         ? AppConstants.subscriptionBooking
         : AppConstants.serviceBooking;
-    vehicleId = vehiclesBloc.selectedVehicle.sId ??
+    vehicleId =
+        vehiclesBloc.selectedVehicle.sId ??
         (throw Exception('Vehicle ID is missing.'));
     washingServices = offersBloc.cartServicesListString.isNotEmpty
         ? offersBloc.cartServicesListString
@@ -66,8 +67,9 @@ class CreateOrderFunction {
     addOns = offersBloc.cartAddOnsListString.isNotEmpty
         ? offersBloc.cartAddOnsListString
         : null;
-    description =
-        singleton.nearByDescription != '' ? singleton.nearByDescription : null;
+    description = singleton.nearByDescription != ''
+        ? singleton.nearByDescription
+        : null;
     subscriptionId = userProfileBloc.profile.isSubscribed == true
         ? plansAndSubscriptionBloc.subscription.sId
         : null;

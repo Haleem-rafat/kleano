@@ -34,10 +34,7 @@ class PaymentWebview extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white,
-                  Colors.grey.shade50,
-                ],
+                colors: [Colors.white, Colors.grey.shade50],
               ),
             ),
             child: Column(
@@ -50,10 +47,7 @@ class PaymentWebview extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     color: Colors.red.shade50,
-                    border: Border.all(
-                      color: Colors.red.shade200,
-                      width: 2,
-                    ),
+                    border: Border.all(color: Colors.red.shade200, width: 2),
                   ),
                   child: Icon(
                     Icons.error_outline,
@@ -81,10 +75,7 @@ class PaymentWebview extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(12.r),
-                    border: Border.all(
-                      color: Colors.red.shade100,
-                      width: 1,
-                    ),
+                    border: Border.all(color: Colors.red.shade100, width: 1),
                   ),
                   child: Text(
                     errorMessage,
@@ -167,8 +158,9 @@ class PaymentWebview extends StatelessWidget {
           final decodedMessage = Uri.decodeComponent(errorMessageParam);
 
           // Use the payment error handler to get user-friendly message
-          final userFriendlyMessage =
-              PaymentErrorHandler.getErrorMessage(decodedMessage);
+          final userFriendlyMessage = PaymentErrorHandler.getErrorMessage(
+            decodedMessage,
+          );
           return userFriendlyMessage ??
               PaymentErrorHandler.getErrorMessage(url);
         }
@@ -204,9 +196,7 @@ class PaymentWebview extends StatelessWidget {
           isTextOnly: false,
         ),
       ),
-      body: WebViewWidget(
-        controller: _initializeController(context),
-      ),
+      body: WebViewWidget(controller: _initializeController(context)),
     );
   }
 }

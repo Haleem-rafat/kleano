@@ -33,10 +33,7 @@ class DateAndServiceTime extends StatelessWidget {
             style: AppStyles.title16Bold.copyWith(color: ColorManager.darkGrey),
           ),
           AppPadding.p8.ph,
-          Text(
-            _formatDate(),
-            style: AppStyles.subtextGray14Regular,
-          ),
+          Text(_formatDate(), style: AppStyles.subtextGray14Regular),
           AppPadding.p18.ph,
           Text(
             translate(AppStrings.serviceTime),
@@ -57,6 +54,8 @@ class DateAndServiceTime extends StatelessWidget {
     final dayMonth = AppDateFormatter.dayAndMonth(date);
     final time = AppDateFormatter.dateToStringHHMMA(date);
 
-    return isScheduled ? '${translate(AppStrings.today)} $dayMonth $time' : '$dayMonth $time';
+    return isScheduled
+        ? '${translate(AppStrings.today)} $dayMonth $time'
+        : '$dayMonth $time';
   }
 }

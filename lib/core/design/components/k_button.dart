@@ -83,7 +83,12 @@ class KButton extends StatelessWidget {
     }
     final Color foreground = onPressed == null
         ? c.textSecondary
-        : (_prominent ? Colors.white : (color ?? c.brand));
+        : (_prominent
+              ? Colors.white
+              : (color ??
+                    (variant == KButtonVariant.secondary
+                        ? c.onBrandTint
+                        : c.brand)));
     return IgnorePointer(
       ignoring: loading,
       child: CupertinoButton(

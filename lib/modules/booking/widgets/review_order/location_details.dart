@@ -12,10 +12,7 @@ import 'package:thewasher/modules/booking/widgets/location/fixed_map.dart';
 
 class LocationDetails extends StatelessWidget {
   final Location location;
-  const LocationDetails({
-    super.key,
-    required this.location,
-  });
+  const LocationDetails({super.key, required this.location});
 
   @override
   Widget build(BuildContext context) {
@@ -40,19 +37,20 @@ class LocationDetails extends StatelessWidget {
                 fit: FlexFit.loose,
                 child: Text(
                   ' (${location.streetName})',
-                  style: AppStyles.subtextGray14Regular
-                      .copyWith(color: ColorManager.black),
+                  style: AppStyles.subtextGray14Regular.copyWith(
+                    color: ColorManager.black,
+                  ),
                   softWrap: false,
                   overflow: TextOverflow.fade,
                 ),
-              )
+              ),
             ],
           ),
           AppPadding.p8.ph,
           FixedMap(
             height: 85,
             latLng: LatLng(location.latitude!, location.longitude!),
-          )
+          ),
         ],
       ),
     );

@@ -6,10 +6,10 @@ class CreationStepIndicator extends StatelessWidget {
   final int step;
   final double stepWidth;
 
-  CreationStepIndicator({
-    required this.step,
-    super.key,
-  })  : stepWidth = (350 - ((accountCreationStepCount - 1) * 10.5)) / accountCreationStepCount;
+  CreationStepIndicator({required this.step, super.key})
+    : stepWidth =
+          (350 - ((accountCreationStepCount - 1) * 10.5)) /
+          accountCreationStepCount;
 
   static const int accountCreationStepCount = 5;
 
@@ -50,7 +50,7 @@ class CreationStepIndicator extends StatelessWidget {
                     height: 4.h,
                     width: 57.w,
                     color: getStepColor(index + 1),
-                  )
+                  ),
               ],
             );
           },

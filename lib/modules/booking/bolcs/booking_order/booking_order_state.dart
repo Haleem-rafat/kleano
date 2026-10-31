@@ -9,10 +9,7 @@ class CreateOrderLoading extends BookingOrderState {}
 class CreateOrderSuccess extends BookingOrderState {
   final ReviewOrderModel reviewOrderModel;
   final num? redeemLimit;
-  CreateOrderSuccess({
-    required this.reviewOrderModel,
-    this.redeemLimit,
-  });
+  CreateOrderSuccess({required this.reviewOrderModel, this.redeemLimit});
 }
 
 class CreateOrderFailed extends BookingOrderState {
@@ -85,10 +82,7 @@ class RateOrderFailed extends BookingOrderState {
   final String? error;
   final ErrorModel? errorModel;
 
-  RateOrderFailed({
-    this.error,
-    this.errorModel,
-  });
+  RateOrderFailed({this.error, this.errorModel});
 }
 
 ///////// Booking Avalabile
@@ -98,9 +92,7 @@ class CalenderAvailableLoading extends BookingOrderState {}
 
 class CalenderAvailableSuccess extends BookingOrderState {
   final List<CalenderAvailableModel> calenderAvailableModel;
-  CalenderAvailableSuccess({
-    required this.calenderAvailableModel,
-  });
+  CalenderAvailableSuccess({required this.calenderAvailableModel});
 }
 
 class CalenderAvailableFailed extends BookingOrderState {

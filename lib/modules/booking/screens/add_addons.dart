@@ -17,15 +17,18 @@ class AddAddOns extends StatelessWidget {
     int indexAddOns = 0;
     OffersBloc offersBloc = sl<OffersBloc>();
     void addOrRemoveAddOns() {
-      if (sl<OffersBloc>()
-          .cartAddOnsList
-          .contains(offersBloc.addOnsList[indexAddOns])) {
-        var deleteCartService = sl<OffersBloc>()
-            .cartAddOnsList
-            .indexOf(offersBloc.addOnsList[indexAddOns]);
-        offersBloc.add(DeleteExtraCart(
+      if (sl<OffersBloc>().cartAddOnsList.contains(
+        offersBloc.addOnsList[indexAddOns],
+      )) {
+        var deleteCartService = sl<OffersBloc>().cartAddOnsList.indexOf(
+          offersBloc.addOnsList[indexAddOns],
+        );
+        offersBloc.add(
+          DeleteExtraCart(
             index: deleteCartService,
-            extra: offersBloc.addOnsList[indexAddOns]));
+            extra: offersBloc.addOnsList[indexAddOns],
+          ),
+        );
       } else {
         offersBloc.add(AddExtraCart(extra: offersBloc.addOnsList[indexAddOns]));
       }
@@ -33,32 +36,32 @@ class AddAddOns extends StatelessWidget {
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: AppPadding.p24.w),
-      child: StatefulBuilder(builder: (context, myState) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              translate(AppStrings.addOns),
-              style: AppStyles.title16Bold.copyWith(
-                color: ColorManager.black,
+      child: StatefulBuilder(
+        builder: (context, myState) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                translate(AppStrings.addOns),
+                style: AppStyles.title16Bold.copyWith(
+                  color: ColorManager.black,
+                ),
               ),
-            ),
-            SizedBox(
-              height: AppPadding.p16.h,
-            ),
-            offersBloc.addOnsList.isEmpty
-                ? Center(child: Text(translate(AppStrings.noAddonsRequested)))
-                : Expanded(
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 14.w,
-                      mainAxisSpacing: 12.h,
-                      scrollDirection: Axis.vertical,
-                      childAspectRatio: (120.w / 190.h),
-                      children:
-                          offersBloc.addOnsList.asMap().keys.map((int index) {
-                        return GestureDetector(
+              SizedBox(height: AppPadding.p16.h),
+              offersBloc.addOnsList.isEmpty
+                  ? Center(child: Text(translate(AppStrings.noAddonsRequested)))
+                  : Expanded(
+                      child: GridView.count(
+                        shrinkWrap: true,
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 14.w,
+                        mainAxisSpacing: 12.h,
+                        scrollDirection: Axis.vertical,
+                        childAspectRatio: (120.w / 190.h),
+                        children: offersBloc.addOnsList.asMap().keys.map((
+                          int index,
+                        ) {
+                          return GestureDetector(
                             onTap: () {
                               myState(() {
                                 indexAddOns = index;
@@ -74,13 +77,15 @@ class AddAddOns extends StatelessWidget {
                                   addOrRemoveAddOns();
                                 });
                               },
-                            ));
-                      }).toList(),
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
-                  ),
-          ],
-        );
-      }),
+            ],
+          );
+        },
+      ),
     );
   }
 }

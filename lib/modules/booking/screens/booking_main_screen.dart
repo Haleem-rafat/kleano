@@ -3,7 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/design/components/k_chip_button.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
+import 'package:thewasher/core/resources/constant_manager.dart';
+import 'package:thewasher/modules/Home/data/model/services_model.dart';
+import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
 import 'package:thewasher/modules/booking/widgets/home/active_order_card.dart';
+import 'package:thewasher/modules/booking/widgets/home/home_sections.dart';
+import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
 import 'package:thewasher/modules/my_booking/blocs/my_booking/my_booking_bloc.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,6 +64,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   late final RefreshController refreshController;
   Key _offerWidgetKey = UniqueKey();
   final MyBookingBloc _activeOrders = MyBookingBloc();
+  final MyBookingBloc _pastOrders = MyBookingBloc();
 
   String _guestAuthMessage(BuildContext context) {
     final String languageCode = Localizations.localeOf(context).languageCode;
@@ -169,7 +175,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         ),
       );
     } else {
-      _activeOrders.add(FetchMyBookingActive());
+      _loadOrders();
       sl<LocationBloc>().add(GetSavedLocation());
       sl<GetUserProfileBloc>().add(GetUserProfileEvent());
       sl<PlansAndSubscriptionBloc>().add(
@@ -202,6 +208,44 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         _offerWidgetKey = UniqueKey();
       });
     }
+  }
+
+  void _loadOrders() {
+    _activeOrders.add(FetchMyBookingActive());
+    _pastOrders.add(FetchMyBookingHistory());
+    sl<VehiclesBloc>().add(GetVehicles());
+  }
+
+  /// Continue in the Choose a wash sheet. Guests log in at this moment.
+  void _continueFromSheet() {
+    if (_isGuest) {
+      AlertHelper.guestAlert(context);
+      return;
+    }
+    _nextButtonSteps();
+  }
+
+  /// Book again: the last wash and car in the cart, straight to choosing a time.
+  void _bookAgain(OrderModel order) {
+    final OffersBloc offers = sl<OffersBloc>();
+    final String? serviceId = order.washingServices?.firstOrNull?.sId;
+    final int index = offers.mainServices.indexWhere(
+      (ServiceModel s) => s.sId == serviceId,
+    );
+    if (index < 0) return;
+    offers.add(
+      AddServiceCart(
+        service: offers.mainServices[index],
+        selectedMainServiceIndex: index,
+      ),
+    );
+    final VehiclesBloc vehicles = sl<VehiclesBloc>();
+    for (final vehicle in vehicles.vehiclesList) {
+      if (vehicle.sId == order.vehicle?.sId) {
+        vehicles.add(SelectCar(vehicle: vehicle));
+      }
+    }
+    setState(() => indexPage = 1);
   }
 
   void _loadOffersForAddress() {
@@ -245,7 +289,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     clearAllOrderDetails();
     refreshController = RefreshController();
     bookingScreen = [
-      const AddServices(),
+      AddServices(onContinue: _continueFromSheet),
       RestUnifiedBookingScreen(
         onNotesFocusChanged: (isFocused) => _isNotesFocused.value = isFocused,
       ),
@@ -291,7 +335,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         });
       } else {
         // For authenticated users, use existing logic
-        _activeOrders.add(FetchMyBookingActive());
+        _loadOrders();
         sl<LocationBloc>().add(GetSavedLocation());
         sl<GetUserProfileBloc>().add(GetUserProfileEvent());
 
@@ -320,6 +364,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     refreshController.dispose();
     _isNotesFocused.dispose();
     _activeOrders.close();
+    _pastOrders.close();
     super.dispose();
   }
 
@@ -443,9 +488,12 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
       _buildTopBar(c),
       if (!_isGuest) SliverToBoxAdapter(child: _buildGreeting(c)),
       if (!_isGuest) SliverToBoxAdapter(child: _buildActiveOrder()),
+      if (!_isGuest) const SliverToBoxAdapter(child: HomeCarChips()),
       SliverToBoxAdapter(
         child: isLoading ? const KLoadingState() : bookingScreen[0],
       ),
+      const SliverToBoxAdapter(child: HomeReassurance()),
+      const SliverToBoxAdapter(child: HomePlansCard()),
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.only(top: KSpace.xl),
@@ -635,25 +683,58 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
             : '';
         return Padding(
           padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.m),
-          child: Text(
-            '${translate(AppStrings.hello)} $name'.trim(),
-            style: KType.largeTitle.copyWith(color: c.text),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                '${translate(AppStrings.hello)} $name'.trim(),
+                style: KType.largeTitle.copyWith(color: c.text),
+              ),
+              Text(
+                translate('homeTagline'),
+                style: KType.subhead.copyWith(color: c.textSecondary),
+              ),
+            ],
           ),
         );
       },
     );
   }
 
-  /// A wash in progress goes first. Uses its own bloc so this does not disturb
-  /// the lists on the Bookings tab.
+  /// One card at most: the wash in progress, else the last wash to book again.
+  /// New customers see neither. Own blocs, so the Bookings tab is not disturbed.
   Widget _buildActiveOrder() {
     return BlocBuilder<MyBookingBloc, MyBookingState>(
       bloc: _activeOrders,
-      builder: (BuildContext context, MyBookingState state) {
-        if (state.activeList.isEmpty) return const SizedBox.shrink();
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
-          child: ActiveOrderCard(order: state.activeList.first),
+      builder: (BuildContext context, MyBookingState active) {
+        if (active.activeList.isNotEmpty) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
+            child: ActiveOrderCard(order: active.activeList.first),
+          );
+        }
+        return BlocBuilder<MyBookingBloc, MyBookingState>(
+          bloc: _pastOrders,
+          builder: (BuildContext context, MyBookingState past) {
+            final Iterable<OrderModel> done = past.historyList.where(
+              (OrderModel o) =>
+                  o.status == AppConstants.completed &&
+                  (o.washingServices?.isNotEmpty ?? false),
+            );
+            if (done.isEmpty) return const SizedBox.shrink();
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(
+                KSpace.l,
+                0,
+                KSpace.l,
+                KSpace.l,
+              ),
+              child: BookAgainCard(
+                order: done.first,
+                onTap: () => _bookAgain(done.first),
+              ),
+            );
+          },
         );
       },
     );
@@ -724,9 +805,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                   // paid service.
                   final bool subscribed =
                       sl<GetUserProfileBloc>().profile.isSubscribed == true;
-                  if (indexPage == 0 &&
-                      !subscribed &&
-                      offersBloc.cartServicesList.isEmpty) {
+                  if (indexPage == 0 && !subscribed) {
                     return const SizedBox.shrink();
                   }
 

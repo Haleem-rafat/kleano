@@ -467,5 +467,15 @@
   "acceptTerms": "I accept the terms and conditions",
   "notValidEmail": "Please enter a valid email address",
   "noSearchResults": "No results found",
-  "cannotLocateAddress": "Could not locate this address. Try another one."
+  "cannotLocateAddress": "Could not locate this address. Try another one.",
+  "bookAgain": "Book again",
+  "chooseATime": "Choose a time",
+  "homeTagline": "Your car, washed where it is parked.",
+  "trustComeToYou": "We come to your location",
+  "trustPayment": "Wallet, card or Apple Pay",
+  "trustSupport": "Help on WhatsApp",
+  "plansPromoTitle": "Wash more, pay less",
+  "plansPromoBody": "Monthly plans for regular washes",
+  "seePlans": "See plans",
+  "addCar": "Add car"
 }

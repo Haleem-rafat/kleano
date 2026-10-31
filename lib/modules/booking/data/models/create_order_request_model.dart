@@ -53,11 +53,12 @@ class LocationRequest {
 
   factory LocationRequest.fromJson(Map<String, dynamic> json) {
     return LocationRequest(
-        latitude: blcoPosition.latitude,
-        longitude: blcoPosition.longitude,
-        streetName: blcoLocationName,
-        subAdministrativeArea: blcoSubAdministrativeArea,
-        country: blcoCountry);
+      latitude: blcoPosition.latitude,
+      longitude: blcoPosition.longitude,
+      streetName: blcoLocationName,
+      subAdministrativeArea: blcoSubAdministrativeArea,
+      country: blcoCountry,
+    );
   }
 
   Map<String, dynamic> toJson() {

@@ -12,13 +12,21 @@ import 'package:thewasher/api/shared.dart';
 import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
+import 'package:thewasher/modules/booking/widgets/home/service_sheet.dart';
 import 'package:thewasher/modules/booking/widgets/main_services.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 
 class ServicesList extends StatefulWidget {
-  const ServicesList({super.key, this.alwaysShowExtras = false});
+  const ServicesList({
+    super.key,
+    this.alwaysShowExtras = false,
+    this.onContinue,
+  });
+
+  /// Continue in the Choose a wash sheet. Null shows extras inline instead.
+  final VoidCallback? onContinue;
 
   /// Subscribers add extras to their plan without picking a main service;
   /// everyone else sees extras only after choosing one.
@@ -215,25 +223,6 @@ class _ServicesListState extends State<ServicesList> {
 
   @override
   Widget build(BuildContext context) {
-    int? selectedServiceIndex;
-
-    void addOrRemoveMainServices() {
-      final mainService = offersBloc.mainServices[selectedServiceIndex!];
-      if (offersBloc.cartServicesList.contains(mainService)) {
-        int deleteIndex = offersBloc.cartServicesList.indexOf(mainService);
-        offersBloc.add(
-          DeleteServiceCart(index: deleteIndex, service: mainService),
-        );
-      } else {
-        offersBloc.add(
-          AddServiceCart(
-            service: mainService,
-            selectedMainServiceIndex: selectedServiceIndex,
-          ),
-        );
-      }
-    }
-
     void addOrRemoveServices(ServiceModel extraService) {
       if (offersBloc.cartServicesList.contains(extraService)) {
         int deleteIndex = offersBloc.cartServicesList.indexOf(extraService);
@@ -289,6 +278,7 @@ class _ServicesListState extends State<ServicesList> {
           );
           final bool showExtras =
               extraServicesData.isNotEmpty &&
+              widget.onContinue == null &&
               (widget.alwaysShowExtras || mainSelected);
 
           return Column(
@@ -301,10 +291,21 @@ class _ServicesListState extends State<ServicesList> {
               const SizedBox(height: KSpace.xs),
               MainServices(
                 mainServices: mainServicesData,
-                addOrRemoveMainServices: (index) {
-                  selectedServiceIndex = index;
-                  addOrRemoveMainServices();
-                },
+                onOpen: widget.onContinue == null
+                    ? null
+                    : (ServiceModel service, int index) {
+                        offersBloc.add(
+                          AddServiceCart(
+                            service: service,
+                            selectedMainServiceIndex: index,
+                          ),
+                        );
+                        showServiceSheet(
+                          context: context,
+                          service: service,
+                          onContinue: widget.onContinue!,
+                        );
+                      },
               ),
               AnimatedSize(
                 duration: KMotion.of(context, KMotion.normal),

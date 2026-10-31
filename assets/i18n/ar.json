@@ -472,5 +472,15 @@
   "acceptTerms": "أوافق على الشروط والأحكام",
   "notValidEmail": "يرجى إدخال بريد إلكتروني صحيح",
   "noSearchResults": "لا توجد نتائج",
-  "cannotLocateAddress": "لا يمكن تحديد موقع العنوان، جرب عنوان آخر."
+  "cannotLocateAddress": "لا يمكن تحديد موقع العنوان، جرب عنوان آخر.",
+  "bookAgain": "احجز مرة أخرى",
+  "chooseATime": "اختر الوقت",
+  "homeTagline": "نغسل سيارتك في مكانها.",
+  "trustComeToYou": "نأتي إلى موقعك",
+  "trustPayment": "المحفظة أو البطاقة أو Apple Pay",
+  "trustSupport": "مساعدة عبر واتساب",
+  "plansPromoTitle": "اغسل أكثر وادفع أقل",
+  "plansPromoBody": "باقات شهرية للغسيل المنتظم",
+  "seePlans": "عرض الباقات",
+  "addCar": "إضافة سيارة"
 }

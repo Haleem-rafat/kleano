@@ -7,7 +7,9 @@ import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profil
 import 'package:thewasher/shared/services/service_locator.dart';
 
 class AddServices extends StatefulWidget {
-  const AddServices({super.key});
+  const AddServices({super.key, this.onContinue});
+
+  final VoidCallback? onContinue;
 
   @override
   State<AddServices> createState() => _AddServicesState();
@@ -33,22 +35,21 @@ class _AddServicesState extends State<AddServices> {
             );
           } else if (state is SubscriptionByLocationLoading) {
             // Show loading state while fetching subscription
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
+            return const Center(child: CircularProgressIndicator());
           } else if (state is SubscriptionByLocationFailed) {
             // If subscription fetch failed, show services list as fallback
-            return const ServicesList();
+            return ServicesList(onContinue: widget.onContinue);
           } else {
             // Default case - use bloc's subscription data
             return SubscriptionAndService(
-              subscription: sl.call<PlansAndSubscriptionBloc>.call().subscription,
+              subscription:
+                  sl.call<PlansAndSubscriptionBloc>.call().subscription,
               message: sl.call<PlansAndSubscriptionBloc>.call().message,
             );
           }
         } else {
           // User is not subscribed, show services list
-          return const ServicesList();
+          return ServicesList(onContinue: widget.onContinue);
         }
       },
     );

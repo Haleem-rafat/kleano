@@ -24,7 +24,7 @@ class DatePickerWidget extends StatelessWidget {
           onDateSelected: () {
             onDateSelected(selectedDate);
           },
-        )
+        ),
       ],
     );
   }

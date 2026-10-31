@@ -96,8 +96,10 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   String humanReadableDateTime(DateTime dateTime) {
-    return intl.DateFormat('EEE, MMM dd, yyyy • hh:mm a', 'en')
-        .format(dateTime);
+    return intl.DateFormat(
+      'EEE, MMM dd, yyyy • hh:mm a',
+      'en',
+    ).format(dateTime);
   }
 
   void _onFieldChanged() => setState(() {});
@@ -118,30 +120,25 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       // Show success message with promo code details
       showSnackBar(
         buildContext: context,
-        message: translate(AppStrings.promoCodeAppliedSuccessfully)
-            .replaceAll(
-                '{amount}', '${state.promoCodeDetail.discountAmount}'),
+        message: translate(
+          AppStrings.promoCodeAppliedSuccessfully,
+        ).replaceAll('{amount}', '${state.promoCodeDetail.discountAmount}'),
       );
     } else if (state is GetPromoCodeDetailError) {
       // Show error message from API response
       String errorMessage;
       if (state.errorModel != null) {
-        errorMessage =
-            Localizations.localeOf(context).languageCode == 'en'
-                ? (state.errorModel!.en ??
-                    state.errorModel!.ar ??
-                    translate(AppStrings.promoCodeNotValid))
-                : (state.errorModel!.ar ??
-                    state.errorModel!.en ??
-                    translate(AppStrings.promoCodeNotValid));
+        errorMessage = Localizations.localeOf(context).languageCode == 'en'
+            ? (state.errorModel!.en ??
+                  state.errorModel!.ar ??
+                  translate(AppStrings.promoCodeNotValid))
+            : (state.errorModel!.ar ??
+                  state.errorModel!.en ??
+                  translate(AppStrings.promoCodeNotValid));
       } else {
-        errorMessage =
-            state.error ?? translate(AppStrings.promoCodeNotValid);
+        errorMessage = state.error ?? translate(AppStrings.promoCodeNotValid);
       }
-      showSnackBar(
-        buildContext: context,
-        message: errorMessage,
-      );
+      showSnackBar(buildContext: context, message: errorMessage);
       setState(() {
         _isPromoApplied = false;
       });
@@ -445,7 +442,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                 Expanded(
                   child: Text(
                     humanReadableDateTime(
-                        GeneralSingleton().orderTime ?? DateTime.now()),
+                      GeneralSingleton().orderTime ?? DateTime.now(),
+                    ),
                     style: KType.subhead.copyWith(color: c.textSecondary),
                   ),
                 ),
@@ -473,7 +471,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         if (state is GetPromoCodeDetailSuccess) {
           totalAmount =
               state.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
-                  offersBloc.total.toDouble();
+              offersBloc.total.toDouble();
           hasPromoCode = true;
         } else if (state is PromoCodeDetailCleared) {
           // Reset to original amount when cleared
@@ -610,10 +608,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           children: <Widget>[
             FixedMap(
               height: _mapHeight,
-              latLng: LatLng(
-                blcoPosition.latitude,
-                blcoPosition.longitude,
-              ),
+              latLng: LatLng(blcoPosition.latitude, blcoPosition.longitude),
             ),
             KListRow(
               leading: Icon(Icons.place, color: KColors.of(context).brand),
@@ -717,33 +712,28 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
   }
 
   void _removePointsDiscount() {
-        // Recalculate total without points discount
-        final promoState =
-            context.read<PromoBloc>().state;
-        double baseTotal =
-            generalSingleton.totalPay?.toDouble() ??
-                offersBloc.total.toDouble();
+    // Recalculate total without points discount
+    final promoState = context.read<PromoBloc>().state;
+    double baseTotal =
+        generalSingleton.totalPay?.toDouble() ?? offersBloc.total.toDouble();
 
-        // Apply promo code discount if exists
-        if (promoState is GetPromoCodeDetailSuccess) {
-          baseTotal = promoState
-                  .promoCodeDetail.totalPayAfterDiscount
-                  ?.toDouble() ??
-              baseTotal;
-        } else {
-          final discount =
-              sl<PromoBloc>().totalPayModel.discount ??
-                  0;
-          baseTotal = baseTotal - discount;
-        }
+    // Apply promo code discount if exists
+    if (promoState is GetPromoCodeDetailSuccess) {
+      baseTotal =
+          promoState.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
+          baseTotal;
+    } else {
+      final discount = sl<PromoBloc>().totalPayModel.discount ?? 0;
+      baseTotal = baseTotal - discount;
+    }
 
-        setState(() {
-          _isPointsApplied = false;
-          _pointsDiscountAmount = null;
-          generalSingleton.appliedPoints = 0;
-          // Update Apple Pay total to remove points discount
-          _applePayTotal = baseTotal;
-        });
+    setState(() {
+      _isPointsApplied = false;
+      _pointsDiscountAmount = null;
+      generalSingleton.appliedPoints = 0;
+      // Update Apple Pay total to remove points discount
+      _applePayTotal = baseTotal;
+    });
   }
 
   Future<void> _applyPointsDiscount() async {
@@ -784,8 +774,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     });
 
     try {
-      final discountModel =
-          await PointRepo.calculatePointsDiscount(points: points);
+      final discountModel = await PointRepo.calculatePointsDiscount(
+        points: points,
+      );
 
       // Calculate new total with points discount
       if (!mounted) return;
@@ -797,7 +788,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       if (promoState is GetPromoCodeDetailSuccess) {
         baseTotal =
             promoState.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
-                baseTotal;
+            baseTotal;
       } else {
         final discount = sl<PromoBloc>().totalPayModel.discount ?? 0;
         baseTotal = baseTotal - discount;
@@ -819,8 +810,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       if (!mounted) return;
       showSnackBar(
         buildContext: context,
-        message: translate(AppStrings.pointsAppliedSuccessfully)
-            .replaceAll('{amount}', '${discountModel.discountAmount}'),
+        message: translate(
+          AppStrings.pointsAppliedSuccessfully,
+        ).replaceAll('{amount}', '${discountModel.discountAmount}'),
       );
     } catch (e) {
       setState(() {
@@ -866,19 +858,16 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         _isProcessingPayment = false;
       });
 
-      if (state.errorModel!.en ==
-              AppStrings.yourWalletBalanceIsNotValid ||
-          state.errorModel!.ar ==
-              AppStrings.yourWalletBalanceIsNotValid) {
+      if (state.errorModel!.en == AppStrings.yourWalletBalanceIsNotValid ||
+          state.errorModel!.ar == AppStrings.yourWalletBalanceIsNotValid) {
         AlertHelper.payWithWalletNotEnoughAmount(context);
       } else {
         showSnackBar(
-            buildContext: context,
-            message: Localizations.localeOf(context)
-                        .languageCode ==
-                    'en'
-                ? state.errorModel!.en!
-                : state.errorModel!.ar!);
+          buildContext: context,
+          message: Localizations.localeOf(context).languageCode == 'en'
+              ? state.errorModel!.en!
+              : state.errorModel!.ar!,
+        );
       }
     } else if (state is PlaceOrderSuccess) {
       // Prevent multiple success handling
@@ -886,20 +875,18 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
         setState(() {
           _isProcessingPayment = false;
         });
-        _onOrderSuccess(context,
-            transactionUrl: state.paymentUrl);
+        _onOrderSuccess(context, transactionUrl: state.paymentUrl);
       }
     } else if (state is PlaceOrderFailed) {
       setState(() {
         _isProcessingPayment = false;
       });
       showSnackBar(
-          buildContext: context,
-          message:
-              Localizations.localeOf(context).languageCode ==
-                      'en'
-                  ? state.errormodel!.en!
-                  : state.errormodel!.ar!);
+        buildContext: context,
+        message: Localizations.localeOf(context).languageCode == 'en'
+            ? state.errormodel!.en!
+            : state.errormodel!.ar!,
+      );
     }
   }
 
@@ -958,10 +945,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     return BlocConsumer<BookingOrderBloc, BookingOrderState>(
       listener: _onBookingOrderState,
       builder: (context, state) {
-        final double currentTotalAmount =
-            _calculateTotalAmount(promoState);
-        final bool isWalletLocked = type.value == 2 &&
-            (walletBalance ?? 0) < currentTotalAmount;
+        final double currentTotalAmount = _calculateTotalAmount(promoState);
+        final bool isWalletLocked =
+            type.value == 2 && (walletBalance ?? 0) < currentTotalAmount;
 
         return CardPaymentMethod(
           walletBalance: walletBalance ?? 0,
@@ -989,7 +975,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     if (promoState is GetPromoCodeDetailSuccess) {
       totalAmount =
           promoState.promoCodeDetail.totalPayAfterDiscount?.toDouble() ??
-              totalAmount;
+          totalAmount;
     } else if (promoState is PromoCodeDetailCleared) {
       totalAmount =
           generalSingleton.totalPay?.toDouble() ?? offersBloc.total.toDouble();
@@ -1128,11 +1114,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
           final currentOrderId = generalSingleton.orderId ?? orderIdd ?? "";
           if (currentOrderId.isNotEmpty) {
             context.read<BookingOrderBloc>().add(
-                  PlaceOrder(
-                    applePayId: applePayId!,
-                    orderId: currentOrderId,
-                  ),
-                );
+              PlaceOrder(applePayId: applePayId!, orderId: currentOrderId),
+            );
           } else {
             _showPaymentErrorBottomSheet(
               title: Localizations.localeOf(context).languageCode == 'en'
@@ -1279,10 +1262,7 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
     // Check if a vehicle is selected
     if (vehicleBloc.vehiclesList.isEmpty ||
         vehicleBloc.selectedVehicle.sId == null) {
-      showSnackBar(
-        buildContext: context,
-        message: 'الرجاء اختيار مركبة',
-      );
+      showSnackBar(buildContext: context, message: 'الرجاء اختيار مركبة');
       return false;
     }
 
@@ -1331,9 +1311,9 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                   : 'خطأ',
               message: Localizations.localeOf(context).languageCode == 'en'
                   ? state.errorModel?.en ??
-                      'Failed to create the order. Please try again'
+                        'Failed to create the order. Please try again'
                   : state.errorModel?.ar ??
-                      'فشل إنشاء الطلب. الرجاء المحاولة مرة أخرى',
+                        'فشل إنشاء الطلب. الرجاء المحاولة مرة أخرى',
               isError: true,
             );
             completer.complete(false);
@@ -1437,10 +1417,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
       // The server will process wallet payment based on the payment type set during order creation
       if (!mounted) return;
       context.read<BookingOrderBloc>().add(
-            PlaceOrder(
-              orderId: generalSingleton.orderId!,
-            ),
-          );
+        PlaceOrder(orderId: generalSingleton.orderId!),
+      );
     } catch (e) {
       if (!mounted) return;
       _showPaymentErrorBottomSheet(
@@ -1622,8 +1600,8 @@ class _OrderDetalisScreenState extends State<OrderDetalisScreen> {
                     title: Localizations.localeOf(context).languageCode == 'en'
                         ? 'Payment Failed'
                         : 'فشل الدفع',
-                    message: Localizations.localeOf(context).languageCode ==
-                            'en'
+                    message:
+                        Localizations.localeOf(context).languageCode == 'en'
                         ? 'Payment could not be processed. Please try again.'
                         : 'فشلت عملية الدفع. الرجاء المحاولة مرة أخرى.',
                     isError: true,
@@ -1938,8 +1916,12 @@ class _CreditCardPaymentBottomSheetState
       if (vehicleBloc.selectedVehicle.sId == null ||
           vehicleBloc.selectedVehicle.sId!.isEmpty) {
         debugPrint("❌ Vehicle data is missing");
-        debugPrint("🔍 Vehicle details: ${vehicleBloc.selectedVehicle.toString()}");
-        debugPrint("🔍 Vehicles list length: ${vehicleBloc.vehiclesList.length}");
+        debugPrint(
+          "🔍 Vehicle details: ${vehicleBloc.selectedVehicle.toString()}",
+        );
+        debugPrint(
+          "🔍 Vehicles list length: ${vehicleBloc.vehiclesList.length}",
+        );
 
         // Try to get the first vehicle if none is selected
         if (vehicleBloc.vehiclesList.isNotEmpty) {
@@ -2011,10 +1993,14 @@ class _CreditCardPaymentBottomSheetState
       final vehicleBloc = sl<VehiclesBloc>();
       if (vehicleBloc.selectedVehicle.sId == null ||
           vehicleBloc.selectedVehicle.sId!.isEmpty) {
-        debugPrint("❌ Vehicle lost before order creation - attempting recovery");
+        debugPrint(
+          "❌ Vehicle lost before order creation - attempting recovery",
+        );
         if (vehicleBloc.vehiclesList.isNotEmpty) {
           vehicleBloc.selectedVehicle = vehicleBloc.vehiclesList.first;
-          debugPrint("🔄 Vehicle recovered: ${vehicleBloc.selectedVehicle.sId}");
+          debugPrint(
+            "🔄 Vehicle recovered: ${vehicleBloc.selectedVehicle.sId}",
+          );
         } else {
           debugPrint("❌ No vehicles available for recovery");
           _resetCreditCardState();
@@ -2093,7 +2079,7 @@ class _CreditCardPaymentBottomSheetState
           message: Localizations.localeOf(context).languageCode == 'en'
               ? errorMessageEn ?? "Failed to create order. Please try again"
               : errorMessageAr ??
-                  "فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى",
+                    "فشل في إنشاء الطلب. الرجاء المحاولة مرة أخرى",
         );
       }
     } catch (e) {
@@ -2151,15 +2137,19 @@ class _CreditCardPaymentBottomSheetState
             // Safe null checking for payment URL
             if (state.paymentUrl != null && state.paymentUrl!.isNotEmpty) {
               debugPrint(
-                  "✅ Place order successful, payment URL: ${state.paymentUrl}");
+                "✅ Place order successful, payment URL: ${state.paymentUrl}",
+              );
               completer.complete(state.paymentUrl);
             } else {
-              debugPrint("❌ Place order successful but no payment URL received");
+              debugPrint(
+                "❌ Place order successful but no payment URL received",
+              );
               completer.complete(null);
             }
           } else if (state is PlaceOrderFailed) {
             debugPrint(
-                "❌ Place order failed: ${state.errormodel?.ar ?? state.error}");
+              "❌ Place order failed: ${state.errormodel?.ar ?? state.error}",
+            );
             completer.complete(null);
           }
         }
@@ -2172,17 +2162,17 @@ class _CreditCardPaymentBottomSheetState
       debugPrint("💳 Payment details validated, proceeding with place order");
 
       context.read<BookingOrderBloc>().add(
-            PlaceOrder(
-              orderId: orderIdd!,
-              paymentDetailsRequest: PaymentDetailsRequest(
-                name: offersBloc.cardHolderName,
-                number: offersBloc.cardNumber,
-                cvc: offersBloc.cardCvv,
-                month: offersBloc.expiryMonth,
-                year: offersBloc.expiryYear,
-              ),
-            ),
-          );
+        PlaceOrder(
+          orderId: orderIdd!,
+          paymentDetailsRequest: PaymentDetailsRequest(
+            name: offersBloc.cardHolderName,
+            number: offersBloc.cardNumber,
+            cvc: offersBloc.cardCvv,
+            month: offersBloc.expiryMonth,
+            year: offersBloc.expiryYear,
+          ),
+        ),
+      );
 
       // Wait for place order result
       final paymentUrl = await completer.future.timeout(
@@ -2285,9 +2275,11 @@ class _CreditCardPaymentBottomSheetState
     // Cart data will be cleared only when returning to main navigation bar
     debugPrint("🔄 Credit Card state reset - ready for new order creation");
     debugPrint(
-        "📝 Order IDs cleared: GeneralSingleton().orderId = null, orderIdd = null");
+      "📝 Order IDs cleared: GeneralSingleton().orderId = null, orderIdd = null",
+    );
     debugPrint(
-        "📝 Cart data preserved - will be cleared only when returning to main nav");
+      "📝 Cart data preserved - will be cleared only when returning to main nav",
+    );
   }
 
   String _formatCardNumber(String value) {
