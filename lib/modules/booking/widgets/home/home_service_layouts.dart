@@ -10,57 +10,6 @@ import 'package:thewasher/modules/Home/data/model/services_model.dart';
 import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 
-/// Shows on whichever service the customer has booked most.
-class MostBookedBadge extends StatelessWidget {
-  const MostBookedBadge({
-    super.key,
-    required this.serviceId,
-    this.tight = false,
-  });
-
-  final String? serviceId;
-
-  /// No space below, for a badge sitting on a photo.
-  final bool tight;
-
-  @override
-  Widget build(BuildContext context) {
-    final KColors c = KColors.of(context);
-    return ValueListenableBuilder<String?>(
-      valueListenable: mostBookedServiceId,
-      builder: (BuildContext context, String? id, Widget? child) {
-        if (id == null || id != serviceId) return const SizedBox.shrink();
-        return Padding(
-          padding: EdgeInsets.only(bottom: tight ? 0 : KSpace.xs),
-          child: DecoratedBox(
-            decoration: ShapeDecoration(
-              shape: const StadiumBorder(),
-              color: c.warning.withValues(alpha: 0.18),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: KSpace.s,
-                vertical: 2,
-              ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text(
-                  '★ ${translate('mostBooked')}',
-                  maxLines: 1,
-                  style: KType.caption.copyWith(
-                    color: c.text,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
-
 typedef ServiceOpen = void Function(ServiceModel service, int index);
 
 /// Home's services: a title with See all, then photo tiles. See all opens
@@ -225,9 +174,9 @@ class _PhotoTile extends StatelessWidget {
                         graphic,
                   ),
                 PositionedDirectional(
-                  top: KSpace.xs,
-                  start: KSpace.xs,
-                  end: KSpace.xs,
+                  top: KSpace.s,
+                  start: KSpace.s,
+                  end: KSpace.s,
                   child: Align(
                     alignment: AlignmentDirectional.centerStart,
                     child: _BadgeOnPhoto(serviceId: service.sId),
@@ -264,7 +213,7 @@ class _PhotoTile extends StatelessWidget {
   }
 }
 
-/// The badge on a solid backing, so it stays readable on any photo.
+/// A small brand label on the photo of the customer's most booked service.
 class _BadgeOnPhoto extends StatelessWidget {
   const _BadgeOnPhoto({required this.serviceId});
 
@@ -272,6 +221,7 @@ class _BadgeOnPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
     return ValueListenableBuilder<String?>(
       valueListenable: mostBookedServiceId,
       builder: (BuildContext context, String? id, Widget? child) {
@@ -279,9 +229,29 @@ class _BadgeOnPhoto extends StatelessWidget {
         return DecoratedBox(
           decoration: ShapeDecoration(
             shape: const StadiumBorder(),
-            color: KColors.of(context).surface,
+            color: c.brand,
           ),
-          child: MostBookedBadge(serviceId: serviceId, tight: true),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: KSpace.s,
+              vertical: KSpace.xs / 2,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(Icons.star_rounded, size: KSpace.m, color: c.surface),
+                const SizedBox(width: KSpace.xs / 2),
+                Flexible(
+                  child: Text(
+                    translate('mostBooked'),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: KType.caption.copyWith(color: c.surface),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
