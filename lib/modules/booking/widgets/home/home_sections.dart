@@ -1,3 +1,5 @@
+import 'package:thewasher/core/resources/strings_manager.dart';
+import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -12,7 +14,15 @@ import 'package:thewasher/utilties/navigator.dart';
 
 /// The last completed wash with everything that would repeat.
 class BookAgainCard extends StatelessWidget {
-  const BookAgainCard({super.key, required this.order, required this.onTap});
+  const BookAgainCard({
+    super.key,
+    required this.order,
+    required this.onTap,
+    this.light = false,
+  });
+
+  /// White card with the price and a main button, for the Photo hero.
+  final bool light;
 
   final OrderModel order;
   final VoidCallback onTap;
@@ -25,6 +35,48 @@ class BookAgainCard extends StatelessWidget {
       order.vehicle?.brand,
       order.vehicle?.model,
     ].where((String? part) => part?.isNotEmpty == true).join(' ');
+    if (light) {
+      return KCard(
+        padding: const EdgeInsets.all(KSpace.l),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Icon(
+                  Icons.auto_awesome_outlined,
+                  size: KSpace.l,
+                  color: c.brand,
+                ),
+                const SizedBox(width: KSpace.xs),
+                Expanded(
+                  child: Text(
+                    translate('bookAgain'),
+                    style: KType.footnote.copyWith(
+                      color: c.brand,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                if (order.totalPrice != null)
+                  Text(
+                    '${order.totalPrice!.toStringAsFixed(0)} ${translate(AppStrings.sAR)}',
+                    style: KType.headline.copyWith(color: c.text),
+                  ),
+              ],
+            ),
+            const SizedBox(height: KSpace.m),
+            Text(
+              order.washingServices?.firstOrNull?.name ?? '',
+              style: KType.title.copyWith(color: c.text),
+            ),
+            Text(car, style: KType.subhead.copyWith(color: c.textSecondary)),
+            const SizedBox(height: KSpace.m),
+            KButton(label: translate('chooseATime'), onPressed: onTap),
+          ],
+        ),
+      );
+    }
     return DecoratedBox(
       decoration: ShapeDecoration(
         color: c.brand,
@@ -112,7 +164,10 @@ class HomeCarChips extends StatelessWidget {
 }
 
 class HomeReassurance extends StatelessWidget {
-  const HomeReassurance({super.key});
+  const HomeReassurance({super.key, this.tiles = false});
+
+  /// Icon tiles instead of plain text.
+  final bool tiles;
 
   @override
   Widget build(BuildContext context) {
@@ -124,6 +179,47 @@ class HomeReassurance extends StatelessWidget {
         style: KType.footnote.copyWith(color: c.textSecondary),
       ),
     );
+    Widget tile(IconData icon, String key) => Expanded(
+      child: KCard(
+        padding: const EdgeInsets.all(KSpace.m),
+        child: Column(
+          children: <Widget>[
+            DecoratedBox(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: c.brandTint,
+              ),
+              child: SizedBox.square(
+                dimension: KSpace.xxxl + KSpace.xs,
+                child: Icon(icon, size: KSpace.l, color: c.onBrandTint),
+              ),
+            ),
+            const SizedBox(height: KSpace.s),
+            Text(
+              translate(key),
+              textAlign: TextAlign.center,
+              style: KType.caption.copyWith(color: c.textSecondary),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (tiles) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: KSpace.s,
+            children: <Widget>[
+              tile(Icons.place_outlined, 'trustComeToYou'),
+              tile(Icons.account_balance_wallet_outlined, 'trustPayment'),
+              tile(Icons.chat_bubble_outline_rounded, 'trustSupport'),
+            ],
+          ),
+        ),
+      );
+    }
     return Padding(
       padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
       child: Row(
@@ -141,15 +237,19 @@ class HomeReassurance extends StatelessWidget {
 }
 
 class HomePlansCard extends StatelessWidget {
-  const HomePlansCard({super.key});
+  const HomePlansCard({super.key, this.solid = false});
+
+  /// Brand fill with a white action, instead of the soft tint.
+  final bool solid;
 
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
+    final Color fg = solid ? c.surface : c.onBrandTint;
     return Padding(
       padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
       child: Material(
-        color: c.brandTint,
+        color: solid ? c.brand : c.brandTint,
         shape: KRadius.shape(BorderRadius.circular(KRadius.card)),
         clipBehavior: Clip.antiAlias,
         child: InkWell(
@@ -167,21 +267,33 @@ class HomePlansCard extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         translate('plansPromoTitle'),
-                        style: KType.headline.copyWith(color: c.onBrandTint),
+                        style: KType.headline.copyWith(color: fg),
                       ),
                       Text(
                         translate('plansPromoBody'),
-                        style: KType.subhead.copyWith(color: c.onBrandTint),
+                        style: KType.subhead.copyWith(color: fg),
                       ),
                     ],
                   ),
                 ),
                 const SizedBox(width: KSpace.s),
-                Text(
-                  translate('seePlans'),
-                  style: KType.subhead.copyWith(
-                    color: c.onBrandTint,
-                    fontWeight: FontWeight.w600,
+                DecoratedBox(
+                  decoration: ShapeDecoration(
+                    shape: const StadiumBorder(),
+                    color: solid ? c.surface : Colors.transparent,
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: solid ? KSpace.l : 0,
+                      vertical: solid ? KSpace.s : 0,
+                    ),
+                    child: Text(
+                      translate('seePlans'),
+                      style: KType.subhead.copyWith(
+                        color: solid ? c.brand : fg,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ),
                 ),
               ],

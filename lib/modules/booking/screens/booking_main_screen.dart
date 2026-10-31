@@ -53,6 +53,8 @@ class BookingMainScreen extends StatefulWidget {
   State<BookingMainScreen> createState() => _BookingMainScreenState();
 }
 
+const double _heroCardOverlap = KSpace.xxxl * 2;
+
 class _BookingMainScreenState extends State<BookingMainScreen> {
   int indexPage = 0;
   BookingOrderBloc createOrderBloc = CreateOrderFunction().orderBloc;
@@ -506,11 +508,50 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     final Widget cars = box(const HomeCarChips());
     final Widget order = box(_buildActiveOrder());
     final Widget live = box(_buildActiveOrder(showStages: true));
+    final HomeStyle style = HomeStyleSetting.style.value;
     return <Widget>[
-      _buildTopBar(c),
+      if (style == HomeStyle.photoHero)
+        box(_buildPhotoHero(c))
+      else
+        _buildTopBar(c),
       const SliverToBoxAdapter(child: HomeStyleChips()),
-      if (_isGuest) ...<Widget>[services, reassurance, plans, offers] else
-        ...switch (HomeStyleSetting.style.value) {
+      if (style == HomeStyle.photoHero) ...<Widget>[
+        if (!_isGuest) cars,
+        services,
+        box(const HomeReassurance(tiles: true)),
+        box(const HomePlansCard(solid: true)),
+        box(
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              KSpace.l,
+              KSpace.xl,
+              KSpace.l,
+              0,
+            ),
+            child: Text(
+              translate('offers'),
+              style: KType.title.copyWith(color: c.text),
+            ),
+          ),
+        ),
+        offers,
+      ] else if (_isGuest) ...<Widget>[
+        services,
+        reassurance,
+        plans,
+        offers,
+      ] else
+        ...switch (style) {
+          HomeStyle.photoHero => const <Widget>[],
+          HomeStyle.serviceGrid => <Widget>[
+            offers,
+            box(const SizedBox(height: KSpace.l)),
+            order,
+            cars,
+            services,
+            plans,
+            reassurance,
+          ],
           HomeStyle.current => <Widget>[
             greeting,
             order,
@@ -579,6 +620,89 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     );
   }
 
+  /// Photo header holding the address, greeting and the wash card (Photo hero).
+  Widget _buildPhotoHero(KColors c) {
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: Colors.transparent,
+      ),
+      child: Stack(
+        children: <Widget>[
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: _heroCardOverlap,
+            child: DecoratedBox(
+              position: DecorationPosition.foreground,
+              decoration: BoxDecoration(
+                color: KColors.light.brand.withValues(alpha: 0.5),
+              ),
+              child: Image.asset(
+                'assets/images/on_boarding_3.png',
+                fit: BoxFit.cover,
+                cacheWidth:
+                    (MediaQuery.sizeOf(context).width *
+                            MediaQuery.devicePixelRatioOf(context))
+                        .round(),
+              ),
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(height: MediaQuery.paddingOf(context).top),
+              Row(
+                children: <Widget>[
+                  const SizedBox(width: KSpace.s),
+                  Expanded(child: _buildAddress(c, onPhoto: true)),
+                  _buildPoints(),
+                  const SizedBox(width: KSpace.s),
+                  _buildNotifications(c),
+                  const SizedBox(width: KSpace.s),
+                ],
+              ),
+              BlocBuilder<GetUserProfileBloc, GetUserProfileState>(
+                builder: (BuildContext context, GetUserProfileState state) {
+                  final String name = state is GetUserProfileSuccess
+                      ? (state.userProfile.data?.userName ?? '')
+                            .split(' ')
+                            .first
+                      : '';
+                  return Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      KSpace.l,
+                      KSpace.s,
+                      KSpace.l,
+                      KSpace.l,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          '${translate(AppStrings.hello)} $name'.trim(),
+                          style: KType.largeTitle.copyWith(color: Colors.white),
+                        ),
+                        Text(
+                          translate('homeTagline'),
+                          style: KType.subhead.copyWith(color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              if (_isGuest)
+                const SizedBox(height: KSpace.xxl)
+              else
+                _buildActiveOrder(showStages: true, light: true),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildTopBar(KColors c) {
     return SliverAppBar(
       pinned: true,
@@ -602,7 +726,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   }
 
   /// The saved address the booking goes to, always one tap from changing.
-  Widget _buildAddress(KColors c) {
+  Widget _buildAddress(KColors c, {bool onPhoto = false}) {
     return BlocBuilder<LocationBloc, LocationState>(
       builder: (BuildContext context, LocationState state) {
         final List<AddressModel> saved = context
@@ -633,20 +757,26 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Icon(Icons.location_on_rounded, size: 20, color: c.brand),
+                    Icon(
+                      Icons.location_on_rounded,
+                      size: 20,
+                      color: onPhoto ? Colors.white : c.brand,
+                    ),
                     const SizedBox(width: KSpace.xs),
                     Flexible(
                       child: Text(
                         label,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: KType.headline.copyWith(color: c.text),
+                        style: KType.headline.copyWith(
+                          color: onPhoto ? Colors.white : c.text,
+                        ),
                       ),
                     ),
                     Icon(
                       Icons.keyboard_arrow_down_rounded,
                       size: 20,
-                      color: c.textSecondary,
+                      color: onPhoto ? Colors.white : c.textSecondary,
                     ),
                   ],
                 ),
@@ -755,7 +885,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
 
   /// One card at most: the wash in progress, else the last wash to book again.
   /// New customers see neither. Own blocs, so the Bookings tab is not disturbed.
-  Widget _buildActiveOrder({bool showStages = false}) {
+  Widget _buildActiveOrder({bool showStages = false, bool light = false}) {
     return BlocBuilder<MyBookingBloc, MyBookingState>(
       bloc: _activeOrders,
       builder: (BuildContext context, MyBookingState active) {
@@ -786,6 +916,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
               ),
               child: BookAgainCard(
                 order: done.first,
+                light: light,
                 onTap: () => _bookAgain(done.first),
               ),
             );

@@ -503,5 +503,8 @@
   "homeStyle_quickRebook": "إعادة الحجز السريع",
   "homeStyle_serviceFirst": "الخدمات أولًا",
   "homeStyle_liveStatus": "الحالة المباشرة",
-  "homeStyle_offersFirst": "العروض أولًا"
+  "homeStyle_offersFirst": "العروض أولًا",
+  "homeStyle_photoHero": "صورة رئيسية",
+  "homeStyle_serviceGrid": "شبكة الخدمات",
+  "searchServices": "ابحث عن خدمة"
 }
