@@ -337,6 +337,9 @@ class _NativeGlassButtonState extends State<NativeGlassButton> {
     'fontSize': widget.fontSize,
     'iconSize': widget.iconSize,
     'enabled': widget.onPressed != null,
+    // The app can be Arabic on an English iPhone: directional SF Symbols
+    // follow this, not the system language.
+    'rtl': Directionality.of(context) == TextDirection.rtl,
   };
 
   @override

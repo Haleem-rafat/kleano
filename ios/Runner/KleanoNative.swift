@@ -188,6 +188,13 @@ final class GlassButtonPlatformView: NSObject, FlutterPlatformView {
       // Prominent glass takes its colour from the tint (brand purple).
       button.tintColor = UIColor(argb: tint.uint32Value)
     }
+    // Directional SF Symbols (chevron.backward) read the layout direction from
+    // the trait collection, not semanticContentAttribute.
+    let rtl = args["rtl"] as? Bool ?? false
+    button.semanticContentAttribute = rtl ? .forceRightToLeft : .forceLeftToRight
+    if #available(iOS 17.0, *) {
+      button.traitOverrides.layoutDirection = rtl ? .rightToLeft : .leftToRight
+    }
     button.configuration = config
     button.isEnabled = args["enabled"] as? Bool ?? true
   }
