@@ -1,3 +1,5 @@
+import 'package:thewasher/core/design/components/k_stage_bar.dart';
+import 'package:thewasher/modules/tracking_order/screens/widgets/functions/check_step_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -17,9 +19,16 @@ import 'package:thewasher/utilties/navigator.dart';
 
 /// The wash in progress, at the top of Home: what a returning user wants first.
 class ActiveOrderCard extends StatelessWidget {
-  const ActiveOrderCard({super.key, required this.order});
+  const ActiveOrderCard({
+    super.key,
+    required this.order,
+    this.showStages = false,
+  });
 
   final OrderModel order;
+
+  /// Adds the four-stage bar, for the Live status Home.
+  final bool showStages;
 
   void _track(BuildContext context) {
     // Nothing to track until a biker has taken the order.
@@ -81,6 +90,18 @@ class ActiveOrderCard extends StatelessWidget {
               ),
             ],
           ),
+          if (showStages) ...<Widget>[
+            const SizedBox(height: KSpace.l),
+            KStageBar(
+              step: getStepData(order.status ?? '').step,
+              stages: <String>[
+                translate(AppStrings.onTheWay),
+                translate(AppStrings.arrived),
+                translate(AppStrings.washing),
+                translate(AppStrings.completed),
+              ],
+            ),
+          ],
           if (onTheWay) ...<Widget>[
             const SizedBox(height: KSpace.m),
             KButton(

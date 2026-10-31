@@ -6,6 +6,8 @@ import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
+import 'package:thewasher/modules/booking/home_style.dart';
+import 'package:thewasher/modules/profile/widgets/home_style_picker.dart';
 import 'package:thewasher/modules/booking/widgets/home/active_order_card.dart';
 import 'package:thewasher/modules/booking/widgets/home/home_sections.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
@@ -466,10 +468,14 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                   enablePullDown: indexPage == 0 ? true : false,
                   header: const ClassicHeader(),
                   onRefresh: _handleRefresh,
-                  child: CustomScrollView(
-                    slivers: indexPage == 0
-                        ? _homeSlivers(c)
-                        : _reviewSlivers(c),
+                  child: ValueListenableBuilder<HomeStyle>(
+                    valueListenable: HomeStyleSetting.style,
+                    builder: (BuildContext _, HomeStyle _, Widget? _) =>
+                        CustomScrollView(
+                          slivers: indexPage == 0
+                              ? _homeSlivers(c)
+                              : _reviewSlivers(c),
+                        ),
                   ),
                 ),
                 _buildBookingAction(),
@@ -481,25 +487,71 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     );
   }
 
-  /// Home, ordered by the layout research: where and what first, a wash in
-  /// progress next, then the service choice; offers come after the task.
+  /// Home in the chosen style. `current` follows the layout research: where and
+  /// what first, a wash in progress next, then services; offers after the task.
   List<Widget> _homeSlivers(KColors c) {
+    Widget box(Widget child) => SliverToBoxAdapter(child: child);
+    final Widget services = box(
+      isLoading ? const KLoadingState() : bookingScreen[0],
+    );
+    final Widget offers = box(
+      Padding(
+        padding: const EdgeInsets.only(top: KSpace.xl),
+        child: OfferWidget(key: _offerWidgetKey),
+      ),
+    );
+    final Widget plans = box(const HomePlansCard());
+    final Widget reassurance = box(const HomeReassurance());
+    final Widget greeting = box(_buildGreeting(c));
+    final Widget cars = box(const HomeCarChips());
+    final Widget order = box(_buildActiveOrder());
+    final Widget live = box(_buildActiveOrder(showStages: true));
     return <Widget>[
       _buildTopBar(c),
-      if (!_isGuest) SliverToBoxAdapter(child: _buildGreeting(c)),
-      if (!_isGuest) SliverToBoxAdapter(child: _buildActiveOrder()),
-      if (!_isGuest) const SliverToBoxAdapter(child: HomeCarChips()),
-      SliverToBoxAdapter(
-        child: isLoading ? const KLoadingState() : bookingScreen[0],
-      ),
-      const SliverToBoxAdapter(child: HomeReassurance()),
-      const SliverToBoxAdapter(child: HomePlansCard()),
-      SliverToBoxAdapter(
-        child: Padding(
-          padding: const EdgeInsets.only(top: KSpace.xl),
-          child: OfferWidget(key: _offerWidgetKey),
-        ),
-      ),
+      const SliverToBoxAdapter(child: HomeStyleChips()),
+      if (_isGuest) ...<Widget>[services, reassurance, plans, offers] else
+        ...switch (HomeStyleSetting.style.value) {
+          HomeStyle.current => <Widget>[
+            greeting,
+            order,
+            cars,
+            services,
+            reassurance,
+            plans,
+            offers,
+          ],
+          HomeStyle.quickRebook => <Widget>[
+            order,
+            cars,
+            services,
+            plans,
+            offers,
+          ],
+          HomeStyle.serviceFirst => <Widget>[
+            cars,
+            services,
+            order,
+            reassurance,
+            plans,
+            offers,
+          ],
+          HomeStyle.liveStatus => <Widget>[
+            live,
+            greeting,
+            cars,
+            services,
+            plans,
+            offers,
+          ],
+          HomeStyle.offersFirst => <Widget>[
+            offers,
+            plans,
+            order,
+            cars,
+            services,
+            reassurance,
+          ],
+        },
       _buildActionClearance(),
     ];
   }
@@ -703,14 +755,17 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
 
   /// One card at most: the wash in progress, else the last wash to book again.
   /// New customers see neither. Own blocs, so the Bookings tab is not disturbed.
-  Widget _buildActiveOrder() {
+  Widget _buildActiveOrder({bool showStages = false}) {
     return BlocBuilder<MyBookingBloc, MyBookingState>(
       bloc: _activeOrders,
       builder: (BuildContext context, MyBookingState active) {
         if (active.activeList.isNotEmpty) {
           return Padding(
             padding: const EdgeInsets.fromLTRB(KSpace.l, 0, KSpace.l, KSpace.l),
-            child: ActiveOrderCard(order: active.activeList.first),
+            child: ActiveOrderCard(
+              order: active.activeList.first,
+              showStages: showStages,
+            ),
           );
         }
         return BlocBuilder<MyBookingBloc, MyBookingState>(

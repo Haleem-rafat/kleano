@@ -8,6 +8,7 @@ import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/widgets/drop_down_language.dart';
+import 'package:thewasher/modules/profile/widgets/home_style_picker.dart';
 import 'package:thewasher/modules/profile/widgets/toggle_notification.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
@@ -36,6 +37,8 @@ class SettingScreen extends StatelessWidget {
           DropDownLanguage(),
           SizedBox(height: KSpace.xl),
           KThemePicker(),
+          SizedBox(height: KSpace.xl),
+          HomeStylePicker(),
           SizedBox(height: KSpace.xl),
           KCard(padding: EdgeInsets.zero, child: ToggleNotification()),
         ],

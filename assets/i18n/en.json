@@ -492,5 +492,11 @@
   "appearance": "Appearance",
   "themeLight": "Light",
   "themeDark": "Dark",
-  "themeSystem": "Same as phone"
+  "themeSystem": "Same as phone",
+  "homeStyle": "Home style",
+  "homeStyle_current": "Current",
+  "homeStyle_quickRebook": "Quick rebook",
+  "homeStyle_serviceFirst": "Service first",
+  "homeStyle_liveStatus": "Live status",
+  "homeStyle_offersFirst": "Offers first"
 }
