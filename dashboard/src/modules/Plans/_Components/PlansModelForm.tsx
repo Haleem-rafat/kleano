@@ -35,7 +35,7 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
   const { washingServicesIoncsOptions, loadingwashingServicesIoncsOptions } =
     useGetWashingServicesIcons();
   console.log(washingServicesIoncsOptions);
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
 
   // Convert old description format (string[]) to new format ({ en, ar }[])
@@ -117,7 +117,7 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
       .then(() => {
         mutate((key: string) => key.includes('get-all-plans-details'));
         mutate((key: string) => key.includes('get-all-plans-list'));
-        toast.success('Plan Edited Successfully');
+        toast.success(oldData ? t('planEdited') : t('planCreated'));
         setIsLoading(false);
         setOpenSheet(false);
       })

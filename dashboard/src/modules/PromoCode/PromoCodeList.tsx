@@ -94,7 +94,7 @@ const PromoCodeList = () => {
         segment: searchParams.get('segment') ?? undefined,
         isGraphView: isChart,
         totalItems: 0,
-        business: activeAudience.label === 'b2b' && business ? business : undefined,
+        business: activeAudience.searchParam === 'b2b' && business ? business : undefined,
       })
   );
 
@@ -184,7 +184,7 @@ const PromoCodeList = () => {
           </div>
         </div>
         <div className="flex flex-col items-center justify-start gap-2 self-end md:flex-row ">
-          {activeAudience.label === 'B2B' && (
+          {activeAudience.searchParam === 'b2b' && (
             <div className="flex items-center justify-center gap-2">
               <Input
                 className="h-10 w-[200px]"
@@ -206,7 +206,7 @@ const PromoCodeList = () => {
           {citiesOptions && (
             <Combobox placeholder={t('city')} dataArray={citiesOptions} filterParam="city" />
           )}
-          {segmentsOptions && activeAudience.label === 'Segments' && (
+          {segmentsOptions && activeAudience.searchParam === 'segment' && (
             <Combobox
               placeholder={t('segment')}
               dataArray={segmentsOptions}

@@ -405,7 +405,7 @@ export default function AdminDetails() {
       <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
         <SheetContent>
           <SheetHeader>
-            <SheetTitle>{t('editegments')}</SheetTitle>
+            <SheetTitle>{t('editAdmin')}</SheetTitle>
             <SheetDescription>
               {AdminDetails && (
                 <AdminModelForm setOpenSheet={setOpenSheet} oldData={AdminDetails} />

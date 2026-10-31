@@ -1,6 +1,6 @@
 import { lazy } from 'react';
 import { ROUTES } from '@constants/routes';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import authService from '@services/auth.service';
 import App from '@/App';
 import ErrorBoundary from '@/shared/Layouts/ErrorBoundary';
@@ -36,7 +36,6 @@ const BannerList = lazy(() => import('@/modules/Banner/BannerList'));
 const ContactInfo = lazy(() => import('@/modules/ContactInfo/ContactInfo'));
 const Profile = lazy(() => import('@/modules/Profile/Profile'));
 const Booking = lazy(() => import('@/modules/booking/Booking'));
-const BookingCalendarV2 = lazy(() => import('@/modules/booking-calendar/BookingCalendarV2'));
 const BookingCalendarV = lazy(() => import('@/modules/booking-calendar/BookingCalendar'));
 
 type TLoginLoader = Promise<{
@@ -88,7 +87,7 @@ const router = createBrowserRouter([
       { path: ROUTES.APP_BANNER, element: <BannerList /> },
       { path: ROUTES.CONTACT_INFO, element: <ContactInfo /> },
       { path: ROUTES.BOOKING, element: <Booking /> },
-      { path: ROUTES.BOOKING_CALENDAR, element: <BookingCalendarV2 /> },
+      { path: ROUTES.BOOKING_CALENDAR, element: <Navigate to={ROUTES.BOOKING_CALENDAR_2} replace /> },
       { path: ROUTES.BOOKING_CALENDAR_2, element: <BookingCalendarV /> },
       { path: ROUTES.PROFILE, element: <Profile /> },
 

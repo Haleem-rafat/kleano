@@ -1,6 +1,7 @@
 import { formatDate } from '@app/utils/helper';
 import usersService from '@services/users.service';
 import { IRootUser } from '@servicesTypes/user.types';
+import Alert from '@UI/Alert/Alert';
 import { Button, ThreeDotsLoader, ImageModal, AdminStatus } from '@UI/Index';
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -243,14 +244,20 @@ export default function UsersDetails() {
             </div>
 
             <div className="flex items-center space-x-3">
-              <Button
-                variant={user?.isSuspended ? 'danger' : 'primary'}
-                onClick={() =>
+              <Alert
+                id=""
+                description={user?.isSuspended ? t('unsuspend') : t('suspendUserConfirm')}
+                handler={() =>
                   handleChangeStatus(user._id, user.isSuspended ? 'unsuspend' : 'suspend')
                 }
-                className="px-4 py-2 text-sm font-medium">
-                {user?.isSuspended ? t('unsuspend') : t('suspend')}
-              </Button>
+                buttonComponent={
+                  <Button
+                    variant={user?.isSuspended ? 'danger' : 'primary'}
+                    className="px-4 py-2 text-sm font-medium">
+                    {user?.isSuspended ? t('unsuspend') : t('suspend')}
+                  </Button>
+                }
+              />
             </div>
           </div>
         </div>

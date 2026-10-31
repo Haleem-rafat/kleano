@@ -58,7 +58,7 @@ export default function WashingServicesForm({ setOpenSheet, oldData }: IWashingS
       servicesName: typeof oldData?.name === 'object' ? oldData.name : { en: '', ar: '' },
       duration: `${oldData?.duration}` || '',
       price: `${oldData?.price}` || '',
-      pointsToPay: `${oldData?.pointsToPay}` || '',
+      pointsToPay: `${oldData?.pointsToPay ?? 0}`,
       icon: { label: '', value: oldData?.icon._id },
       type: { label: oldData?.type, value: oldData?.type },
       city:
@@ -74,7 +74,7 @@ export default function WashingServicesForm({ setOpenSheet, oldData }: IWashingS
       duration: +values.duration,
       durationUnit: 'min',
       price: +values.price,
-      pointsToPay: +values.pointsToPay,
+      pointsToPay: +values.pointsToPay || 0,
       type: values.type.value,
       icon: values.icon.value,
       cities: selectAllCities ? [] : values.city?.map((e) => e?.value),

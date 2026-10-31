@@ -39,7 +39,7 @@ const AssignOrderList = () => {
   return (
     <div className="relative flex h-full w-full flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('admins')}</p>
+        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('assignOrder')}</p>
         <div></div>
       </div>
       <div>

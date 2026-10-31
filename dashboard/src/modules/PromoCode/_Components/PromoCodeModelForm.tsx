@@ -103,6 +103,7 @@ export default function PromoCodeModelForm({ setOpenSheet }: IPromoCodeModelForm
     endPoint
       .then(() => {
         mutate((key: string) => key.includes('get-all-promo-codes'));
+        toast.success(t('promoCreated'));
         setOpenSheet(false);
       })
       .catch(({ response }) => {

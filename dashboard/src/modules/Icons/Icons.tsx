@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from '@shadecn/components/ui/table';
+import Alert from '@UI/Alert/Alert';
 import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
 import { t } from 'i18next';
 import { useState } from 'react';
@@ -74,9 +75,16 @@ export default function Icons() {
               <TableRow key={e.value} className="cursor-pointer hover:bg-primary/10">
                 <TableCell className="font-medium">{e.label}</TableCell>
                 <TableCell className="font-medium">
-                  <Button variant="danger" size="sm" loading={isloading} onClick={() => handelDelete(e?.value)}>
-                    {t("Deleteimg")}
-                  </Button>
+                  <Alert
+                    id=""
+                    description={t('deleteIconConfirm')}
+                    handler={() => handelDelete(e?.value)}
+                    buttonComponent={
+                      <Button variant="danger" size="sm" loading={isloading}>
+                        {t('Deleteimg')}
+                      </Button>
+                    }
+                  />
                 </TableCell>
               </TableRow>
             ))}

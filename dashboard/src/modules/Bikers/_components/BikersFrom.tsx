@@ -33,8 +33,10 @@ export default function BikersFrom({ setOpenSheet, oldData }: IBikersFromProps) 
       commission: (oldData as any)?.commission ?? (oldData ? 0 : ''),
       ordersBeforeCommission: (oldData as any)?.ordersBeforeCommission ?? 0,
       minimumCommission: (oldData as any)?.minimumCommission ?? (oldData ? 0 : ''),
+      weekendCommission: (oldData as any)?.weekendCommission ?? (oldData ? 0 : ''),
     },
-    resolver: yupResolver(oldData ? bikersService.editBikerSchema : bikersService.addBikerSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: (yupResolver as any)(oldData ? bikersService.editBikerSchema : bikersService.addBikerSchema),
   });
 
   const handelOnSubmit = (values) => {

@@ -171,7 +171,7 @@ const BannerList = () => {
           modal={true}>
           <SheetContent>
             <SheetHeader>
-              <SheetTitle>{t('addBanner')}</SheetTitle>
+              <SheetTitle>{selectedForEdit ? t('editBanner') : t('addBanner')}</SheetTitle>
               <SheetDescription>
                 <BannerForm oldData={selectedForEdit} setOpen={setOpen} />
               </SheetDescription>

@@ -123,7 +123,7 @@ const OrdersList = () => {
       const url = window.URL.createObjectURL(response);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'users_export.xlsx');
+      link.setAttribute('download', 'orders_export.xlsx');
       link.click();
       link.parentNode.removeChild(link);
       window.URL.revokeObjectURL(url);

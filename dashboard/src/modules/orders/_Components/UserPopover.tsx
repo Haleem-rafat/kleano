@@ -41,6 +41,7 @@ const UserPopover = ({ orderId }: { orderId: string }) => {
       .then(() => {
         toast.success(t('Order canceled successfully'));
         mutate((key: string) => key.includes('get-all-order-list'));
+        mutate((key: string) => key.includes('get-all-order-details'));
       })
       .catch(({ response }) => {
         const messages = response?.data?.message;

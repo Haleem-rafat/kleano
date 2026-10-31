@@ -31,6 +31,7 @@ const AssignedBikerTable = ({ orderId, setOpenSheet, areaId }) => {
       .then(() => {
         mutate((key: string) => key.includes('get-all-order-details'));
         mutate((key: string) => key.includes('get-all-order-list'));
+        toast.success(t('bikerAssigned'));
         setOpenSheet(false);
       })
       .catch(({ response }) => {

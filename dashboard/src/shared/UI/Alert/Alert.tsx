@@ -37,8 +37,7 @@ const Alert = ({
         <AlertDialogHeader>
           <AlertDialogTitle>{t('confirmationMessage')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {description ??
-              'This action cannot be undone. This will permanently delete your  account and remove your data from our servers.'}
+            {description ?? t('cannotBeUndone')}
           </AlertDialogDescription>
           {hasReason && (
             <div className="my-4 flex w-full flex-col gap-4">

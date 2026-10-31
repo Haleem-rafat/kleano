@@ -11,6 +11,7 @@ import { useTranslation } from 'react-i18next';
 import useSWR, { mutate } from 'swr';
 import bikersService from '@services/bikers.service';
 import { IBikers } from '@servicesTypes/bikers.types';
+import Alert from '@UI/Alert/Alert';
 import { AdminStatus, Button, ThreeDotsLoader } from '@UI/Index';
 import { t } from 'i18next';
 import {
@@ -463,17 +464,25 @@ export default function BikersDetails() {
                           : ''}
                       </p>
                     </div>
-                    <Button
-                      size="sm"
-                      loading={isloading}
-                      onClick={() => handelActionBiker(data?._id, data?.status)}
-                      className={
-                        data?.status !== 'SUSPENDED'
-                          ? 'bg-red-600 text-white hover:bg-red-700'
-                          : 'bg-green-600 text-white hover:bg-green-700'
-                      }>
-                      {data?.status !== 'SUSPENDED' ? t('suspend') : t('activate')}
-                    </Button>
+                    <Alert
+                      id=""
+                      description={
+                        data?.status !== 'SUSPENDED' ? t('suspendBikerConfirm') : t('activate')
+                      }
+                      handler={() => handelActionBiker(data?._id, data?.status)}
+                      buttonComponent={
+                        <Button
+                          size="sm"
+                          loading={isloading}
+                          className={
+                            data?.status !== 'SUSPENDED'
+                              ? 'bg-red-600 text-white hover:bg-red-700'
+                              : 'bg-green-600 text-white hover:bg-green-700'
+                          }>
+                          {data?.status !== 'SUSPENDED' ? t('suspend') : t('activate')}
+                        </Button>
+                      }
+                    />
                   </div>
                 </div>
               </div>

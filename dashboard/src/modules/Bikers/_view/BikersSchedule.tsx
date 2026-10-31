@@ -415,10 +415,10 @@ export default function BikersSchedule() {
         toast.success(t('scheduleSaved'));
         mutate(['get-biker-schedule', bikerIdValue]);
       } else {
-        toast.error(t('scheduleSaved'));
+        toast.error(t('scheduleSaveError'));
       }
     } catch (error) {
-      toast.error(t('scheduleSaved'));
+      toast.error(t('scheduleSaveError'));
     } finally {
       setIsSaving(false);
     }

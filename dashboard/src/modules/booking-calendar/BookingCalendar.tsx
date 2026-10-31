@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -38,6 +38,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/shadecn/components/ui
 const BookingCalendar = () => {
   const { t } = useTranslation();
   // State management
+  const calendarRef = useRef<FullCalendar>(null);
   const [currentView, setCurrentView] = useState<CalendarView>('dayGridMonth');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
@@ -92,11 +93,14 @@ const BookingCalendar = () => {
 
   const handleViewChange = (view: CalendarView) => {
     setCurrentView(view);
+    calendarRef.current?.getApi().changeView(view);
     setFilters((prev) => ({ ...prev, view }));
   };
 
   // Convert sprints to calendar events
-  const calendarEvents = sprintsToCalendarEvents(sprints);
+  const calendarEvents = sprintsToCalendarEvents(
+    filters.showInactive ? sprints : sprints.filter((sprint) => sprint.isActive)
+  );
 
   if (isLoading) {
     return (
@@ -191,7 +195,9 @@ const BookingCalendar = () => {
             center: 'title',
             right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
           }}
+          ref={calendarRef}
           initialView={currentView}
+          datesSet={(info) => setCurrentView(info.view.type as CalendarView)}
           events={calendarEvents}
           eventClick={handleEventClick}
           selectable={true}
