@@ -477,5 +477,11 @@
   "plansPromoTitle": "Wash more, pay less",
   "plansPromoBody": "Monthly plans for regular washes",
   "seePlans": "See plans",
-  "addCar": "Add car"
+  "addCar": "Add car",
+  "contact_us": "Contact us",
+  "default_error": "Something went wrong. Please try again.",
+  "noRouteFound": "Page not found",
+  "no_internet_error": "No internet connection. Check your connection and try again.",
+  "ok": "OK",
+  "thereIsNoHistoryBookingYet": "There are no past bookings yet"
 }

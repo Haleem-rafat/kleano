@@ -482,5 +482,11 @@
   "plansPromoTitle": "اغسل أكثر وادفع أقل",
   "plansPromoBody": "باقات شهرية للغسيل المنتظم",
   "seePlans": "عرض الباقات",
-  "addCar": "إضافة سيارة"
+  "addCar": "إضافة سيارة",
+  "contact_us": "تواصل معنا",
+  "default_error": "حدث خطأ ما. حاول مرة أخرى.",
+  "noRouteFound": "الصفحة غير موجودة",
+  "no_internet_error": "لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.",
+  "ok": "حسنًا",
+  "thereIsNoHistoryBookingYet": "لا توجد حجوزات سابقة بعد"
 }
