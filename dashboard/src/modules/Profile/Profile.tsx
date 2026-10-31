@@ -120,7 +120,7 @@ const Profile = () => {
           <p className="text-lg font-semibold text-gray-800">{data?.userName}</p>
         </div>
 
-        <div className="mb-4 grid grid-cols-2 gap-4">
+        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <h2 className="text-sm font-medium text-gray-500">Language</h2>
             <p className="text-lg text-gray-800">{data?.lang.toUpperCase()}</p>
@@ -136,7 +136,7 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="mb-4 grid grid-cols-2 gap-4">
+        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <h2 className="text-sm font-medium text-gray-500">is SuperAdmin</h2>
             <p className="text-lg text-gray-800">{data?.isSuperAdmin ? 'Yes' : 'No'}</p>

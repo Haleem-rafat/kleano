@@ -103,7 +103,7 @@ const OrdersList = () => {
             if (selectedSubFilter) handleSubFilterChange(selectedSubFilter.status);
           }}
           className="my-4">
-          <TabsList className="flex">
+          <TabsList className="flex max-w-full">
             {activeTab.subFilters.map((subFilter, index) => (
               <TabsTrigger value={subFilter.title} key={index} className="mr-2">
                 {t(subFilter.title)}
@@ -168,7 +168,7 @@ const OrdersList = () => {
   return (
     <div className="relative">
       {ordersListLoading && <ThreeDotsLoader />}
-      <div className="flex items-center justify-between pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('orders')}</p>
         <div>
           <Input
@@ -191,7 +191,7 @@ const OrdersList = () => {
             const selectedTab = TABS.find((tab) => tab.title === value);
             handleTabChange(selectedTab, true);
           }}>
-          <TabsList className="flex">
+          <TabsList className="flex max-w-full">
             {TABS.map((tab, index) => (
               <TabsTrigger value={tab.title} key={index} className="mr-2">
                 {t(tab.title)}

@@ -155,7 +155,7 @@ const ContactForm = () => {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <button
                 type="button"
@@ -261,7 +261,7 @@ const ContactForm = () => {
 
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <h4 className="text-sm font-medium text-slate-700">Email Addresses</h4>
                       <Button
                         type="button"
@@ -327,7 +327,7 @@ const ContactForm = () => {
 
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
                       <h4 className="text-sm font-medium text-slate-700">Phone Numbers</h4>
                       <Button
                         type="button"

@@ -223,7 +223,7 @@ export default function UsersDetails() {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <button
                 type="button"
@@ -332,7 +332,7 @@ export default function UsersDetails() {
               {/* Vehicles Section */}
               <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center space-x-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                         <IoCarOutline className="h-4 w-4 text-primary" />
@@ -354,7 +354,7 @@ export default function UsersDetails() {
                         className="rounded-lg border border-slate-200 bg-slate-50 p-4">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <div className="mb-4 grid grid-cols-2 gap-4">
+                            <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
                                 <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                                   {t('brand')}
@@ -544,7 +544,7 @@ export default function UsersDetails() {
             <div className="xl:col-span-2">
               <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center space-x-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                         <IoReceiptOutline className="h-4 w-4 text-primary" />
@@ -777,13 +777,13 @@ export default function UsersDetails() {
                                   Pricing
                                 </h4>
                                 <div className="space-y-2">
-                                  <div className="flex items-center justify-between">
+                                  <div className="flex flex-wrap items-center justify-between gap-3">
                                     <span className="text-sm text-slate-500">Total Price</span>
                                     <span className="text-sm font-semibold text-slate-900">
                                       {order.totalPrice}
                                     </span>
                                   </div>
-                                  <div className="flex items-center justify-between">
+                                  <div className="flex flex-wrap items-center justify-between gap-3">
                                     <span className="text-sm text-slate-500">Discount</span>
                                     <span className="text-sm font-semibold text-green-600">
                                       -{order.discount}

@@ -343,3 +343,18 @@ table tbody tr:hover {
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* Small screens: pages never scroll sideways; wide tables scroll inside their card. */
+main {
+  min-width: 0;
+  overflow-x: clip;
+}
+[role='tablist'] {
+  scrollbar-width: none;
+}
+@media (max-width: 640px) {
+  .fc-toolbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

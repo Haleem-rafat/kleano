@@ -106,7 +106,7 @@ const navGroups: { title: string; labels: string[] }[] = [
 ];
 
 export default function AppLayouts({ children }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(() => window.innerWidth >= 768);
   const user = getLocalStorageItem(ELocalStorageKeys.USER) as ILoginData;
   const { t } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
@@ -147,7 +147,7 @@ export default function AppLayouts({ children }) {
     <>
       {/* Professional Header */}
       <div className="fixed z-10 w-full border-b border-slate-200 bg-white ltr:md:pl-60 rtl:md:pr-60">
-        <div className="flex h-14 items-center px-6">
+        <div className="flex h-14 items-center px-4 md:px-6">
           <div className="flex w-full items-center justify-between">
             <div className="flex items-center space-x-4">
               <button
@@ -260,7 +260,7 @@ export default function AppLayouts({ children }) {
 
       <div className="min-h-screen bg-background ltr:md:ml-60 rtl:md:mr-60">
         <main className="pt-14">
-          <div className="px-6 py-6">{children}</div>
+          <div className="min-w-0 px-4 py-4 md:px-6 md:py-6">{children}</div>
         </main>
       </div>
     </>

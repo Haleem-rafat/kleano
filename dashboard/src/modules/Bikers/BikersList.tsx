@@ -146,7 +146,7 @@ export default function BikersList() {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                 <IoPersonOutline className="h-4 w-4 text-primary" />
@@ -161,7 +161,7 @@ export default function BikersList() {
                 onChange={(e) => setSearch(e.target.value)}
                 value={search}
                 placeholder={t('search') || 'Search...'}
-                className="w-64"
+                className="w-full sm:w-64"
               />
               <Button loading={loading} onClick={() => handelExport()} variant="secondary">
                 {t('Export')}

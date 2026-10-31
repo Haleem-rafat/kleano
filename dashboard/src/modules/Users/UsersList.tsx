@@ -143,7 +143,7 @@ export default function UsersList() {
 
   return (
     <div className="relative">
-      <div className="flex items-center justify-between pb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('users')}</p>
         <div className="flex items-center justify-center gap-4">
           <Select onValueChange={(e) => setFilter(e as 'SUSPENDED' | 'ACTIVE')}>

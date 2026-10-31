@@ -147,7 +147,7 @@ export default function BikersDetails() {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <button
                 type="button"

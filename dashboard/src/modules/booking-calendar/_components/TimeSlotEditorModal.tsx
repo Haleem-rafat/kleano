@@ -141,7 +141,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
 
           {/* Time Slot Selection */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-medium">Available Time Slots</h3>
               <div className="text-sm text-gray-600">Selected: {selectedHours.length} slots</div>
             </div>

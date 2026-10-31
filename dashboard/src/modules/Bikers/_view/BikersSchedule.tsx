@@ -570,7 +570,7 @@ export default function BikersSchedule() {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <button
                 type="button"
@@ -624,7 +624,7 @@ export default function BikersSchedule() {
               </div>
             </div>
             <div className="p-6">
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
                 {DAYS_OF_WEEK.map((day) => {
                   const dayName = day.label.en.toUpperCase();
                   const isSelected = weekends.includes(dayName);
@@ -794,7 +794,7 @@ export default function BikersSchedule() {
                                   <div className="text-sm text-slate-500">{t('noCitiesFound')}</div>
                                 </div>
                               ) : (
-                                <div className="mb-6 grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
+                                <div className="mb-6 grid max-h-96 grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
                                   {filteredCities.map((city) => {
                                     const isSelected = selectedCityId === city.value;
                                     return (
@@ -896,7 +896,7 @@ export default function BikersSchedule() {
                                   <div className="text-sm text-slate-500">{t('noAreasFound')}</div>
                                 </div>
                               ) : (
-                                <div className="grid max-h-96 grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
+                                <div className="grid max-h-96 grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
                                   {filteredAreas.map((area) => {
                                     const isSelected = schedule[day.value].areas.includes(area.id);
                                     const priority =
@@ -974,7 +974,7 @@ export default function BikersSchedule() {
                             </h3>
                           </div>
                           <div className="max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-4">
-                            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
+                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
                               {TIME_SLOTS.map((timeSlot) => {
                                 const isSelected = schedule[day.value].timeSlots.includes(timeSlot);
                                 return (

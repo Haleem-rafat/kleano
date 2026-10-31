@@ -48,7 +48,7 @@ export default function WashingServicesDetails() {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <button
                 type="button"
@@ -164,7 +164,7 @@ export default function WashingServicesDetails() {
               <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
                 <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center space-x-3">
                       <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                         <IoLocationOutline className="h-4 w-4 text-primary" />

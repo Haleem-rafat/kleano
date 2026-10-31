@@ -72,7 +72,7 @@ const AdminsList = () => {
       {/* Professional Header */}
       <div className="pb-4">
         <div>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center space-x-4">
               <div>
                 <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('admins')}</h1>
@@ -85,7 +85,7 @@ const AdminsList = () => {
                   onChange={(e) => setSearch(e.target.value)}
                   value={search}
                   placeholder="Search admins..."
-                  className="w-64"
+                  className="w-full sm:w-64"
                 />
               </div>
               <Button onClick={() => setOpenSheet(true)} className="bg-primary">
@@ -104,7 +104,7 @@ const AdminsList = () => {
             <Tabs
               defaultValue={tabs[0].status}
               onValueChange={(value) => handleTabChange(tabs.find((tab) => tab.status === value))}>
-              <TabsList className="grid w-full grid-cols-3 border border-slate-200 bg-white">
+              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 border border-slate-200 bg-white">
                 {tabs.map((tab, index) => (
                   <TabsTrigger
                     value={tab.status}

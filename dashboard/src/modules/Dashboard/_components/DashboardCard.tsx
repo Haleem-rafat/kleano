@@ -51,7 +51,7 @@ const DashboardCard = ({
         '300'
       )}`}>
       <CardContent className="p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h4 className={`mb-1 text-xs font-medium capitalize ${colors.titleColor}`}>{title}</h4>
             <p className={`text-2xl font-semibold tracking-tight ${colors.valueColor}`}>{count || 0}</p>

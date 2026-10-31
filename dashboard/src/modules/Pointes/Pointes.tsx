@@ -51,7 +51,7 @@ export default function Pointes() {
     <div className="relative flex w-full max-w-xl flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6">
       {isLoading && <ThreeDotsLoader />}
 
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('pointes')}</p>
       </div>
 

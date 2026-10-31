@@ -196,7 +196,7 @@ const BookingCalendarV2 = () => {
   return (
     <div className="flex h-full w-full flex-col gap-4 p-4">
       {/* Header with filters and controls */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">Enhanced Booking Calendar</h1>
 

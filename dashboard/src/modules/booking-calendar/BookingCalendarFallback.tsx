@@ -50,7 +50,7 @@ const BookingCalendarFallback = () => {
   return (
     <div className="flex w-full flex-col gap-4 p-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-4">
           <h1 className="text-2xl font-bold">Enhanced Booking Calendar</h1>
           <div className="rounded bg-brandTint px-2 py-1 text-xs text-primary">
