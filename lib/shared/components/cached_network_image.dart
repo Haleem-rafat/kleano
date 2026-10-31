@@ -73,6 +73,10 @@ class ImageShared extends StatelessWidget {
             width: width,
             fit: fit,
             alignment: alignment,
+            // Decode at the size shown, not the size uploaded.
+            memCacheWidth: width != null && width!.isFinite
+                ? (width! * MediaQuery.devicePixelRatioOf(context)).round()
+                : null,
             imageBuilder:
                 (BuildContext ctx, ImageProvider<Object> imageProvider) {
               return Container(

@@ -55,10 +55,9 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   void goToNextView() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      _controllerA.forward();
-    });
-    Future.delayed(const Duration(milliseconds: 3300), () async {
+    // Play once and go: the logo animation is the only wait.
+    _controllerA.forward();
+    Future.delayed(const Duration(milliseconds: 1000), () async {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       if (prefs.containsKey('FirstTime')) {
         // Add a timeout to prevent infinite loading
