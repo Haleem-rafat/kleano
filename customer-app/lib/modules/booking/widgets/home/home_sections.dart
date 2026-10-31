@@ -237,66 +237,85 @@ class HomeReassurance extends StatelessWidget {
 }
 
 class HomePlansCard extends StatelessWidget {
-  const HomePlansCard({super.key, this.solid = false});
+  const HomePlansCard({super.key, this.solid = false, this.gradient = false});
 
   /// Brand fill with a white action, instead of the soft tint.
   final bool solid;
 
+  /// Brand gradient behind a solid card (implies [solid]'s white action).
+  final bool gradient;
+
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    final Color fg = solid ? c.surface : c.onBrandTint;
+    final bool strong = solid || gradient;
+    final Color fg = strong ? c.surface : c.onBrandTint;
     return Padding(
       padding: const EdgeInsets.fromLTRB(KSpace.l, KSpace.l, KSpace.l, 0),
       child: Material(
-        color: solid ? c.brand : c.brandTint,
+        color: gradient
+            ? Colors.transparent
+            : solid
+            ? c.brand
+            : c.brandTint,
         shape: KRadius.shape(BorderRadius.circular(KRadius.card)),
         clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => popALlAndPushPage(
-            context,
-            const MainNavigationScreen(selectedIndex: 3),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(KSpace.l),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        translate('plansPromoTitle'),
-                        style: KType.headline.copyWith(color: fg),
-                      ),
-                      Text(
-                        translate('plansPromoBody'),
-                        style: KType.subhead.copyWith(color: fg),
-                      ),
-                    ],
+        child: Ink(
+          decoration: gradient
+              ? BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: AlignmentDirectional.centerStart,
+                    end: AlignmentDirectional.centerEnd,
+                    colors: <Color>[c.brand, c.brandLight],
                   ),
-                ),
-                const SizedBox(width: KSpace.s),
-                DecoratedBox(
-                  decoration: ShapeDecoration(
-                    shape: const StadiumBorder(),
-                    color: solid ? c.surface : Colors.transparent,
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: solid ? KSpace.l : 0,
-                      vertical: solid ? KSpace.s : 0,
-                    ),
-                    child: Text(
-                      translate('seePlans'),
-                      style: KType.subhead.copyWith(
-                        color: solid ? c.brand : fg,
-                        fontWeight: FontWeight.w600,
-                      ),
+                )
+              : null,
+          child: InkWell(
+            onTap: () => popALlAndPushPage(
+              context,
+              const MainNavigationScreen(selectedIndex: 3),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(KSpace.l),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          translate('plansPromoTitle'),
+                          style: KType.headline.copyWith(color: fg),
+                        ),
+                        Text(
+                          translate('plansPromoBody'),
+                          style: KType.subhead.copyWith(color: fg),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: KSpace.s),
+                  DecoratedBox(
+                    decoration: ShapeDecoration(
+                      shape: const StadiumBorder(),
+                      color: strong ? c.surface : Colors.transparent,
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: strong ? KSpace.l : 0,
+                        vertical: strong ? KSpace.s : 0,
+                      ),
+                      child: Text(
+                        translate('seePlans'),
+                        style: KType.subhead.copyWith(
+                          color: strong ? c.brand : fg,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

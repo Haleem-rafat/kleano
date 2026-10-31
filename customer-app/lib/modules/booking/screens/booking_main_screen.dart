@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/tokens.dart';
@@ -69,6 +71,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   Key _offerWidgetKey = UniqueKey();
   final MyBookingBloc _activeOrders = MyBookingBloc();
   final MyBookingBloc _pastOrders = MyBookingBloc();
+  StreamSubscription<MyBookingState>? _pastOrdersSub;
 
   String _guestAuthMessage(BuildContext context) {
     final String languageCode = Localizations.localeOf(context).languageCode;
@@ -291,6 +294,14 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   void initState() {
     super.initState();
     clearAllOrderDetails();
+    _pastOrdersSub = _pastOrders.stream.listen((MyBookingState state) {
+      mostBookedServiceId.value = mostFrequentId(
+        state.historyList
+            .where((OrderModel o) => o.status == AppConstants.completed)
+            .expand((OrderModel o) => o.washingServices ?? <ServiceModel>[])
+            .map((ServiceModel service) => service.sId),
+      );
+    });
     refreshController = RefreshController();
     bookingScreen = [
       AddServices(onContinue: _continueFromSheet),
@@ -368,6 +379,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     refreshController.dispose();
     _isNotesFocused.dispose();
     _activeOrders.close();
+    _pastOrdersSub?.cancel();
     _pastOrders.close();
     super.dispose();
   }
@@ -512,10 +524,18 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     return <Widget>[
       if (style == HomeStyle.photoHero)
         box(_buildPhotoHero(c))
+      else if (style == HomeStyle.mix)
+        box(_buildPhotoHero(c, fade: true))
       else
         _buildTopBar(c),
       const SliverToBoxAdapter(child: HomeStyleChips()),
-      if (style == HomeStyle.photoHero) ...<Widget>[
+      if (style == HomeStyle.mix) ...<Widget>[
+        if (!_isGuest) cars,
+        services,
+        box(const HomeReassurance(tiles: true)),
+        box(const HomePlansCard(gradient: true)),
+        offers,
+      ] else if (style == HomeStyle.photoHero) ...<Widget>[
         if (!_isGuest) cars,
         services,
         box(const HomeReassurance(tiles: true)),
@@ -542,7 +562,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         offers,
       ] else
         ...switch (style) {
-          HomeStyle.photoHero => const <Widget>[],
+          HomeStyle.mix || HomeStyle.photoHero => const <Widget>[],
           HomeStyle.serviceGrid => <Widget>[
             offers,
             box(const SizedBox(height: KSpace.l)),
@@ -621,7 +641,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   }
 
   /// Photo header holding the address, greeting and the wash card (Photo hero).
-  Widget _buildPhotoHero(KColors c) {
+  Widget _buildPhotoHero(KColors c, {bool fade = false}) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light.copyWith(
         statusBarColor: Colors.transparent,
@@ -632,11 +652,24 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
             top: 0,
             left: 0,
             right: 0,
-            bottom: _heroCardOverlap,
+            bottom: fade ? 0 : _heroCardOverlap,
             child: DecoratedBox(
               position: DecorationPosition.foreground,
               decoration: BoxDecoration(
-                color: KColors.light.brand.withValues(alpha: 0.5),
+                color: fade ? null : KColors.light.brand.withValues(alpha: 0.5),
+                // Melts the photo into the page behind the card.
+                gradient: fade
+                    ? LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        stops: const <double>[0, 0.55, 1],
+                        colors: <Color>[
+                          KColors.light.brand.withValues(alpha: 0.55),
+                          KColors.light.brand.withValues(alpha: 0.35),
+                          c.background,
+                        ],
+                      )
+                    : null,
               ),
               child: Image.asset(
                 'assets/images/on_boarding_3.png',
@@ -656,9 +689,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
                 children: <Widget>[
                   const SizedBox(width: KSpace.s),
                   Expanded(child: _buildAddress(c, onPhoto: true)),
-                  _buildPoints(),
+                  _buildPoints(onPhoto: true),
                   const SizedBox(width: KSpace.s),
-                  _buildNotifications(c),
+                  _buildNotifications(c, onPhoto: true),
                   const SizedBox(width: KSpace.s),
                 ],
               ),
@@ -740,55 +773,56 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         final String label = address.savedName?.isNotEmpty == true
             ? address.savedName!
             : address.streetName ?? translate(AppStrings.defaultAddress);
-        return Align(
-          alignment: AlignmentDirectional.centerStart,
-          child: Semantics(
-            button: true,
-            label: label,
-            excludeSemantics: true,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(KRadius.field),
-              onTap: () => pushPage(context, SetBookingLocationScreen()),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: KSpace.s,
-                  vertical: KSpace.m,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: <Widget>[
-                    Icon(
-                      Icons.location_on_rounded,
-                      size: 20,
-                      color: onPhoto ? Colors.white : c.brand,
-                    ),
-                    const SizedBox(width: KSpace.xs),
-                    Flexible(
-                      child: Text(
-                        label,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: KType.headline.copyWith(
-                          color: onPhoto ? Colors.white : c.text,
-                        ),
+        final Widget control = Semantics(
+          button: true,
+          label: label,
+          excludeSemantics: true,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(KRadius.field),
+            onTap: () => pushPage(context, SetBookingLocationScreen()),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: KSpace.s,
+                vertical: KSpace.m,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Icon(
+                    Icons.location_on_rounded,
+                    size: 20,
+                    color: onPhoto ? Colors.white : c.brand,
+                  ),
+                  const SizedBox(width: KSpace.xs),
+                  Flexible(
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: KType.headline.copyWith(
+                        color: onPhoto ? Colors.white : c.text,
                       ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      size: 20,
-                      color: onPhoto ? Colors.white : c.textSecondary,
-                    ),
-                  ],
-                ),
+                  ),
+                  Icon(
+                    Icons.keyboard_arrow_down_rounded,
+                    size: 20,
+                    color: onPhoto ? Colors.white : c.textSecondary,
+                  ),
+                ],
               ),
             ),
           ),
+        );
+        return Align(
+          alignment: AlignmentDirectional.centerStart,
+          child: onPhoto ? LiquidGlass(capsule: true, child: control) : control,
         );
       },
     );
   }
 
-  Widget _buildPoints() {
+  Widget _buildPoints({bool onPhoto = false}) {
     final Widget coin = SvgPicture.asset(
       AssetsManager.walletCoin,
       height: 16,
@@ -798,6 +832,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
       return KChipButton(
         leading: coin,
         label: '0',
+        onPhoto: onPhoto,
         semanticLabel: translate(AppStrings.points),
         onTap: () => AlertHelper.pointAlert(context),
       );
@@ -807,6 +842,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         return KChipButton(
           leading: coin,
           label: '${points ?? 0}',
+          onPhoto: onPhoto,
           semanticLabel: translate(AppStrings.points),
           onTap: () => AlertHelper.pointAlert(context),
         );
@@ -814,7 +850,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     );
   }
 
-  Widget _buildNotifications(KColors c) {
+  Widget _buildNotifications(KColors c, {bool onPhoto = false}) {
     return Stack(
       clipBehavior: Clip.none,
       alignment: Alignment.center,
@@ -822,7 +858,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         GlassBarButton(
           icon: Icons.notifications_none_rounded,
           sfSymbol: 'bell',
-          color: c.brand,
+          color: onPhoto ? Colors.white : c.brand,
           tooltip: translate(AppStrings.notifications),
           onPressed: () {
             pushPage(

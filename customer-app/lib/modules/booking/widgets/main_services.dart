@@ -119,6 +119,12 @@ class _MainServicesState extends State<MainServices> {
                 services: widget.mainServices,
                 onOpen: open,
               );
+            case HomeStyle.mix:
+              return HomeServiceGrid(
+                services: widget.mainServices,
+                onOpen: open,
+                compact: true,
+              );
             case HomeStyle.serviceGrid:
               return HomeServiceGrid(
                 services: widget.mainServices,

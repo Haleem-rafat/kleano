@@ -1,11 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_list_row.dart';
 import 'package:thewasher/core/design/components/k_search_field.dart';
+import 'package:thewasher/core/design/components/k_sheet.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
+import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
+
+/// Shows on whichever service the customer has booked most.
+class MostBookedBadge extends StatelessWidget {
+  const MostBookedBadge({super.key, required this.serviceId});
+
+  final String? serviceId;
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    return ValueListenableBuilder<String?>(
+      valueListenable: mostBookedServiceId,
+      builder: (BuildContext context, String? id, Widget? child) {
+        if (id == null || id != serviceId) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(bottom: KSpace.xs),
+          child: DecoratedBox(
+            decoration: ShapeDecoration(
+              shape: const StadiumBorder(),
+              color: c.warning.withValues(alpha: 0.18),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: KSpace.s,
+                vertical: 2,
+              ),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  '★ ${translate('mostBooked')}',
+                  maxLines: 1,
+                  style: KType.caption.copyWith(
+                    color: c.text,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
 
 typedef ServiceOpen = void Function(ServiceModel service, int index);
 
@@ -51,6 +98,7 @@ class HomePricedServices extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        MostBookedBadge(serviceId: services[i].sId),
                         Text(
                           services[i].name ?? '',
                           maxLines: 2,
@@ -95,10 +143,15 @@ class HomeServiceGrid extends StatefulWidget {
     super.key,
     required this.services,
     required this.onOpen,
+    this.compact = false,
   });
 
   final List<ServiceModel> services;
   final ServiceOpen onOpen;
+
+  /// Four across with no search, ending in a See all tile that opens every
+  /// service in a sheet.
+  final bool compact;
 
   @override
   State<HomeServiceGrid> createState() => _HomeServiceGridState();
@@ -106,9 +159,46 @@ class HomeServiceGrid extends StatefulWidget {
 
 class _HomeServiceGridState extends State<HomeServiceGrid> {
   static const int _columns = 3;
+  static const int _compactColumns = 4;
+  static const int _compactRows = 2;
   static const double _photo = KSpace.xxxl + KSpace.xl;
 
   String _query = '';
+
+  void _openAll(List<int> shown) {
+    showKSheet<void>(
+      context: context,
+      builder: (BuildContext sheet) => ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(sheet).height * 0.6,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            for (final int index in shown)
+              KListRow(
+                leading: ClipRRect(
+                  borderRadius: BorderRadius.circular(KRadius.field),
+                  child: ImageShared(
+                    image: widget.services[index].icon?.iconLink ?? '',
+                    height: KSpace.xxxl + KSpace.s,
+                    width: KSpace.xxxl + KSpace.s,
+                  ),
+                ),
+                title: widget.services[index].name ?? '',
+                subtitle:
+                    '${widget.services[index].price ?? ''} ${translate(AppStrings.sAR)}',
+                showChevron: true,
+                onTap: () {
+                  Navigator.of(sheet).pop();
+                  widget.onOpen(widget.services[index], index);
+                },
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,6 +211,92 @@ class _HomeServiceGridState extends State<HomeServiceGrid> {
             ))
           i,
     ];
+    if (widget.compact) {
+      final int room = _compactColumns * _compactRows - 1;
+      final List<int> first = shown.take(room).toList();
+      return GridView.count(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        crossAxisCount: _compactColumns,
+        crossAxisSpacing: KSpace.s,
+        mainAxisSpacing: KSpace.s,
+        childAspectRatio: 0.6,
+        children: <Widget>[
+          for (final int index in first)
+            KCard(
+              padding: const EdgeInsets.all(KSpace.s),
+              onTap: () => widget.onOpen(widget.services[index], index),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  MostBookedBadge(serviceId: widget.services[index].sId),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(KRadius.field),
+                    child: ColoredBox(
+                      color: c.fill,
+                      child: ImageShared(
+                        image: widget.services[index].icon?.iconLink ?? '',
+                        height: KSpace.xxxl + KSpace.s,
+                        width: KSpace.xxxl + KSpace.s,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: KSpace.xs),
+                  Text(
+                    widget.services[index].name ?? '',
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    overflow: TextOverflow.ellipsis,
+                    style: KType.caption.copyWith(
+                      color: c.text,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '${widget.services[index].price ?? ''} ${translate(AppStrings.sAR)}',
+                    maxLines: 1,
+                    style: KType.caption.copyWith(color: c.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+          KCard(
+            padding: const EdgeInsets.all(KSpace.s),
+            onTap: () => _openAll(shown),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: c.brandTint,
+                  ),
+                  child: SizedBox.square(
+                    dimension: KSpace.xxxl + KSpace.s,
+                    child: Icon(
+                      Directionality.of(context) == TextDirection.rtl
+                          ? Icons.arrow_back_rounded
+                          : Icons.arrow_forward_rounded,
+                      color: c.onBrandTint,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: KSpace.xs),
+                Text(
+                  translate('seeAll'),
+                  textAlign: TextAlign.center,
+                  style: KType.caption.copyWith(
+                    color: c.text,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
@@ -149,6 +325,7 @@ class _HomeServiceGridState extends State<HomeServiceGrid> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  MostBookedBadge(serviceId: service.sId),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(KRadius.field),
                     child: ColoredBox(

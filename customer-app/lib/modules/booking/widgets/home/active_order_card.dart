@@ -63,6 +63,10 @@ class ActiveOrderCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
+              if (showStages) ...<Widget>[
+                OrderStageIcon(step: getStepData(order.status ?? '').step),
+                const SizedBox(width: KSpace.m),
+              ],
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -93,6 +97,7 @@ class ActiveOrderCard extends StatelessWidget {
           if (showStages) ...<Widget>[
             const SizedBox(height: KSpace.l),
             KStageBar(
+              pulse: true,
               step: getStepData(order.status ?? '').step,
               stages: <String>[
                 translate(AppStrings.onTheWay),
@@ -111,6 +116,95 @@ class ActiveOrderCard extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// The wash's current stage as a living icon: the bike rides, the pin bounces,
+/// the drop pulses. Still when the user asked for reduced motion.
+class OrderStageIcon extends StatefulWidget {
+  const OrderStageIcon({super.key, required this.step});
+
+  /// Same numbering as the stage bar; -1 means waiting to set off.
+  final int step;
+
+  @override
+  State<OrderStageIcon> createState() => _OrderStageIconState();
+}
+
+class _OrderStageIconState extends State<OrderStageIcon>
+    with SingleTickerProviderStateMixin {
+  static const double _size = KSpace.xxxl + KSpace.l;
+  static const double _travel = KSpace.xs;
+
+  late final AnimationController _motion = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _motion.stop();
+    } else if (!_motion.isAnimating) {
+      _motion.repeat(reverse: true);
+    }
+  }
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
+
+  IconData get _icon => switch (widget.step) {
+    0 => Icons.two_wheeler_rounded,
+    1 => Icons.place_rounded,
+    2 => Icons.water_drop_rounded,
+    >= 3 => Icons.check_rounded,
+    _ => Icons.schedule_rounded,
+  };
+
+  @override
+  Widget build(BuildContext context) {
+    final KColors c = KColors.of(context);
+    final CurvedAnimation curve = CurvedAnimation(
+      parent: _motion,
+      curve: Curves.easeInOut,
+    );
+    final Widget icon = Icon(_icon, color: c.onBrandTint);
+    return RepaintBoundary(
+      child: DecoratedBox(
+        decoration: BoxDecoration(shape: BoxShape.circle, color: c.brandTint),
+        child: SizedBox.square(
+          dimension: _size,
+          child: Center(
+            child: switch (widget.step) {
+              0 => AnimatedBuilder(
+                animation: curve,
+                builder: (BuildContext _, Widget? child) => Transform.translate(
+                  offset: Offset((curve.value - 0.5) * _travel * 2, 0),
+                  child: child,
+                ),
+                child: icon,
+              ),
+              1 => AnimatedBuilder(
+                animation: curve,
+                builder: (BuildContext _, Widget? child) => Transform.translate(
+                  offset: Offset(0, -curve.value * _travel),
+                  child: child,
+                ),
+                child: icon,
+              ),
+              _ => ScaleTransition(
+                scale: Tween<double>(begin: 0.9, end: 1.1).animate(curve),
+                child: icon,
+              ),
+            },
+          ),
+        ),
       ),
     );
   }

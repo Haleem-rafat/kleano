@@ -501,5 +501,8 @@
   "homeStyle_offersFirst": "Offers first",
   "homeStyle_photoHero": "Photo hero",
   "homeStyle_serviceGrid": "Service grid",
-  "searchServices": "Search services"
+  "searchServices": "Search services",
+  "homeStyle_mix": "Mix",
+  "seeAll": "See all",
+  "mostBooked": "Most booked"
 }
