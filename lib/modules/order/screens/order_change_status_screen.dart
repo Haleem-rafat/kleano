@@ -208,8 +208,6 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
               controller: panelController,
               maxHeight: math.max(screenHeight * .60, minPanelHeight),
               minHeight: minPanelHeight,
-              parallaxEnabled: true,
-              parallaxOffset: .3,
               color: c.surface,
               panelBuilder: (ScrollController scrollController) =>
                   StatusOrderBottomSheet(
