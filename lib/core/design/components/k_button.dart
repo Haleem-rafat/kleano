@@ -91,7 +91,9 @@ class KButton extends StatelessWidget {
         : (_onPhoto
               ? c.brand
               : _prominent
-              ? Colors.white
+              ? (variant == KButtonVariant.primary
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Colors.white)
               : (color ??
                     (variant == KButtonVariant.secondary
                         ? c.onBrandTint
@@ -136,7 +138,9 @@ class KButton extends StatelessWidget {
             dimension: 22,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
-              color: _prominent ? Colors.white : KColors.of(context).brand,
+              color: _prominent
+                  ? Theme.of(context).colorScheme.onPrimary
+                  : KColors.of(context).brand,
             ),
           )
         : Row(

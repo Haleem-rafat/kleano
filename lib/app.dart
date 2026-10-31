@@ -2,6 +2,7 @@ import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewasher/core/design/adaptive_screen.dart';
+import 'package:thewasher/core/design/k_theme_mode.dart';
 import 'package:thewasher/core/design/kleano_theme.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -32,6 +33,9 @@ import 'package:thewasher/layout/services/notification_manager_service.dart';
 
 /// Root navigator. It is Chucker's key so its in-app HTTP log (dev flavor)
 /// can show its notification and open its screen.
+final ThemeData _light = kleanoTheme(brightness: Brightness.light);
+final ThemeData _dark = kleanoTheme(brightness: Brightness.dark);
+
 final GlobalKey<NavigatorState> navigatorKeyAlice = ChuckerFlutter.navigatorKey;
 
 class App extends StatefulWidget {
@@ -54,13 +58,12 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
-    LocalizationDelegate localizationDelegate =
-        LocalizedApp.of(context).delegate;
+    LocalizationDelegate localizationDelegate = LocalizedApp.of(
+      context,
+    ).delegate;
     return MultiBlocProvider(
       providers: <BlocProvider<dynamic>>[
-        BlocProvider<AuthCubit>(
-          create: (_) => AuthCubit(),
-        ),
+        BlocProvider<AuthCubit>(create: (_) => AuthCubit()),
         BlocProvider<DeleteUserAccountBloc>(
           create: (BuildContext context) => DeleteUserAccountBloc(),
         ),
@@ -73,9 +76,7 @@ class _AppState extends State<App> {
         BlocProvider<VehiclesBloc>(
           create: (BuildContext context) => sl<VehiclesBloc>(),
         ),
-        BlocProvider<CarsBloc>(
-          create: (_) => CarsBloc(),
-        ),
+        BlocProvider<CarsBloc>(create: (_) => CarsBloc()),
         BlocProvider<LocationBloc>(
           create: (BuildContext context) => sl<LocationBloc>(),
         ),
@@ -110,32 +111,38 @@ class _AppState extends State<App> {
       child: LocalizationProvider(
         state: LocalizationProvider.of(context).state,
         child: AdaptiveScreenUtil(
-            builder: (_) {
-              return MaterialApp(
-                navigatorKey: navigatorKeyAlice,
-                theme: kleanoTheme(brightness: Brightness.light),
-                darkTheme: kleanoTheme(brightness: Brightness.dark),
-                // Light until every screen uses the design tokens.
-                themeMode: ThemeMode.light,
-                builder: (BuildContext context, Widget? navigator) {
-                  return BackdropGroup(
-                    child: LiquidGlassTheme.clampTextScale(context,
-                        FoldScope(child: SystemBarInset(child: navigator!))),
-                  );
-                },
-                debugShowCheckedModeBanner: false,
-                title: F.title,
-                home: const SplashTwoScreen(),
-                localizationsDelegates: [
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                  localizationDelegate
-                ],
-                supportedLocales: localizationDelegate.supportedLocales,
-                locale: localizationDelegate.currentLocale,
-              );
-            }),
+          builder: (_) {
+            return ValueListenableBuilder<ThemeMode>(
+              valueListenable: KThemeMode.mode,
+              builder: (BuildContext context, ThemeMode mode, Widget? child) =>
+                  MaterialApp(
+                    navigatorKey: navigatorKeyAlice,
+                    theme: _light,
+                    darkTheme: _dark,
+                    themeMode: mode,
+                    builder: (BuildContext context, Widget? navigator) {
+                      return BackdropGroup(
+                        child: LiquidGlassTheme.clampTextScale(
+                          context,
+                          FoldScope(child: SystemBarInset(child: navigator!)),
+                        ),
+                      );
+                    },
+                    debugShowCheckedModeBanner: false,
+                    title: F.title,
+                    home: const SplashTwoScreen(),
+                    localizationsDelegates: [
+                      GlobalMaterialLocalizations.delegate,
+                      GlobalWidgetsLocalizations.delegate,
+                      GlobalCupertinoLocalizations.delegate,
+                      localizationDelegate,
+                    ],
+                    supportedLocales: localizationDelegate.supportedLocales,
+                    locale: localizationDelegate.currentLocale,
+                  ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:chucker_flutter/chucker_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/k_theme_mode.dart';
 import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/components/k_auth_scaffold.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +37,7 @@ Future<void> bootstrap(Flavor flavor) async {
   await SystemChrome.setPreferredOrientations(DeviceOrientation.values);
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+  await KThemeMode.load();
   final LocalizationDelegate delegate = await LocalizationDelegate.create(
     preferences: TranslatePreferences(),
     fallbackLocale: 'en',

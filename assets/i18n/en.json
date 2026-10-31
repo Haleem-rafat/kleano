@@ -488,5 +488,9 @@
   "noRouteFound": "Page not found",
   "no_internet_error": "No internet connection. Check your connection and try again.",
   "ok": "OK",
-  "thereIsNoHistoryBookingYet": "There are no past bookings yet"
+  "thereIsNoHistoryBookingYet": "There are no past bookings yet",
+  "appearance": "Appearance",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "themeSystem": "Same as phone"
 }

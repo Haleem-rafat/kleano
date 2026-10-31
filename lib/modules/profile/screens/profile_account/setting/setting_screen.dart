@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:thewasher/core/design/components/k_card.dart';
+import 'package:thewasher/core/design/components/k_theme_picker.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
@@ -33,6 +34,8 @@ class SettingScreen extends StatelessWidget {
         padding: const EdgeInsets.all(KSpace.xl),
         children: const <Widget>[
           DropDownLanguage(),
+          SizedBox(height: KSpace.xl),
+          KThemePicker(),
           SizedBox(height: KSpace.xl),
           KCard(padding: EdgeInsets.zero, child: ToggleNotification()),
         ],

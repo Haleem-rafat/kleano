@@ -493,5 +493,9 @@
   "noRouteFound": "الصفحة غير موجودة",
   "no_internet_error": "لا يوجد اتصال بالإنترنت. تحقق من اتصالك وحاول مرة أخرى.",
   "ok": "حسنًا",
-  "thereIsNoHistoryBookingYet": "لا توجد حجوزات سابقة بعد"
+  "thereIsNoHistoryBookingYet": "لا توجد حجوزات سابقة بعد",
+  "appearance": "المظهر",
+  "themeLight": "فاتح",
+  "themeDark": "داكن",
+  "themeSystem": "مثل الهاتف"
 }

@@ -17,16 +17,17 @@ ThemeData kleanoTheme({required Brightness brightness}) {
         brightness: brightness,
       ).copyWith(
         primary: c.brand,
-        onPrimary: Colors.white,
+        // White fails contrast on the lighter dark-mode purple.
+        onPrimary: brightness == Brightness.dark ? c.surface : Colors.white,
         // Fixed, so nothing picks up the pink tones fromSeed derives.
         primaryContainer: c.brandTint,
         onPrimaryContainer: c.onBrandTint,
         secondary: c.brand,
-        onSecondary: Colors.white,
+        onSecondary: brightness == Brightness.dark ? c.surface : Colors.white,
         secondaryContainer: c.brandTint,
         onSecondaryContainer: c.onBrandTint,
         tertiary: c.brand,
-        onTertiary: Colors.white,
+        onTertiary: brightness == Brightness.dark ? c.surface : Colors.white,
         tertiaryContainer: c.brandTint,
         onTertiaryContainer: c.onBrandTint,
         surfaceTint: Colors.transparent,

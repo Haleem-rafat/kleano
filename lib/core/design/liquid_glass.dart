@@ -30,6 +30,8 @@ class GlassTokens {
 
   static const Color tintLight = Color(0xB8FFFFFF);
   static const Color tintLightLow = Color(0x8CFFFFFF);
+  static const Color tintDark = Color(0xB82C2C2E);
+  static const Color opaqueSurfaceDark = Color(0xFF1C1C1E);
   static const Color opaqueSurface = Color(0xFFF7F7FA);
   static const Color sheetSurface = Color(0xF5FFFFFF);
   static const Color barrier = Color(0x40000000);
@@ -185,11 +187,12 @@ class _FlutterGlass extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool opaque = GlassTokens.reduceTransparency(context);
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color base = tint == null
-        ? GlassTokens.tintLight
+        ? (isDark ? GlassTokens.tintDark : GlassTokens.tintLight)
         : Color.alphaBlend(
             tint!.withValues(alpha: tint!.a * 0.85),
-            GlassTokens.tintLightLow,
+            isDark ? GlassTokens.tintDark : GlassTokens.tintLightLow,
           );
     final BorderRadius borderRadius = BorderRadius.circular(
       capsule ? 999 : radius,
@@ -202,7 +205,12 @@ class _FlutterGlass extends StatelessWidget {
       decoration: ShapeDecoration(
         shape: shape,
         color: opaque
-            ? Color.alphaBlend(base, GlassTokens.opaqueSurface)
+            ? Color.alphaBlend(
+                base,
+                isDark
+                    ? GlassTokens.opaqueSurfaceDark
+                    : GlassTokens.opaqueSurface,
+              )
             : base,
       ),
       child: CustomPaint(
@@ -512,7 +520,7 @@ class GlassTabBar extends StatelessWidget {
     required this.currentIndex,
     required this.onTap,
     this.activeColor,
-    this.inactiveColor = const Color(0xFF6E6E73),
+    this.inactiveColor = const Color(0xFF8E8E93),
     this.labelStyle,
   });
 
@@ -732,7 +740,9 @@ class _Lens extends StatelessWidget {
         shape: const StadiumBorder(),
         color: Color.alphaBlend(
           color.withValues(alpha: 0.10),
-          const Color(0x66FFFFFF),
+          Theme.of(context).brightness == Brightness.dark
+              ? const Color(0x33FFFFFF)
+              : const Color(0x66FFFFFF),
         ),
       ),
     );
@@ -839,7 +849,7 @@ class GlassAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final Color background = Theme.of(context).scaffoldBackgroundColor;
     final Color fg = foregroundColor == Colors.white || foregroundColor == null
-        ? const Color(0xFF1C1C1E)
+        ? Theme.of(context).colorScheme.onSurface
         : foregroundColor!;
     final bool canPop = ModalRoute.of(context)?.impliesAppBarDismissal ?? false;
 
