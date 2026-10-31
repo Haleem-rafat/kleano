@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/modules/my_booking/blocs/my_booking/my_booking_bloc.dart';
+import 'package:thewasher/modules/tracking_order/blocs/socket_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -29,6 +31,20 @@ class _SpyOrderBloc extends BookingOrderBloc {
   }
 }
 
+class _QuietSocketBloc extends SocketBloc {
+  @override
+  void add(SocketEvent event) {}
+
+  void push(SocketState state) => emit(state);
+}
+
+class _QuietMyBookingBloc extends MyBookingBloc {
+  @override
+  void add(MyBookingEvent event) {}
+}
+
+late _QuietSocketBloc socketBloc;
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -45,11 +61,15 @@ void main() {
   });
 
   setUp(() {
+    socketBloc = _QuietSocketBloc();
     bloc = _SpyOrderBloc();
     if (sl.isRegistered<BookingOrderBloc>()) {
       sl.unregister<BookingOrderBloc>();
     }
     sl.registerSingleton<BookingOrderBloc>(bloc);
+    if (!sl.isRegistered<MyBookingBloc>()) {
+      sl.registerSingleton<MyBookingBloc>(_QuietMyBookingBloc());
+    }
   });
 
   // No location: the Google Map is a platform view tests can't render.
@@ -77,9 +97,12 @@ void main() {
             localizationsDelegates: <LocalizationsDelegate<dynamic>>[delegate],
             supportedLocales: delegate.supportedLocales,
             locale: delegate.currentLocale,
-            home: BlocProvider<BookingOrderBloc>.value(
-              value: bloc,
-              child: const WashDetailsScreen(orderId: 'abcdef123456'),
+            home: BlocProvider<SocketBloc>(
+              create: (_) => socketBloc,
+              child: BlocProvider<BookingOrderBloc>.value(
+                value: bloc,
+                child: const WashDetailsScreen(orderId: 'abcdef123456'),
+              ),
             ),
           ),
         ),
@@ -87,6 +110,16 @@ void main() {
     );
     await tester.pump();
   }
+
+  testWidgets('a status change from the biker reloads the order', (
+    WidgetTester tester,
+  ) async {
+    await pump(tester);
+    expect(bloc.events.whereType<GetOrderById>(), hasLength(1));
+    socketBloc.push(ReceivedOrderCompletedSuccess(orderId: 'abcdef123456'));
+    await tester.pump();
+    expect(bloc.events.whereType<GetOrderById>(), hasLength(2));
+  });
 
   testWidgets('asks for the order, then shows id, chips and the prices', (
     WidgetTester tester,
