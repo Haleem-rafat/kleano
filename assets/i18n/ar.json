@@ -499,5 +499,8 @@
   "themeDark": "داكن",
   "themeSystem": "مثل الهاتف",
   "searchServices": "ابحث عن خدمة",
-  "seeAll": "عرض الكل"
+  "seeAll": "عرض الكل",
+  "checkout": "الدفع",
+  "earnRewards": "اكسب مكافآت مع كل خدمة تحجزها",
+  "showPromoCodes": "إظهار أكواد الخصم"
 }

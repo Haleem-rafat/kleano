@@ -39,7 +39,7 @@ class CreateSubscription extends StatelessWidget {
           '${translate(AppStrings.youArePaying)} ${price.toStringAsFixed(0)} $planType',
       actions: <Widget>[
         KButton(
-          label: 'Checkout',
+          label: translate('checkout'),
           onPressed: () {
             pop(context);
             pushPage(

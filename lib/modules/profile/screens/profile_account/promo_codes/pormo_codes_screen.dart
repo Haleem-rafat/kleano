@@ -105,7 +105,7 @@ class _PromoCodeScreenState extends State<PromoCodeScreen>
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    'Show Promo Codes',
+                    translate('showPromoCodes'),
                     style: KType.body.copyWith(color: c.text),
                   ),
                 ),

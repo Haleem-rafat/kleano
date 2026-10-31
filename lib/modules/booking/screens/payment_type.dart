@@ -282,7 +282,7 @@ class _SelectPaymentTypeScreenState extends State<SelectPaymentTypeScreen> {
                                         ),
                                       );
                                     },
-                              label: "Checkout",
+                              label: translate('checkout'),
                             );
                           },
                         ),

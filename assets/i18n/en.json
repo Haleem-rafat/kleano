@@ -494,5 +494,8 @@
   "themeDark": "Dark",
   "themeSystem": "Same as phone",
   "searchServices": "Search services",
-  "seeAll": "See all"
+  "seeAll": "See all",
+  "checkout": "Checkout",
+  "earnRewards": "Earn rewards with every service you book",
+  "showPromoCodes": "Show Promo Codes"
 }
