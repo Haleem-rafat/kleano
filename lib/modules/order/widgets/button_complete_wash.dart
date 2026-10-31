@@ -20,13 +20,15 @@ class ButtonCompleteWashWidget extends StatelessWidget {
     required this.index,
   });
 
+  // The sheet is closed before the picker opens, so what follows the pick must
+  // use the screen's context: the sheet's is no longer mounted.
   void _showImageSelectionSheet(BuildContext context) {
     showKSheet<void>(
       context: context,
-      builder: (BuildContext context) => PhotoSourceSheet(
-        title: tr(context, AppStrings.chooseAfterWashPicture),
+      builder: (BuildContext sheetContext) => PhotoSourceSheet(
+        title: tr(sheetContext, AppStrings.chooseAfterWashPicture),
         onGallery: () async {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           final XFile? image = await ImagePicker().pickImage(
             source: ImageSource.gallery,
             maxHeight: 800,
@@ -46,7 +48,7 @@ class ButtonCompleteWashWidget extends StatelessWidget {
           }
         },
         onCamera: () async {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           final XFile? image = await ImagePicker().pickImage(
             source: ImageSource.camera,
             maxHeight: 800,

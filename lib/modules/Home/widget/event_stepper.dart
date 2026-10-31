@@ -47,13 +47,15 @@ class EventsStepper extends StatelessWidget {
     },
   );
 
+  // The sheet is closed before the picker opens, so what follows the pick must
+  // use the screen's context: the sheet's is no longer mounted.
   void _showImagePickerDialog(BuildContext context) {
     showKSheet<void>(
       context: context,
-      builder: (BuildContext context) => PhotoSourceSheet(
-        title: tr(context, AppStrings.chooseBeforeWashPicture),
+      builder: (BuildContext sheetContext) => PhotoSourceSheet(
+        title: tr(sheetContext, AppStrings.chooseBeforeWashPicture),
         onGallery: () async {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           final XFile? image = await ImagePicker().pickImage(
             source: ImageSource.gallery,
             maxHeight: 800,
@@ -73,7 +75,7 @@ class EventsStepper extends StatelessWidget {
           }
         },
         onCamera: () async {
-          Navigator.of(context).pop();
+          Navigator.of(sheetContext).pop();
           final XFile? image = await ImagePicker().pickImage(
             source: ImageSource.camera,
             maxHeight: 800,
