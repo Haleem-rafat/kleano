@@ -70,7 +70,7 @@ class _CardServicesState extends State<CardServices> {
                         const SizedBox(width: KSpace.s),
                         Flexible(
                           child: Text(
-                            "${widget.service.duration!} ${translate(AppStrings.service)}",
+                            "${widget.service.duration!} ${translate(AppStrings.min)}",
                             style: info,
                           ),
                         ),

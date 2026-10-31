@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_translate/flutter_translate.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:thewasher/core/design/components/k_stage_bar.dart';
+import 'package:thewasher/modules/tracking_order/screens/widgets/functions/check_step_data.dart';
 import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:thewasher/core/design/components/k_chip_button.dart';
 import 'package:thewasher/core/design/components/k_list_row.dart';
@@ -132,6 +134,15 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
   }
 }
 
+/// The statuses that sit on the wash's stage bar.
+const Set<String> _liveStatuses = <String>{
+  AppConstants.acceptedByBiker,
+  AppConstants.bikerOnTheWay,
+  AppConstants.bikerArrived,
+  AppConstants.onWashing,
+  AppConstants.completed,
+};
+
 class _OrderHeader extends StatelessWidget {
   const _OrderHeader({required this.order, required this.onCancelled});
 
@@ -198,6 +209,18 @@ class _OrderHeader extends StatelessWidget {
                 ),
             ],
           ),
+          if (_liveStatuses.contains(order.status)) ...<Widget>[
+            const SizedBox(height: KSpace.l),
+            KStageBar(
+              step: getStepData(order.status!).step,
+              stages: <String>[
+                translate(AppStrings.onTheWay),
+                translate(AppStrings.arrived),
+                translate(AppStrings.washing),
+                translate(AppStrings.completed),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -380,7 +403,7 @@ class _DatesCard extends StatelessWidget {
               subtitle:
                   '${AppDateFormatter.allDate(washingDate)} ${AppDateFormatter.dateToStringHHMMA(washingDate.toLocal())}',
             ),
-          if (order.ratingOfBiker != null)
+          if ((order.ratingOfBiker ?? 0) > 0)
             KListRow(
               leading: icon(Icons.star, c.warning),
               title: translate(AppStrings.yourRating),
