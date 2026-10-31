@@ -43,7 +43,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
     if (permission == LocationPermission.deniedForever) {}
     Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        timeLimit: Duration(seconds: 15),
+      ),
     );
     currentPosition = LatLng(position.latitude, position.longitude);
     List<Placemark> placeMarks = await placemarkFromCoordinates(
@@ -238,7 +241,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           String? response;
           try {
             response = await ApiService.refreshToken().timeout(
-              const Duration(seconds: 45),
+              const Duration(seconds: 8),
             );
           } catch (e) {
             debugPrint("Token refresh unavailable: $e");
