@@ -89,7 +89,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             bloc: sl<NotificationBloc>(),
             builder: (BuildContext context, NotificationState state) {
               if (state is BikerNotificationLoading) {
-                return const KLoadingState();
+                return const KSkeleton.list();
               } else if (state is BikerNotificationEmpty) {
                 return Center(
                   child: EmptyScreen(

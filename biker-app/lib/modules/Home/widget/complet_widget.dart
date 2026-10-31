@@ -64,7 +64,7 @@ class _CompleteWidgetState extends State<CompleteWidget> {
         final List<OrderModel> orders = sl<HomeBloc>().completeList;
         if (orders.isEmpty) {
           if (state is BikerGetOrdersCompleteLoading) {
-            return const SliverToBoxAdapter(child: KLoadingState());
+            return const SliverToBoxAdapter(child: KSkeleton.list());
           }
           if (state is BikerGetOrdersCompleteFailed) {
             return SliverToBoxAdapter(

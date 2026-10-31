@@ -132,7 +132,7 @@ class _BikerScheduleState extends State<BikerSchedule> {
               );
             }
             if (state is! BikerGetScheduleSuccess) {
-              return const KLoadingState();
+              return const KSkeleton.list();
             }
             final BikerScheduleModel schedule = state.schedule;
             if (schedule.shifts.isEmpty) {

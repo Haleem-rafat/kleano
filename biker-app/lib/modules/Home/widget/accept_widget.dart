@@ -121,7 +121,7 @@ class _AcceptWidgetState extends State<AcceptWidget> {
         final List<OrderModel> orders = sl<HomeBloc>().activeList;
         if (orders.isEmpty) {
           if (state is BikerGetOrdersAcceptLoading) {
-            return const SliverToBoxAdapter(child: KLoadingState());
+            return const SliverToBoxAdapter(child: KSkeleton.list());
           }
           if (state is BikerGetOrdersAcceptFailed) {
             return SliverToBoxAdapter(

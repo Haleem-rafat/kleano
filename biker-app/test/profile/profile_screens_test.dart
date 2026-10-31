@@ -101,7 +101,7 @@ void main() {
         await t.pumpWidget(app(const BikerSchedule()));
         await settle(t);
         expect(profile.sent.single, isA<BikerGetSchedule>());
-        expect(find.byType(KLoadingState), findsOneWidget);
+        expect(find.byType(KSkeleton), findsOneWidget);
 
         profile.push(BikerGetScheduleFailed(error: 'No schedule data'));
         await settle(t);

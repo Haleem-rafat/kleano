@@ -306,7 +306,7 @@ void main() {
 
       home.push(BikerGetOrdersAcceptLoading());
       await settle(t);
-      expect(find.byType(KLoadingState), findsOneWidget);
+      expect(find.byType(KSkeleton), findsOneWidget);
 
       home.push(BikerGetOrdersAcceptFailed(error: 'No connection'));
       await settle(t);
@@ -327,7 +327,7 @@ void main() {
 
       home.push(BikerGetOrdersAcceptLoading());
       await settle(t);
-      expect(find.byType(KLoadingState), findsNothing);
+      expect(find.byType(KSkeleton), findsNothing);
       expect(find.byType(AcceptContainer), findsOneWidget);
     });
 
@@ -393,10 +393,7 @@ void main() {
       profile.push(BikerGetTotalWashesLoading());
       await settle(t);
       expect(
-        find.descendant(
-          of: find.byType(KCard),
-          matching: find.byType(KLoadingState),
-        ),
+        find.byType(KSkeleton),
         findsOneWidget,
       );
 
@@ -423,7 +420,7 @@ void main() {
 
         profile.push(BikerProfileSuccess(profile: profile.profile));
         await settle(t);
-        expect(find.byType(KLoadingState), findsNothing);
+        expect(find.byType(KSkeleton), findsNothing);
         expect(find.text('Total Washes'), findsOneWidget);
         expect(find.text('0'), findsOneWidget);
       },
