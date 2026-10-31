@@ -170,7 +170,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
     final double screenHeight = MediaQuery.sizeOf(context).height;
     // Tall enough closed that the swipe for the next step is always on screen.
     final double minPanelHeight = math.min(
-      KSwipeAction.height * 5 + MediaQuery.paddingOf(context).bottom,
+      KSwipeAction.height * 6 + MediaQuery.paddingOf(context).bottom,
       screenHeight * .75,
     );
     return Scaffold(
