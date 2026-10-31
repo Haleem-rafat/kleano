@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:thewasher/core/design/kleano_theme.dart';
 import 'package:thewasher/modules/my_booking/widgets/wash_photos.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    await LocalizationDelegate.create(
+      fallbackLocale: 'en',
+      supportedLocales: <String>['en', 'ar'],
+    );
+  });
+
   Future<void> pump(WidgetTester t, {String? before, String? after}) =>
       t.pumpWidget(
         MaterialApp(
