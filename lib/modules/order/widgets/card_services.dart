@@ -26,7 +26,7 @@ class _CardServicesState extends State<CardServices> {
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
     final String language = Localizations.localeOf(context).languageCode;
-    final String? icon = widget.service.iconWashingServices!.iconLink;
+    final String? icon = widget.service.iconWashingServices?.iconLink;
     final int cacheSize = (_iconSize * MediaQuery.devicePixelRatioOf(context))
         .round();
     return KCard(

@@ -68,12 +68,13 @@ class OrderModel {
         addOns!.add(AddOns.fromJson(v));
       });
     }
-    vehicle =
-        json['vehicle'] != null ? Vehicle.fromJson(json['vehicle']) : null;
+    vehicle = json['vehicle'] != null
+        ? Vehicle.fromJson(json['vehicle'])
+        : null;
     location = json['location'] != null
         ? OrderLocation.fromJson(json['location'])
         : null;
-    startTime = DateTime.parse(json['startTime']).toLocal();
+    startTime = DateTime.tryParse(json['startTime'] ?? '')?.toLocal();
     totalDuration = json['totalDuration'];
     status = json['status'];
     description = json['description'];
@@ -91,7 +92,7 @@ class OrderModel {
     afterWashImage = json['carAfterWashLink'];
     beforeWashImage = json['carBeforeWashLink'];
     isCarFreshened = json['isCarFreshened'];
-    bookingDate = DateTime.parse(json['bookingDate']).toLocal();
+    bookingDate = DateTime.tryParse(json['bookingDate'] ?? '')?.toLocal();
   }
 }
 
@@ -130,8 +131,8 @@ class WashingServices {
     this.price,
     this.pointsToPay,
     this.iconWashingServices,
-  })  : _name = nameMultilingual ?? name,
-        _description = descriptionMultilingual ?? description;
+  }) : _name = nameMultilingual ?? name,
+       _description = descriptionMultilingual ?? description;
 
   String? get name {
     if (_name is String) {
@@ -170,8 +171,8 @@ class WashingServices {
 
   MultilingualDescription? get descriptionMultilingual =>
       _description is MultilingualDescription
-          ? _description as MultilingualDescription
-          : null;
+      ? _description as MultilingualDescription
+      : null;
 
   List<String>? getLocalizedDescription(String languageCode) {
     if (_description is List<String>) {
@@ -199,7 +200,8 @@ class WashingServices {
     // - "en: English text Arabic text" (no ar: prefix)
 
     final arabicCharPattern = RegExp(
-        r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]');
+      r'[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]',
+    );
     final hasArabic = arabicCharPattern.hasMatch(text);
 
     if (languageCode == 'ar') {
@@ -228,8 +230,10 @@ class WashingServices {
     } else {
       // Extract English part
       // Try pattern "en: ..."
-      final enPattern =
-          RegExp(r'en:\s*(.+?)(?:\s*,\s*ar:|\s*ar:|$)', dotAll: true);
+      final enPattern = RegExp(
+        r'en:\s*(.+?)(?:\s*,\s*ar:|\s*ar:|$)',
+        dotAll: true,
+      );
       final enMatch = enPattern.firstMatch(text);
       if (enMatch != null && enMatch.group(1) != null) {
         String englishText = enMatch.group(1)!.trim();
@@ -237,8 +241,9 @@ class WashingServices {
         if (hasArabic) {
           final arabicStartMatch = arabicCharPattern.firstMatch(englishText);
           if (arabicStartMatch != null) {
-            englishText =
-                englishText.substring(0, arabicStartMatch.start).trim();
+            englishText = englishText
+                .substring(0, arabicStartMatch.start)
+                .trim();
           }
         }
         return englishText;
@@ -277,14 +282,16 @@ class WashingServices {
             .cast<String>();
       } else if (json['description'] is Map<String, dynamic>) {
         _description = MultilingualDescription.fromJson(
-            json['description'] as Map<String, dynamic>);
+          json['description'] as Map<String, dynamic>,
+        );
       }
     }
     duration = json['duration'];
     price = json['price'];
     pointsToPay = json['pointsToPay'];
-    iconWashingServices =
-        json['icon'] != null ? IconOrder.fromJson(json['icon']) : null;
+    iconWashingServices = json['icon'] != null
+        ? IconOrder.fromJson(json['icon'])
+        : null;
   }
 }
 
@@ -315,12 +322,16 @@ class MultilingualDescription {
 
   MultilingualDescription.fromJson(Map<String, dynamic> json) {
     if (json['en'] != null) {
-      en =
-          (json['en'] as List).map((e) => e.toString()).toList().cast<String>();
+      en = (json['en'] as List)
+          .map((e) => e.toString())
+          .toList()
+          .cast<String>();
     }
     if (json['ar'] != null) {
-      ar =
-          (json['ar'] as List).map((e) => e.toString()).toList().cast<String>();
+      ar = (json['ar'] as List)
+          .map((e) => e.toString())
+          .toList()
+          .cast<String>();
     }
   }
 
@@ -337,11 +348,7 @@ class IconOrder {
   String? iconPath;
   String? iconLink;
 
-  IconOrder({
-    this.sId,
-    this.iconPath,
-    this.iconLink,
-  });
+  IconOrder({this.sId, this.iconPath, this.iconLink});
 
   IconOrder.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];

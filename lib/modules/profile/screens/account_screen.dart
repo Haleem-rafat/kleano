@@ -24,6 +24,7 @@ class AccountScreen extends StatelessWidget {
   /// `(+20) 1012345678`: country code, then the rest. Isolated left to right,
   /// so the digits and brackets stay in order in Arabic.
   String _formattedPhone(String phoneNumber) {
+    if (phoneNumber.length <= 3) return phoneNumber;
     final String countryCode = phoneNumber.substring(0, 3);
     final String restOfNumber = phoneNumber.substring(3);
     return '\u2066($countryCode) $restOfNumber\u2069';
@@ -95,10 +96,8 @@ class AccountScreen extends StatelessWidget {
                         title: tr(context, AppStrings.password),
                         subtitle: '********',
                         showChevron: true,
-                        onTap: () => pushPage(
-                          context,
-                          UpdatePassword(profile: true),
-                        ),
+                        onTap: () =>
+                            pushPage(context, UpdatePassword(profile: true)),
                       ),
                       Divider(height: 1, color: c.separator),
                       KListRow(

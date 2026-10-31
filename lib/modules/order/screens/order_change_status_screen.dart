@@ -33,13 +33,14 @@ class OrderChangeStatus extends StatefulWidget {
   final bool notification;
   final BitmapDescriptor? markerBikerLocation;
   final BitmapDescriptor? markerUserLocation;
-  const OrderChangeStatus(
-      {super.key,
-      required this.order,
-      this.index,
-      required this.notification,
-      this.markerBikerLocation,
-      this.markerUserLocation});
+  const OrderChangeStatus({
+    super.key,
+    required this.order,
+    this.index,
+    required this.notification,
+    this.markerBikerLocation,
+    this.markerUserLocation,
+  });
 
   @override
   State<OrderChangeStatus> createState() => _OrderChangeStatusState();
@@ -55,66 +56,77 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
   // GoogleMapPolyline googleMapPolyline =
   //     GoogleMapPolyline(apiKey: AppConfig.kApiKey);
   List<LatLng> routes = <LatLng>[];
-  late StreamSubscription<Position> positionStream;
+  StreamSubscription<Position>? positionStream;
 
-  void getCurrentLocation(BitmapDescriptor markerBikerLocation,
-      BitmapDescriptor markerUserLocation) async {
-    positionStream = Geolocator.getPositionStream(
-            locationSettings: LocationSettings(accuracy: LocationAccuracy.high))
-        .listen((Position position) async {
-      debugPrint("llll ${position.latitude} ${position.longitude}");
-      sl<AuthBloc>().currentPosition =
-          LatLng(position.latitude, position.longitude);
-      debugPrint(
-          "llll2 ${sl<AuthBloc>().currentPosition.latitude} ${sl<AuthBloc>().currentPosition.longitude}");
-      setState(() {
-        markers.clear();
-        polyline.clear();
-        markers.add(
-          Marker(
-            markerId: const MarkerId("biker"),
-            position: LatLng(sl<AuthBloc>().currentPosition.latitude,
-                sl<AuthBloc>().currentPosition.longitude),
-            icon: markerBikerLocation,
-            flat: true,
-          ),
-        );
-        markers.add(
-          Marker(
-            markerId: const MarkerId("user"),
-            position: LatLng(sl<HomeBloc>().orderDetails.location!.latitude!,
-                sl<HomeBloc>().orderDetails.location!.longitude!),
-            icon: markerUserLocation,
-            flat: true,
-          ),
-        );
+  void getCurrentLocation(
+    BitmapDescriptor markerBikerLocation,
+    BitmapDescriptor markerUserLocation,
+  ) async {
+    positionStream =
+        Geolocator.getPositionStream(
+          locationSettings: LocationSettings(accuracy: LocationAccuracy.high),
+        ).listen((Position position) async {
+          debugPrint("llll ${position.latitude} ${position.longitude}");
+          sl<AuthBloc>().currentPosition = LatLng(
+            position.latitude,
+            position.longitude,
+          );
+          debugPrint(
+            "llll2 ${sl<AuthBloc>().currentPosition.latitude} ${sl<AuthBloc>().currentPosition.longitude}",
+          );
+          setState(() {
+            markers.clear();
+            polyline.clear();
+            markers.add(
+              Marker(
+                markerId: const MarkerId("biker"),
+                position: LatLng(
+                  sl<AuthBloc>().currentPosition.latitude,
+                  sl<AuthBloc>().currentPosition.longitude,
+                ),
+                icon: markerBikerLocation,
+                flat: true,
+              ),
+            );
+            markers.add(
+              Marker(
+                markerId: const MarkerId("user"),
+                position: LatLng(
+                  sl<HomeBloc>().orderDetails.location!.latitude!,
+                  sl<HomeBloc>().orderDetails.location!.longitude!,
+                ),
+                icon: markerUserLocation,
+                flat: true,
+              ),
+            );
 
-        polyline.add(Polyline(
-          polylineId: PolylineId('route'),
-          points: routes,
-          patterns: <PatternItem>[PatternItem.dot],
-          width: 4,
-          color: KColors.of(context).textSecondary,
-          startCap: Cap.roundCap,
-        ));
-      });
+            polyline.add(
+              Polyline(
+                polylineId: PolylineId('route'),
+                points: routes,
+                patterns: <PatternItem>[PatternItem.dot],
+                width: 4,
+                color: KColors.of(context).textSecondary,
+                startCap: Cap.roundCap,
+              ),
+            );
+          });
 
-      if (sl<HomeBloc>().orderStep == 0) {
-        debugPrint("on the way");
-        sl<HomeBloc>()
-            .socketService
-            .emit("biker:location-changes", <String, Object?>{
-          "order": sl<HomeBloc>().orderDetails.sId,
-          "latitude": sl<AuthBloc>().currentPosition.latitude,
-          "longitude": sl<AuthBloc>().currentPosition.longitude,
-          "streetName": "dataValue",
-          "subAdministrativeArea": "dataValue",
+          if (sl<HomeBloc>().orderStep == 0) {
+            debugPrint("on the way");
+            sl<HomeBloc>().socketService
+                .emit("biker:location-changes", <String, Object?>{
+                  "order": sl<HomeBloc>().orderDetails.sId,
+                  "latitude": sl<AuthBloc>().currentPosition.latitude,
+                  "longitude": sl<AuthBloc>().currentPosition.longitude,
+                  "streetName": "dataValue",
+                  "subAdministrativeArea": "dataValue",
+                });
+          } else if (sl<HomeBloc>().orderStep == 1) {
+            debugPrint("Arrived");
+            positionStream?.cancel();
+          }
         });
-      } else if (sl<HomeBloc>().orderStep == 1) {
-        debugPrint("Arrived");
-        positionStream.cancel();
-      }
-    });
   }
 
   @override
@@ -144,12 +156,11 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
     }
   }
 
-  Future<dynamic> onMapCreated(GoogleMapController mapController) async {
-  }
+  Future<dynamic> onMapCreated(GoogleMapController mapController) async {}
 
   @override
   void dispose() {
-    positionStream.cancel();
+    positionStream?.cancel();
     super.dispose();
   }
 
@@ -174,7 +185,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
           } else if (state is BikerCompleteOrderSuccess) {
             AlertHelper.ratingDialog(context, state.orderId);
           } else if (state is BikerCancelOrderSuccess) {
-            positionStream.cancel();
+            positionStream?.cancel();
             showSnackBar(
               buildContext: context,
               message: translate(AppStrings.cancelOrderSuccess),
@@ -275,7 +286,7 @@ class _OrderChangeStatusState extends State<OrderChangeStatus> {
           color: KColors.of(context).brand,
           tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
           onPressed: () {
-            positionStream.cancel();
+            positionStream?.cancel();
             pop(context);
           },
         ),

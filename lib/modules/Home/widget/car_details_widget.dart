@@ -95,7 +95,9 @@ class CarDetailsWidget extends StatelessWidget {
               const SizedBox(width: KSpace.xs),
               DecoratedBox(
                 decoration: ShapeDecoration(
-                  color: colorList[selectedColor].color,
+                  color: selectedColor < 0
+                      ? c.fill
+                      : colorList[selectedColor].color,
                   shape: CircleBorder(side: BorderSide(color: c.separator)),
                 ),
                 child: const SizedBox.square(dimension: KSpace.m),

@@ -29,7 +29,7 @@ class AddOnsWidget extends StatelessWidget {
                 leading: SizedBox.square(
                   dimension: _iconSize,
                   child: CachedNetworkImage(
-                    imageUrl: addOn.iconAddons!.iconLink!,
+                    imageUrl: addOn.iconAddons?.iconLink ?? '',
                     memCacheWidth: cacheSize,
                     errorWidget: (BuildContext context, String url, Object e) =>
                         const SizedBox.shrink(),

@@ -166,9 +166,11 @@ class _NotificationRow extends StatelessWidget {
         sl<NotificationBloc>().notificationList[index];
     final bool english = Localizations.localeOf(context).languageCode == 'en';
     final String title = english
-        ? item.message!.enTitle!
-        : item.message!.arTitle!;
-    final String body = english ? item.message!.enBody! : item.message!.arBody!;
+        ? item.message?.enTitle ?? ''
+        : item.message?.arTitle ?? '';
+    final String body = english
+        ? item.message?.enBody ?? ''
+        : item.message?.arBody ?? '';
     return KCard(
       onTap: () => _onTap(context, item),
       child: Row(
