@@ -7,6 +7,7 @@ import 'package:thewasher/core/design/components/k_card.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:thewasher/core/design/tokens.dart';
+import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/data/models/profile_user.dart';
@@ -52,11 +53,19 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
           if (state is GetUserProfileSuccess) {
             user = state.userProfile.data!;
             if ((user.phone ?? '').isNotEmpty) {
-              final PhoneNumber phoneNumber = PhoneNumber.parse(user.phone!);
-              setState(() {
-                countryCode = '+${phoneNumber.countryCode}';
-                phoneNumberText = phoneNumber.international;
-              });
+              // A number saved without a dial code cannot be parsed.
+              try {
+                final PhoneNumber phoneNumber = PhoneNumber.parse(user.phone!);
+                setState(() {
+                  countryCode = '+${phoneNumber.countryCode}';
+                  phoneNumberText = phoneNumber.international;
+                });
+              } on Exception catch (_) {
+                setState(() {
+                  countryCode = AppConstants.defaultDialCode;
+                  phoneNumberText = user.phone!;
+                });
+              }
             } else {
               setState(() {
                 countryCode = '+20';

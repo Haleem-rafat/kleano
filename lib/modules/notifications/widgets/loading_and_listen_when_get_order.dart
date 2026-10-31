@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:thewasher/modules/booking/bolcs/booking_order/booking_order_bloc.dart';
+import 'package:thewasher/modules/my_booking/screens/wash_details.dart';
 import 'package:thewasher/modules/tracking_order/blocs/socket_bloc.dart';
 import 'package:thewasher/modules/tracking_order/screens/tracking_order_main_screen.dart';
 import 'package:thewasher/core/design/components/k_states.dart';
@@ -26,6 +27,14 @@ class LoadingAndListenWhenGetOrder extends StatelessWidget {
           generalSingleton.timeArrived = '';
           generalSingleton.timeWashing = '';
           generalSingleton.timeComplete = '';
+          // Nothing to track until a biker has taken the order.
+          if (state.orderModel.biker == null) {
+            pushPage(
+              context,
+              WashDetailsScreen(orderId: state.orderModel.sId!),
+            );
+            return;
+          }
           BlocProvider.of<SocketBloc>(context).add(OpenSocketIo());
           pushPage(
             context,

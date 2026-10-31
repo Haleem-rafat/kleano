@@ -138,7 +138,7 @@ class ExploreScreen extends StatelessWidget {
                           child: Column(
                             children: <Widget>[
                               ImageShared(
-                                image: addOn.icon!.iconLink!,
+                                image: addOn.icon?.iconLink ?? '',
                                 height: 50,
                                 width: 50,
                               ),

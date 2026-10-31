@@ -112,7 +112,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
             before: order.beforeWashImage,
             after: order.afterWashImage,
           ),
-          if (order.biker != null)
+          if (order.biker != null && order.location != null)
             BikerDetails(biker: order.biker!, location: order.location!),
           if (order.location != null) _ServiceLocationCard(order: order),
           if (order.status == AppConstants.completed)
@@ -130,8 +130,8 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
           _DatesCard(order: order),
           _PaymentSummary(order: order),
           TabsServicesAndAddOns(
-            addOnsModel: order.addOns!,
-            services: order.washingServices!,
+            addOnsModel: order.addOns ?? [],
+            services: order.washingServices ?? [],
           ),
         ],
       ),

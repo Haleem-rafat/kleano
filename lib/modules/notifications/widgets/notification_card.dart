@@ -71,8 +71,8 @@ class _NotificationCardState extends State<NotificationCard> {
     final isPromoCode = widget.notification.type == AppConstants.promoCodeBased;
 
     String bodyText = languageCode == 'en'
-        ? widget.notification.message!.enBody!
-        : widget.notification.message!.arBody!;
+        ? widget.notification.message?.enBody ?? ''
+        : widget.notification.message?.arBody ?? '';
 
     String promoCode = '';
     if (isPromoCode) {
@@ -99,8 +99,8 @@ class _NotificationCardState extends State<NotificationCard> {
                   children: <Widget>[
                     Text(
                       languageCode == 'en'
-                          ? widget.notification.message!.enTitle!
-                          : widget.notification.message!.arTitle!,
+                          ? widget.notification.message?.enTitle ?? ''
+                          : widget.notification.message?.arTitle ?? '',
                       style: KType.headline.copyWith(color: c.text),
                     ),
                     const SizedBox(height: KSpace.xs),

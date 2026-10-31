@@ -54,8 +54,7 @@ class _MyVehiclesState extends State<MyVehicles> {
         }
         selectedColor = colorList.indexWhere(
           (element) =>
-              element.colorName ==
-              sl<VehiclesBloc>().vehiclesList[index].color!,
+              element.colorName == sl<VehiclesBloc>().vehiclesList[index].color,
         );
         return InkWell(
           borderRadius: radius,

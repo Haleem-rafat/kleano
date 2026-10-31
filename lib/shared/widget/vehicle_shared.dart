@@ -113,7 +113,9 @@ class VehiclesCard extends StatelessWidget {
                             const SizedBox(width: KSpace.xs),
                             DecoratedBox(
                               decoration: ShapeDecoration(
-                                color: colorList[selectedColor].color,
+                                color: selectedColor < 0
+                                    ? c.fill
+                                    : colorList[selectedColor].color,
                                 shape: CircleBorder(
                                   side: selectedColor == 0
                                       ? BorderSide(color: c.separator)

@@ -48,7 +48,10 @@ class _CardOfPlanState extends State<CardOfPlan> {
 
   void _toggleExpansion() => setState(() => _isExpanded = !_isExpanded);
 
-  Color get _planColor => Color(int.parse("0xFF${widget.plan.color!}"));
+  Color get _planColor {
+    final int? value = int.tryParse("0xFF${widget.plan.color}");
+    return value == null ? KColors.light.brand : Color(value);
+  }
 
   bool get _isSubscribed =>
       AppShared.token.isNotEmpty &&

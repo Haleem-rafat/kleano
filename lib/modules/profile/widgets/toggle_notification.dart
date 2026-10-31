@@ -18,7 +18,7 @@ class _ToggleNotificationState extends State<ToggleNotification> {
   @override
   void initState() {
     super.initState();
-    toggleSelected = isAllowedNotifications!;
+    toggleSelected = isAllowedNotifications ?? false;
   }
 
   @override

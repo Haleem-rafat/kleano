@@ -13,11 +13,11 @@ class InformationSubscription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final KColors c = KColors.of(context);
-    final Color planColor = Color(
-      int.parse("0xFF${subscription.plan!.color!}"),
-    );
-    final double washesPercentage =
-        subscription.remainingWashes! / subscription.washesCount!;
+    final int? colorValue = int.tryParse("0xFF${subscription.plan?.color}");
+    final Color planColor = colorValue == null ? c.brand : Color(colorValue);
+    final double washesPercentage = (subscription.washesCount ?? 0) == 0
+        ? 0
+        : (subscription.remainingWashes ?? 0) / subscription.washesCount!;
     final TextStyle label = KType.footnote.copyWith(color: c.textSecondary);
 
     return Column(
@@ -69,10 +69,12 @@ class InformationSubscription extends StatelessWidget {
         Text(translate(AppStrings.expiryDate), style: label),
         const SizedBox(height: KSpace.xs),
         Text(
-          AppDateFormatter.allDate(
-            DateTime.parse(subscription.expiryDate!),
-            'en_us',
-          ),
+          subscription.expiryDate == null
+              ? ''
+              : AppDateFormatter.allDate(
+                  DateTime.parse(subscription.expiryDate!),
+                  'en_us',
+                ),
           style: KType.subhead.copyWith(
             color: c.text,
             fontWeight: FontWeight.w600,

@@ -16,7 +16,7 @@ class CardAddOns extends StatelessWidget {
     final KColors c = KColors.of(context);
     return KListRow(
       leading: ImageShared(
-        image: addOns.icon!.iconLink!,
+        image: addOns.icon?.iconLink ?? '',
         height: KSpace.xxl,
         width: KSpace.xxl,
       ),

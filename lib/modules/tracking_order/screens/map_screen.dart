@@ -28,7 +28,7 @@ class _MapScreenState extends State<MapScreen> {
   final Set<Polyline> _polylines = <Polyline>{};
   final Set<Marker> _markers = <Marker>{};
   late SocketBloc socketBloc;
-  late GoogleMapController _mapController;
+  GoogleMapController? _mapController;
   BitmapDescriptor? markerDestinationLocation, markerCurrentLocation;
   // GoogleMapPolyline googleMapPolyline =
   //     GoogleMapPolyline(apiKey: AppConfig.kApiKey);
@@ -161,7 +161,7 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void dispose() {
     super.dispose();
-    _mapController.dispose();
+    _mapController?.dispose();
   }
 
   @override
