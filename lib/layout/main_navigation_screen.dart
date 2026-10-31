@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +11,6 @@ import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:animations/animations.dart';
 import 'package:thewasher/layout/assets_nav_bar.dart';
-import 'package:thewasher/modules/Home/bloc/location/location_bloc.dart';
 import 'package:thewasher/modules/Home/bloc/offers/offers_bloc.dart';
 import 'package:thewasher/modules/about_us/bloc/about_us_bloc.dart';
 import 'package:thewasher/modules/booking/screens/booking_main_screen.dart';
@@ -17,7 +18,6 @@ import 'package:thewasher/modules/my_booking/screens/my_booking_tabs.dart';
 import 'package:thewasher/modules/notifications/blocs/notifications/notifications_bloc.dart';
 import 'package:thewasher/modules/notifications/data/models/notifaction_model.dart';
 import 'package:thewasher/modules/plans_and_subscription/screens/plans_subscription_screen.dart';
-import 'package:thewasher/modules/profile/blocs/get_user_profile/get_user_profile_bloc.dart';
 import 'package:thewasher/modules/profile/screens/user_profile_screen.dart';
 import 'package:thewasher/layout/guest_flow.dart';
 import 'package:thewasher/modules/my_vehicles/screens/my_vehicles_screen.dart';
@@ -49,6 +49,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   LocationMap locationMap = LocationMap();
 
   GeneralSingleton generalSingleton = GeneralSingleton();
+  StreamSubscription<NotificationsState>? _notificationsSub;
+
+  @override
+  void dispose() {
+    _notificationsSub?.cancel();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -66,7 +73,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     // Listen to notifications bloc state changes only
     // FCM listeners are already set up in NotificationManagerService
-    sl<NotificationsBloc>().stream.listen((
+    _notificationsSub = sl<NotificationsBloc>().stream.listen((
       NotificationsState notificationsState,
     ) {
       if (notificationsState is PushNotificationsSuccess) {
@@ -123,10 +130,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   void _onTabSelected(int index) {
     HapticFeedback.selectionClick();
     setState(() {
-      if (screenIndex == 0) {
-        sl<LocationBloc>().add(GetSavedLocation());
-        sl<GetUserProfileBloc>().add(GetUserProfileEvent());
-      }
       // Clear selected services when navigating away from booking screen
       if (screenIndex == 0 && index != 0) {
         sl<OffersBloc>().add(ClearAllSelectedServices());

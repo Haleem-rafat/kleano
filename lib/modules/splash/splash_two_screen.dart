@@ -32,7 +32,7 @@ class _SplashTwoScreenState extends State<SplashTwoScreen>
     AppsFlyerService.logEvent("af_app_opened");
 
     _controllerA = AnimationController(
-      duration: const Duration(milliseconds: 1000),
+      duration: const Duration(milliseconds: 900),
       vsync: this,
     );
 
@@ -41,15 +41,8 @@ class _SplashTwoScreenState extends State<SplashTwoScreen>
       curve: Curves.bounceOut,
     );
 
-    // Start animation
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if (mounted) _controllerA.forward();
-    });
-
-    // Navigate after animation
-    Future.delayed(const Duration(milliseconds: 2500), () {
-      _navigateToNextScreen();
-    });
+    // Play once and go: the logo animation is the only wait.
+    _controllerA.forward().whenComplete(_navigateToNextScreen);
   }
 
   void _navigateToNextScreen() async {
