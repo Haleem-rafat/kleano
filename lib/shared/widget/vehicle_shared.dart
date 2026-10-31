@@ -85,40 +85,53 @@ class VehiclesCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: KSpace.xs),
-                    Row(
+                    // Plate and colour share a line when they fit; on a narrow
+                    // card they stack, so neither is cut off.
+                    Wrap(
+                      spacing: KSpace.m,
+                      runSpacing: KSpace.xs,
                       children: <Widget>[
-                        Text(translate(AppStrings.plateNo), style: label),
-                        const SizedBox(width: KSpace.xs),
-                        Flexible(
-                          child: Text(
-                            vehicle.plateNumber ?? '',
-                            style: value,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: KSpace.m),
-                        Text(translate(AppStrings.color), style: label),
-                        const SizedBox(width: KSpace.xs),
-                        DecoratedBox(
-                          decoration: ShapeDecoration(
-                            color: colorList[selectedColor].color,
-                            shape: CircleBorder(
-                              side: selectedColor == 0
-                                  ? BorderSide(color: c.separator)
-                                  : BorderSide.none,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(translate(AppStrings.plateNo), style: label),
+                            const SizedBox(width: KSpace.xs),
+                            Flexible(
+                              child: Text(
+                                vehicle.plateNumber ?? '',
+                                style: value,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
-                          ),
-                          child: const SizedBox.square(dimension: KSpace.m),
+                          ],
                         ),
-                        const SizedBox(width: KSpace.xs),
-                        Flexible(
-                          child: Text(
-                            vehicle.color ?? '',
-                            style: value,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(translate(AppStrings.color), style: label),
+                            const SizedBox(width: KSpace.xs),
+                            DecoratedBox(
+                              decoration: ShapeDecoration(
+                                color: colorList[selectedColor].color,
+                                shape: CircleBorder(
+                                  side: selectedColor == 0
+                                      ? BorderSide(color: c.separator)
+                                      : BorderSide.none,
+                                ),
+                              ),
+                              child: const SizedBox.square(dimension: KSpace.m),
+                            ),
+                            const SizedBox(width: KSpace.xs),
+                            Flexible(
+                              child: Text(
+                                vehicle.color ?? '',
+                                style: value,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),

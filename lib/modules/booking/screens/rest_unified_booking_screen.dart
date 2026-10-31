@@ -329,7 +329,7 @@ class _RestUnifiedBookingScreenState extends State<RestUnifiedBookingScreen> {
         ),
       ),
       title: addOn.name ?? '',
-      subtitle: '+ ${addOn.price ?? ''}',
+      subtitle: '+ ${addOn.price ?? ''} ${translate(AppStrings.sAR)}',
       trailing: Checkbox.adaptive(
         value: selected,
         activeColor: c.brand,

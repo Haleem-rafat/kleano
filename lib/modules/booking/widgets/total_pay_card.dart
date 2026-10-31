@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_translate/flutter_translate.dart';
+import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
 import 'package:thewasher/core/design/tokens.dart';
 
@@ -35,7 +37,9 @@ class TotalPayCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: KSpace.xl),
       child: KButton(
-        label: totalPrice > 0 ? '$text · ${_formatPrice(totalPrice)}' : text,
+        label: totalPrice > 0
+            ? '$text · ${_formatPrice(totalPrice)} ${translate(AppStrings.sAR)}'
+            : text,
         onPressed: onTap ?? () {},
       ),
     );

@@ -112,7 +112,7 @@ class _ServiceSheet extends StatelessWidget {
                           style: KType.body.copyWith(color: c.text),
                         ),
                         subtitle: Text(
-                          '${extra.duration ?? ''} ${translate(extra.durationUnit ?? '')} · ${extra.price ?? ''}',
+                          '${extra.duration ?? ''} ${translate(extra.durationUnit ?? '')} · ${extra.price ?? ''} ${translate(AppStrings.sAR)}',
                           style: KType.footnote.copyWith(
                             color: c.textSecondary,
                           ),
@@ -132,7 +132,8 @@ class _ServiceSheet extends StatelessWidget {
             ),
             const SizedBox(height: KSpace.m),
             KButton(
-              label: '${translate(AppStrings.nextButton)} · ${offers.total}',
+              label:
+                  '${translate(AppStrings.nextButton)} · ${offers.total} ${translate(AppStrings.sAR)}',
               onPressed: onContinue,
             ),
           ],
