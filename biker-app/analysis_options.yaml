@@ -1,0 +1,15 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - third_party/**
+    - build/**
+    - android/**
+    - ios/**
+  errors:
+    avoid_print: ignore
+
+linter:
+  rules:
+    - directives_ordering
+    - sort_child_properties_last

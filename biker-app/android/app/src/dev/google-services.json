@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "605756628913",
+    "project_id": "kleano-dev",
+    "storage_bucket": "kleano-dev.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605756628913:android:7b4529c10d31984374a790",
+        "android_client_info": {
+          "package_name": "co.KLeanoBiker.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxdvtGCbltguorT5gc64FU6dV1nDqSlPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:605756628913:android:cbc2a280b08903f674a790",
+        "android_client_info": {
+          "package_name": "co.Kleano.dev"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxdvtGCbltguorT5gc64FU6dV1nDqSlPY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
