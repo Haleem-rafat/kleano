@@ -18,6 +18,18 @@ ThemeData kleanoTheme({required Brightness brightness}) {
       ).copyWith(
         primary: c.brand,
         onPrimary: Colors.white,
+        // Fixed, so nothing picks up the pink tones fromSeed derives.
+        primaryContainer: c.brandTint,
+        onPrimaryContainer: c.onBrandTint,
+        secondary: c.brand,
+        onSecondary: Colors.white,
+        secondaryContainer: c.brandTint,
+        onSecondaryContainer: c.onBrandTint,
+        tertiary: c.brand,
+        onTertiary: Colors.white,
+        tertiaryContainer: c.brandTint,
+        onTertiaryContainer: c.onBrandTint,
+        surfaceTint: Colors.transparent,
         onSurface: c.text,
         onSurfaceVariant: c.textSecondary,
         error: c.error,
