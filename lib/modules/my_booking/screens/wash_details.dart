@@ -291,11 +291,16 @@ class _ServiceLocationCard extends StatelessWidget {
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onTap: openFullMap,
-                  child: Center(
-                    child: KChipButton(
-                      label: translate(AppStrings.tapToViewFullMap),
-                      leading: const Icon(Icons.fullscreen),
-                      onTap: openFullMap,
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.all(KSpace.m),
+                      child: KChipButton(
+                        label: translate(AppStrings.tapToViewFullMap),
+                        leading: const Icon(Icons.fullscreen),
+                        maxWidth: double.infinity,
+                        onTap: openFullMap,
+                      ),
                     ),
                   ),
                 ),

@@ -9,6 +9,7 @@ import '../tokens.dart';
 class KChipButton extends StatelessWidget {
   const KChipButton({
     super.key,
+    this.maxWidth = 200,
     required this.label,
     required this.onTap,
     this.leading,
@@ -17,6 +18,9 @@ class KChipButton extends StatelessWidget {
 
   final String label;
   final VoidCallback? onTap;
+
+  /// Longest the chip may grow before its label is cut.
+  final double maxWidth;
   final Widget? leading;
   final String? semanticLabel;
 
@@ -66,7 +70,7 @@ class KChipButton extends StatelessWidget {
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 200),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: SizedBox(height: height, child: chip),
         ),
       ),
