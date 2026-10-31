@@ -148,11 +148,11 @@ export default function BikersList() {
         <div className="px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                <IoPersonOutline className="h-6 w-6 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                <IoPersonOutline className="h-4 w-4 text-primary" />
               </div>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('bikers')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikers')}</h1>
                 <p className="mt-1 text-sm text-slate-500">Manage and view all bikers</p>
               </div>
             </div>
@@ -187,7 +187,7 @@ export default function BikersList() {
           </div>
 
           {/* Table Card */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
             {/* Table Content */}
             <div className="overflow-x-auto">
               <Table>

@@ -53,7 +53,7 @@ export function WeeklyRevenueChart() {
           <defs>
             <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#543063" />
-              <stop offset="100%" stopColor="#8D5BA5" />
+              <stop offset="100%" stopColor="#543063" />
             </linearGradient>
           </defs>
           <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-slate-200" />

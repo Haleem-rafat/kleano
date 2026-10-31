@@ -232,7 +232,7 @@ export default function UsersDetails() {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('userDetails')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('userDetails')}</h1>
                 <div className="mt-1 flex items-center space-x-2">
                   <span className="text-sm text-slate-500">{t('userId')}:</span>
                   <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
@@ -262,14 +262,14 @@ export default function UsersDetails() {
           <div className="mx-auto max-w-[95%]">
             <div className="mb-5 grid grid-cols-1 gap-6 xl:grid-cols-3">
               {/* User Profile Section */}
-              <div className="colspa overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="colspa overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoPersonOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoPersonOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('userInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('userInfo')}</h2>
                       <p className="text-sm text-slate-500">User profile information</p>
                     </div>
                   </div>
@@ -281,13 +281,13 @@ export default function UsersDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('name')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">{user.userName}</p>
+                        <p className="text-sm font-semibold text-slate-900">{user.userName}</p>
                       </div>
                       <div>
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('phone')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">{user.phone}</p>
+                        <p className="text-sm font-semibold text-slate-900">{user.phone}</p>
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -330,15 +330,15 @@ export default function UsersDetails() {
               </div>
 
               {/* Vehicles Section */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoCarOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoCarOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('vehicles')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('vehicles')}</h2>
                         <p className="text-sm text-slate-500">
                           {user.vehicles.length} vehicle(s) registered
                         </p>
@@ -410,14 +410,14 @@ export default function UsersDetails() {
               </div>
 
               {/* Order Statistics Section */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoStatsChartOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoStatsChartOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Order Statistics</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Order Statistics</h2>
                       <p className="text-sm text-slate-500">Overall order performance metrics</p>
                     </div>
                   </div>
@@ -426,8 +426,8 @@ export default function UsersDetails() {
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 ">
                     {/* Total Orders */}
                     <div className="text-center">
-                      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoReceiptOutline className="h-6 w-6 text-primary" />
+                      <div className="mx-auto mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoReceiptOutline className="h-4 w-4 text-primary" />
                       </div>
                       <p className="text-2xl font-bold text-slate-900">{user.ordersCount}</p>
                       <p className="text-sm text-slate-500">Total Orders</p>
@@ -542,15 +542,15 @@ export default function UsersDetails() {
 
             {/* Orders Section */}
             <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoReceiptOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoReceiptOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('orders')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('orders')}</h2>
                         <p className="text-sm text-slate-500">
                           {user.orders.length} order(s) placed
                         </p>

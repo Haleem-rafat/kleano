@@ -50,22 +50,22 @@ const DashboardCard = ({
         '200',
         '300'
       )}`}>
-      <CardContent className="p-6">
+      <CardContent className="p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h4 className={`mb-2 text-sm font-semibold ${colors.titleColor}`}>{title}</h4>
-            <p className={`text-2xl font-bold ${colors.valueColor}`}>{count || 0}</p>
+            <h4 className={`mb-1 text-xs font-medium capitalize ${colors.titleColor}`}>{title}</h4>
+            <p className={`text-2xl font-semibold tracking-tight ${colors.valueColor}`}>{count || 0}</p>
           </div>
           {isPromo ? (
             <div
               style={{ backgroundColor: `${color || '#533063'}20` }}
-              className="flex h-12 w-12 items-center justify-center rounded-full">
-              <HiCurrencyDollar style={{ color: color || '#533063' }} className="h-6 w-6" />
+              className="flex h-8 w-8 items-center justify-center rounded-lg">
+              <HiCurrencyDollar style={{ color: color || '#533063' }} className="h-4 w-4" />
             </div>
           ) : (
             <div
-              className={`flex h-12 w-12 items-center justify-center rounded-full ${colors.iconBg}`}>
-              <img src={icon} alt={`${title}`} className="h-6 w-6" />
+              className={`flex h-8 w-8 items-center justify-center rounded-lg ${colors.iconBg}`}>
+              <img src={icon} alt={`${title}`} className="h-4 w-4" />
             </div>
           )}
         </div>

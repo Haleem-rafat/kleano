@@ -60,7 +60,7 @@ export default function OrderDetails() {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('orderDetails')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('orderDetails')}</h1>
                 <div className="mt-1 flex items-center space-x-2">
                   <span className="text-sm text-slate-500">Order ID:</span>
                   <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
@@ -89,14 +89,14 @@ export default function OrderDetails() {
               {/* First Row: User Info, Biker Info, Vehicle Info */}
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                 {/* User Information Section */}
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                  <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="border-b border-slate-100 bg-white px-5 py-3">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoPersonOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoPersonOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('userInfo')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('userInfo')}</h2>
                         <p className="text-sm text-slate-500">Customer information</p>
                       </div>
                     </div>
@@ -110,7 +110,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('name')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.user?.userName}
                           </p>
                         </div>
@@ -118,7 +118,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('phone')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.user?.phone}
                           </p>
                         </div>
@@ -164,10 +164,10 @@ export default function OrderDetails() {
 
                 {/* Biker Information Section */}
                 {data?.biker && (
-                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <div className="border-b border-slate-200 bg-white px-6 py-4">
+                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-100 bg-white px-5 py-3">
                       <div className="flex items-center space-x-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                           <ImageModal
                             src={data?.biker?.imageLink}
                             alt="biker profile"
@@ -175,7 +175,7 @@ export default function OrderDetails() {
                           />
                         </div>
                         <div>
-                          <h2 className=" text-lg font-semibold text-slate-900">{t('bikerInfo')}</h2>
+                          <h2 className=" text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
                           <p className="text-sm text-slate-500">Assigned service provider</p>
                         </div>
                       </div>
@@ -186,7 +186,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block cursor-pointer text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('bikerName')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.biker?.userName}
                           </p>
                         </div>
@@ -194,7 +194,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('phone')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.biker?.phone}
                           </p>
                         </div>
@@ -202,7 +202,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('bikerCommission')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.bikerCommission || 'N/A'}
                           </p>
                         </div>
@@ -222,14 +222,14 @@ export default function OrderDetails() {
                 )}
 
                 {/* Vehicle Information Section */}
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                  <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="border-b border-slate-100 bg-white px-5 py-3">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoCarOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoCarOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('vehicleInfo')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('vehicleInfo')}</h2>
                         <p className="text-sm text-slate-500">Vehicle details</p>
                       </div>
                     </div>
@@ -240,7 +240,7 @@ export default function OrderDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('brand')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900">
                           {data?.vehicle?.brand}
                         </p>
                       </div>
@@ -248,7 +248,7 @@ export default function OrderDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('model')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900">
                           {data?.vehicle?.model}
                         </p>
                       </div>
@@ -256,7 +256,7 @@ export default function OrderDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('color')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900">
                           {data?.vehicle?.color}
                         </p>
                       </div>
@@ -264,7 +264,7 @@ export default function OrderDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('plateNumber')}
                         </label>
-                        <p className="font-mono text-lg font-semibold text-slate-900">
+                        <p className="font-mono text-sm font-semibold text-slate-900">
                           {data?.vehicle?.plateNumber}
                         </p>
                       </div>
@@ -291,14 +291,14 @@ export default function OrderDetails() {
               {/* Second Row: Location, Pricing, Car Picture */}
               <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
                 {/* Location Information Section */}
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                  <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="border-b border-slate-100 bg-white px-5 py-3">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoLocationOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoLocationOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('location')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('location')}</h2>
                         <p className="text-sm text-slate-500">Service location details</p>
                       </div>
                     </div>
@@ -310,7 +310,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('cityName')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.location?.city?.name[lang]}
                           </p>
                         </div>
@@ -318,7 +318,7 @@ export default function OrderDetails() {
                           <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                             {t('area')}
                           </label>
-                          <p className="text-lg font-semibold text-slate-900">
+                          <p className="text-sm font-semibold text-slate-900">
                             {data?.location?.subAdministrativeArea}
                           </p>
                         </div>
@@ -327,7 +327,7 @@ export default function OrderDetails() {
                         <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
                           {t('streetName')}
                         </label>
-                        <p className="text-lg font-semibold text-slate-900">
+                        <p className="text-sm font-semibold text-slate-900">
                           {data?.location?.streetName}
                         </p>
                       </div>
@@ -348,14 +348,14 @@ export default function OrderDetails() {
                 </div>
 
                 {/* Pricing Information Section */}
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                  <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div className="border-b border-slate-100 bg-white px-5 py-3">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoCashOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoCashOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('pricing')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('pricing')}</h2>
                         <p className="text-sm text-slate-500">Order pricing breakdown</p>
                       </div>
                     </div>
@@ -367,7 +367,7 @@ export default function OrderDetails() {
                           <span className="text-sm font-medium text-slate-600">
                             {t('total price')}
                           </span>
-                          <span className="text-lg font-semibold text-slate-900">
+                          <span className="text-sm font-semibold text-slate-900">
                             {data?.totalPrice}
                           </span>
                         </div>
@@ -416,7 +416,7 @@ export default function OrderDetails() {
 
                 {/* Subscription Information Section */}
                 {data?.paymentType === 'SUBSCRIBED' && data?.subscription && (
-                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                     <div
                       className="px-6 py-4"
                       style={{
@@ -441,7 +441,7 @@ export default function OrderDetails() {
                             <span className="text-sm font-medium text-slate-600">
                               {t('Plan Name')}
                             </span>
-                            <span className="text-lg font-semibold text-slate-900">
+                            <span className="text-sm font-semibold text-slate-900">
                               {data?.subscription?.plan?.type?.[lang] || 'N/A'}
                             </span>
                           </div>
@@ -449,7 +449,7 @@ export default function OrderDetails() {
                         <div className="rounded-lg bg-slate-50 p-4">
                           <div className="flex justify-between">
                             <span className="text-sm font-medium text-slate-600">{t('Price')}</span>
-                            <span className="text-lg font-semibold text-slate-900">
+                            <span className="text-sm font-semibold text-slate-900">
                               {data?.subscription?.plan?.price || 'N/A'}
                             </span>
                           </div>
@@ -459,7 +459,7 @@ export default function OrderDetails() {
                             <span className="text-sm font-medium text-slate-600">
                               {t('Total Washes')}
                             </span>
-                            <span className="text-lg font-semibold text-slate-900">
+                            <span className="text-sm font-semibold text-slate-900">
                               {data?.subscription?.washesCount || 'N/A'}
                             </span>
                           </div>
@@ -469,7 +469,7 @@ export default function OrderDetails() {
                             <span className="text-sm font-medium text-slate-600">
                               {t('Remaining Washes')}
                             </span>
-                            <span className="text-lg font-semibold text-slate-900">
+                            <span className="text-sm font-semibold text-slate-900">
                               {data?.subscription?.remainingWashes || 'N/A'}
                             </span>
                           </div>
@@ -496,14 +496,14 @@ export default function OrderDetails() {
 
                 {/* Car Pictures Section */}
                 {(data?.carBeforeWashLink || data?.carAfterWashLink) && (
-                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                    <div className="border-b border-slate-200 bg-white px-6 py-4">
+                  <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                    <div className="border-b border-slate-100 bg-white px-5 py-3">
                       <div className="flex items-center space-x-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                          <IoCarOutline className="h-6 w-6 text-primary" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                          <IoCarOutline className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <h2 className="text-lg font-semibold text-slate-900">{t('carPictures')}</h2>
+                          <h2 className="text-sm font-semibold text-slate-900">{t('carPictures')}</h2>
                           <p className="text-sm text-slate-500">Before and after wash photos</p>
                         </div>
                       </div>
@@ -550,14 +550,14 @@ export default function OrderDetails() {
               </div>
 
               {/* Third Row: Combined Services & Add-ons */}
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoCheckmarkCircleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoCheckmarkCircleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">
+                      <h2 className="text-sm font-semibold text-slate-900">
                         {t('washingServicesPlan')} & {t('addOns')}
                       </h2>
                       <p className="text-sm text-slate-500">
@@ -573,7 +573,7 @@ export default function OrderDetails() {
                     <div>
                       <div className="mb-4 flex items-center gap-2">
                         <IoCheckmarkCircleOutline className="h-5 w-5 text-primary" />
-                        <h3 className="text-lg font-semibold text-slate-900">
+                        <h3 className="text-sm font-semibold text-slate-900">
                           {t('washingServicesPlan')}
                         </h3>
                       </div>
@@ -590,7 +590,7 @@ export default function OrderDetails() {
                                 showExpandIcon={false}
                                 fallbackText="Service icon"
                               />
-                              <h4 className="text-lg font-semibold text-slate-900">
+                              <h4 className="text-sm font-semibold text-slate-900">
                                 {service?.name[lang]}
                               </h4>
                             </div>
@@ -637,7 +637,7 @@ export default function OrderDetails() {
                     <div>
                       <div className="mb-4 flex items-center gap-2">
                         <IoInformationCircleOutline className="h-5 w-5 text-purple-600" />
-                        <h3 className="text-lg font-semibold text-slate-900">{t('addOns')}</h3>
+                        <h3 className="text-sm font-semibold text-slate-900">{t('addOns')}</h3>
                       </div>
                       {data?.addOns && data.addOns.length > 0 ? (
                         <div className="space-y-3">

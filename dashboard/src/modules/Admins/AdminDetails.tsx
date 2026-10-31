@@ -153,7 +153,7 @@ export default function AdminDetails() {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('adminDetails')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('adminDetails')}</h1>
                 <p className="mt-1 text-sm text-slate-500">
                   {t('adminId')}: #{AdminDetails?._id?.slice(-4)}
                 </p>
@@ -172,15 +172,15 @@ export default function AdminDetails() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             {/* Admin Information Card */}
             <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoPersonCircleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('adminInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('adminInfo')}</h2>
                       <p className="text-sm text-slate-500">Personal and contact information</p>
                     </div>
                   </div>
@@ -216,15 +216,15 @@ export default function AdminDetails() {
               </div>
 
               {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoLocationOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoLocationOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('adminCities')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('adminCities')}</h2>
                       <p className="text-sm text-slate-500">Assigned cities and regions</p>
                     </div>
                   </div>
@@ -247,15 +247,15 @@ export default function AdminDetails() {
 
             {/* Actions Card */}
             <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoSettingsOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoSettingsOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('actions')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('actions')}</h2>
                       <p className="text-sm text-slate-500">Manage admin settings</p>
                     </div>
                   </div>

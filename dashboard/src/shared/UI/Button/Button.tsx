@@ -51,9 +51,9 @@ const buttonVariants = cva(
       },
       size: {
         xs: 'h-[1.9375rem] px-[0.625rem] py-[0.3125rem] text-sm font-medium',
-        sm: 'h-[2.375rem] px-[0.875rem] py-[0.375rem] text-sm font-medium',
-        md: 'h-[2.625rem] px-[1.25rem] py-[0.5rem] text-sm font-medium',
-        lg: 'h-[3rem] px-[1.5rem] py-[0.75rem] text-base font-medium ',
+        sm: 'h-8 px-3 text-[13px] font-medium',
+        md: 'h-9 px-4 text-[13px] font-medium',
+        lg: 'h-9 px-4 text-[13px] font-medium',
         super: 'h-[3.5rem] px-[1.5rem] py-[1rem] text-base font-bold',
         icon: '!h-8 w-8 rounded-super',
       },

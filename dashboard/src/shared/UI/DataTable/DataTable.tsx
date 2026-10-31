@@ -98,7 +98,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div
-      className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm ${className}`}>
+      className={`overflow-hidden bg-white ${className}`}>
       {isLoading && (
         <div className="flex items-center justify-center py-12">
           <ThreeDotsLoader />
@@ -109,7 +109,7 @@ export function DataTable<TData, TValue>({
         <>
           {/* Column Visibility Toggle */}
           {showColumnToggle && enableColumnVisibility && (
-            <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-6 py-3">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-white px-4 py-2">
               <span className="text-sm font-medium text-slate-700">Columns</span>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -142,12 +142,12 @@ export function DataTable<TData, TValue>({
             <Table className="w-full">
               <TableHeader>
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="border-b border-slate-200 bg-slate-50">
+                  <TableRow key={headerGroup.id} className="border-b border-slate-100 bg-white">
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id} className="whitespace-nowrap px-6 py-4 text-left">
+                      <TableHead key={header.id} className="whitespace-nowrap px-4 py-2 text-start">
                         {header.isPlaceholder ? null : (
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-semibold text-slate-700">
+                            <span className="text-xs font-medium text-slate-500">
                               {flexRender(header.column.columnDef.header, header.getContext())}
                             </span>
                             {header.column.getCanSort() && (
@@ -183,7 +183,7 @@ export function DataTable<TData, TValue>({
                       } ${index % 2 === 0 ? 'bg-white' : 'bg-slate-25'}`}
                       onClick={() => handleRowClick(row.original)}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap px-6 py-4">
+                        <TableCell key={cell.id} className="whitespace-nowrap px-4 py-2.5">
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}

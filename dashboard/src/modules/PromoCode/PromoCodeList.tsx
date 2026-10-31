@@ -144,7 +144,7 @@ const PromoCodeList = () => {
     <div className="relative flex h-full w-full flex-col gap-3">
       {isLoading && <ThreeDotsLoader />}
       <div className="flex items-center justify-between pb-6">
-        <p className="text-2xl font-semibold capitalize text-slate-900">{t('promoCode')}</p>
+        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('promoCode')}</p>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('addNewPromoCode')}</Button>
         </div>

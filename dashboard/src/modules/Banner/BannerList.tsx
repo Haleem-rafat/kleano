@@ -57,7 +57,7 @@ const BannerList = () => {
   return (
     <div className="relative">
       <div className="flex items-center justify-between pb-6">
-        <p className="text-2xl font-semibold capitalize text-slate-900">{t('banners')}</p>
+        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('banners')}</p>
 
         <Button onClick={() => setOpen(true)}>Add banner</Button>
       </div>

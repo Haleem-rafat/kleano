@@ -164,7 +164,7 @@ const ContactForm = () => {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">Contact Information</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">Contact Information</h1>
                 <p className="mt-1 text-sm text-slate-500">
                   Manage your contact details and social media links
                 </p>
@@ -193,13 +193,13 @@ const ContactForm = () => {
             <form onSubmit={contactForm.handleSubmit(onSubmit)}>
               <Card className="overflow-hidden">
                 {/* Basic Information Section */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoCall className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoCall className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Basic Information</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Basic Information</h2>
                       <p className="text-sm text-slate-500">Primary contact details and title</p>
                     </div>
                   </div>
@@ -247,13 +247,13 @@ const ContactForm = () => {
 
               {/* Email Addresses Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoMail className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoMail className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Email Addresses</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Email Addresses</h2>
                       <p className="text-sm text-slate-500">Manage multiple email addresses</p>
                     </div>
                   </div>
@@ -313,13 +313,13 @@ const ContactForm = () => {
 
               {/* Phone Numbers Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoCall className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoCall className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Phone Numbers</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Phone Numbers</h2>
                       <p className="text-sm text-slate-500">Manage multiple phone numbers</p>
                     </div>
                   </div>
@@ -379,13 +379,13 @@ const ContactForm = () => {
 
               {/* Social Media Links Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoLogoWhatsapp className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoLogoWhatsapp className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Social Media Links</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Social Media Links</h2>
                       <p className="text-sm text-slate-500">Connect your social media profiles</p>
                     </div>
                   </div>
@@ -394,7 +394,7 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="border-b border-slate-200 pb-4">
-                      <h3 className="text-lg font-semibold text-slate-900">Social Media Links</h3>
+                      <h3 className="text-sm font-semibold text-slate-900">Social Media Links</h3>
                       <p className="mt-1 text-sm text-slate-500">
                         Connect your social media profiles
                       </p>

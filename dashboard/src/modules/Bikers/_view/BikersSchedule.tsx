@@ -579,7 +579,7 @@ export default function BikersSchedule() {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('bikerSchedule')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikerSchedule')}</h1>
                 <p className="mt-1 text-sm text-slate-500">
                   {t('bikerId')}: #{bikerId?.slice(-4) || bikerData?._id?.slice(-4)}
                 </p>
@@ -611,14 +611,14 @@ export default function BikersSchedule() {
       <div className="p-6">
         <div className="mx-auto max-w-[95%]">
           {/* Weekend Selection Card */}
-          <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div className="border-b border-slate-200 bg-white px-6 py-4">
+          <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
+            <div className="border-b border-slate-100 bg-white px-5 py-3">
               <div className="flex items-center space-x-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                  <IoCalendarOutline className="h-6 w-6 text-primary" />
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                  <IoCalendarOutline className="h-4 w-4 text-primary" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">{t('weekendDays')}</h2>
+                  <h2 className="text-sm font-semibold text-slate-900">{t('weekendDays')}</h2>
                   <p className="text-sm text-slate-500">{t('selectWeekendDays')}</p>
                 </div>
               </div>
@@ -672,15 +672,15 @@ export default function BikersSchedule() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             {/* Schedule Card */}
             <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoCalendarOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoCalendarOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerSchedule')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerSchedule')}</h2>
                       <p className="text-sm text-slate-500">{t('manageWeeklySchedule')}</p>
                     </div>
                   </div>
@@ -766,7 +766,7 @@ export default function BikersSchedule() {
                         <div>
                           <div className="mb-4 flex items-center space-x-2">
                             <IoLocationOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-lg font-semibold text-slate-900">{t('city')}</h3>
+                            <h3 className="text-sm font-semibold text-slate-900">{t('city')}</h3>
                           </div>
                           {citiesOptions.length === 0 ? (
                             <div className="flex items-center justify-center py-8">
@@ -843,7 +843,7 @@ export default function BikersSchedule() {
                         <div>
                           <div className="mb-4 flex items-center space-x-2">
                             <IoLocationOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-lg font-semibold text-slate-900">
+                            <h3 className="text-sm font-semibold text-slate-900">
                               {t('selectAreas')}
                             </h3>
                           </div>
@@ -969,7 +969,7 @@ export default function BikersSchedule() {
                         <div>
                           <div className="mb-4 flex items-center space-x-2">
                             <IoTimeOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-lg font-semibold text-slate-900">
+                            <h3 className="text-sm font-semibold text-slate-900">
                               {t('selectTimeSlots')}
                             </h3>
                           </div>
@@ -1002,15 +1002,15 @@ export default function BikersSchedule() {
             </div>{' '}
             {/* Biker Information Card */}
             <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoPersonCircleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
                       <p className="text-sm text-slate-500">{t('basicInformation')}</p>
                     </div>
                   </div>
@@ -1030,19 +1030,19 @@ export default function BikersSchedule() {
                       <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                         {t('name')}
                       </h4>
-                      <p className="text-lg font-semibold text-slate-900">{bikerData?.userName}</p>
+                      <p className="text-sm font-semibold text-slate-900">{bikerData?.userName}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
                       <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                         {t('phone')}
                       </h4>
-                      <p className="text-lg font-semibold text-slate-900">{bikerData?.phone}</p>
+                      <p className="text-sm font-semibold text-slate-900">{bikerData?.phone}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
                       <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                         {t('city')}
                       </h4>
-                      <p className="text-lg font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         {bikerData?.city?.name?.[lang] || '-'}
                       </p>
                     </div>
@@ -1058,7 +1058,7 @@ export default function BikersSchedule() {
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-slate-900">
+            <DialogTitle className="text-sm font-semibold text-slate-900">
               {t('deleteSchedule')}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-500">
@@ -1090,7 +1090,7 @@ export default function BikersSchedule() {
       <Dialog open={isCopyDialogOpen} onOpenChange={setIsCopyDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-semibold text-slate-900">
+            <DialogTitle className="text-sm font-semibold text-slate-900">
               {t('copyScheduleTo')}
             </DialogTitle>
             <DialogDescription className="text-sm text-slate-500">

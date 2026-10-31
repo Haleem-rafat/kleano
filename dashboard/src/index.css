@@ -124,7 +124,7 @@
 }
 
 * {
-  font-family: 'Nunito', sans-serif;
+  font-family: 'Inter', 'IBM Plex Sans Arabic', system-ui, sans-serif;
 }
 
 html {
@@ -288,4 +288,58 @@ html {
 }
 .leaflet-routing-alt {
   display: none !important;
+}
+
+/* Console look: quiet tables, underlined tabs, calm text. */
+body {
+  color: #1b1b1d;
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+table th {
+  height: 40px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b6b73;
+  white-space: nowrap;
+}
+table td {
+  font-size: 13px;
+  color: #2c2c30;
+}
+table tbody tr {
+  border-color: #eeeef0;
+}
+table tbody tr:hover {
+  background: #fafafb;
+}
+[role='tablist'] {
+  height: auto;
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+  border-bottom: 1px solid #e6e6e9;
+  border-radius: 0;
+  overflow-x: auto;
+}
+[role='tab'] {
+  margin: 0 !important;
+  padding: 8px 12px;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+  color: #6b6b73;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+[role='tab'][data-state='active'] {
+  color: #533063;
+  border-bottom-color: #533063;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
 }

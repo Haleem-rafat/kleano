@@ -65,7 +65,7 @@ export default function PlansDetails() {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('plansDetails')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('plansDetails')}</h1>
                 <div className="mt-1 flex items-center space-x-2">
                   <span className="text-sm text-slate-500">{t('planID')}:</span>
                   <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
@@ -92,9 +92,9 @@ export default function PlansDetails() {
             {/* Plan Information Card */}
             <div>
               <Card className="overflow-hidden rounded-xl border-slate-200 shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
                       {planDetails?.icon ? (
                         <img
                           src={planDetails.icon.iconLink}
@@ -102,11 +102,11 @@ export default function PlansDetails() {
                           className="rounded-full object-contain"
                         />
                       ) : (
-                        <IoCalendarOutline className="h-6 w-6 text-primary" />
+                        <IoCalendarOutline className="h-4 w-4 text-primary" />
                       )}
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('planInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('planInfo')}</h2>
                       <p className="text-sm text-slate-500">Plan details and configuration</p>
                     </div>
                   </div>
@@ -150,7 +150,7 @@ export default function PlansDetails() {
                       </h4>
                       <div className="flex items-center space-x-2">
                         <IoTimeOutline className="h-4 w-4 text-slate-400" />
-                        <span className="text-lg font-semibold text-slate-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {planDetails?.duration} month{planDetails?.duration > 1 ? 's' : ''}
                         </span>
                       </div>
@@ -161,7 +161,7 @@ export default function PlansDetails() {
                       <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('price')}</h4>
                       <div className="flex items-center space-x-2">
                         <IoCashOutline className="h-4 w-4 text-slate-400" />
-                        <span className="text-lg font-semibold text-slate-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {planDetails?.price}
                         </span>
                       </div>
@@ -174,7 +174,7 @@ export default function PlansDetails() {
                       </h4>
                       <div className="flex items-center space-x-2">
                         <IoCalendarOutline className="h-4 w-4 text-slate-400" />
-                        <span className="text-lg font-semibold text-slate-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {formatDate(planDetails?.createdAt)}
                         </span>
                       </div>
@@ -186,7 +186,7 @@ export default function PlansDetails() {
                       </h4>
                       <div className="flex items-center space-x-2">
                         <RxCountdownTimer className="h-4 w-4 text-slate-400" />
-                        <span className="text-lg font-semibold text-slate-900">
+                        <span className="text-sm font-semibold text-slate-900">
                           {planDetails?.usageCount}
                         </span>
                       </div>
@@ -199,13 +199,13 @@ export default function PlansDetails() {
             {/* Washing Services Card */}
             <div>
               <Card className="overflow-hidden rounded-xl border-slate-200 shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoWaterOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoWaterOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">
+                      <h2 className="text-sm font-semibold text-slate-900">
                         {t('washingServicesPlan')}
                       </h2>
                       <p className="text-sm text-slate-500">Included services</p>
@@ -241,13 +241,13 @@ export default function PlansDetails() {
             {/* Plan Description Card */}
             <div>
               <Card className="overflow-hidden rounded-xl border-slate-200 shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoCalendarOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoCalendarOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Plan Description</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">Plan Description</h2>
                       <p className="text-sm text-slate-500">Plan features and details</p>
                     </div>
                   </div>
@@ -283,14 +283,14 @@ export default function PlansDetails() {
             {/* Cities Card */}
             <div>
               <Card className="overflow-hidden rounded-xl border-slate-200 shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                        <IoLocationOutline className="h-6 w-6 text-primary" />
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                        <IoLocationOutline className="h-4 w-4 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-semibold text-slate-900">{t('planCities')}</h2>
+                        <h2 className="text-sm font-semibold text-slate-900">{t('planCities')}</h2>
                         <p className="text-sm text-slate-500">Available locations</p>
                       </div>
                     </div>

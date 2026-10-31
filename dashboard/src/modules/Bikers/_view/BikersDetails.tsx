@@ -158,7 +158,7 @@ export default function BikersDetails() {
               <div className="flex items-center gap-3">
                 <div>
                   <div className="flex items-center gap-3">
-                    <h1 className="text-2xl font-semibold text-slate-900">{t('bikerDetails')}</h1>
+                    <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikerDetails')}</h1>
                   </div>
                   <p className="mt-1 text-sm text-slate-500">
                     {t('bikerId')}: #{data?._id?.slice(-4)}
@@ -183,15 +183,15 @@ export default function BikersDetails() {
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             {/* Biker Information Card */}
             <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoPersonCircleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
                       <p className="text-sm text-slate-500">Personal and contact information</p>
                     </div>
                   </div>
@@ -316,15 +316,15 @@ export default function BikersDetails() {
               </div>
 
               {/* Areas Card */}
-              {/* <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"> */}
+              {/* <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white"> */}
               {/* Gradient Header */}
-              {/* <div className="border-b border-slate-200 bg-white px-6 py-4">
+              {/* <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoLocationOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoLocationOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerAreas')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerAreas')}</h2>
                       <p className="text-sm text-slate-500">Assigned service areas</p>
                     </div>
                   </div>
@@ -345,15 +345,15 @@ export default function BikersDetails() {
               {/* </div> */}
 
               {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                {/* <div className="border-b border-slate-200 bg-white px-6 py-4">
+                {/* <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoLocationOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoLocationOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerCities')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerCities')}</h2>
                       <p className="text-sm text-slate-500">Assigned cities</p>
                     </div>
                   </div>
@@ -372,15 +372,15 @@ export default function BikersDetails() {
 
             {/* Actions Card */}
             <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
                 {/* Gradient Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoSettingsOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoSettingsOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('bikerActions')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerActions')}</h2>
                       <p className="text-sm text-slate-500">Manage biker settings</p>
                     </div>
                   </div>

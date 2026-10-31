@@ -41,7 +41,7 @@ const SegmentsList = () => {
     <div className="relative">
       {isLoading && <ThreeDotsLoader />}
       <div className="flex items-center justify-between pb-6">
-        <p className="text-2xl font-semibold capitalize text-slate-900">{t('segments')}</p>
+        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('segments')}</p>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('addNewSegments')}</Button>
         </div>

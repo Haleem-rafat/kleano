@@ -72,179 +72,71 @@ export default function Dashboard() {
     plansService.getAllPlansList().then((data) => data?.data as IPlan[])
   );
   if (isLoading || !data) return <ThreeDotsLoader />;
+  const maxUsage = Math.max(...data.map((plan) => plan?.usageCount || 0), 1);
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Professional Header */}
-      <div className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-semibold text-slate-900">{t('dashboard')}</h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Overview of your business metrics and performance
-              </p>
-            </div>
-          </div>
+    <div className="space-y-6">
+      <header>
+        <h1 className="text-xl font-semibold capitalize tracking-tight text-slate-900">
+          {t('dashboard')}
+        </h1>
+        <p className="mt-0.5 text-[13px] text-slate-500">
+          Overview of your business metrics and performance
+        </p>
+      </header>
+
+      {ordersListLoading && promoCodesLoading && usersisLoading && bikersIsLoading && (
+        <ThreeDotsLoader />
+      )}
+
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {dashboardData.map((card, index) => (
+          <DashboardCard
+            key={index}
+            title={t(card.title)}
+            count={card.count}
+            icon={card.icon}
+            theme={card.theme}
+          />
+        ))}
+      </section>
+
+      <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
+        <div className="rounded-xl border border-slate-200 bg-white p-5 xl:col-span-7">
+          <h2 className="mb-4 text-sm font-semibold text-slate-900">Weekly revenue</h2>
+          <WeeklyRevenueChart />
         </div>
-      </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-5 xl:col-span-5">
+          <h2 className="mb-4 text-sm font-semibold text-slate-900">Revenue this year</h2>
+          <Earningchart />
+        </div>
+      </section>
 
-      {/* Main Content */}
-      <div className="p-6">
-        <div>
-          {ordersListLoading && promoCodesLoading && usersisLoading && bikersIsLoading && (
-            <ThreeDotsLoader />
-          )}
-
-          {/* Statistics Cards Section */}
-          <div className="mb-8">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              {/* Section Header */}
-              <div className="border-b border-slate-200 bg-white px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                    <svg
-                      className="h-6 w-6 text-primary"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-900">Key Metrics</h2>
-                    <p className="text-sm text-slate-500">
-                      Essential business statistics at a glance
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section Content */}
-              <div className="p-6">
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                  {dashboardData.map((card, index) => (
-                    <DashboardCard
-                      key={index}
-                      title={t(card.title)}
-                      count={card.count}
-                      icon={card.icon}
-                      theme={card.theme}
+      {data.length > 0 && (
+        <section className="rounded-xl border border-slate-200 bg-white p-5">
+          <h2 className="mb-4 text-sm font-semibold text-slate-900">Plan usage</h2>
+          <ul className="space-y-3">
+            {data.map((plan, index) => {
+              const name = typeof plan?.type === 'string' ? plan?.type : plan?.type[lang];
+              const usage = plan?.usageCount || 0;
+              return (
+                <li key={index} className="grid grid-cols-[140px_1fr_48px] items-center gap-3">
+                  <span className="truncate text-[13px] text-slate-700">{name}</span>
+                  <span className="h-2 overflow-hidden rounded-full bg-slate-100">
+                    <span
+                      className="block h-full rounded-full bg-primary"
+                      style={{ width: `${(usage / maxUsage) * 100}%` }}
                     />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Charts Section */}
-          <div className="mb-8">
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-              {/* Section Header */}
-              <div className="border-b border-slate-200 bg-white px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                    <svg
-                      className="h-6 w-6 text-primary"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-slate-900">Revenue Analytics</h2>
-                    <p className="text-sm text-slate-500">
-                      Track your financial performance over time
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Section Content */}
-              <div className="p-6">
-                <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-                  <WeeklyRevenueChart />
-                  <Earningchart />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Plans Usage Section */}
-          {data && data.length > 0 && (
-            <div className="mb-8">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                {/* Section Header */}
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <svg
-                        className="h-6 w-6 text-primary"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-lg font-semibold text-slate-900">Plan Usage Statistics</h2>
-                      <p className="text-sm text-slate-500">
-                        Monitor subscription plan utilization
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {data
-                      ?.map((e, index) => ({
-                        title: typeof e?.type === 'string' ? e?.type : e?.type[lang],
-
-                        count: e?.usageCount,
-                        color: e?.color,
-                        theme: ['orange', 'emerald', 'purple'][index % 3] as
-                          | 'green'
-                          | 'purple'
-                          | 'indigo'
-                          | 'blue'
-                          | 'default'
-                          | 'orange'
-                          | 'emerald',
-                      }))
-                      ?.map((card, index) => (
-                        <DashboardCard
-                          key={index}
-                          title={t(card.title)}
-                          count={card.count}
-                          color={card.color}
-                          theme={card.theme}
-                          isPromo
-                        />
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+                  </span>
+                  <span className="text-end text-[13px] font-medium tabular-nums text-slate-900">
+                    {usage}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
     </div>
   );
 }

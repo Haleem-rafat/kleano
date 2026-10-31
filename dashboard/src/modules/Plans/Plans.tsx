@@ -38,7 +38,7 @@ export default function Plans() {
   return (
     <div className="relative">
       <div className="flex items-center justify-between pb-6">
-        <p className="text-2xl font-semibold capitalize text-slate-900">{t('plans')}</p>
+        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('plans')}</p>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('AddNewPlan')}</Button>
         </div>

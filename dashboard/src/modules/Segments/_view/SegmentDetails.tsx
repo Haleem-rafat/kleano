@@ -56,7 +56,7 @@ const SegmentDetails = () => {
                 <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
               </button>
               <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{t('segmentsDetails')}</h1>
+                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('segmentsDetails')}</h1>
                 <div className="mt-1 flex items-center space-x-2">
                   <span className="text-sm text-slate-500">{t('segmentsId')}:</span>
                   <span className="rounded bg-slate-100 px-2 py-1 font-mono text-xs text-slate-700">
@@ -76,14 +76,14 @@ const SegmentDetails = () => {
         <div className="mx-auto max-w-[95%]">
           <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
             <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoExtensionPuzzleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoExtensionPuzzleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('segmentsInfo')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('segmentsInfo')}</h2>
                       <p className="text-sm text-slate-500">Segment details and information</p>
                     </div>
                   </div>
@@ -95,13 +95,13 @@ const SegmentDetails = () => {
                       <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                         {t('segmentName')}
                       </h4>
-                      <p className="text-lg font-semibold text-slate-900">{data?.name || '—'}</p>
+                      <p className="text-sm font-semibold text-slate-900">{data?.name || '—'}</p>
                     </div>
                     <div className="rounded-lg bg-slate-50 p-4">
                       <h4 className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
                         {t('createddate')}
                       </h4>
-                      <p className="text-lg font-semibold text-slate-900">
+                      <p className="text-sm font-semibold text-slate-900">
                         {data?.createdAt ? formatDate(data.createdAt) : '—'}
                       </p>
                     </div>
@@ -111,14 +111,14 @@ const SegmentDetails = () => {
             </div>
 
             <div>
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-                <div className="border-b border-slate-200 bg-white px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                <div className="border-b border-slate-100 bg-white px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brandTint">
-                      <IoPeopleOutline className="h-6 w-6 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
+                      <IoPeopleOutline className="h-4 w-4 text-primary" />
                     </div>
                     <div>
-                      <h2 className="text-lg font-semibold text-slate-900">{t('selectedUser')}</h2>
+                      <h2 className="text-sm font-semibold text-slate-900">{t('selectedUser')}</h2>
                       <p className="text-sm text-slate-500">
                         {data?.users?.length || 0} {t('users')}
                       </p>

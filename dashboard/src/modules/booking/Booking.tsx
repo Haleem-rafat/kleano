@@ -335,7 +335,7 @@ const Booking = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-slate-900">
+            <h1 className="text-xl font-semibold tracking-tight text-slate-900">
               {t('bookingSchedule') || 'Booking Schedule'}
             </h1>
             <p className="mt-1 text-sm text-slate-500">

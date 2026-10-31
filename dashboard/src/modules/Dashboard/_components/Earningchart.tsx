@@ -61,9 +61,9 @@ export function Earningchart() {
   return (
     <div className="h-full">
       <div className="mb-4 flex items-center justify-between">
-        <div className="rounded-lg border border-slate-200 bg-brandTint p-4">
-          <h4 className="mb-2 text-sm font-semibold text-primary">Total Revenue</h4>
-          <p className="text-lg font-bold text-primary">{data?.yearTotalRevenue || 0}</p>
+        <div>
+          <h4 className="text-xs font-medium text-slate-500">Total Revenue</h4>
+          <p className="text-2xl font-semibold tracking-tight text-slate-900">{data?.yearTotalRevenue || 0}</p>
         </div>
       </div>
 
@@ -97,7 +97,7 @@ export function Earningchart() {
           {/* Line with gradient stroke and drop shadow */}
           <Line
             dataKey="totalEarnings"
-            type="natural"
+            type="monotone"
             stroke="url(#lineGradient)"
             strokeWidth={3}
             dot={{
