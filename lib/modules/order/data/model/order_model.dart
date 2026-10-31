@@ -459,7 +459,9 @@ class OrderLocation {
     longitude = json['longitude'];
     streetName = json['streetName'];
     subAdministrativeArea = json['subAdministrativeArea'];
-    city = json['city'];
+    // The backend sends either the id or the populated city object.
+    final dynamic rawCity = json['city'];
+    city = rawCity is Map ? rawCity['_id']?.toString() : rawCity?.toString();
     isSaved = json['isSaved'];
   }
 }

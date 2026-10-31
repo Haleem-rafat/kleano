@@ -1,103 +1,77 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_translate/flutter_translate.dart';
-import 'package:thewhsherbiker/core/resources/app_styles.dart';
-import 'package:thewhsherbiker/core/resources/color_manager.dart';
-import 'package:thewhsherbiker/core/resources/fonts_manager.dart';
+import 'package:thewhsherbiker/core/design/components/k_button.dart';
+import 'package:thewhsherbiker/core/design/components/k_card.dart';
+import 'package:thewhsherbiker/core/design/tokens.dart';
 import 'package:thewhsherbiker/core/resources/strings_manager.dart';
-import 'package:thewhsherbiker/modules/Home/widget/user_details_widget.dart';
+import 'package:thewhsherbiker/modules/Home/widget/home_order_parts.dart';
 import 'package:thewhsherbiker/modules/order/data/model/order_model.dart';
 import 'package:thewhsherbiker/modules/order/screens/order_details_screen.dart';
-import 'package:thewhsherbiker/shared/components/buttons.dart';
 import 'package:thewhsherbiker/utilties/app_date_formatter.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
+/// A finished order: date, request number, customer and street.
 class CompletedCard extends StatelessWidget {
   final OrderModel order;
-  const CompletedCard({
-    super.key,
-    required this.order,
-  });
+  const CompletedCard({super.key, required this.order});
+
+  void _openDetails(BuildContext context) {
+    pushPage(context, OrderDetailsScreen(data: order, complete: true));
+  }
+
+  /// The last six characters of the id, as the rest of the app shows it.
+  String get _shortId {
+    final String? id = order.sId;
+    if (id == null) return 'N/A';
+    return id.length > 6 ? id.substring(id.length - 6) : id;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        pushPage(context, OrderDetailsScreen(data: order, complete: true));
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorManager.darkGrey,
-          borderRadius: BorderRadius.all(Radius.circular(15.r)),
-        ),
-        child: Column(
-          children: <Widget>[
-            SizedBox(
-              height: 11.h,
-            ),
-            Text(
-              AppDateFormatter.dateFormate(order.createdAt!),
-              style: AppStyles.caption12Regular.copyWith(
-                color: ColorManager.white,
-                fontSize: FontSize.s10.sp,
-              ),
-            ),
-            SizedBox(
-              height: 11.h,
-            ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                width: 326.6.w,
-                decoration: BoxDecoration(
-                    color: ColorManager.white,
-                    borderRadius: BorderRadius.all(Radius.circular(15.r)),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                          color: ColorManager.black.withValues(alpha: .08),
-                          blurRadius: 6.r,
-                          offset: const Offset(0, 3))
-                    ]),
-                padding: EdgeInsets.symmetric(horizontal: 24.w),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    SizedBox(
-                      height: 24.h,
-                    ),
-                    UserDetailsWidget(
-                      userData: order,
-                      textStyle: AppStyles.title16Bold,
-                    ),
-                    SizedBox(
-                      height: 20.h,
-                    ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: ButtonsShared(
-                        height: 30.h,
-                        width: 130.w,
-                        onPressed: () {
-                          pushPage(context,
-                              OrderDetailsScreen(data: order, complete: true));
-                        },
-                        text: translate(AppStrings.viewDetails),
-                        colorText: ColorManager.primary,
-                        colorButton: ColorManager.white,
-                        borderRadius: 8,
-                        showShadow: false,
-                        textStyle: AppStyles.body14Medium,
-                      ),
-                    ),
-                    SizedBox(
-                      height: 24.h,
-                    ),
-                  ],
+    final KColors c = KColors.of(context);
+    final DateTime? created = order.createdAt;
+    return KCard(
+      onTap: () => _openDetails(context),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  tr(context, AppStrings.requestID),
+                  style: KType.headline.copyWith(color: c.text),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              Text(
+                '# $_shortId',
+                textDirection: TextDirection.ltr,
+                style: KType.headline.copyWith(color: c.textSecondary),
+              ),
+            ],
+          ),
+          if (created != null) ...<Widget>[
+            const SizedBox(height: KSpace.xs),
+            Text(
+              AppDateFormatter.dateFormate(created),
+              style: KType.footnote.copyWith(color: c.textSecondary),
             ),
           ],
-        ),
+          const SizedBox(height: KSpace.m),
+          OrderCustomerRow(order: order),
+          if (order.location?.streetName != null) ...<Widget>[
+            const SizedBox(height: KSpace.xs),
+            OrderLocationRow(order: order),
+          ],
+          const SizedBox(height: KSpace.m),
+          KButton(
+            label: tr(context, AppStrings.viewDetails),
+            variant: KButtonVariant.secondary,
+            onPressed: () => _openDetails(context),
+          ),
+        ],
       ),
     );
   }

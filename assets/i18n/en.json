@@ -143,5 +143,9 @@
   "onboardTitle2": "Make cars shine",
   "onboardBody2": "Follow each wash step by step, with before and after photos.",
   "onboardTitle3": "Earn on every wash",
-  "onboardBody3": "See today’s earnings and your rating at a glance."
+  "onboardBody3": "See today’s earnings and your rating at a glance.",
+  "online": "Online",
+  "offline": "Offline",
+  "Go Online Now": "Go Online Now",
+  "defaultError": "Something went wrong. Please try again."
 }
