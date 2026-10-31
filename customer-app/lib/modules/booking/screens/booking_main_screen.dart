@@ -516,7 +516,13 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     Widget box(Widget child) => SliverToBoxAdapter(child: child);
     return <Widget>[
       box(_buildPhotoHero(c)),
-      box(isLoading ? const KSkeleton.grid() : bookingScreen[0]),
+      box(
+        isLoading
+            ? const KSkeleton.grid(
+                padding: EdgeInsets.symmetric(horizontal: KSpace.l),
+              )
+            : bookingScreen[0],
+      ),
       box(const HomePlansCard()),
       box(
         Padding(
@@ -525,7 +531,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         ),
       ),
       box(const HomeReassurance()),
-      _buildActionClearance(),
+      _buildHomeClearance(),
     ];
   }
 
@@ -543,6 +549,20 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
       ),
       _buildActionClearance(),
     ];
+  }
+
+  /// Keeps Home's end just above the tab bar, or above the booking action for
+  /// subscribers, who get one without choosing a service.
+  Widget _buildHomeClearance() {
+    final bool subscribed =
+        sl<GetUserProfileBloc>().profile.isSubscribed == true;
+    return subscribed
+        ? _buildActionClearance()
+        : SliverToBoxAdapter(
+            child: SizedBox(
+              height: MediaQuery.paddingOf(context).bottom + KSpace.l,
+            ),
+          );
   }
 
   /// Keeps the last content clear of the floating booking action and tab bar.

@@ -65,7 +65,7 @@ class KSkeleton extends StatefulWidget {
   /// A title above three-column photo tiles: Home's services.
   const KSkeleton.grid({
     super.key,
-    this.count = 6,
+    this.count = 3,
     this.padding = const EdgeInsets.all(KSpace.l),
   }) : _kind = _KSkeletonKind.grid;
 
@@ -91,7 +91,7 @@ class _KSkeletonState extends State<KSkeleton>
   late final AnimationController _pulse = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
-    lowerBound: 0.5,
+    lowerBound: 0.65,
     value: 1,
   );
 
