@@ -188,7 +188,16 @@ class _ProfileBody extends StatelessWidget {
             child: CircleAvatar(
               radius: KSpace.xxxl * 1.5,
               backgroundColor: c.brandTint,
-              foregroundImage: image == null ? null : NetworkImage(image),
+              foregroundImage: image == null
+                  ? null
+                  : ResizeImage(
+                      NetworkImage(image),
+                      width:
+                          (KSpace.xxxl *
+                                  3 *
+                                  MediaQuery.devicePixelRatioOf(context))
+                              .round(),
+                    ),
               child: Text(
                 name.isEmpty ? '' : name.characters.first.toUpperCase(),
                 style: KType.largeTitle.copyWith(color: c.onBrandTint),

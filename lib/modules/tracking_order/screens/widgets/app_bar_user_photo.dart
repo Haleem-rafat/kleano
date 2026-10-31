@@ -38,7 +38,14 @@ class AppBarUserPhoto extends StatelessWidget {
             child: CircleAvatar(
               radius: 20,
               backgroundColor: c.brandTint,
-              foregroundImage: image.isEmpty ? null : NetworkImage(image),
+              foregroundImage: image.isEmpty
+                  ? null
+                  : ResizeImage(
+                      NetworkImage(image),
+                      width:
+                          (KSpace.xxxl * MediaQuery.devicePixelRatioOf(context))
+                              .round(),
+                    ),
               child: Text(
                 name.isEmpty ? '' : name.characters.first.toUpperCase(),
                 style: KType.headline.copyWith(color: c.onBrandTint),
