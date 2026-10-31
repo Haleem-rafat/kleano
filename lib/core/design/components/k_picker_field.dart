@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import '../liquid_glass.dart';
 import '../tokens.dart';
 import 'k_list_row.dart';
+import 'k_search_field.dart';
 import 'k_sheet.dart';
 
 /// Picks one value from a (long) list: a field that opens a searchable sheet.
@@ -155,24 +154,11 @@ class _PickerSheetState<T> extends State<_PickerSheet<T>> {
               textAlign: TextAlign.center,
               style: KType.headline.copyWith(color: c.text)),
           const SizedBox(height: KSpace.m),
-          // Platform search field: Apple's on iOS, Material 3 SearchBar on
-          // Android — never an outlined form field.
-          if (GlassTokens.useNative)
-            CupertinoSearchTextField(
-              autofocus: widget.items.length > 12,
-              placeholder: widget.searchHint,
-              style: KType.body.copyWith(color: c.text),
-              onChanged: (String v) => setState(() => _query = v.trim()),
-            )
-          else
-            SearchBar(
-              autoFocus: widget.items.length > 12,
-              hintText: widget.searchHint,
-              elevation: const WidgetStatePropertyAll<double>(0),
-              backgroundColor: WidgetStatePropertyAll<Color>(c.fill),
-              leading: Icon(Icons.search_rounded, color: c.textSecondary),
-              onChanged: (String v) => setState(() => _query = v.trim()),
-            ),
+          KSearchField(
+            autofocus: widget.items.length > 12,
+            hint: widget.searchHint,
+            onChanged: (String v) => setState(() => _query = v.trim()),
+          ),
           const SizedBox(height: KSpace.s),
           Expanded(
             child: ListView.separated(
