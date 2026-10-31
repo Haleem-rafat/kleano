@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "619764404613",
+    "project_id": "kleano-prod",
+    "storage_bucket": "kleano-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619764404613:android:6c6f25e0ccf7389bb7b4ec",
+        "android_client_info": {
+          "package_name": "co.Kleano"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpqBAU4o3F4xuNodSnlm1frkAhJKYXgdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

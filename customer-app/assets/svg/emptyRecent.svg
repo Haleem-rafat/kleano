@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100">
+  <g id="Group_557" data-name="Group 557" transform="translate(-129.776 -440.776)">
+    <rect id="Rectangle_46" data-name="Rectangle 46" width="100" height="100" transform="translate(129.776 440.776)" fill="none"/>
+    <path id="marker-time_1_" data-name="marker-time (1)" d="M37.765,80.253a18.128,18.128,0,0,1-12.739-5.192L11.84,62.875a36.8,36.8,0,1,1,51.941-.09L50.43,75.125a18.031,18.031,0,0,1-12.665,5.128Zm0-73.594a30.107,30.107,0,0,0-21.289,51.4l13.16,12.163a11.762,11.762,0,0,0,16.184.064L59.148,57.964A30.112,30.112,0,0,0,37.765,6.659Zm0,53.523A23.416,23.416,0,1,1,61.182,36.766,23.416,23.416,0,0,1,37.765,60.182Zm0-40.142A16.726,16.726,0,1,0,54.491,36.766,16.726,16.726,0,0,0,37.765,20.04Zm5.71,22.436a3.345,3.345,0,0,0,0-4.73l-2.365-2.365V30.075a3.345,3.345,0,0,0-6.69,0v6.69a3.345,3.345,0,0,0,.98,2.365l3.346,3.346a3.345,3.345,0,0,0,4.73,0Z" transform="translate(141.961 450.615)" fill="#e5e5e5"/>
+    <g id="Component_129_5" data-name="Component 129 – 5" transform="translate(130 442.496)">
+      <g id="interrogation" transform="translate(5.246 8.584)">
+        <circle id="Ellipse_103" data-name="Ellipse 103" cx="2.146" cy="2.146" r="2.146" transform="translate(2.911 12.876)" fill="#e5e5e5"/>
+        <path id="Path_341" data-name="Path 341" d="M13.711,5A5.061,5.061,0,0,0,7.757,9.979a1.786,1.786,0,0,0,3.572,0,1.486,1.486,0,1,1,2.2,1.31A3.957,3.957,0,0,0,11.1,15.049a1.786,1.786,0,0,0,3.572,0,1.517,1.517,0,0,1,.019-.26,2.205,2.205,0,0,1,.561-.373,5.059,5.059,0,0,0-1.539-9.408Z" transform="translate(-7.757 -4.92)" fill="#e5e5e5"/>
+      </g>
+      <g id="interrogation-2" data-name="interrogation" transform="translate(15.54)">
+        <circle id="Ellipse_103-2" data-name="Ellipse 103" cx="2.146" cy="2.146" r="2.146" transform="translate(2.911 12.876)" fill="#e5e5e5"/>
+        <path id="Path_341-2" data-name="Path 341" d="M13.711,5A5.061,5.061,0,0,0,7.757,9.979a1.786,1.786,0,0,0,3.572,0,1.486,1.486,0,1,1,2.2,1.31A3.957,3.957,0,0,0,11.1,15.049a1.786,1.786,0,0,0,3.572,0,1.517,1.517,0,0,1,.019-.26,2.205,2.205,0,0,1,.561-.373,5.059,5.059,0,0,0-1.539-9.408Z" transform="translate(-7.757 -4.92)" fill="#e5e5e5"/>
+      </g>
+      <rect id="Rectangle_190" data-name="Rectangle 190" width="20.597" height="20.597" transform="translate(0 7.306)" fill="none"/>
+    </g>
+  </g>
+</svg>

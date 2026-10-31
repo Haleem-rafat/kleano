@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="42" height="41.999" viewBox="0 0 42 41.999">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#67c6b9"/>
+      <stop offset="1" stop-color="#2d544e"/>
+    </linearGradient>
+    <filter id="car-bus" x="0" y="0" width="42" height="41.999" filterUnits="userSpaceOnUse">
+      <feOffset dy="3" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#67c6b9" flood-opacity="0.502"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <g id="Bus_icon" data-name="Bus icon" transform="translate(-1156 -1435)">
+    <g transform="matrix(1, 0, 0, 1, 1156, 1435)" filter="url(#car-bus)">
+      <path id="car-bus-2" data-name="car-bus" d="M24,19a15.921,15.921,0,0,0-1.23-6.153l-.321-.77A4.988,4.988,0,0,0,17.833,9H14.167a4.988,4.988,0,0,0-4.616,3.077l-.32.769c-.9,2.642-2.7,7.576.769,8.982V22a2,2,0,0,0,4,0h4a2,2,0,0,0,4,0v-.172A3,3,0,0,0,24,19ZM11.4,12.846A2.994,2.994,0,0,1,14.167,11h3.666a2.994,2.994,0,0,1,2.77,1.846l.32.77c.054.127.1.255.154.384H10.924c.049-.129.1-.257.153-.385ZM21,20H11c-1.757-.17-.77-2.869-.676-4H12v1a1,1,0,0,0,2,0V16h4v1a1,1,0,0,0,2,0V16h1.676C21.769,17.129,22.757,19.831,21,20ZM6.5,11H4V6.265A2.6,2.6,0,0,1,4.009,6H9V7a1,1,0,0,0,2,0V6h4.991c.005.088.009.176.009.265V7a1,1,0,0,0,2,0V6.265A5.946,5.946,0,0,0,13.668.5,13.737,13.737,0,0,0,6.332.5,5.946,5.946,0,0,0,2,6.265V9a2,2,0,0,0,0,4v3a3.006,3.006,0,0,0,2,2.829V20a1,1,0,0,0,2,0V18a1,1,0,0,0-1-1,1,1,0,0,1-1-1V13H6.5a1,1,0,0,0,0-2Zm.355-8.568a11.723,11.723,0,0,1,6.29,0A3.826,3.826,0,0,1,15.313,4H4.687A3.826,3.826,0,0,1,6.855,2.432Z" transform="translate(9 6)" fill="url(#linear-gradient)"/>
+    </g>
+    <rect id="Rectangle_59" data-name="Rectangle 59" width="24" height="24" transform="translate(1165 1441)" fill="none"/>
+  </g>
+</svg>

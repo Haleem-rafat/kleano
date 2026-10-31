@@ -1,0 +1,8 @@
+<svg id="book_amrk_filled" data-name="book amrk filled" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <path id="bookmark_1_" data-name="bookmark (1)" d="M41.585,0h-13.5a2.062,2.062,0,0,0-2.065,1.975V21.942a1.53,1.53,0,0,0,.26.888,1.01,1.01,0,0,0,.834.434,1.505,1.505,0,0,0,.956-.4l6.039-5.127a1.2,1.2,0,0,1,1.466,0L41.6,22.86a1.453,1.453,0,0,0,.934.4c.53,0,1.046-.409,1.046-1.321V1.975A2,2,0,0,0,41.585,0Z" transform="translate(-22.799)" fill="#e5e5e5"/>
+  <rect id="Rectangle_172" data-name="Rectangle 172" width="24" height="24" fill="none"/>
+  <g id="star" transform="translate(4.732 2)">
+    <path id="star_1_" data-name="star (1)" d="M9.644,3.78A.508.508,0,0,0,9.2,3.449L6.411,3.211,5.308.789a.528.528,0,0,0-.946,0l-1.1,2.422L.467,3.449a.509.509,0,0,0-.442.331.464.464,0,0,0,.15.512l2.11,1.735L1.663,8.6a.467.467,0,0,0,.2.5.541.541,0,0,0,.565.023l2.407-1.35,2.407,1.35a.542.542,0,0,0,.565-.023.467.467,0,0,0,.2-.5l-.622-2.57,2.11-1.735a.463.463,0,0,0,.15-.512ZM4.881,7.742" transform="translate(2.663 2.302)" fill="#fff"/>
+    <rect id="Rectangle_173" data-name="Rectangle 173" width="14" height="14" fill="none"/>
+  </g>
+</svg>

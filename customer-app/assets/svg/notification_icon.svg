@@ -1,0 +1,7 @@
+<svg id="Notification_Icon" data-name="Notification Icon" xmlns="http://www.w3.org/2000/svg" width="24" height="26.009" viewBox="0 0 24 26.009">
+  <g id="_01_align_center" data-name="01 align center" transform="translate(0.069 2.004)">
+    <path id="Path_336" data-name="Path 336" d="M23.259,16.2l-2.6-9.371A9.321,9.321,0,0,0,2.576,7.3L.565,16.35A3,3,0,0,0,3.493,20H7.1a5,5,0,0,0,9.8,0h3.47a3,3,0,0,0,2.89-3.8ZM12,22a3,3,0,0,1-2.816-2h5.632A3,3,0,0,1,12,22Zm9.165-4.4a.993.993,0,0,1-.8.4H3.493a1,1,0,0,1-.976-1.217l2.011-9.05a7.321,7.321,0,0,1,14.2-.372l2.6,9.371a.993.993,0,0,1-.163.873Z" fill="#fff"/>
+  </g>
+  <rect id="Rectangle_183" data-name="Rectangle 183" width="24" height="24" transform="translate(0 2)" fill="none"/>
+  <circle id="Ellipse_102" data-name="Ellipse 102" cx="4" cy="4" r="4" transform="translate(1)" fill="#e53737"/>
+</svg>

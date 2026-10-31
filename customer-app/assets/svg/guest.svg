@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="34.249" height="37.665" viewBox="0 0 34.249 37.665">
+  <g id="Group_463" data-name="Group 463" transform="translate(-139.603 -69.329)">
+    <g id="Group_423" data-name="Group 423" transform="translate(-4.273 -0.838)">
+      <g id="user_1_" data-name="user (1)" transform="translate(140.876 70.168)">
+        <path id="Path_247" data-name="Path 247" d="M15.416,18.832A9.416,9.416,0,1,0,6,9.416a9.416,9.416,0,0,0,9.416,9.416Zm0-15.694A6.277,6.277,0,1,1,9.139,9.416a6.277,6.277,0,0,1,6.277-6.277Z" transform="translate(1.708)" fill="#e5e5e5"/>
+        <path id="Path_248" data-name="Path 248" d="M17.124,14A14.14,14.14,0,0,0,3,28.124a1.569,1.569,0,1,0,3.139,0,10.986,10.986,0,0,1,21.971,0,1.569,1.569,0,0,0,3.139,0A14.14,14.14,0,0,0,17.124,14Z" transform="translate(0 7.971)" fill="#e5e5e5"/>
+      </g>
+    </g>
+    <g id="Group_462" data-name="Group 462" transform="translate(-38.525 -188.713)">
+      <path id="Path_774" data-name="Path 774" d="M8,0A8,8,0,1,1,0,8,8,8,0,0,1,8,0Z" transform="translate(196.377 268.874)" fill="#f8f8f8"/>
+      <g id="Group_422" data-name="Group 422" transform="translate(130.13 67.18) rotate(45)">
+        <line id="Line_26" data-name="Line 26" x2="6" y2="6" transform="translate(197.777 92.776)" fill="none" stroke="#707070" stroke-linecap="round" stroke-width="2"/>
+        <line id="Line_27" data-name="Line 27" x1="6" y2="6" transform="translate(197.777 92.776)" fill="none" stroke="#707070" stroke-linecap="round" stroke-width="2"/>
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="102.04" height="97.536" viewBox="0 0 102.04 97.536">
+  <g id="Group_674" data-name="Group 674" transform="translate(-137.464 -292)">
+    <path id="calendar-clock" d="M48.14,28.428A19.767,19.767,0,1,0,67.963,48.14,19.846,19.846,0,0,0,48.14,28.428Zm0,33.871A14.1,14.1,0,1,1,62.3,48.14,14.121,14.121,0,0,1,48.14,62.3ZM52.974,48.97a2.831,2.831,0,1,1-4,4l-2.832-2.832a2.829,2.829,0,0,1-.83-2V42.477a2.832,2.832,0,0,1,5.664,0v4.491ZM67.963,19.823v5.664a2.832,2.832,0,1,1-5.664,0V19.823a8.506,8.506,0,0,0-8.5-8.5H14.159a8.506,8.506,0,0,0-8.5,8.5v2.832H31.15a2.832,2.832,0,0,1,0,5.664H5.664V53.8a8.506,8.506,0,0,0,8.5,8.5H25.486a2.832,2.832,0,1,1,0,5.664H14.159A14.175,14.175,0,0,1,0,53.8V19.823A14.175,14.175,0,0,1,14.159,5.664h2.832V2.832a2.832,2.832,0,0,1,5.664,0V5.664H45.309V2.832a2.832,2.832,0,0,1,5.664,0V5.664H53.8A14.175,14.175,0,0,1,67.963,19.823Z" transform="translate(155.003 305.019)" fill="#e5e5e5"/>
+    <rect id="Rectangle_58" data-name="Rectangle 58" width="94" height="94" transform="translate(141.984 292)" fill="none"/>
+    <line id="Line_24" data-name="Line 24" x1="90" y2="90" transform="translate(141 296)" fill="none" stroke="#fff" stroke-linecap="round" stroke-width="5"/>
+    <line id="Line_25" data-name="Line 25" x1="90" y2="90" transform="translate(145.969 296)" fill="none" stroke="#e5e5e5" stroke-linecap="round" stroke-width="5"/>
+  </g>
+</svg>

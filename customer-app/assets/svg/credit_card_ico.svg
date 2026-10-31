@@ -1,0 +1,7 @@
+<svg id="credit_card_ico" data-name="credit card ico" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <g id="credit-card" transform="translate(1.701 4.275)">
+    <circle id="Ellipse_107" data-name="Ellipse 107" cx="1.5" cy="1.5" r="1.5" transform="translate(3.299 8.725)" fill="#67c6b9"/>
+    <path id="Path_389" data-name="Path 389" d="M16.308,3H4.291A4.3,4.3,0,0,0,0,7.291v6.866a4.3,4.3,0,0,0,4.291,4.291H16.308A4.3,4.3,0,0,0,20.6,14.158V7.291A4.3,4.3,0,0,0,16.308,3ZM4.291,4.717H16.308a2.575,2.575,0,0,1,2.575,2.575H1.717A2.575,2.575,0,0,1,4.291,4.717ZM16.308,16.733H4.291a2.575,2.575,0,0,1-2.575-2.575V9.008H18.882v5.15A2.575,2.575,0,0,1,16.308,16.733Z" transform="translate(0 -3)" fill="#67c6b9"/>
+  </g>
+  <rect id="Rectangle_216" data-name="Rectangle 216" width="24" height="24" fill="none"/>
+</svg>
