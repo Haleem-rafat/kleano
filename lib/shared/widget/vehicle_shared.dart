@@ -117,9 +117,7 @@ class VehiclesCard extends StatelessWidget {
                                     ? c.fill
                                     : colorList[selectedColor].color,
                                 shape: CircleBorder(
-                                  side: selectedColor == 0
-                                      ? BorderSide(color: c.separator)
-                                      : BorderSide.none,
+                                  side: BorderSide(color: c.separator),
                                 ),
                               ),
                               child: const SizedBox.square(dimension: KSpace.m),

@@ -223,6 +223,10 @@ class _MainServicesState extends State<MainServices> {
                                             text: "${service.price ?? ''} ",
                                             suffix: SvgPicture.asset(
                                               AssetsManager.saudiRiyalSymbol,
+                                              colorFilter: ColorFilter.mode(
+                                                KColors.of(context).text,
+                                                BlendMode.srcIn,
+                                              ),
                                               height: 12,
                                               width: 12,
                                             ),

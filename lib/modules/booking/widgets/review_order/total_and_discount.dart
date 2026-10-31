@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -47,6 +48,10 @@ class DiscountAndTotal extends StatelessWidget {
                     ),
                     SvgPicture.asset(
                       AssetsManager.saudiRiyalSymbol,
+                      colorFilter: ColorFilter.mode(
+                        KColors.of(context).text,
+                        BlendMode.srcIn,
+                      ),
                       height: 14.h,
                       width: 14.w,
                     ),
@@ -84,6 +89,10 @@ class DiscountAndTotal extends StatelessWidget {
                 AppPadding.p4.pw,
                 SvgPicture.asset(
                   AssetsManager.saudiRiyalSymbol,
+                  colorFilter: ColorFilter.mode(
+                    KColors.of(context).text,
+                    BlendMode.srcIn,
+                  ),
                   height: 14.h,
                   width: 14.w,
                 ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -212,7 +213,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     items: _tabItems(),
                     currentIndex: screenIndex,
                     onTap: _onTabSelected,
-                    activeColor: ColorManager.primary,
+                    activeColor: KColors.of(context).brand,
                     labelStyle: AppStyles.body14Medium,
                   ),
                   Expanded(
@@ -230,8 +231,8 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ? null
             : GlassTabBar(
                 currentIndex: screenIndex,
-                activeColor: ColorManager.primary,
-                inactiveColor: ColorManager.medGray,
+                activeColor: KColors.of(context).brand,
+                inactiveColor: KColors.of(context).textSecondary,
                 labelStyle: AppStyles.body14Medium,
                 items: _tabItems(),
                 onTap: _onTabSelected,

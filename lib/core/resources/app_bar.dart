@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:thewasher/core/design/liquid_glass.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -28,13 +29,13 @@ class AppBarShared extends StatelessWidget {
       automaticallyImplyLeading: false,
       title: Text(
         titleAppBar,
-        style: AppStyles.titleWhite16Bold.copyWith(color: ColorManager.black),
+        style: KType.headline.copyWith(color: KColors.of(context).text),
       ),
       leadingWidth: 60,
       leading: isTextOnly
           ? null
           : GlassBackButton(
-              color: ColorManager.primary,
+              color: KColors.of(context).brand,
               onPressed: onTap ?? () => pop(context),
             ),
     );

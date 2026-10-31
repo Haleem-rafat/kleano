@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:thewasher/core/resources/app_styles.dart';
@@ -27,6 +28,10 @@ class AddOnsDetails extends StatelessWidget {
               SizedBox(width: AppPadding.p4.w),
               SvgPicture.asset(
                 AssetsManager.saudiRiyalSymbol,
+                colorFilter: ColorFilter.mode(
+                  KColors.of(context).text,
+                  BlendMode.srcIn,
+                ),
                 height: 14.h,
                 width: 14.w,
               ),

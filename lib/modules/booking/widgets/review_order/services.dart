@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/tokens.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -48,6 +49,10 @@ class ServicesDetails extends StatelessWidget {
                     AppPadding.p4.pw,
                     SvgPicture.asset(
                       AssetsManager.saudiRiyalSymbol,
+                      colorFilter: ColorFilter.mode(
+                        KColors.of(context).text,
+                        BlendMode.srcIn,
+                      ),
                       height: 14.h,
                       width: 14.w,
                     ),

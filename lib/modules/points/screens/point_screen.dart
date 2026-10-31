@@ -86,7 +86,14 @@ class _PointsBody extends StatelessWidget {
           children: <Widget>[
             Text(text, style: KType.title.copyWith(color: c.text)),
             const SizedBox(width: KSpace.s),
-            SvgPicture.asset(asset, height: KSpace.xxl, width: KSpace.xxl),
+            SvgPicture.asset(
+              asset,
+              height: KSpace.xxl,
+              width: KSpace.xxl,
+              colorFilter: asset == AssetsManager.saudiRiyalSymbol
+                  ? ColorFilter.mode(c.text, BlendMode.srcIn)
+                  : null,
+            ),
           ],
         ),
       ),
