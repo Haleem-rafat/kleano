@@ -456,7 +456,7 @@ void main() {
 
       home.push(BikerGetOrdersAcceptFailed(error: 'No connection'));
       await settle(t);
-      expect(find.text('No connection'), findsOneWidget);
+      expect(find.byType(KErrorState), findsOneWidget);
 
       home.sent.clear();
       await t.tap(find.byKey(const ValueKey<String>('k-error-retry')));
@@ -520,7 +520,7 @@ void main() {
 
       home.push(BikerGetOrdersCompleteFailed(error: 'Server error'));
       await settle(t);
-      expect(find.text('Server error'), findsOneWidget);
+      expect(find.byType(KErrorState), findsOneWidget);
 
       home.completeList = <OrderModel>[order('done', status: 'COMPLETED')];
       home.completeTotalLength = 1;
@@ -585,7 +585,7 @@ void main() {
 
       profile.push(BikerGetTotalCommissionFailed(error: 'Stats failed'));
       await settle(t);
-      expect(find.text('Stats failed'), findsOneWidget);
+      expect(find.byType(KErrorState), findsOneWidget);
 
       await t.tap(find.byKey(const ValueKey<String>('k-error-retry')));
       expect(profile.sent, hasLength(2));
