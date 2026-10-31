@@ -163,5 +163,15 @@
   "wednesday": "الأربعاء",
   "thursday": "الخميس",
   "friday": "الجمعة",
-  "Car Freshener": "معطر السيارة"
+  "Car Freshener": "معطر السيارة",
+  "No Name": "بدون اسم",
+  "PhoneNumberAlreadyExists": "رقم الهاتف مسجل بالفعل",
+  "PhoneNumberHasBeenBlockedForTooManyRequests": "تم حظر هذا الرقم مؤقتًا بسبب كثرة المحاولات. حاول لاحقًا.",
+  "PhoneNumberIsInvalid": "رقم الهاتف غير صحيح",
+  "backButton": "اضغط رجوع مرة أخرى للخروج",
+  "carPlate": "رقم اللوحة",
+  "notValidEmail": "البريد الإلكتروني غير صحيح",
+  "refresh": "تحديث",
+  "requiredEmail": "البريد الإلكتروني مطلوب",
+  "yourNotConnected": "أنت غير متصل بالإنترنت"
 }
