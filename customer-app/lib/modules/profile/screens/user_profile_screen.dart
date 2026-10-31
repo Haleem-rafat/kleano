@@ -115,7 +115,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       );
                     }
                     if (state is! GetUserProfileSuccess) {
-                      return const KLoadingState();
+                      return const KSkeleton.details();
                     }
                     return _ProfileBody(
                       profile: state.userProfile.data!,

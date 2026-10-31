@@ -137,7 +137,7 @@ class _SetBookingLocationScreenState extends State<SetBookingLocationScreen> {
           if (state is LocationInitial ||
               state is GetSavedLocationLoading ||
               state is SetDefaultLocationLoading) {
-            return const KLoadingState();
+            return const KSkeleton.list();
           }
           if (state is GetSavedLocationFailed ||
               state is SetDefaultLocationFailed) {

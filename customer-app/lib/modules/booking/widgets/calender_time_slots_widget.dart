@@ -135,7 +135,7 @@ class _CalenderTimeSlotsWidgetState extends State<CalenderTimeSlotsWidget> {
     return BlocBuilder<BookingOrderBloc, BookingOrderState>(
       builder: (_, state) {
         if (state is CalenderAvailableLoading) {
-          return const KLoadingState();
+          return const KSkeleton.details();
         }
         return SizedBox(
           height: KSpace.tapTarget,

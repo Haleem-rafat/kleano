@@ -8,7 +8,6 @@ import 'package:thewasher/core/design/components/k_states.dart';
 import 'package:thewasher/core/resources/constant_manager.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
 import 'package:thewasher/modules/booking/data/models/review_order_model.dart';
-import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:thewasher/modules/booking/widgets/home/active_order_card.dart';
 import 'package:thewasher/modules/booking/widgets/home/home_sections.dart';
 import 'package:thewasher/modules/my_vehicles/bloc/vehicles_bloc.dart';
@@ -70,7 +69,6 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   Key _offerWidgetKey = UniqueKey();
   final MyBookingBloc _activeOrders = MyBookingBloc();
   final MyBookingBloc _pastOrders = MyBookingBloc();
-  StreamSubscription<MyBookingState>? _pastOrdersSub;
   final ValueNotifier<bool> _scrolledPastHero = ValueNotifier<bool>(false);
 
   String _guestAuthMessage(BuildContext context) {
@@ -294,14 +292,6 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
   void initState() {
     super.initState();
     clearAllOrderDetails();
-    _pastOrdersSub = _pastOrders.stream.listen((MyBookingState state) {
-      mostBookedServiceId.value = mostFrequentId(
-        state.historyList
-            .where((OrderModel o) => o.status == AppConstants.completed)
-            .expand((OrderModel o) => o.washingServices ?? <ServiceModel>[])
-            .map((ServiceModel service) => service.sId),
-      );
-    });
     refreshController = RefreshController();
     bookingScreen = [
       AddServices(onContinue: _continueFromSheet),
@@ -379,7 +369,6 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     refreshController.dispose();
     _isNotesFocused.dispose();
     _activeOrders.close();
-    _pastOrdersSub?.cancel();
     _scrolledPastHero.dispose();
     _pastOrders.close();
     super.dispose();
@@ -527,7 +516,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
     Widget box(Widget child) => SliverToBoxAdapter(child: child);
     return <Widget>[
       box(_buildPhotoHero(c)),
-      box(isLoading ? const KLoadingState() : bookingScreen[0]),
+      box(isLoading ? const KSkeleton.grid() : bookingScreen[0]),
       box(const HomePlansCard()),
       box(
         Padding(
@@ -550,7 +539,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         title: Text(translate(AppStrings.bookingOrder)),
       ),
       SliverToBoxAdapter(
-        child: isLoading ? const KLoadingState() : bookingScreen[indexPage],
+        child: isLoading ? const KSkeleton.details() : bookingScreen[indexPage],
       ),
       _buildActionClearance(),
     ];
@@ -671,51 +660,14 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
         final String label = address.savedName?.isNotEmpty == true
             ? address.savedName!
             : address.streetName ?? translate(AppStrings.defaultAddress);
-        final Widget control = Semantics(
-          button: true,
-          label: label,
-          excludeSemantics: true,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(KRadius.field),
-            onTap: () => pushPage(context, SetBookingLocationScreen()),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: KSpace.s,
-                vertical: KSpace.m,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    Icons.location_on_rounded,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(width: KSpace.xs),
-                  Flexible(
-                    child: Text(
-                      label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: KType.headline.copyWith(color: Colors.white),
-                    ),
-                  ),
-                  Icon(
-                    Icons.keyboard_arrow_down_rounded,
-                    size: 20,
-                    color: Colors.white,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
         return Align(
           alignment: AlignmentDirectional.centerStart,
-          child: LiquidGlass(
-            capsule: true,
-            tint: KColors.light.brand.withValues(alpha: 0.4),
-            child: control,
+          child: KChipButton(
+            leading: const Icon(Icons.location_on_rounded),
+            trailing: const Icon(Icons.keyboard_arrow_down_rounded),
+            label: label,
+            onPhoto: true,
+            onTap: () => pushPage(context, SetBookingLocationScreen()),
           ),
         );
       },
@@ -759,6 +711,7 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
           icon: Icons.notifications_none_rounded,
           sfSymbol: 'bell',
           color: Colors.white,
+          style: GlassButtonStyle.clear,
           tooltip: translate(AppStrings.notifications),
           onPressed: () {
             pushPage(

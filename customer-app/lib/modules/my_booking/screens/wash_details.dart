@@ -128,7 +128,7 @@ class _WashDetailsScreenState extends State<WashDetailsScreen> {
           final OrderModel? order = _order;
           if (order != null) return _details(context, order);
           if (state is OrderByIdLoading) {
-            return const KLoadingState();
+            return const KSkeleton.details();
           }
           if (state is OrderByIdFailed) {
             return KErrorState(

@@ -7,7 +7,6 @@ import 'package:thewasher/core/design/components/k_sheet.dart';
 import 'package:thewasher/core/design/tokens.dart';
 import 'package:thewasher/core/resources/strings_manager.dart';
 import 'package:thewasher/modules/Home/data/model/services_model.dart';
-import 'package:thewasher/modules/booking/home_style.dart';
 import 'package:thewasher/shared/components/cached_network_image.dart';
 
 typedef ServiceOpen = void Function(ServiceModel service, int index);
@@ -154,13 +153,9 @@ class _PhotoTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           Expanded(
-            child: Stack(
-              fit: StackFit.expand,
-              children: <Widget>[
-                if (link.isEmpty)
-                  graphic
-                else
-                  CachedNetworkImage(
+            child: link.isEmpty
+                ? graphic
+                : CachedNetworkImage(
                     imageUrl: link,
                     fit: BoxFit.cover,
                     memCacheWidth:
@@ -173,17 +168,6 @@ class _PhotoTile extends StatelessWidget {
                     errorWidget: (BuildContext _, String _, Object _) =>
                         graphic,
                   ),
-                PositionedDirectional(
-                  top: KSpace.xs,
-                  start: KSpace.xs,
-                  end: KSpace.xs,
-                  child: Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: _BadgeOnPhoto(serviceId: service.sId),
-                  ),
-                ),
-              ],
-            ),
           ),
           Padding(
             padding: const EdgeInsets.all(KSpace.s),
@@ -209,53 +193,6 @@ class _PhotoTile extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-/// A small brand label on the photo of the customer's most booked service.
-class _BadgeOnPhoto extends StatelessWidget {
-  const _BadgeOnPhoto({required this.serviceId});
-
-  final String? serviceId;
-
-  @override
-  Widget build(BuildContext context) {
-    final KColors c = KColors.of(context);
-    return ValueListenableBuilder<String?>(
-      valueListenable: mostBookedServiceId,
-      builder: (BuildContext context, String? id, Widget? child) {
-        if (id == null || id != serviceId) return const SizedBox.shrink();
-        return DecoratedBox(
-          decoration: ShapeDecoration(
-            shape: const StadiumBorder(),
-            color: c.brand,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: KSpace.s,
-              vertical: KSpace.xs / 2,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Icon(Icons.star_rounded, size: KSpace.m, color: c.surface),
-                const SizedBox(width: KSpace.xs / 2),
-                Flexible(
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text(
-                      translate('mostBooked'),
-                      maxLines: 1,
-                      style: KType.caption.copyWith(color: c.surface),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
     );
   }
 }

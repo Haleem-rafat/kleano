@@ -101,7 +101,7 @@ void main() {
     await pump(tester);
     bloc.push(const MyBookingState(myBookingStatus: RequestStatus.loading));
     await tester.pump();
-    expect(find.byType(KLoadingState), findsOneWidget);
+    expect(find.byType(KSkeleton), findsOneWidget);
 
     bloc.push(
       const MyBookingState(myBookingStatus: RequestStatus.connectionError),

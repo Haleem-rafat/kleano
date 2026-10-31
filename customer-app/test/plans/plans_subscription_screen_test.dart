@@ -109,7 +109,7 @@ void main() {
     await pump(tester);
     bloc.push(GetPlansLoading());
     await tester.pump();
-    expect(find.byType(KLoadingState), findsOneWidget);
+    expect(find.byType(KSkeleton), findsOneWidget);
 
     bloc.push(PlansAndSubscriptionConnectionError());
     await tester.pump();

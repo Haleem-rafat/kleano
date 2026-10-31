@@ -129,7 +129,7 @@ void main() {
 
     bloc.push(OrderByIdLoading());
     await tester.pump();
-    expect(find.byType(KLoadingState), findsOneWidget);
+    expect(find.byType(KSkeleton), findsOneWidget);
 
     bloc.push(OrderByIdSuccess(orderModel: order()));
     await tester.pumpAndSettle();

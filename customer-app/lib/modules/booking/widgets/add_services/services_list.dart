@@ -241,7 +241,9 @@ class _ServicesListState extends State<ServicesList> {
         bloc: offersBloc,
         builder: (context, state) {
           if (_shouldShowLoading(state)) {
-            return const KLoadingState();
+            return widget.onContinue == null
+                ? const KSkeleton.list(padding: EdgeInsets.zero)
+                : const KSkeleton.grid(padding: EdgeInsets.zero);
           }
 
           // Handle empty services state

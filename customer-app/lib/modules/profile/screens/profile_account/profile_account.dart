@@ -133,7 +133,7 @@ class _ProfileAccountScreenState extends State<ProfileAccountScreen> {
               ],
             );
           }
-          return const KLoadingState();
+          return const KSkeleton.details();
         },
       ),
     );

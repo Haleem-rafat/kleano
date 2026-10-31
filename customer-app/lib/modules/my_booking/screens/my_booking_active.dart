@@ -65,7 +65,7 @@ class _MyBookingActiveState extends State<MyBookingActive> {
       },
       builder: (BuildContext context, MyBookingState state) {
         if (state.myBookingStatus == RequestStatus.loading) {
-          return const KLoadingState();
+          return const KSkeleton.list();
         } else if (state.myBookingStatus == RequestStatus.connectionError) {
           return KErrorState(
             message: translate(AppStrings.yourNotConnected),

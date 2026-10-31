@@ -35,7 +35,7 @@ class ContactUsScreen extends StatelessWidget {
           },
           builder: (BuildContext context, AboutUsState state) {
             if (state.status == AboutUsStateStatus.loading) {
-              return const KLoadingState();
+              return const KSkeleton.details();
             }
             if (state.status == AboutUsStateStatus.success) {
               return _buildContactInfo(context, state);
