@@ -1,8 +1,9 @@
 # Kleano apps — rules for every session
 
-Two Flutter apps share one design system: `Kleano-Flutter-dev/` (customer) and
-`Kleano-Biker-Flutter-dev/` (biker). Read `docs/HANDOFF.md` first, then
-`docs/design-system.md`. Design system page:
+One repo: two Flutter apps sharing one design system, `customer-app/` and `biker-app/`,
+plus `dashboard/` (React admin), `landing/` (marketing page) and `backend/` (NestJS +
+MongoDB API, live at `kleano-backend.onrender.com`). Read `docs/HANDOFF.md` first, then
+`docs/design-system.md`; for backend work `docs/backend-review.md`. Design system page:
 https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
 
 ## Everything must match the design system (owner's rule)
@@ -26,12 +27,17 @@ https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
 - Keep the app's own identity: its icons in `assets/svg/`, its photos, its wording.
   No generic placeholder UI.
 - If something you need isn't in the design system, add it there (customer app),
-  run `tool/sync_design.sh`, and document it — don't style it inline.
+  run `customer-app/tool/sync_design.sh`, and document it — don't style it inline.
 
 ## Working rules
 
 - Keep BLoC/cubit calls, navigation and validation unchanged when restyling.
-- After changes: `flutter analyze` (0 errors) and `flutter test` in both apps,
-  `tool/sync_design.sh --check`, then check on the simulator before saying done.
+- After app changes: `flutter analyze` (0 errors) and `flutter test` in both apps,
+  `customer-app/tool/sync_design.sh --check`, then check on the simulator before saying done.
+- After backend changes (in `backend/`): `npx tsc -p tsconfig.build.json --noEmit`
+  (0 errors), `npm run lint`, `npm test`. Keep response shapes unchanged: the apps and
+  dashboard parse them.
 - Don't type OTP codes or passwords into the app: it uses the live backend.
-- Commit in both repos after each verified step; never push.
+- Never commit `backend/.env`, deploy the backend, or call its admin, payment or webhook
+  routes on the live server without the owner's OK.
+- Commit in the root repo after each verified step; never push.

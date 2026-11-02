@@ -7,12 +7,13 @@ set -euo pipefail
 
 here="$(cd "$(dirname "$0")/.." && pwd)"
 src="$here/lib/core/design"
-dst="$here/../Kleano-Biker-Flutter-dev/lib/core/design"
+dst="$here/../biker-app/lib/core/design"
 
 render() { # $1 = output dir
   mkdir -p "$1"
   rsync -a --delete "$src/" "$1/"
-  find "$1" -name '*.dart' -exec sed -i '' 's#package:thewasher/#package:thewhsherbiker/#g' {} +
+  # perl -pi works the same on macOS and Linux (sed -i does not).
+  find "$1" -name '*.dart' -exec perl -pi -e 's#package:thewasher/#package:thewhsherbiker/#g' {} +
 }
 
 if [[ "${1:-}" == "--check" ]]; then

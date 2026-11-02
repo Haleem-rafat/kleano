@@ -27,7 +27,7 @@ The notification sound file exists at `assets/audio/newOrder.wav` but needs to b
 
 3. Select **"Add Files to Runner..."**
 
-4. Navigate to: `Kleano-Biker-Flutter/assets/audio/`
+4. Navigate to: `biker-app/assets/audio/`
 
 5. Select `newOrder.wav`
 

@@ -1,27 +1,41 @@
 # Kleano redesign — handoff prompt
 
-Paste everything below the line into a new Claude Code session opened in
-`/Users/mac/Documents/prsonal/Kleno-app`.
+Paste everything below the line into a new Claude Code session opened at the repo root
+(`kleano/`; on the current machine `/home/typezero/Work/insightx/kleano`).
 
 ---
 
 You are continuing the Kleano app redesign. Read these first, in order:
-`docs/design-system.md`, `docs/superpowers/specs/2026-10-30-kleano-redesign-design.md`,
-`UPGRADE_REPORT.md`. The published design system (tokens, components, iOS/Android rules,
+`docs/design-system.md`, `docs/backend-review.md`. The redesign spec
+(`docs/superpowers/specs/2026-10-30-kleano-redesign-design.md`), `UPGRADE_REPORT.md`,
+`reports/`, `docs/screens/` and `docs/kleano-client-guide.html` were on the old machine and are
+not in this repo; references to them below are history. The published design system (tokens, components, iOS/Android rules,
 layouts) is at https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk.
 
 ## Projects
 
-- `Kleano-Flutter-dev/` — customer app (package `thewasher`), local git, source of truth
-  for the shared design code in `lib/core/design/`.
-- `Kleano-Biker-Flutter-dev/` — biker app (package `thewhsherbiker`), local git.
-- After any change under `Kleano-Flutter-dev/lib/core/design/` run
-  `Kleano-Flutter-dev/tool/sync_design.sh` then `tool/sync_design.sh --check`.
+One git repo (root `kleano/`); each folder used to be its own repo.
+
+- `customer-app/` — customer app (package `thewasher`), source of truth for the shared
+  design code in `lib/core/design/`.
+- `biker-app/` — biker app (package `thewhsherbiker`).
+- After any change under `customer-app/lib/core/design/` run
+  `customer-app/tool/sync_design.sh` then `customer-app/tool/sync_design.sh --check`.
   `ios/Runner/KleanoNative.swift` is identical in both apps: copy it across by hand.
-- `*-prod` folders are the old production copies: reference only, don't edit.
+- `dashboard/` — React admin dashboard (Vite, Tailwind, shadcn); `npm run dev`, port 4000.
+- `landing/` — static marketing page (port 4100 when served locally).
+- `backend/` — NestJS 9 + MongoDB API that the apps and dashboard call. The apps use
+  `https://kleano-backend.onrender.com/api/`; the backend's own CI
+  (`backend/.github/workflows/push.yml`, push to `prod`) deploys a GHCR image to a VPS.
+  Which one is production is not confirmed: ask the owner. Run: `npm install`, `npm run start:dev` (port 3000,
+  needs `backend/.env`). Checks: `npx tsc -p tsconfig.build.json --noEmit`, `npm run lint`,
+  `npm test`. `backend/.env` holds live secrets: never commit it. Review with open security
+  issues: `docs/backend-review.md`.
+- The old `*-prod` production copies are not in this repo.
 - Flutter 3.47.8. Build for the simulator:
   `flutter build ios --simulator --debug --flavor dev -t lib/main_dev.dart`.
   Booted simulator: iPhone 18 Pro. Customer dev bundle id: `co.spiritude.kleanoDev`.
+  (Simulator and `~/Library/...` paths below are from the old macOS machine.)
 
 ## Owner's goals
 
@@ -135,7 +149,7 @@ New shared component `KPickerField` (core/design/components/k_picker_field.dart,
 to Biker): a field that opens a searchable sheet — **use it to replace every dropdown in
 both apps** (owner: dropdowns are "so ugly"). Find the rest with
 `grep -rn "DropdownSearchShared\|DropdownButton" lib` in both apps.
-Owner rules are now in `Kleno-app/CLAUDE.md` (everything must match the design system).
+Owner rules are now in `CLAUDE.md` (repo root) (everything must match the design system).
 The app does not bundle the `cupertino_icons` font: `CupertinoIcons.*` render as "?"
 (seen in the picker; also used in `Home/screens/home_screen.dart`). Add `cupertino_icons`
 to both pubspecs or use Material icons.
@@ -145,7 +159,7 @@ edit mode has no "Delete vehicle" action yet (delete is swipe on the list).
 
 ## (was) TOP PRIORITY: vehicle add / edit / delete (owner: "UI so bad, not app principles")
 
-File: `Kleano-Flutter-dev/lib/modules/my_vehicles/screens/edit_vehicles_screen.dart`
+File: `customer-app/lib/modules/my_vehicles/screens/edit_vehicles_screen.dart`
 (~1,150 lines; used for create and edit) + `shared/widget/vehicle_shared.dart` (car card)
 + `shared/components/alert_helper/delete_car_alert.dart` (already KDialog).
 Seen on the simulator ("Add New Vehicles"):
@@ -205,7 +219,7 @@ flows / Biker flows. Work one row at a time: rebuild the widget tree on the desi
 system, keep every BLoC/cubit call and navigation target, add a widget test, run
 analyze + tests in both apps, commit, then tick the row here.
 
-| # | Mockup | Files (customer = `Kleano-Flutter-dev/lib/modules/`, biker = `Kleano-Biker-Flutter-dev/lib/modules/`) | Status |
+| # | Mockup | Files (customer = `customer-app/lib/modules/`, biker = `biker-app/lib/modules/`) | Status |
 |---|---|---|---|
 | 1 | ProfileFlow · Profile | customer `profile/screens/user_profile_screen.dart` (done: grouped KListRows, logout confirmed in KDialog, KLoading/KErrorState); `profile_guest_view/` still todo; `widgets/list_of_screens_in_profile.dart`, `header_profile.dart`, `my_wallet.dart`, `my_points.dart` now unused, delete after checking | done, seen running with real data |
 | 2 | ProfileFlow · Wallet, Notifications | customer `profile/widgets/wallet_topup_bottom_sheet.dart` (→ showKSheet), `notifications/screens/notifications_screen.dart`, `guest_notification_screen.dart` | todo |
@@ -230,10 +244,10 @@ Approved design: Design System https://claude.ai/artifact/WmVGCPkT3vAHz77umXbaRf
 Latest fixes: customer 944d3da, 28b48bc; biker eed0909, 1e635f8, ba0df8f. Tests: customer 154, biker 105.
 Seen running: biker tabs, schedule, settings, notifications, order steps (iOS), biker Orders (Android, before the segment colour fix); customer Home, Profile, Account, points, promo, about, wash details (iOS). Not seen: the Android splash and segment fixes, the moved map label, the Account avatar and phone fixes; customer tracking map, wallet, dialogs, onboarding, login photo; biker login photo (`photo_onboard_three.png` is a hand holding banknotes: check it suits the login).
 Client guide updated: https://claude.ai/artifact/8JyAdVtste4WXgCpizqHWE. Still to do: build the Figma files once the Figma plugin is connected (design system, both apps' screens, flows, prototype).
-Owner's queue, in order (2026-10-31): dark mode in both apps (`themeMode` is still light; old screens still hard-code colours); test every page and flow in both apps for the client demo, starting with Account; restyle `kleano-client-admin-web-development/` with shadcn to match the apps, updating the dashboard's stack if needed; build a landing page. Done in this batch: `KSwipeAction` and wash progress bar (stages now go in order; skipping a stage was possible before), `KRatingStars`, dialogs, customer Profile in the biker style, softer Android glass shadow, fixed Android secondary colours. Not seen on a device yet: customer Profile, new dialogs and rating, Android back-button shadow, the `order_pop_up.dart` new-order popup is not restyled further.
+Owner's queue, in order (2026-10-31): dark mode in both apps (`themeMode` is still light; old screens still hard-code colours); test every page and flow in both apps for the client demo, starting with Account; restyle `dashboard/` with shadcn to match the apps, updating the dashboard's stack if needed; build a landing page. Done in this batch: `KSwipeAction` and wash progress bar (stages now go in order; skipping a stage was possible before), `KRatingStars`, dialogs, customer Profile in the biker style, softer Android glass shadow, fixed Android secondary colours. Not seen on a device yet: customer Profile, new dialogs and rating, Android back-button shadow, the `order_pop_up.dart` new-order popup is not restyled further.
 Before comparing Android colours, reinstall: a stale customer install (13:58) caused an "Android colours differ" report.
 Latest measurements (customer dev profile build, Android emulator, 2026-10-31): start about 2.2 s, memory about 177 MB, build p90 about 1 ms, Home raster p90 9-17 ms with 5-25% of frames over 16.7 ms, Bookings mostly 0 over. Emulator numbers only: measure on a real phone. Release APK dev 83 MB (customer), 78 MB (biker); iOS release builds compile unsigned. Open: customer iOS went black once while idle (no error, restart cleared it, one-minute background did not reproduce it). Not fixed from the crash audit: map_screen stream never cancelled, biker home_screen.dart:128 push without title, guest_home.dart:104 `placemarks.first.street!`, tracking `biker!` from Bookings for statuses other than the two excluded. `as` casts not audited.
-Added 2026-10-31 (later): dark mode foundation (`KThemeMode`, `KThemePicker`, light stays the default; iOS window style set over `kleano/appearance`); seen dark on customer Home, Settings, Vehicles, Bookings, Plans before the last fixes. Older screens with fixed colours not converted: edit vehicle, onboarding, guest home, order review parts, and the shared old buttons and fields. Dashboard: git baseline created in `kleano-client-admin-web-development/`; login, sidebar and theme restyled; run `npm run dev` (port 4000); inner pages unseen, need the owner's login. Landing page: `landing/` (port 4100). Store links and contact details still missing. Before the repo push: real keys are tracked (see the session's secret scan), so the repo must be private.
+Added 2026-10-31 (later): dark mode foundation (`KThemeMode`, `KThemePicker`, light stays the default; iOS window style set over `kleano/appearance`); seen dark on customer Home, Settings, Vehicles, Bookings, Plans before the last fixes. Older screens with fixed colours not converted: edit vehicle, onboarding, guest home, order review parts, and the shared old buttons and fields. Dashboard: git baseline created in `dashboard/`; login, sidebar and theme restyled; run `npm run dev` (port 4000); inner pages unseen, need the owner's login. Landing page: `landing/` (port 4100). Store links and contact details still missing. Before the repo push: real keys are tracked (see the session's secret scan), so the repo must be private.
 Customer Home is the owner's chosen Mix layout (2026-10-31): photo fading into the page, Liquid Glass top controls, wash card with animated stage bar, photo service tiles with See all on the title line, gradient plans card, offers, three promise cards. Other Home versions were removed. Most booked comes from the customer's own finished washes. Live status on Home updates on reload only.
 Device rule: the owner may be using the emulator or simulator. Confirm first and screenshot before every tap. Blind `adb` taps can land on Confirm Order, which places a real order on the live backend.
 Suspected, unfixed: biker start/complete wash event may never send (`context.mounted` on a popped sheet in `event_stepper.dart`, `button_complete_wash.dart`), high priority; one service tap sends AddServiceCart twice (`main_services.dart` toggle plus `services_list.dart` callback; total stayed correct); Apple Pay/wallet total may ignore applied points; dev Apple merchant ID hard-coded; card payment leaves Confirm disabled after closing the sheet; order listener fires once per payment row; `country: "saudi arabia"` hard-coded; WhatsApp 966 prefix in `biker_details.dart`; biker completed pagination uses `activePageNumber`. Full lists were in the session reports.
@@ -244,11 +258,26 @@ Suspected, unfixed: biker start/complete wash event may never send (`context.mou
   no OTP check). Left as TODOs; wiring it changes behaviour.
 - Dark mode: white text on dark brand `#b88cd0` fails contrast; recommended `#1c1c1e`.
 - The dev app works against the live backend `kleano-backend.onrender.com` (both
-  flavors use it). A separate staging backend is recommended (UPGRADE_REPORT BE-10).
+  flavors use it, `customer-app/lib/api/app_config.dart`). A separate staging backend is
+  recommended (UPGRADE_REPORT BE-10), now possible since `backend/` is in the repo.
+- Backend security fixes (`docs/backend-review.md`): the Moyasar webhook is unverified (free
+  wallet credit, orders marked paid), biker accounts can be taken over from a phone number,
+  Qoyod routes are public, any user can cancel or read anyone's order or wallet. The fixes
+  are small but need a deploy to the live server: ask before deploying.
+
+## Backend (added 2026-11-02)
+
+`backend/` was added to the repo on 2026-11-02 and reviewed the same day (read only, no
+changes): `docs/backend-review.md`. Open, in order: the eight "Fix first" items there (unverified
+Moyasar webhook, biker reset from `check-phone`, public Qoyod routes, order and wallet owner
+checks, Tamara checkout proxy, wallet double spend, writes outside the transaction), then OTP
+throttling, the `000000` test numbers and `.env` baked into the Docker image. Several app-side
+"suspected" items above may be backend bugs too: check the backend before patching the app.
 
 ## Rules for the agent
 
 - Don't type OTP codes or passwords into the app: it talks to the live backend. Open the
   screen and ask the owner to type them in the simulator panel.
-- Commit in both repos after each verified step; never push.
+- Commit in the root repo after each verified step; never push.
+- Don't deploy the backend or call its admin, payment or webhook routes on the live server.
 - One primary button per screen; brand purple only for actions; no purple bars.

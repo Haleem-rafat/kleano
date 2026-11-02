@@ -1,7 +1,7 @@
 # Kleano Design System
 
 One design system for both Kleano apps (**User** and **Biker**), on iOS and Android.
-Source of truth: `Kleano-Flutter-dev/lib/core/design/` (copied byte-identical into the Biker app by `tool/sync_design.sh`).
+Source of truth: `customer-app/lib/core/design/` (copied byte-identical into the Biker app by `tool/sync_design.sh`).
 
 ## 1. Principles
 
