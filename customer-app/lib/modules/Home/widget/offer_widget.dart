@@ -49,34 +49,39 @@ class _OfferWidgetState extends State<OfferWidget> {
               Localizations.localeOf(context).languageCode == 'ar';
           return Column(
             children: <Widget>[
-              AspectRatio(
-                aspectRatio: 1.9,
-                child: PageView.builder(
-                  controller: _pageController,
-                  itemCount: banners.length,
-                  onPageChanged: (int index) {
-                    setState(() => currentIndex = index);
-                  },
-                  itemBuilder: (BuildContext context, int index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: KSpace.xs,
-                      ),
-                      child: KCard(
-                        padding: EdgeInsets.zero,
-                        onTap: () => _handleBannerTap(context, banners[index]),
-                        child: ImageShared(
-                          image: arabic
-                              ? banners[index].imageLinkAr ?? ''
-                              : banners[index].imageLink ?? '',
-                          height: double.infinity,
-                          width: double.infinity,
-                          raduis: KRadius.card,
-                          fit: BoxFit.cover,
+              // Keeps banners from filling the screen when unfolded.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 280),
+                child: AspectRatio(
+                  aspectRatio: 1.9,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: banners.length,
+                    onPageChanged: (int index) {
+                      setState(() => currentIndex = index);
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: KSpace.xs,
                         ),
-                      ),
-                    );
-                  },
+                        child: KCard(
+                          padding: EdgeInsets.zero,
+                          onTap: () =>
+                              _handleBannerTap(context, banners[index]),
+                          child: ImageShared(
+                            image: arabic
+                                ? banners[index].imageLinkAr ?? ''
+                                : banners[index].imageLink ?? '',
+                            height: double.infinity,
+                            width: double.infinity,
+                            raduis: KRadius.card,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
               if (banners.length > 1) ...<Widget>[

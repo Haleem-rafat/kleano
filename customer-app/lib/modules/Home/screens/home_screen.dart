@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,7 @@ String currentAddress = "";
 String administrativeArea = "";
 String country = "";
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends StatefulWidget implements KFullWidthPage {
   final bool isFromSignUp;
   const HomeScreen({super.key, this.isFromSignUp = false});
 

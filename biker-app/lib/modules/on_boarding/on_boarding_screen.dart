@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_translate/flutter_translate.dart';
@@ -8,7 +10,7 @@ import 'package:thewhsherbiker/modules/Auth/screens/log_in_screen.dart';
 import 'package:thewhsherbiker/modules/on_boarding/on_boarding_model.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
-class OnboardScreen extends StatefulWidget {
+class OnboardScreen extends StatefulWidget implements KFullWidthPage {
   const OnboardScreen({super.key});
 
   @override
@@ -88,10 +90,16 @@ class _OnboardScreenState extends State<OnboardScreen> {
             ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  KSpace.xxl,
+                padding: EdgeInsets.fromLTRB(
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.s,
-                  KSpace.xxl,
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.l,
                 ),
                 child: Column(

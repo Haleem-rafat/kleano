@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -579,7 +580,7 @@ class _PriceRow extends StatelessWidget {
   }
 }
 
-class _FullScreenMapView extends StatefulWidget {
+class _FullScreenMapView extends StatefulWidget implements KFullWidthPage {
   final LatLng latLng;
   final String locationName;
 

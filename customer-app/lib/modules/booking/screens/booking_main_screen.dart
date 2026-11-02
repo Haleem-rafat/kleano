@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -624,7 +625,9 @@ class _BookingMainScreenState extends State<BookingMainScreen> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(height: MediaQuery.paddingOf(context).top),
+              SizedBox(
+                height: math.max(MediaQuery.paddingOf(context).top, KSpace.s),
+              ),
               Row(
                 children: <Widget>[
                   const SizedBox(width: KSpace.s),

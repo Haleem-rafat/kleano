@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
@@ -13,7 +15,7 @@ import 'package:thewasher/modules/Auth/screens/log_in_screen.dart';
 import 'package:thewasher/modules/Auth/screens/sign_up_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-class ChooseRegisterView extends StatefulWidget {
+class ChooseRegisterView extends StatefulWidget implements KFullWidthPage {
   // bool comeFromMain;
   const ChooseRegisterView({super.key});
 
@@ -67,10 +69,16 @@ class _ChooseRegisterViewState extends State<ChooseRegisterView> {
             ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
+                padding: EdgeInsets.fromLTRB(
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.xxl,
-                  KSpace.xxl,
-                  KSpace.xxl,
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.l,
                 ),
                 child: Column(

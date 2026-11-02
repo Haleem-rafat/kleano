@@ -1,3 +1,4 @@
+import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -27,7 +28,7 @@ import 'package:thewhsherbiker/shared/components/snack_bar.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
-class OrderChangeStatus extends StatefulWidget {
+class OrderChangeStatus extends StatefulWidget implements KFullWidthPage {
   final ord.OrderModel order;
   final int? index;
   final bool notification;

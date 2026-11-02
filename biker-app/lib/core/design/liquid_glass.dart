@@ -9,6 +9,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'adaptive_screen.dart';
+
 /// The glass navigation controls of both apps:
 ///
 ///  * Glass is only the navigation layer: the tab bar, back and top-bar buttons,
@@ -1252,10 +1254,16 @@ class LiquidGlassTheme {
       splashFactory: InkSparkle.splashFactory,
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: <TargetPlatform, PageTransitionsBuilder>{
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-          TargetPlatform.macOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.iOS: KAdaptivePageTransitions(
+            CupertinoPageTransitionsBuilder(),
+          ),
+          TargetPlatform.macOS: KAdaptivePageTransitions(
+            CupertinoPageTransitionsBuilder(),
+          ),
           // Android 16 predictive back (swipe preview of the previous page).
-          TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+          TargetPlatform.android: KAdaptivePageTransitions(
+            PredictiveBackPageTransitionsBuilder(),
+          ),
         },
       ),
       bottomSheetTheme: base.bottomSheetTheme.copyWith(

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:thewasher/core/design/components/k_button.dart';
@@ -12,7 +14,7 @@ import 'package:thewasher/modules/on_boarding/choose_register.dart';
 import 'package:thewasher/modules/on_boarding/on_boarding_model.dart';
 import 'package:thewasher/utilties/navigator.dart';
 
-class OnboardScreen extends StatefulWidget {
+class OnboardScreen extends StatefulWidget implements KFullWidthPage {
   const OnboardScreen({super.key});
 
   @override
@@ -99,10 +101,16 @@ class _OnboardScreenState extends State<OnboardScreen> {
             ),
             SafeArea(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  KSpace.xxl,
+                padding: EdgeInsets.fromLTRB(
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.s,
-                  KSpace.xxl,
+                  math.max(
+                    KSpace.xxl,
+                    (MediaQuery.sizeOf(context).width - 480) / 2,
+                  ),
                   KSpace.l,
                 ),
                 child: Column(

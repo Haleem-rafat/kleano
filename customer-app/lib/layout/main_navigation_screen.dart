@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'package:thewasher/utilties/navigator.dart';
 import 'dart:async';
 
@@ -32,7 +33,7 @@ import 'package:thewasher/shared/singleton.dart';
 import 'package:thewasher/utilties/order_utils.dart';
 import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 
-class MainNavigationScreen extends StatefulWidget {
+class MainNavigationScreen extends StatefulWidget implements KFullWidthPage {
   final int selectedIndex;
   final bool isBooking;
 
@@ -121,7 +122,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
               child: child,
             );
           },
-      child: screens[screenIndex],
+      child: AdaptiveContent(
+        key: ValueKey<int>(screenIndex),
+        maxWidth: 840,
+        child: screens[screenIndex],
+      ),
     );
   }
 

@@ -166,7 +166,7 @@ class _KSkeletonState extends State<KSkeleton>
   );
 
   List<Widget> _grid() {
-    const int columns = 3;
+    final int columns = MediaQuery.sizeOf(context).width >= 600 ? 6 : 3;
     final int rows = (widget.count / columns).ceil();
     return <Widget>[
       const FractionallySizedBox(

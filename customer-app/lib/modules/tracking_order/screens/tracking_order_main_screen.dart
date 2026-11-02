@@ -1,3 +1,4 @@
+import 'package:thewasher/core/design/adaptive_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
@@ -12,7 +13,7 @@ import 'package:thewasher/modules/tracking_order/screens/widgets/bottom_sheet_st
 import 'package:thewasher/shared/services/service_locator.dart';
 import 'package:thewasher/shared/singleton.dart';
 
-class TrackingOrderMainScreen extends StatefulWidget {
+class TrackingOrderMainScreen extends StatefulWidget implements KFullWidthPage {
   final AcceptedOrderByBikerModel? orderAcceptedModel;
   final OrderModel? orderModel;
   const TrackingOrderMainScreen({

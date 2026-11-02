@@ -1,4 +1,6 @@
-import 'package:flutter/widgets.dart';
+import 'dart:ui' show DisplayFeature, DisplayFeatureType;
+
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// ScreenUtil set-up that works on every screen shape: phones (portrait and
@@ -79,6 +81,76 @@ class AdaptiveContent extends StatelessWidget {
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: child,
+      ),
+    );
+  }
+}
+
+/// A page that uses the whole window on wide screens: maps, full-bleed photos
+/// and the tab shell, which limits its own content.
+abstract interface class KFullWidthPage {}
+
+/// Gives every other page a readable width on unfolded foldables, tablets and
+/// landscape, in one place. A hinge with a real gap keeps the page in one pane.
+class KAdaptivePageTransitions extends PageTransitionsBuilder {
+  const KAdaptivePageTransitions(this.base);
+
+  final PageTransitionsBuilder base;
+
+  static final Expando<bool> _fullWidth = Expando<bool>();
+
+  static bool _isFullWidth(PageRoute<dynamic> route, BuildContext context) =>
+      _fullWidth[route] ??=
+          route is MaterialPageRoute<dynamic> &&
+          route.builder(context) is KFullWidthPage;
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => base.buildTransitions<T>(
+    route,
+    context,
+    animation,
+    secondaryAnimation,
+    _isFullWidth(route, context) ? child : KReadablePage(child: child),
+  );
+}
+
+/// Centres one page at a readable width; a no-op on phones.
+class KReadablePage extends StatelessWidget {
+  const KReadablePage({super.key, required this.child});
+
+  static const double maxWidth = 720;
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final MediaQueryData mq = MediaQuery.of(context);
+    final bool gap = mq.displayFeatures.any(
+      (DisplayFeature f) =>
+          f.type != DisplayFeatureType.cutout &&
+          f.bounds.width > 0 &&
+          f.bounds.height > f.bounds.width,
+    );
+    if (gap) return DisplayFeatureSubScreen(child: child);
+    if (mq.size.width <= maxWidth) return child;
+    return ColoredBox(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Center(
+        child: SizedBox(
+          width: maxWidth,
+          child: MediaQuery(
+            data: mq
+                .removePadding(removeLeft: true, removeRight: true)
+                .copyWith(size: Size(maxWidth, mq.size.height)),
+            child: child,
+          ),
+        ),
       ),
     );
   }

@@ -1,3 +1,4 @@
+import 'package:thewhsherbiker/core/design/adaptive_screen.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ import 'package:thewhsherbiker/modules/profile/bloc/profile_bloc.dart';
 import 'package:thewhsherbiker/shared/services/service_locator.dart';
 import 'package:thewhsherbiker/utilties/navigator.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends StatefulWidget implements KFullWidthPage {
   const SplashScreen({super.key});
 
   /// Longest the profile may hold the splash; a late answer still reaches Home.

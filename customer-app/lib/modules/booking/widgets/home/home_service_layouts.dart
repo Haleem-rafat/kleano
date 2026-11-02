@@ -101,7 +101,9 @@ class _HomeServiceGridState extends State<HomeServiceGrid> {
           padding: EdgeInsets.zero,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: _columns,
+          crossAxisCount: MediaQuery.sizeOf(context).width >= 600
+              ? _columns * _compactRows
+              : _columns,
           crossAxisSpacing: KSpace.s,
           mainAxisSpacing: KSpace.s,
           childAspectRatio: 0.72,
