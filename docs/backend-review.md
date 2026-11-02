@@ -91,7 +91,8 @@ provider's behaviour that was not checked.
   every restart; `orders-cron.service.ts` (every 30 min) is the only backup.
 - Webhook handlers `console.log` the full provider body (customer data in logs).
 - `npm audit`: 8 critical, 31 high in production dependencies. Nest 9 is out of support.
-- CI (`.github/workflows/push.yml`) deploys on push to `prod` only; it runs no lint or tests.
+- CI (`.github/workflows/push.yml`) is the production deploy (push to `prod`); it runs no lint
+  or tests before deploying. It is inert in this monorepo and must stay that way.
 - One shared `ACCESS_TOKEN_SECRET` for users, bikers and admins; the `ADMIN_JWT_*` variables
   in `.env` are unused.
 

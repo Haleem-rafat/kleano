@@ -39,5 +39,7 @@ https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
   dashboard parse them.
 - Don't type OTP codes or passwords into the app: it uses the live backend.
 - Never commit `backend/.env`, deploy the backend, or call its admin, payment or webhook
-  routes on the live server without the owner's OK.
+  routes on the live server without the owner's OK. The backend CI
+  (`backend/.github/workflows/push.yml`) is the production deploy: never trigger it, move it
+  to the root `.github/`, or create a `prod` branch.
 - Commit in the root repo after each verified step; never push.
