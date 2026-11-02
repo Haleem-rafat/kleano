@@ -68,7 +68,7 @@ const responseInterceptor = instance.interceptors.response.use(
         axios.interceptors.response.eject(responseInterceptor);
 
         if (newToken) return instance(originalConfig);
-        else throw router.navigate(ROUTES.LOG_IN);;
+        else throw router.navigate(ROUTES.LOG_IN);
       } catch (_err) {
         return Promise.reject(_err);
       }

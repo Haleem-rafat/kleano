@@ -18,7 +18,6 @@ class UsersService {
     return data;
   }
 
-
   public async getUsersDetails(userId: string) {
     const { data } = await api.get(`${EAPI.USERS}/${userId}`);
     return data;
@@ -28,7 +27,7 @@ class UsersService {
     const { data } = await api.get(EAPI.USERS_EXPORT_EXCEL, { responseType: 'blob' });
     return data;
   }
-  public async toggleUserStatus(userId: string, status: 'suspend' | "unsuspend") {
+  public async toggleUserStatus(userId: string, status: 'suspend' | 'unsuspend') {
     const { data } = await api.post(`${EAPI.SUSPEND_USER}/${userId}/${status}`);
     return data;
   }

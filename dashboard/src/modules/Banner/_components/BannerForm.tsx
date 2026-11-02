@@ -1,4 +1,7 @@
-import { Button, ImgUpload, MainInput, MainSelect } from '@UI/Index';
+import { v } from '@app/utils/validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { Button, ImgUpload, MainInput, MainSelect, SheetActions } from '@UI/Index';
 import React, { SetStateAction, useState, useEffect, useRef } from 'react';
 import { Form, FormControl, FormField, FormItem, FormLabel } from '@shadecn/components/ui/form';
 import { RadioGroup, RadioGroupItem } from '@shadecn/components/ui/radio-group';
@@ -57,6 +60,31 @@ const BannerForm = ({ setOpen, oldData }: BannerFormProps) => {
   });
 
   const form = useForm({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(
+      Yup.object({
+        title: v.text(80),
+        description: v.optionalText(300),
+        image: v.file(),
+        imageAr: v.file(),
+        linkType: v.choice(),
+        externalUrl: Yup.string().when('linkType', {
+          is: 'external',
+          then: () => v.url(),
+          otherwise: (sch) => sch.notRequired(),
+        }),
+        resource: Yup.string().when('linkType', {
+          is: 'internal',
+          then: () => v.choice(),
+          otherwise: (sch) => sch.notRequired(),
+        }),
+        resourceId: Yup.mixed().when('linkType', {
+          is: 'internal',
+          then: () => v.picked(),
+          otherwise: (sch) => sch.notRequired(),
+        }),
+      })
+    ) as any,
     defaultValues: {
       title: oldData?.title || '',
       description: oldData?.description || '',
@@ -238,10 +266,9 @@ const BannerForm = ({ setOpen, oldData }: BannerFormProps) => {
   ];
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {/* {loadingCitiesOptions && loadingAreasOptions && <ThreeDotsLoader />} */}
+    <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5 ">
+        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 ">
           {formFields.map((formField) => (
             <FormField
               key={formField?.name}
@@ -283,7 +310,7 @@ const BannerForm = ({ setOpen, oldData }: BannerFormProps) => {
               name="linkType"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-text-600 text-start text-sm font-semibold">
+                  <FormLabel className="text-start text-sm font-semibold text-foreground">
                     {t('Link Type')}
                   </FormLabel>
                   <FormControl>
@@ -345,10 +372,10 @@ const BannerForm = ({ setOpen, oldData }: BannerFormProps) => {
             />
           ) : (
             <FormItem>
-              <FormLabel className="text-text-600 text-start text-sm font-semibold">
+              <FormLabel className="text-start text-sm font-semibold text-foreground">
                 {t('Link Type')}
               </FormLabel>
-              <div className="text-text-600 text-sm">
+              <div className="text-sm text-foreground">
                 {linkType === 'external' ? t('External Link') : t('Internal Link')}
               </div>
             </FormItem>
@@ -433,11 +460,11 @@ const BannerForm = ({ setOpen, oldData }: BannerFormProps) => {
               )}
             </>
           )}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isLoading}>
               {oldData ? t('edit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

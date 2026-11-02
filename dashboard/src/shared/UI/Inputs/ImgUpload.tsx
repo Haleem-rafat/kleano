@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 
 import { Button } from '@UI/Index';
-import { FormItem, FormLabel } from '@shadecn/components/ui/form';
+import { FormItem, FormLabel, FormMessage } from '@shadecn/components/ui/form';
 import classNames from 'classnames';
 import { Avatar, AvatarImage } from '@/shadecn/components/ui/avatar';
 
@@ -15,12 +15,7 @@ interface IMainCoverUploadProps {
   disabled?: boolean;
 }
 
-export default function ImgUpload({
-  field,
-  textButton,
-  title,
-  disabled,
-}: IMainCoverUploadProps) {
+export default function ImgUpload({ field, textButton, title, disabled }: IMainCoverUploadProps) {
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -46,10 +41,10 @@ export default function ImgUpload({
 
   return (
     <FormItem className={classNames({ 'pointer-events-none opacity-50': disabled })}>
-      {title && <FormLabel className="text-text-600 text-sm font-semibold">{title}</FormLabel>}
+      {title && <FormLabel className="text-sm font-semibold text-foreground">{title}</FormLabel>}
       <div className="relative flex flex-col items-center gap-2">
         <Avatar
-          className="flex h-40 w-full items-center justify-center rounded-lg border bg-neutral-100"
+          className="flex h-40 w-full items-center justify-center rounded-lg border bg-muted"
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}>
           {imagePreview || field.value ? (
@@ -82,6 +77,7 @@ export default function ImgUpload({
           />
         </Avatar>
       </div>
+      <FormMessage />
     </FormItem>
   );
 }

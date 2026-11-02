@@ -28,7 +28,7 @@ const WaitingAssignTable = ({ data }: { data }) => {
     setSelectedLocation({
       location: order.location,
       cityName: order.location.city?.name[lang],
-      streetName: order.location.streetName,
+      streetName: order.location?.streetName,
     });
     setOpenMapDialog(true);
   };
@@ -94,7 +94,9 @@ const WaitingAssignTable = ({ data }: { data }) => {
     {
       accessorKey: 'action',
       header: t('action'),
-      cell: ({ row }) => <UserPopover orderId={row.original._id} />,
+      cell: ({ row }) => (
+        <UserPopover orderId={row.original._id} paid={row.original.totalPay} compact />
+      ),
     },
   ];
 

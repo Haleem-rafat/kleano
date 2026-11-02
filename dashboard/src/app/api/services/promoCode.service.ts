@@ -40,12 +40,12 @@ class promoCodeService {
     return data;
   }
   public async editPromoCodeName(code, id) {
-    const { data } = await api.patch(EAPI.EDIT_CODE_NAME.replace(":id", id), { code });
+    const { data } = await api.patch(EAPI.EDIT_CODE_NAME.replace(':id', id), { code });
     return data;
   }
 
   public async editPromoCodeStatus(status: 'activate' | 'disable', id: string) {
-    const { data } = await api.post(EAPI.EDIT_CODE_NAME.replace(":id", id) + `/${status}`)
+    const { data } = await api.post(EAPI.EDIT_CODE_NAME.replace(':id', id) + `/${status}`);
     return data;
   }
 

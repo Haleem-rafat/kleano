@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ControllerRenderProps, FieldValues } from 'react-hook-form';
+import { ControllerRenderProps } from 'react-hook-form';
 import classNames from 'classnames';
 import { Input } from '@/shadecn/components/ui/input';
 import { FormControl, FormItem, FormLabel, FormMessage } from '@/shadecn/components/ui/form';
@@ -50,7 +50,7 @@ export default function MainInput({
 
   return (
     <FormItem className={classNames({ 'pointer-events-none opacity-50': disabled })}>
-      {label && <FormLabel className="text-text-600 text-sm font-semibold">{label}</FormLabel>}
+      {label && <FormLabel className="text-sm font-semibold text-foreground">{label}</FormLabel>}
       <FormControl>
         <Input
           type={type}

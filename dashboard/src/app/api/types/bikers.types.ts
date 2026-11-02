@@ -44,5 +44,5 @@ export interface CreatedBy {
 export interface IBikerParams {
   fromDate?: string;
   toDate?: string;
-  search?: string
+  search?: string;
 }

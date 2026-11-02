@@ -16,20 +16,15 @@ import {
 } from '@shadecn/components/ui/form';
 
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
-import { Button, ThreeDotsLoader } from '@UI/Index';
+  Button,
+  FormSheet,
+  InfoList,
+  MainAvatar,
+  PageHeader,
+  SectionCard,
+  PageSkeleton,
+} from '@UI/Index';
 import { useTranslation } from 'react-i18next';
-import {
-  IoArrowBackCircleOutline,
-  IoPersonCircleOutline,
-  IoLocationOutline,
-  IoSettingsOutline,
-} from 'react-icons/io5';
 import adminsService from '@services/admins.service';
 import { toast } from 'react-toastify';
 import Alert from '@UI/Alert/Alert';
@@ -75,10 +70,7 @@ export default function AdminDetails() {
     },
     resolver: yupResolver(
       yup.object({
-        password: yup
-          .string()
-          .required('Required')
-          .min(8, 'Password must be at least 8 characters'),
+        password: yup.string().required('validation.required').min(8, 'validation.password'),
       })
     ),
   });
@@ -129,291 +121,187 @@ export default function AdminDetails() {
       .then(() => {
         setIsLoading(false);
         setOpen(false);
-        toast.success('Password updated successfully');
+        toast.success(t('passwordUpdated'));
       })
       .catch((e) => {
         setIsLoading(false);
 
-        toast.error(e.response.localizedMessage['en']);
+        toast.error(e?.response?.data?.localizedMessage?.[lang] || t('somethingWentWrong'));
       });
   };
+  const suspended = AdminDetails?.status === 'SUSPENDED';
+  if (isLoading) return <PageSkeleton kind="details" />;
+
   return (
-    <div className="space-y-1">
-      {(isLoading || isloading) && <ThreeDotsLoader />}
+    <div className="space-y-5">
+      <PageHeader
+        onBack={() => navigate(-1)}
+        leading={
+          <MainAvatar src={undefined} name={AdminDetails?.userName || ''} className="h-10 w-10" />
+        }
+        title={AdminDetails?.userName || t('adminDetails')}
+        description={AdminDetails && `${t('adminDetails')} · #${AdminDetails._id.slice(-6)}`}
+        actions={
+          <>
+            {AdminDetails?.status && <MainStatusChipe status={AdminDetails.status} />}
+            <Button onClick={() => setOpenSheet(true)} disabled={!AdminDetails}>
+              {t('editAdmin')}
+            </Button>
+          </>
+        }
+      />
 
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition-colors duration-200 hover:bg-slate-200">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('adminDetails')}</h1>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t('adminId')}: #{AdminDetails?._id?.slice(-4)}
-                </p>
+      <div className="grid gap-5 xl:grid-cols-3">
+        <div className="space-y-5 xl:col-span-2">
+          <SectionCard title={t('adminInfo')}>
+            <InfoList
+              items={[
+                { label: t('name'), value: AdminDetails?.userName },
+                {
+                  label: t('phone'),
+                  value: AdminDetails?.phone && <span dir="ltr">{AdminDetails.phone}</span>,
+                },
+                { label: t('nationalId'), value: AdminDetails?.nationalId },
+                {
+                  label: t('createddate'),
+                  value: AdminDetails?.createdAt && formatDate(AdminDetails.createdAt),
+                },
+              ]}
+            />
+          </SectionCard>
+
+          <SectionCard
+            title={t('adminCities')}
+            action={
+              <span className="text-xs text-muted-foreground">
+                {AdminDetails?.city?.length || 0}
+              </span>
+            }>
+            {AdminDetails?.city?.length ? (
+              <div className="flex flex-wrap gap-2">
+                {AdminDetails.city.map((c) => (
+                  <span
+                    key={c._id}
+                    className="rounded-full bg-accent px-3 py-1 text-[13px] font-medium text-primary">
+                    {c?.name?.[lang]}
+                  </span>
+                ))}
               </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <MainStatusChipe status={AdminDetails?.status} />
-            </div>
-          </div>
+            ) : (
+              <p className="text-[13px] text-muted-foreground">{t('noCitiesYet')}</p>
+            )}
+          </SectionCard>
         </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="pt-1">
-        <div className="mx-auto max-w-[95%]">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* Admin Information Card */}
-            <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('adminInfo')}</h2>
-                      <p className="text-sm text-slate-500">{t('Personal and contact information')}</p>
-                    </div>
+        <div className="xl:col-span-1">
+          <SectionCard title={t('actions')}>
+            <ul className="divide-y divide-border">
+              {isSuperAdmin && (
+                <li className="flex items-center justify-between gap-3 py-3 first:pt-0">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-foreground">{t('Reset password')}</p>
+                    <p className="text-xs text-muted-foreground">{t('resetPasswordHint')}</p>
                   </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('name')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{AdminDetails?.userName}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('phone')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{AdminDetails?.phone}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('nationalId')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">{AdminDetails?.nationalId}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('createddate')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {formatDate(AdminDetails?.createdAt)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoLocationOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('adminCities')}</h2>
-                      <p className="text-sm text-slate-500">{t('Assigned cities and regions')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="flex flex-wrap gap-3">
-                    {AdminDetails?.city?.map((e) => (
-                      <div
-                        key={e._id}
-                        className="rounded-full border-2 border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 transition-colors duration-200 hover:bg-orange-100">
-                        {e?.name[lang]}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions Card */}
-            <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoSettingsOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('actions')}</h2>
-                      <p className="text-sm text-slate-500">{t('Manage admin settings')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="space-y-4 p-6">
-                  {/* Edit Info */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('editInfo')}</h4>
-                      <p className="text-xs text-slate-500">{t('Update admin information')}</p>
-                    </div>
-                    <Button
-                      size="sm"
-                      className="min-w-[8rem] font-semibold"
-                      onClick={() => setOpenSheet(true)}>
-                      {t('editAdmin')}
-                    </Button>
-                  </div>
-
-                  {/* Status Toggle */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">
-                        {AdminDetails?.status === 'SUSPENDED' ? t('active') : t('suspend')}
-                      </h4>
-                      <p className="text-xs text-slate-500">
-                        {AdminDetails?.status === 'SUSPENDED'
-                          ? 'Restore admin access'
-                          : 'Suspend admin access'}
-                      </p>
-                    </div>
-                    {AdminDetails?.status === 'SUSPENDED' ? (
-                      <Alert
-                        handler={() => handleToggleAdminStatus('restore')}
-                        id={AdminDetails?._id}
-                        description={t('restoreAdminAlert')}
-                        buttonComponent={
+                  <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" size="sm">
+                        {t('Reset password')}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-md">
+                      <DialogHeader>
+                        <DialogTitle>{t('Reset password')}</DialogTitle>
+                        <DialogDescription>{t('resetPasswordHint')}</DialogDescription>
+                      </DialogHeader>
+                      <Form {...newPasswrodForm}>
+                        <form
+                          className="flex w-full flex-col gap-3"
+                          onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
+                          <FormField
+                            control={newPasswrodForm.control}
+                            name="password"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel />
+                                <FormControl>
+                                  <Input type="password" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
                           <Button
-                            size="sm"
-                            className="min-w-[8rem] bg-green-600 font-semibold text-white hover:bg-green-700">
-                            {t('active')}
+                            disabled={isLoading}
+                            loading={isLoading}
+                            type="submit"
+                            className="w-full">
+                            {t('Save changes')}
                           </Button>
-                        }
-                      />
-                    ) : (
-                      <Alert
-                        handler={() => handleToggleAdminStatus('suspend', reason)}
-                        id={AdminDetails?._id}
-                        description={t('suspendAdminAlert')}
-                        hasReason
-                        setInputValue={setReason}
-                        buttonComponent={
-                          <Button
-                            size="sm"
-                            className="min-w-[8rem] bg-red-600 font-semibold text-white hover:bg-red-700">
-                            {t('suspend')}
-                          </Button>
-                        }
-                      />
-                    )}
-                  </div>
-
-                  {/* Delete Admin */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-red-300 hover:shadow-red-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('delete')}</h4>
-                      <p className="text-xs text-slate-500">{t('Permanently remove admin')}</p>
-                    </div>
-                    <Alert
-                      handler={handleDeleteAdmin}
-                      id={AdminDetails?._id}
-                      description="Are you sure you want to delete this admin?"
-                      buttonComponent={
-                        <Button
-                          size="sm"
-                          className="min-w-[8rem] bg-red-200 font-semibold text-red-600 hover:bg-red-100">
-                          {t('deleteAdmin')}
-                        </Button>
-                      }
-                    />
-                  </div>
-
-                  {/* Reset Password - Super Admin Only */}
-                  {isSuperAdmin && (
-                    <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                      <div>
-                        <h4 className="text-sm font-semibold text-slate-700">
-                          {t('Reset password')}
-                        </h4>
-                        <p className="text-xs text-slate-500">{t('Generate new password')}</p>
-                      </div>
-                      <Dialog open={open} onOpenChange={setOpen}>
-                        <DialogTrigger asChild>
-                          <Button variant="secondary" size="sm" className="min-w-[8rem]">
-                            {t('Reset password')}
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                          <DialogHeader>
-                            <DialogTitle>{t('Reset password')}</DialogTitle>
-                            <DialogDescription>
-                              Make changes to your Password here. Click save when you&lsquo;re done.
-                            </DialogDescription>
-                          </DialogHeader>
-
-                          <div className="w-full">
-                            <Form {...newPasswrodForm}>
-                              <form
-                                className="flex w-full flex-col gap-3"
-                                onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
-                                <FormField
-                                  control={newPasswrodForm.control}
-                                  name="password"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel />
-                                      <FormControl>
-                                        <Input type="password" {...field} />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <Button
-                                  disabled={isLoading}
-                                  loading={isLoading}
-                                  type="submit"
-                                  className="w-full">
-                                  {t('Save changes')}
-                                </Button>
-                              </form>
-                            </Form>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('editAdmin')}</SheetTitle>
-            <SheetDescription>
-              {AdminDetails && (
-                <AdminModelForm setOpenSheet={setOpenSheet} oldData={AdminDetails} />
+                        </form>
+                      </Form>
+                    </DialogContent>
+                  </Dialog>
+                </li>
               )}
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+              <li className="flex items-center justify-between gap-3 py-3 first:pt-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {suspended ? t('activate') : t('suspend')}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {suspended ? t('restoreAdminHint') : t('suspendAdminHint')}
+                  </p>
+                </div>
+                {suspended ? (
+                  <Alert
+                    handler={() => handleToggleAdminStatus('restore')}
+                    id={AdminDetails?._id}
+                    description={t('restoreAdminAlert')}
+                    buttonComponent={
+                      <Button size="sm" variant="secondary" loading={isloading}>
+                        {t('activate')}
+                      </Button>
+                    }
+                  />
+                ) : (
+                  <Alert
+                    handler={() => handleToggleAdminStatus('suspend', reason)}
+                    id={AdminDetails?._id}
+                    description={t('suspendAdminAlert')}
+                    hasReason
+                    setInputValue={setReason}
+                    buttonComponent={
+                      <Button size="sm" variant="dangerOutline" loading={isloading}>
+                        {t('suspend')}
+                      </Button>
+                    }
+                  />
+                )}
+              </li>
+              <li className="flex items-center justify-between gap-3 py-3 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-destructive">{t('deleteAdmin')}</p>
+                  <p className="text-xs text-muted-foreground">{t('deleteAdminHint')}</p>
+                </div>
+                <Alert
+                  handler={handleDeleteAdmin}
+                  id={AdminDetails?._id}
+                  description={t('deleteAdminConfirm')}
+                  buttonComponent={
+                    <Button size="sm" variant="danger" loading={isloading}>
+                      {t('delete')}
+                    </Button>
+                  }
+                />
+              </li>
+            </ul>
+          </SectionCard>
+        </div>
+      </div>
+
+      <FormSheet open={openSheet} onOpenChange={() => setOpenSheet(false)} title={t('editAdmin')}>
+        {AdminDetails && <AdminModelForm setOpenSheet={setOpenSheet} oldData={AdminDetails} />}
+      </FormSheet>
     </div>
   );
 }

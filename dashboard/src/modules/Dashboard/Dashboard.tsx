@@ -15,13 +15,11 @@ import plansService from '@services/plans.service';
 import { IPlan } from '@servicesTypes/plan.types';
 import { ROUTES } from '@constants/routes';
 import { IOrderList } from '@servicesTypes/order.types';
-import { AdminStatus } from '@UI/Index';
-import DashboardCard from './_components/DashboardCard';
+import { AdminStatus, PageHeader, SectionCard, StatCard } from '@UI/Index';
 import { Earningchart } from './_components/Earningchart';
 import { WeeklyRevenueChart } from './_components/WeeklyRevenueChart';
 
 const iconClass = 'h-5 w-5';
-const panel = 'rounded-xl border border-slate-200 bg-white p-5';
 
 export default function Dashboard() {
   const { t, i18n } = useTranslation();
@@ -44,73 +42,69 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
-      <header>
-        <h1 className="text-xl font-semibold capitalize tracking-tight text-slate-900">
-          {t('dashboard')}
-        </h1>
-        <p className="mt-0.5 text-[13px] text-slate-500">{t('dashboardSubtitle')}</p>
-      </header>
+      <PageHeader title={t('dashboard')} description={t('dashboardSubtitle')} />
 
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard
+        <StatCard
           title={t('totalOrders')}
-          count={orders?.pagination?.totalItems}
+          value={orders?.pagination?.totalItems}
           icon={<ClipboardDocumentListIcon className={iconClass} />}
           to={ROUTES.ORDER}
         />
-        <DashboardCard
+        <StatCard
           title={t('totalUsers')}
-          count={users?.pagination?.totalItems ?? users?.data?.length}
+          value={users?.pagination?.totalItems ?? users?.data?.length}
           icon={<UsersIcon className={iconClass} />}
           to={ROUTES.USERS}
         />
-        <DashboardCard
+        <StatCard
           title={t('totalBikers')}
-          count={bikers?.data?.length}
+          value={bikers?.data?.length}
           icon={<TruckIcon className={iconClass} />}
           to={ROUTES.BIKERS}
         />
-        <DashboardCard
+        <StatCard
           title={t('totalPromoCodes')}
-          count={promoCodes?.data?.paginationData?.totalItems}
+          value={promoCodes?.data?.paginationData?.totalItems}
           icon={<TicketIcon className={iconClass} />}
           to={ROUTES.PROMO_CODE}
         />
       </section>
 
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className={`${panel} min-w-0 xl:col-span-7`}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">{t('weeklyRevenue')}</h2>
+        <SectionCard title={t('weeklyRevenue')} className="xl:col-span-7">
           <WeeklyRevenueChart />
-        </div>
-        <div className={`${panel} min-w-0 xl:col-span-5`}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">{t('yearRevenue')}</h2>
+        </SectionCard>
+        <SectionCard title={t('yearRevenue')} className="xl:col-span-5">
           <Earningchart />
-        </div>
+        </SectionCard>
       </section>
 
       <section className="grid grid-cols-1 gap-4 xl:grid-cols-12">
-        <div className={`${panel} min-w-0 xl:col-span-7`}>
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-sm font-semibold text-slate-900">{t('recentOrders')}</h2>
-            <Link to={ROUTES.ORDER} className="text-[13px] font-medium text-primary hover:underline">
+        <SectionCard
+          title={t('recentOrders')}
+          className="xl:col-span-7"
+          action={
+            <Link
+              to={ROUTES.ORDER}
+              className="text-[13px] font-medium text-primary hover:underline">
               {t('viewAll')}
             </Link>
-          </div>
+          }>
           {orders && recentOrders.length === 0 && (
-            <p className="py-8 text-center text-[13px] text-slate-500">{t('noOrdersYet')}</p>
+            <p className="py-8 text-center text-[13px] text-muted-foreground">{t('noOrdersYet')}</p>
           )}
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {recentOrders.map((order) => (
               <li key={order._id}>
                 <Link
                   to={generatePath(ROUTES.ORDER_DETAILS, { orderId: order._id })}
-                  className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 hover:bg-slate-50">
+                  className="-mx-2 flex items-center justify-between gap-3 rounded-lg px-2 py-2.5 hover:bg-muted">
                   <span className="min-w-0">
-                    <span className="block truncate text-[13px] font-medium text-slate-900">
+                    <span className="block truncate text-[13px] font-medium text-foreground">
                       {order.user?.userName || '—'}
                     </span>
-                    <span className="block truncate text-xs text-slate-500">
+                    <span className="block truncate text-xs text-muted-foreground">
                       {[order.vehicle?.brand, order.vehicle?.model].filter(Boolean).join(' ') ||
                         order.location?.streetName}
                     </span>
@@ -120,30 +114,29 @@ export default function Dashboard() {
               </li>
             ))}
           </ul>
-        </div>
-        <div className={`${panel} min-w-0 xl:col-span-5`}>
-          <h2 className="mb-4 text-sm font-semibold text-slate-900">{t('planUsage')}</h2>
+        </SectionCard>
+        <SectionCard title={t('planUsage')} className="xl:col-span-5">
           <ul className="space-y-3">
             {(plans ?? []).map((plan) => {
               const name = typeof plan?.type === 'string' ? plan.type : plan?.type?.[lang];
               const usage = plan?.usageCount || 0;
               return (
                 <li key={plan._id} className="grid grid-cols-[110px_1fr_40px] items-center gap-3">
-                  <span className="truncate text-[13px] text-slate-700">{name}</span>
-                  <span className="h-2 overflow-hidden rounded-full bg-slate-100">
+                  <span className="truncate text-[13px] text-foreground">{name}</span>
+                  <span className="h-2 overflow-hidden rounded-full bg-muted">
                     <span
                       className="block h-full rounded-full bg-primary"
                       style={{ width: `${(usage / maxUsage) * 100}%` }}
                     />
                   </span>
-                  <span className="text-end text-[13px] font-medium tabular-nums text-slate-900">
+                  <span className="text-end text-[13px] font-medium tabular-nums text-foreground">
                     {usage}
                   </span>
                 </li>
               );
             })}
           </ul>
-        </div>
+        </SectionCard>
       </section>
     </div>
   );

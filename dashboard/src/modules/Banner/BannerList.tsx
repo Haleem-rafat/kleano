@@ -1,29 +1,14 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@shadecn/components/ui/table';
-
-import { Button, EmtyState, ImageModal, ThreeDotsLoader } from '@UI/Index';
+import { Button, DataTable, EmtyState, ImageModal, FormSheet } from '@UI/Index';
+import { ColumnDef } from '@tanstack/react-table';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSWR, { mutate } from 'swr';
+import useSWR from 'swr';
 import bannerService from '@services/banner.service';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
 import { toast } from 'react-toastify';
 import BannerForm from './_components/BannerForm';
 
 const BannerList = () => {
-  const [loading, setLoading] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   const [selectedForEdit, setSelectedForEdit] = useState(null);
   const [open, setOpen] = useState(false);
   const { t } = useTranslation();
@@ -41,143 +26,153 @@ const BannerList = () => {
   const { data, isLoading, mutate } = useSWR('get-all-banners', fetchBanners);
 
   const handleChangeStatus = async (id, status: 'activate' | 'deactivate') => {
-    setLoading(true);
+    setTogglingId(id);
     await bannerService
       .toggleBannerStatus(id, status)
       .then(() => {
         toast.success('Banner status changed successfully');
         mutate();
-        setLoading(false);
+        setTogglingId(null);
       })
       .catch((e) => {
-        setLoading(false);
-        toast.error(e.response.data.localizedMessage.en);
+        setTogglingId(null);
+        toast.error(e?.response?.data?.localizedMessage?.en || t('somethingWentWrong'));
       });
   };
+  const resourceLabel = (resource?: string) =>
+    resource === 'PROMO_CODE' ? t('Promo Code') : resource === 'PLAN' ? t('Plan') : resource || '—';
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnDef<any>[] = [
+    { id: 'title', header: t('title'), accessorKey: 'title' },
+    {
+      id: 'description',
+      header: t('description'),
+      accessorKey: 'description',
+      cell: ({ row }) => (
+        <span className="max-w-64 block truncate">{row.original?.description}</span>
+      ),
+    },
+    {
+      id: 'externalUrl',
+      header: t('External Link'),
+      accessorKey: 'externalUrl',
+      cell: ({ row }) =>
+        row.original?.externalUrl ? (
+          <a
+            href={row.original.externalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-56 block truncate text-primary hover:underline">
+            {row.original.externalUrl}
+          </a>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
+      id: 'image',
+      header: t('image'),
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => (
+        <ImageModal
+          src={row.original.imageLink}
+          alt={`${row.original.title} banner image`}
+          className="h-12 w-12 rounded-md"
+          fallbackText="No image"
+        />
+      ),
+    },
+    {
+      id: 'imageAr',
+      header: t('image (Arabic)'),
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => (
+        <ImageModal
+          src={row.original.imageLinkAr}
+          alt={`${row.original.title} banner image (Arabic)`}
+          className="h-12 w-12 rounded-md"
+          fallbackText="No image"
+        />
+      ),
+    },
+    {
+      id: 'resource',
+      header: t('Resource'),
+      accessorFn: (banner) => (banner?.externalUrl ? '—' : resourceLabel(banner?.resource)),
+    },
+    {
+      id: 'status',
+      header: t('status'),
+      accessorFn: (banner) => (banner?.isActive ? 'active' : 'inactive'),
+      cell: ({ row }) => {
+        const banner = row.original;
+        return (
+          <button
+            type="button"
+            disabled={togglingId === banner._id}
+            onClick={() =>
+              handleChangeStatus(banner._id, banner.isActive ? 'deactivate' : 'activate')
+            }
+            title={banner.isActive ? t('deactivate') : t('activate')}
+            className={`rounded-full px-3 py-1 text-xs font-semibold transition-opacity disabled:opacity-50 ${
+              banner.isActive
+                ? 'bg-success/10 text-success hover:bg-success/20'
+                : 'bg-destructive/10 text-destructive hover:bg-destructive/20'
+            }`}>
+            {banner.isActive ? t('active') : t('inactive')}
+          </button>
+        );
+      },
+    },
+    {
+      id: 'actions',
+      header: t('actions'),
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => (
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => {
+            setSelectedForEdit(row.original);
+            setOpen(true);
+          }}>
+          {t('edit')}
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="relative">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('banners')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('banners')}</h1>
 
         <Button onClick={() => setOpen(true)}>{t('Add banner')}</Button>
       </div>
       <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('title')}</TableHead>
-              <TableHead>{t('description')}</TableHead>
-              <TableHead>{t('External Link') || 'External URL'}</TableHead>
-              <TableHead>{t('image') || 'Image'}</TableHead>
-              <TableHead>{t('image (Arabic)') || 'Image (Arabic)'}</TableHead>
-              <TableHead>{t('Resource')}</TableHead>
-              <TableHead>{t('status')}</TableHead>
-              <TableHead>{t('actions')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.map((banner) => (
-              <TableRow key={banner._id} className="cursor-pointer hover:bg-primary/10">
-                <TableCell className="font-medium">{banner?.title}</TableCell>
-                <TableCell className="font-medium">{banner?.description}</TableCell>
-                <TableCell className="font-medium">
-                  {banner?.externalUrl ? (
-                    <a
-                      href={banner.externalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline">
-                      {banner.externalUrl.length > 40
-                        ? `${banner.externalUrl.slice(0, 40)}...`
-                        : banner.externalUrl}
-                    </a>
-                  ) : (
-                    <span className="text-slate-400">N/A</span>
-                  )}
-                </TableCell>
-                <TableCell className="font-medium">
-                  <ImageModal
-                    src={banner.imageLink}
-                    alt={`${banner.title} banner image`}
-                    className="h-16 w-16 rounded-lg"
-                    fallbackText="No image"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  <ImageModal
-                    src={banner.imageLinkAr}
-                    alt={`${banner.title} banner image (Arabic)`}
-                    className="h-16 w-16 rounded-lg"
-                    fallbackText="No image"
-                  />
-                </TableCell>
-                <TableCell className="font-medium">
-                  {banner?.externalUrl ? (
-                    <span className="text-slate-400">N/A</span>
-                  ) : (
-                    <span>
-                      {banner?.resource
-                        ? banner.resource === 'PROMO_CODE'
-                          ? t('Promo Code')
-                          : banner.resource === 'PLAN'
-                          ? t('Plan')
-                          : banner.resource
-                        : '--'}
-                    </span>
-                  )}
-                </TableCell>
+        <DataTable
+          columns={columns}
+          data={data || []}
+          isLoading={isLoading}
+          searchable
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
 
-                <TableCell
-                  onClick={() =>
-                    handleChangeStatus(banner._id, banner.isActive ? 'deactivate' : 'activate')
-                  }
-                  className="font-medium">
-                  <p
-                    className={`${
-                      banner?.isActive ? 'bg-green-500' : 'bg-red-500'
-                    } !w-[5rem] rounded-md border p-3 text-center text-white`}>
-                    {banner?.isActive ? 'Active' : 'Inactive'}
-                  </p>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    onClick={() => {
-                      setSelectedForEdit(banner);
-                      setOpen(true);
-                    }}>
-                    {t('edit')}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {/* {data?.paginationData && (
-          <PaginationComponent
-            page={data?.paginationData?.page}
-            pages={data?.paginationData?.totalPages}
-            setPageIndex={setPage}
-          />
-        )} */}
-        {data?.data?.length === 0 && <EmtyState />}
-
-        <Sheet
+        <FormSheet
           open={open}
           onOpenChange={() => {
             setOpen(false);
             setSelectedForEdit(null);
           }}
-          modal={true}>
-          <SheetContent>
-            <SheetHeader>
-              <SheetTitle>{selectedForEdit ? t('editBanner') : t('addBanner')}</SheetTitle>
-              <SheetDescription>
-                <BannerForm oldData={selectedForEdit} setOpen={setOpen} />
-              </SheetDescription>
-            </SheetHeader>
-          </SheetContent>
-        </Sheet>
+          title={selectedForEdit ? t('editBanner') : t('addBanner')}>
+          <BannerForm oldData={selectedForEdit} setOpen={setOpen} />
+        </FormSheet>
       </div>
     </div>
   );

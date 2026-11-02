@@ -283,3 +283,24 @@ throttling, the `000000` test numbers and `.env` baked into the Docker image. Se
 - Commit in the root repo after each verified step; never push.
 - Don't deploy the backend or call its admin, payment or webhook routes on the live server.
 - One primary button per screen; brand purple only for actions; no purple bars.
+
+## Glass and loading (2026-10-31)
+
+- Apple's "Adopting Liquid Glass" page was read through its JSON. On a photo, chips and the bell
+  are Apple's real clear glass button; the WhatsApp button is glass in both apps; icon-only glass
+  buttons pass a VoiceOver label.
+- Not adopted: `GlassEffectContainer`/morphing and tab-bar minimise on scroll, since each glass
+  piece is a separate platform view and the tab bar is a bare `UITabBar`. Sheets stay solid
+  (owner's rule), although Apple makes them glass.
+- `KSkeleton.list/.grid/.details` replaced the spinner on lists and screens.
+- Don't test the emulator during a build: the Mac overloads and Android shows "isn't responding".
+
+## Live wash status (2026-10-31)
+
+- Customer app: `WashLiveStatus` feeds iOS Live Activity / Dynamic Island (`ios/WashLiveActivity`,
+  `WashLiveActivityBridge.swift`) and an Android ongoing progress notification.
+- It updates from the active order on Home and socket events, so **only while the app is running**.
+  Live updates with the app closed need the backend: ActivityKit pushes through APNs on iOS, and
+  FCM data messages on Android. Not built.
+- Personal Team iPhone builds temporarily swap team and bundle IDs and drop the entitlements file,
+  then restore `project.pbxproj`. Never commit that swap.

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { formatToFilterDate } from '@app/utils/helper';
 import { cn } from '@/shadecn/lib/utils';
+import { fieldClass } from '@/shadecn/lib/field';
 import { Button } from '@/shadecn/components/ui/button';
 import { Calendar } from '@/shadecn/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shadecn/components/ui/popover';
@@ -72,8 +73,12 @@ export function DatePickerWithPresets({
         <Button
           id="date"
           variant={'outline'}
-          className={cn('justify-start text-left font-normal', !date && 'text-muted-foreground')}>
-          <CalendarIcon className="mr-2 h-4 w-4" />
+          className={cn(
+            fieldClass,
+            'h-10 w-auto justify-start text-start font-normal hover:bg-card',
+            !date && 'text-muted-foreground'
+          )}>
+          <CalendarIcon className="me-2 h-4 w-4 text-muted-foreground" />
           {date?.from ? (
             date.to ? (
               <>
@@ -92,8 +97,8 @@ export function DatePickerWithPresets({
           <SelectTrigger>
             <SelectValue placeholder={t('select')} />
           </SelectTrigger>
-          <SelectContent position="popper" className="bg-white">
-            <SelectItem value="reset" className="cursor-pointer text-red-700">
+          <SelectContent position="popper">
+            <SelectItem value="reset" className="cursor-pointer text-destructive">
               {t('Reset')}
             </SelectItem>
             <SelectItem value="0">{t('Today')}</SelectItem>

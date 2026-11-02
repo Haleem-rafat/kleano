@@ -1,3 +1,4 @@
+import { v } from '@app/utils/validation';
 import { EAPI } from '@constants/endpoints';
 import * as Yup from 'yup';
 import { EFormFieldType } from '@constants/enums';
@@ -43,16 +44,13 @@ class WashingServices {
 
   /* API SCHEMAS */
   public WashingServicesFormSchema = Yup.object().shape({
-    servicesName: Yup.object().shape({
-      en: Yup.string().required('Required').trim(),
-      ar: Yup.string().required('Required').trim(),
-    }).required('Required'),
-    duration: Yup.string().required('Required'),
-    price: Yup.string().required('Required').trim(),
-    pointsToPay: Yup.string().required('Required').trim(),
-    type: Yup.object().required('Required'),
-    icon: Yup.mixed().required('Required'),
-    city: Yup.array().required('Required'),
+    servicesName: v.bilingual(),
+    duration: v.positive(),
+    price: v.price(),
+    pointsToPay: v.count(),
+    type: v.picked(),
+    icon: v.picked(),
+    city: v.options(),
     description: Yup.array()
       .of(
         Yup.object().shape({

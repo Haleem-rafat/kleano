@@ -38,7 +38,7 @@ const ErrorBoundary = ({ isRoot }: ErrorBoundaryProps) => {
     default:
       errorText = (
         <>
-          <span className="text-warning px-3 font-medium">⚠️</span>
+          <span className="px-3 font-medium text-warning">⚠️</span>
           <span className="px-3">Something went wrong</span>
         </>
       );

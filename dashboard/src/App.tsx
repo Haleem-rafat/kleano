@@ -1,5 +1,5 @@
+import RouteSkeleton from '@UI/Skeleton/RouteSkeleton';
 import { Suspense, useEffect } from 'react';
-import { ThreeDotsLoader } from '@UI/Index';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLoaderData } from 'react-router-dom';
 
@@ -18,7 +18,7 @@ function App() {
 
   return (
     <AppLayouts>
-      <Suspense fallback={<ThreeDotsLoader />}>
+      <Suspense fallback={<RouteSkeleton />}>
         <Outlet />
       </Suspense>
     </AppLayouts>

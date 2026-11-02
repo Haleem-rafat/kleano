@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Button, ThreeDotsLoader } from '@UI/Index';
+import { Button, PageHeader, TableSkeleton } from '@UI/Index';
+import { toast } from 'react-toastify';
+import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import useSWR from 'swr';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -52,7 +54,7 @@ const OrdersList = () => {
     {
       title: t('cancelled'),
       route: 'cancelled',
-      status: ['CANCELLED_BY_USER', 'CANCELLED_BY_USER'],
+      status: ['CANCELLED_BY_USER', 'CANCELLED_BY_ADMIN'],
       render: (data) => <CancelledTable data={data} />,
     },
   ];
@@ -105,7 +107,7 @@ const OrdersList = () => {
           className="my-4">
           <TabsList className="flex max-w-full">
             {activeTab.subFilters.map((subFilter, index) => (
-              <TabsTrigger value={subFilter.title} key={index} className="mr-2">
+              <TabsTrigger value={subFilter.title} key={index} className="me-2">
                 {t(subFilter.title)}
               </TabsTrigger>
             ))}
@@ -124,15 +126,17 @@ const OrdersList = () => {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'orders_export.xlsx');
+      // The link must be in the page to click and remove it (it crashed before).
+      document.body.appendChild(link);
       link.click();
-      link.parentNode.removeChild(link);
+      link.remove();
       window.URL.revokeObjectURL(url);
-    } catch ({ response }) {
-      const messages = response?.data?.message;
-      const errList = Array.isArray(messages)
-        ? messages.map((e, index) => <p key={index}>{e}</p>)
-        : messages?.[lang];
-      console.log(errList);
+    } catch (error) {
+      const messages = error?.response?.data?.message;
+      toast.error(
+        (Array.isArray(messages) ? messages.join(', ') : messages?.[lang]) ||
+          t('somethingWentWrong')
+      );
     } finally {
       setloading(false);
     }
@@ -167,21 +171,27 @@ const OrdersList = () => {
   }, [activeTab, searchParams]);
   return (
     <div className="relative">
-      {ordersListLoading && <ThreeDotsLoader />}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('orders')}</p>
-        <div>
-          <Input
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
-            placeholder="search..."
-          />
-        </div>
-        <div>
-          <Button loading={loading} onClick={() => handelExport()}>
-            {t('Export')}
-          </Button>
-        </div>
+      <div className="pb-5">
+        <PageHeader
+          title={t('orders')}
+          actions={
+            <>
+              <div className="relative w-64 max-w-full">
+                <MagnifyingGlassIcon className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  onChange={(e) => setSearch(e.target.value)}
+                  value={search}
+                  placeholder={t('search')}
+                  aria-label={t('search')}
+                  className="ps-9"
+                />
+              </div>
+              <Button loading={loading} onClick={() => handelExport()}>
+                {t('Export')}
+              </Button>
+            </>
+          }
+        />
       </div>
       <div className="mb-5 flex w-full flex-col items-start justify-start">
         <Tabs
@@ -193,7 +203,7 @@ const OrdersList = () => {
           }}>
           <TabsList className="flex max-w-full">
             {TABS.map((tab, index) => (
-              <TabsTrigger value={tab.title} key={index} className="mr-2">
+              <TabsTrigger value={tab.title} key={index} className="me-2">
                 {t(tab.title)}
               </TabsTrigger>
             ))}
@@ -202,7 +212,11 @@ const OrdersList = () => {
         {renderSubFilters()}
       </div>
       <div>
-        {ordersListData?.data && activeTab?.render(ordersListData)}
+        {ordersListLoading ? (
+          <TableSkeleton columns={7} />
+        ) : (
+          ordersListData?.data && activeTab?.render(ordersListData)
+        )}
       </div>
       {ordersListData && (
         <PaginationComponent

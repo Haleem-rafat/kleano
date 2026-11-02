@@ -1,4 +1,3 @@
-import Lottie from 'lottie-react';
 // import noAcsess from '@assets/animations/no-acsess.json';
 
 const NoAcsess = (): JSX.Element => {

@@ -1,3 +1,4 @@
+import { yupResolver } from '@hookform/resolvers/yup';
 import { SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,11 +13,11 @@ import {
   MainColorInput,
   MainInput,
   MainSelect,
-  ThreeDotsLoader,
   MainMultiLangInput,
   MultiLangDescriptionListInputs,
+  SheetActions,
+  FormSkeleton,
 } from '@UI/Index';
-import { t } from 'i18next';
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 import useGetWashingServicesIcons from '@/hooks/useGetWashingServicesIcons';
@@ -73,13 +74,15 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
   };
 
   const addPlanForm = useForm({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(plansService.plansSchema) as any,
     defaultValues: {
       type: convertType(oldData?.type),
       color: oldData?.color || '',
       icon: { label: '', value: oldData?.icon?._id },
       description: convertDescriptions(oldData?.description),
-      price: oldData?.price || 0,
-      duration: oldData?.duration || 0,
+      price: oldData?.price ?? undefined,
+      duration: oldData?.duration ?? undefined,
       durationUnit: oldData?.durationUnit || 'month',
       usageCount: oldData?.usageCount || 0,
       pointsToPay: oldData?.pointsToPay || 0,
@@ -95,7 +98,6 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
         [],
     },
   });
-  console.log(addPlanForm.getValues());
   const handelOnSubmit = (values) => {
     setIsLoading(true);
 
@@ -138,14 +140,18 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
     : plansService.addPlansFormFields;
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingCitiesOptions && loadingwashingServicesIoncsOptions && loadingiconsOptions && (
-        <ThreeDotsLoader />
+    <div>
+      {(loadingCitiesOptions || loadingwashingServicesIoncsOptions || loadingiconsOptions) && (
+        <FormSkeleton />
       )}
       <Form {...addPlanForm}>
         <form
           onSubmit={addPlanForm.handleSubmit(handelOnSubmit)}
-          className="flex flex-col gap-4 py-5 ">
+          className={`flex flex-col gap-4 ${
+            loadingCitiesOptions || loadingwashingServicesIoncsOptions || loadingiconsOptions
+              ? 'hidden'
+              : ''
+          }`}>
           {viewPlansFormFields.map((plansFormField) => (
             <FormField
               key={plansFormField.name}
@@ -235,11 +241,11 @@ const PlansModelForm = ({ setOpenSheet, oldData }: IPlansModelFormProps) => {
               )}
             />
           ))}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {oldData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

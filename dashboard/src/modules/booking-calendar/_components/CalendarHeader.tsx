@@ -37,7 +37,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg border bg-white p-4">
+    <div className="flex items-center justify-between rounded-lg border bg-card p-4">
       {/* Navigation and View Controls */}
       <div className="flex items-center gap-4">
         {/* Navigation Buttons */}
@@ -68,7 +68,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         )}
 
         {/* View Toggle Buttons */}
-        <div className="flex items-center gap-1 rounded-lg bg-gray-100 p-1">
+        <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
           {viewButtons.map((view) => (
             <Button
               key={view.key}
@@ -76,7 +76,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               size="sm"
               onClick={() => onViewChange(view.key)}
               className={`px-3 py-1 text-sm ${
-                currentView === view.key ? 'bg-primary text-white shadow-sm' : 'hover:bg-white'
+                currentView === view.key ? 'bg-primary text-white shadow-sm' : 'hover:bg-card'
               }`}>
               {view.label}
             </Button>
@@ -98,7 +98,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
         </div>
 
         {/* Sprint Count */}
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-muted-foreground">
           {/* This will be populated with actual sprint count */}
         </div>
       </div>

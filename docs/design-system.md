@@ -151,3 +151,15 @@ Used by every auth / entry screen (login, sign up, OTP, phone, new password).
 ## 7. Screens
 
 (Filled in as screens are redesigned, with before/after screenshots.)
+
+## Skeleton loading
+
+`KSkeleton.list()`, `.grid()` and `.details()` (in `k_states.dart`) are the loading state for
+lists and screens: grey placeholders with one shared pulse, still under Reduce Motion.
+`KLoadingState` (spinner) stays for short waits with no content shape, such as placing an order.
+
+## Glass on a photo
+
+`KChipButton(onPhoto: true)` and `GlassIconButton(style: GlassButtonStyle.clear)` are Apple's real
+clear glass button on iOS, with Flutter artwork drawn on top. The floating WhatsApp button is
+glass too. Every icon-only glass button needs a `tooltip`: it becomes the VoiceOver label.

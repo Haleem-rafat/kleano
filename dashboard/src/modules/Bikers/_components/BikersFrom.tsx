@@ -1,5 +1,12 @@
 import { Dispatch, SetStateAction, useState } from 'react';
-import { Button, ImgUpload, MainInput, MainPhoneNumberInpute, MainSelect } from '@UI/Index';
+import {
+  Button,
+  ImgUpload,
+  MainInput,
+  MainPhoneNumberInpute,
+  MainSelect,
+  SheetActions,
+} from '@UI/Index';
 import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -36,7 +43,9 @@ export default function BikersFrom({ setOpenSheet, oldData }: IBikersFromProps) 
       weekendCommission: (oldData as any)?.weekendCommission ?? (oldData ? 0 : ''),
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    resolver: (yupResolver as any)(oldData ? bikersService.editBikerSchema : bikersService.addBikerSchema),
+    resolver: (yupResolver as any)(
+      oldData ? bikersService.editBikerSchema : bikersService.addBikerSchema
+    ),
   });
 
   const handelOnSubmit = (values) => {
@@ -83,9 +92,9 @@ export default function BikersFrom({ setOpenSheet, oldData }: IBikersFromProps) 
     : bikersService.addBikerFormFields;
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
+    <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5 ">
+        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 ">
           {formFields.map((formField) => (
             <FormField
               key={formField?.name}
@@ -189,11 +198,11 @@ export default function BikersFrom({ setOpenSheet, oldData }: IBikersFromProps) 
               )}
             />
           ))}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {oldData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

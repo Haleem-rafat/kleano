@@ -1,3 +1,4 @@
+import { v } from '@app/utils/validation';
 import { EAPI } from '@constants/endpoints';
 import i18n from '@app/locales/i18n';
 import { EFormFieldType } from '@constants/enums';
@@ -40,18 +41,17 @@ class addOnsService {
   /* API SCHEMAS */
 
   baseAddOnsSchema = {
-    name: Yup.object().shape({
-      en: Yup.string().required('Required').trim(),
-      ar: Yup.string().required('Required').trim(),
-    }).required('Required'),
-    price: Yup.string().required('Required').trim(),
-    icon: Yup.mixed().required('Required'),
-    stock: Yup.number().required('Required'),
+    name: v.bilingual(),
+    price: v.price(),
+    icon: v.picked(),
+    stock: v.count(),
   };
 
   public editAddOnsSchemas = Yup.object(this.baseAddOnsSchema);
-  public addAddOnsSchemas = Yup.object({ ...this.baseAddOnsSchema, cities: Yup.array().min(1, 'at least one').required('required') });
-
+  public addAddOnsSchemas = Yup.object({
+    ...this.baseAddOnsSchema,
+    cities: v.options(),
+  });
 
   /* API FIELDS */
   baseAddOnsFormFields: IFormField[] = [

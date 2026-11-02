@@ -4,14 +4,13 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
 import { Card, CardContent } from '@shadecn/components/ui/card';
-import { Button, MainInput } from '@UI/Index';
+import { Button, MainInput, PageHeader, PageSkeleton } from '@UI/Index';
 import contactInfoService from '@services/contactInfo.service';
 import useSWR from 'swr';
 import Alert from '@UI/Alert/Alert';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import {
-  IoArrowBackCircleOutline,
   IoAdd,
   IoTrash,
   IoMail,
@@ -133,76 +132,53 @@ const ContactForm = () => {
 
   const socialLinks = [
     { name: 'facebookLink', label: 'Facebook', icon: IoLogoFacebook, color: 'text-primary' },
-    { name: 'instagramLink', label: 'Instagram', icon: IoLogoInstagram, color: 'text-pink-600' },
-    { name: 'twitterLink', label: 'Twitter', icon: IoLogoTwitter, color: 'text-sky-600' },
-    { name: 'youtubeLink', label: 'YouTube', icon: IoLogoYoutube, color: 'text-red-600' },
-    { name: 'linkedinLink', label: 'Linkedin', icon: IoLogoLinkedin, color: 'text-yellow-600' },
+    { name: 'instagramLink', label: 'Instagram', icon: IoLogoInstagram, color: 'text-destructive' },
+    { name: 'twitterLink', label: 'Twitter', icon: IoLogoTwitter, color: 'text-primary' },
+    { name: 'youtubeLink', label: 'YouTube', icon: IoLogoYoutube, color: 'text-destructive' },
+    { name: 'linkedinLink', label: 'Linkedin', icon: IoLogoLinkedin, color: 'text-warning' },
     { name: 'tiktokLink', label: 'TikTok', icon: IoLogoTiktok, color: 'text-black' },
-    { name: 'website', label: 'Website', icon: IoGlobe, color: 'text-slate-600' },
+    { name: 'website', label: 'Website', icon: IoGlobe, color: 'text-muted-foreground' },
   ];
 
   if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-          <p className="text-slate-600">Loading contact information...</p>
-        </div>
-      </div>
-    );
+    return <PageSkeleton kind="form" />;
   }
 
   return (
-    <div className="space-y-1">
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="rounded-lg p-2 transition-colors hover:bg-slate-100">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('Contact Information')}</h1>
-                <p className="mt-1 text-sm text-slate-500">
-                  Manage your contact details and social media links
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Alert
-                id=""
-                buttonComponent={
-                  <Button variant="danger" size="sm">
-                    <IoTrash className="mr-2 h-4 w-4" />
-                    {t('Delete')}
-                  </Button>
-                }
-                handler={handleDelete}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-5">
+      <PageHeader
+        title={t('Contact Information')}
+        description={t('contactInfoHint')}
+        actions={
+          <Alert
+            id=""
+            buttonComponent={
+              <Button variant="dangerOutline">
+                <IoTrash className="me-1.5 h-4 w-4" />
+                {t('Delete')}
+              </Button>
+            }
+            handler={handleDelete}
+          />
+        }
+      />
 
       {/* Form Content */}
-      <div className="pt-1">
-        <div className="mx-auto max-w-[90%]">
+      <div>
+        <div className="mx-auto max-w-4xl">
           <Form {...contactForm}>
             <form onSubmit={contactForm.handleSubmit(onSubmit)}>
               <Card className="overflow-hidden">
                 {/* Basic Information Section */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
+                <div className="border-b border-border bg-card px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoCall className="h-4 w-4 text-primary" />
-                    </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('Basic Information')}</h2>
-                      <p className="text-sm text-slate-500">{t('Primary contact details and title')}</p>
+                      <h2 className="text-sm font-semibold text-foreground">
+                        {t('Basic Information')}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {t('Primary contact details and title')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -249,14 +225,15 @@ const ContactForm = () => {
 
               {/* Email Addresses Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
+                <div className="border-b border-border bg-card px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoMail className="h-4 w-4 text-primary" />
-                    </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('Email Addresses')}</h2>
-                      <p className="text-sm text-slate-500">{t('Manage multiple email addresses')}</p>
+                      <h2 className="text-sm font-semibold text-foreground">
+                        {t('Email Addresses')}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {t('Manage multiple email addresses')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -264,7 +241,9 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-sm font-medium text-slate-700">{t('Email Addresses')}</h4>
+                      <h4 className="text-sm font-medium text-foreground">
+                        {t('Email Addresses')}
+                      </h4>
                       <Button
                         type="button"
                         variant="secondary"
@@ -278,9 +257,7 @@ const ContactForm = () => {
 
                     <div className="space-y-3">
                       {emailFields.map((field, index) => (
-                        <div
-                          key={field.id}
-                          className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div key={field.id} className="flex items-center gap-2">
                           <div className="flex-1">
                             <FormField
                               control={contactForm.control}
@@ -300,10 +277,12 @@ const ContactForm = () => {
                           </div>
                           <Button
                             type="button"
-                            variant="danger"
-                            size="sm"
+                            variant="dangerOutline"
+                            size="icon"
+                            aria-label={t('remove')}
+                            title={t('remove')}
                             onClick={() => removeEmail(index)}
-                            className="shrink-0">
+                            className="h-10 w-10 shrink-0">
                             <IoTrash className="h-4 w-4" />
                           </Button>
                         </div>
@@ -315,14 +294,15 @@ const ContactForm = () => {
 
               {/* Phone Numbers Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
+                <div className="border-b border-border bg-card px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoCall className="h-4 w-4 text-primary" />
-                    </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('Phone Numbers')}</h2>
-                      <p className="text-sm text-slate-500">{t('Manage multiple phone numbers')}</p>
+                      <h2 className="text-sm font-semibold text-foreground">
+                        {t('Phone Numbers')}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {t('Manage multiple phone numbers')}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -330,7 +310,7 @@ const ContactForm = () => {
                 <CardContent className="p-6">
                   <div className="space-y-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-sm font-medium text-slate-700">{t('Phone Numbers')}</h4>
+                      <h4 className="text-sm font-medium text-foreground">{t('Phone Numbers')}</h4>
                       <Button
                         type="button"
                         variant="secondary"
@@ -344,9 +324,7 @@ const ContactForm = () => {
 
                     <div className="space-y-3">
                       {phoneFields.map((field, index) => (
-                        <div
-                          key={field.id}
-                          className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4">
+                        <div key={field.id} className="flex items-center gap-2">
                           <div className="flex-1">
                             <FormField
                               control={contactForm.control}
@@ -366,10 +344,12 @@ const ContactForm = () => {
                           </div>
                           <Button
                             type="button"
-                            variant="danger"
-                            size="sm"
+                            variant="dangerOutline"
+                            size="icon"
+                            aria-label={t('remove')}
+                            title={t('remove')}
                             onClick={() => removePhone(index)}
-                            className="shrink-0">
+                            className="h-10 w-10 shrink-0">
                             <IoTrash className="h-4 w-4" />
                           </Button>
                         </div>
@@ -381,23 +361,26 @@ const ContactForm = () => {
 
               {/* Social Media Links Section */}
               <Card className="mt-6 overflow-hidden">
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
+                <div className="border-b border-border bg-card px-5 py-3">
                   <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoLogoWhatsapp className="h-4 w-4 text-primary" />
-                    </div>
                     <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('Social Media Links')}</h2>
-                      <p className="text-sm text-slate-500">{t('Connect your social media profiles')}</p>
+                      <h2 className="text-sm font-semibold text-foreground">
+                        {t('Social Media Links')}
+                      </h2>
+                      <p className="text-sm text-muted-foreground">
+                        {t('Connect your social media profiles')}
+                      </p>
                     </div>
                   </div>
                 </div>
 
                 <CardContent className="p-6">
                   <div className="space-y-4">
-                    <div className="border-b border-slate-200 pb-4">
-                      <h3 className="text-sm font-semibold text-slate-900">{t('Social Media Links')}</h3>
-                      <p className="mt-1 text-sm text-slate-500">
+                    <div className="border-b border-border pb-4">
+                      <h3 className="text-sm font-semibold text-foreground">
+                        {t('Social Media Links')}
+                      </h3>
+                      <p className="mt-1 text-sm text-muted-foreground">
                         {t('Connect your social media profiles')}
                       </p>
                     </div>
@@ -405,7 +388,7 @@ const ContactForm = () => {
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                       {socialLinks.map((link) => (
                         <div key={link.name} className="space-y-2">
-                          <label className="flex items-center gap-2 text-sm font-medium text-slate-700">
+                          <label className="flex items-center gap-2 text-sm font-medium text-foreground">
                             <link.icon className={`h-4 w-4 ${link.color}`} />
                             {link.label}
                           </label>

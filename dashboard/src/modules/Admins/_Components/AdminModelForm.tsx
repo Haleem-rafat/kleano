@@ -1,10 +1,19 @@
+import { v } from '@app/utils/validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
 import React, { SetStateAction, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
-import { PhoneInput } from 'react-international-phone';
-import { Button, MainInput, MainPhoneNumberInpute, MainSelect, ThreeDotsLoader } from '@UI/Index';
+import {
+  Button,
+  MainInput,
+  MainPhoneNumberInpute,
+  MainSelect,
+  SheetActions,
+  FormSkeleton,
+} from '@UI/Index';
 import i18n from '@app/locales/i18n';
 import { EFormFieldType } from '@constants/enums';
 import adminsService from '@services/admins.service';
@@ -25,6 +34,18 @@ const AdminModelForm = ({ oldData, setOpenSheet }: IAdminModelFormProps) => {
   const lang = i18n.language as 'en' | 'ar';
 
   const adminForm = useForm({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(
+      Yup.object({
+        userName: v.text(60),
+        password: oldData
+          ? Yup.string().test('pw', 'validation.password', (p) => !p || p.length >= 8)
+          : v.password(),
+        phone: v.phone(),
+        nationalId: v.digits(),
+        city: v.options(),
+      })
+    ) as any,
     defaultValues: {
       userName: oldData?.userName || '',
       password: oldData?.password || '',
@@ -67,12 +88,12 @@ const AdminModelForm = ({ oldData, setOpenSheet }: IAdminModelFormProps) => {
   const formFields = oldData ? adminsService.baseAdminFormFields : adminsService.adminFormFields;
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingCitiesOptions && <ThreeDotsLoader />}
+    <div>
+      {loadingCitiesOptions && <FormSkeleton />}
       <Form {...adminForm}>
         <form
           onSubmit={adminForm.handleSubmit(handelOnSubmit)}
-          className="flex flex-col gap-4 py-5 ">
+          className={`flex flex-col gap-4 ${loadingCitiesOptions ? 'hidden' : ''}`}>
           {formFields.map((adminFormField) => (
             <FormField
               key={adminFormField.name}
@@ -96,8 +117,8 @@ const AdminModelForm = ({ oldData, setOpenSheet }: IAdminModelFormProps) => {
                         case EFormFieldType.PHONE_NUMBER:
                           return (
                             <MainPhoneNumberInpute
-                              label="Phone number"
-                              placeholder="Phone number"
+                              label={t('phone')}
+                              placeholder={t('phone')}
                               field={{ ...field }}
                             />
                           );
@@ -126,11 +147,11 @@ const AdminModelForm = ({ oldData, setOpenSheet }: IAdminModelFormProps) => {
               )}
             />
           ))}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {oldData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

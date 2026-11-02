@@ -5,7 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
-import { Button, ThreeDotsLoader } from '@UI/Index';
+import { Button, HeaderSkeleton, Skeleton } from '@UI/Index';
 import useSWR from 'swr';
 import bookingService from '@services/booking.service';
 import { addDays } from 'date-fns';
@@ -104,8 +104,15 @@ const BookingCalendar = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <ThreeDotsLoader />
+      <div className="space-y-4" aria-busy>
+        <HeaderSkeleton actions={2} />
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="grid grid-cols-7 gap-2">
+            {Array.from({ length: 35 }).map((_, i) => (
+              <Skeleton key={i} className="h-20" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -187,13 +194,14 @@ const BookingCalendar = () => {
       />
 
       {/* Main Calendar */}
-      <div className="flex-1 rounded-lg border bg-white p-4">
+      <div className="flex-1 rounded-lg border bg-card p-4">
         <FullCalendar
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
           headerToolbar={{
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+            // Views are switched by CalendarHeader above; no second switcher.
+            right: '',
           }}
           ref={calendarRef}
           initialView={currentView}
@@ -220,7 +228,7 @@ const BookingCalendar = () => {
           nowIndicator={true}
           // Custom styling
           eventClassNames="cursor-pointer hover:opacity-80 transition-opacity"
-          dayCellClassNames="hover:bg-gray-50"
+          dayCellClassNames="hover:bg-muted"
         />
       </div>
 

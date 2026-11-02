@@ -1,3 +1,4 @@
+import { v } from '@app/utils/validation';
 import { EAPI } from '@constants/endpoints';
 import { IAllSegment, ISegment } from '@servicesTypes/segments.types';
 import * as Yup from 'yup';
@@ -30,8 +31,8 @@ class segmentsServices {
   }
 
   public createSegmentSchema = Yup.object({
-    segmentName: Yup.string().required('Required').trim(),
-    segmentUsers: Yup.array().required('Required'),
+    segmentName: v.text(60),
+    segmentUsers: v.options(),
   });
 }
 

@@ -18,11 +18,11 @@ export interface IRootUser {
   imagePath: string;
   isAllowNotification: boolean;
   rating: number;
-  totalAddOnsPrice: number
-  addOnsCount: number
-  ordersCount: number
-  totalOrdersPrice: number
-  isSuspended: boolean
+  totalAddOnsPrice: number;
+  addOnsCount: number;
+  ordersCount: number;
+  totalOrdersPrice: number;
+  isSuspended: boolean;
   vehicles: Vehicle[];
   orders: Order[];
   plans: IPlan[];

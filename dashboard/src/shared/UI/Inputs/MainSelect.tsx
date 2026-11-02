@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, { useEffect, useState } from 'react';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { ChevronDown } from 'lucide-react';
@@ -15,6 +16,7 @@ import {
 } from '@/shadecn/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shadecn/components/ui/popover';
 import { cn } from '@/shadecn/lib/utils';
+import { fieldClass } from '@/shadecn/lib/field';
 import { FormItem, FormLabel, FormMessage } from '@/shadecn/components/ui/form';
 
 interface Option {
@@ -52,6 +54,7 @@ export default function MainSelect({
     Array.isArray(field?.value) ? field.value : defaultValue || []
   );
   const [filteredOptions, setFilteredOptions] = useState(options);
+  const { t } = useTranslation();
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   useEffect(() => {
@@ -93,10 +96,12 @@ export default function MainSelect({
     if (field?.value) {
       if (multiSelect) {
         // Convert field.value to array of strings if needed
-        setSelectedValues(field.value.map((item: { value: string }) => item.value));
+        setSelectedValues(
+          field.value.map((item: { value: string }) => item?.value).filter(Boolean)
+        );
       } else {
         // Set single value for non-multi-select
-        setSelectedValues([field.value.value]);
+        setSelectedValues(field.value.value ? [field.value.value] : []);
       }
     }
   }, [field?.value]);
@@ -108,7 +113,7 @@ export default function MainSelect({
 
   return (
     <FormItem className={cn({ 'group pointer-events-none opacity-50': disabled })}>
-      <FormLabel className="text-text-600 text-sm font-semibold">{title}</FormLabel>
+      <FormLabel className="text-sm font-medium text-foreground">{title}</FormLabel>
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal>
         <PopoverTrigger asChild>
           <Button
@@ -116,22 +121,16 @@ export default function MainSelect({
             {...props}
             onClick={handleButtonClick}
             className={cn(
-              'w-full shrink-0 flex-grow border border-primary/50 text-sm shadow-none transition-colors',
-              'focus-within:border-primary-dark-800 focus-within:border-[1.5px]',
-              {
-                'h-auto px-[0.625rem] py-[0.3125rem] text-xs font-medium': size === 'xs',
-                'h-auto px-[0.875rem] py-[0.375rem] text-sm font-medium': size === 'sm',
-                'h-auto px-[1.25rem] py-[0.5rem] text-sm font-medium': size === 'md',
-                'h-auto px-[1.5rem] py-[0.75rem] text-base font-medium': size === 'lg',
-                'h-auto px-[1.5rem] py-[1rem] text-base font-bold': size === 'super',
-              },
+              fieldClass,
+              'min-h-10 h-auto min-w-0 py-1.5 font-normal hover:bg-card',
+              { 'min-h-8 text-xs': size === 'xs' },
               className
             )}>
-            <div className="flex w-full items-center justify-between">
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
               {selectedValues.length === 0 ? (
-                <p className="text-text-400">{placeholder || 'Select ...'}</p>
+                <p className="truncate text-muted-foreground">{placeholder || t('search')}</p>
               ) : (
-                <div className="flex flex-wrap gap-2">
+                <div className="flex min-w-0 flex-1 flex-wrap gap-2 overflow-hidden">
                   {multiSelect &&
                     selectedValues?.map((value, index) => {
                       const option = options.find((o) => o.value === value);
@@ -141,7 +140,7 @@ export default function MainSelect({
                           {IconComponent && <IconComponent className="mr-2 h-4 w-4" />}
                           {option?.label}
                           <XCircleIcon
-                            className="h-5 w-5 cursor-pointer text-black"
+                            className="h-5 w-5 cursor-pointer text-current"
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleOption(value);
@@ -151,33 +150,38 @@ export default function MainSelect({
                       );
                     })}
                   {!multiSelect && (
-                    <span className="text-sm font-medium">
+                    <span className="block truncate text-sm font-medium">
                       {options.find((o) => o.value === selectedValues[0])?.label || ''}
                     </span>
                   )}
                 </div>
               )}
               <ChevronDown
-                className={cn('size-4 ml-2 cursor-pointer text-black transition-transform', {
-                  'rotate-180': isPopoverOpen,
-                })}
+                className={cn(
+                  'size-4 shrink-0 cursor-pointer text-muted-foreground transition-transform',
+                  {
+                    'rotate-180': isPopoverOpen,
+                  }
+                )}
               />
             </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="ma bg-white p-0 drop-shadow-sm"
+          className="bg-popover p-0 drop-shadow-sm"
           onEscapeKeyDown={() => setIsPopoverOpen(false)}>
           <Command>
             <CommandList>
-              <CommandInput className="h-9" placeholder="Search option..." />
-              <CommandEmpty className="p-2">No results found.</CommandEmpty>
+              <CommandInput className="h-9" placeholder={t('search')} />
+              <CommandEmpty className="p-2 text-sm text-muted-foreground">
+                {t('noResults')}
+              </CommandEmpty>
               <CommandGroup>
                 {filteredOptions.map((option) => (
                   <CommandItem
                     key={option.value}
                     onSelect={() => toggleOption(option.value)}
-                    className="hover:bg-primary-light-100 active:bg-primary-light-500 cursor-pointer rounded-lg px-3 transition-colors">
+                    className="cursor-pointer rounded-lg px-3 transition-colors hover:bg-accent active:bg-accent/80">
                     {option.label}
                   </CommandItem>
                 ))}

@@ -1,10 +1,9 @@
 import { Bar, BarChart, CartesianGrid, LabelList, XAxis } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import { IoBarChartOutline } from 'react-icons/io5';
 
 import useSWR from 'swr';
 import staticService from '@services/static.service';
-import { ThreeDotsLoader } from '@UI/Index';
+import { Skeleton } from '@UI/Index';
 import {
   ChartConfig,
   ChartContainer,
@@ -41,41 +40,51 @@ export function WeeklyRevenueChart() {
 
   return (
     <div className="h-full">
-      {isLoading && <ThreeDotsLoader />}
-
-      <ChartContainer config={chartConfig} className="h-[300px] w-full">
-        <BarChart
-          accessibilityLayer
-          data={chartData}
-          margin={{
-            top: 20,
-          }}>
-          <defs>
-            <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#543063" />
-              <stop offset="100%" stopColor="#543063" />
-            </linearGradient>
-          </defs>
-          <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-slate-200" />
-          <XAxis
-            dataKey="week"
-            tickLine={false}
-            tickMargin={10}
-            axisLine={false}
-            tickFormatter={(value) => value.slice(0, 3)}
-            className="text-xs text-slate-500"
-          />
-          <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-          <Bar dataKey="totalEarnings" fill="url(#barGradient)" radius={[8, 8, 0, 0]} barSize={24}>
-            <LabelList
-              position="top"
-              offset={8}
-              className="fill-slate-600 text-xs font-medium"
-              fontSize={12}
+      {isLoading ? (
+        <div className="flex h-[300px] items-end gap-3 px-2 pb-2">
+          {[45, 70, 35, 85, 55, 65, 40].map((h, i) => (
+            <Skeleton key={i} className="flex-1 rounded-b-none" style={{ height: `${h}%` }} />
+          ))}
+        </div>
+      ) : (
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <BarChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              top: 20,
+            }}>
+            <defs>
+              <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="hsl(var(--primary))" />
+                <stop offset="100%" stopColor="hsl(var(--primary))" />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-border" />
+            <XAxis
+              dataKey="week"
+              tickLine={false}
+              tickMargin={10}
+              axisLine={false}
+              tickFormatter={(value) => value.slice(0, 3)}
+              className="text-xs text-muted-foreground"
             />
-          </Bar>
-        </BarChart>
-      </ChartContainer>
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+            <Bar
+              dataKey="totalEarnings"
+              fill="url(#barGradient)"
+              radius={[8, 8, 0, 0]}
+              barSize={24}>
+              <LabelList
+                position="top"
+                offset={8}
+                className="fill-muted-foreground text-xs font-medium"
+                fontSize={12}
+              />
+            </Bar>
+          </BarChart>
+        </ChartContainer>
+      )}
     </div>
   );
 }

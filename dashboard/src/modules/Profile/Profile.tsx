@@ -1,5 +1,7 @@
 import settingsService from '@services/settings.service';
-import { Button, ThreeDotsLoader } from '@UI/Index';
+import { Button, InfoList, MainAvatar, PageHeader, SectionCard, PageSkeleton } from '@UI/Index';
+import MainStatusChipe from '@UI/Status/MainStatusChipe';
+import { formatDate } from '@app/utils/helper';
 import { toast } from 'react-toastify';
 import useSWR from 'swr';
 import { Input } from '@shadecn/components/ui/input';
@@ -36,7 +38,7 @@ const Profile = () => {
         return data.data;
       })
       .catch((e) => {
-        toast.error(e.response.localizedMessage['en']);
+        toast.error(e?.response?.data?.localizedMessage?.[lang] || t('somethingWentWrong'));
       });
   };
   const { data, isLoading } = useSWR('get-amin-profile', fetchProfile);
@@ -61,114 +63,93 @@ const Profile = () => {
       .then(() => {
         setLoading(false);
         setOpen(false);
-        toast.success('Password updated successfully');
+        toast.success(t('passwordUpdated'));
       })
       .catch((e) => {
         setLoading(false);
 
-        toast.error(e.response.localizedMessage['en']);
+        toast.error(e?.response?.data?.localizedMessage?.[lang] || t('somethingWentWrong'));
       });
   };
-  if (isLoading) return <ThreeDotsLoader />;
+  if (isLoading) return <PageSkeleton kind="form" />;
   return (
-    <div>
-      <div className="w-full rounded-xl border border-slate-200 bg-white p-6">
-        <div className="flex w-full justify-between">
-          <h1 className="mb-4 text-2xl font-bold text-gray-700">{t('User Profile')}</h1>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>{t('Reset password')}</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>{t('Reset password')}</DialogTitle>
-                <DialogDescription>
-                  Make changes to your Password here. Click save when you&lsquo;re done.
-                </DialogDescription>
-              </DialogHeader>
+    <div className="mx-auto w-full max-w-4xl space-y-5">
+      <PageHeader
+        leading={<MainAvatar src={undefined} name={data?.userName || ''} className="h-10 w-10" />}
+        title={data?.userName || t('User Profile')}
+        description={t('User Profile')}
+        actions={
+          <>
+            {data?.status && <MainStatusChipe status={data.status} />}
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="secondary">{t('Reset password')}</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>{t('Reset password')}</DialogTitle>
+                  <DialogDescription>{t('resetPasswordHint')}</DialogDescription>
+                </DialogHeader>
 
-              <div className=" w-full">
-                <Form {...newPasswrodForm}>
-                  <form
-                    className="flex w-full flex-col gap-3"
-                    onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
-                    <FormField
-                      control={newPasswrodForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel />
-                          <FormControl>
-                            <Input type="password" {...field} />
-                          </FormControl>
+                <div className=" w-full">
+                  <Form {...newPasswrodForm}>
+                    <form
+                      className="flex w-full flex-col gap-3"
+                      onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
+                      <FormField
+                        control={newPasswrodForm.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel />
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
 
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />{' '}
-                    <Button disabled={loading} loading={loading} type="submit" className="w-full">
-                      {t('Save changes')}
-                    </Button>
-                  </form>
-                </Form>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-gray-500">{t('User Name')}</h2>
-          <p className="text-lg font-semibold text-gray-800">{data?.userName}</p>
-        </div>
-
-        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <h2 className="text-sm font-medium text-gray-500">{t('Language')}</h2>
-            <p className="text-sm font-medium text-slate-900">{data?.lang.toUpperCase()}</p>
-          </div>
-          <div>
-            <h2 className="text-sm font-medium text-gray-500">{t('Status')}</h2>
-            <p
-              className={`text-lg font-semibold ${
-                data?.status === 'ACTIVE' ? 'text-green-600' : 'text-red-600'
-              }`}>
-              {data?.status}
-            </p>
-          </div>
-        </div>
-
-        <div className="mb-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <h2 className="text-sm font-medium text-gray-500">is SuperAdmin</h2>
-            <p className="text-sm font-medium text-slate-900">{data?.isSuperAdmin ? 'Yes' : 'No'}</p>
-          </div>
-          <div>
-            <h2 className="text-sm font-medium text-gray-500">{t('Is Deleted')}</h2>
-            <p className="text-sm font-medium text-slate-900">{data?.isDeleted ? 'Yes' : 'No'}</p>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-gray-500">{t('Suspend Reason')}</h2>
-          <p className="text-sm font-medium text-slate-900">{data?.suspendReason || '—'}</p>
-        </div>
-
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-gray-500">{t('City')}</h2>
-          <p className="text-sm font-medium text-slate-900">
-            {data?.city.length ? data?.city?.map((item) => item.name[lang]).join(', ') : '—'}
-          </p>
-        </div>
-
-        <div className="mb-4">
-          <h2 className="text-sm font-medium text-gray-500">{t('Created At')}</h2>
-          <p className="text-sm font-medium text-slate-900">{new Date(data?.createdAt).toLocaleDateString()}</p>
-        </div>
-
-        <div>
-          <h2 className="text-sm font-medium text-gray-500">{t('Last Updated')}</h2>
-          <p className="text-sm font-medium text-slate-900">{new Date(data?.updatedAt).toLocaleDateString()}</p>
-        </div>
-      </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />{' '}
+                      <Button disabled={loading} loading={loading} type="submit" className="w-full">
+                        {t('Save changes')}
+                      </Button>
+                    </form>
+                  </Form>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </>
+        }
+      />
+      <SectionCard title={t('accountInfo')}>
+        <InfoList
+          items={[
+            { label: t('User Name'), value: data?.userName },
+            { label: t('Language'), value: data?.lang?.toUpperCase() },
+            { label: t('role'), value: data?.isSuperAdmin ? t('superAdmin') : t('admin') },
+            { label: t('Created At'), value: data?.createdAt && formatDate(data.createdAt) },
+            { label: t('Last Updated'), value: data?.updatedAt && formatDate(data.updatedAt) },
+            ...(data?.suspendReason
+              ? [{ label: t('Suspend Reason'), value: data.suspendReason }]
+              : []),
+            {
+              label: t('City'),
+              wide: true,
+              value: data?.city?.length ? (
+                <span className="flex flex-wrap gap-1.5">
+                  {data.city.map((c) => (
+                    <span
+                      key={c._id}
+                      className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-medium text-primary">
+                      {c?.name?.[lang] || c?.name?.en}
+                    </span>
+                  ))}
+                </span>
+              ) : undefined,
+            },
+          ]}
+        />
+      </SectionCard>
     </div>
   );
 };

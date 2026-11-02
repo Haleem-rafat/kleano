@@ -17,7 +17,6 @@ export interface ITransactionsList {
   updatedAt: string;
 }
 
-
 export interface Pagination {
   page: number;
   perPage: number;
@@ -45,9 +44,9 @@ export interface IOrderList {
   carAfterWashLink?: string;
   carBeforeWashLink?: string;
   totalPay: number;
-  createdAt: string
-  ratingOfUser: number,
-  ratingOfBiker: number,
+  createdAt: string;
+  ratingOfUser: number;
+  ratingOfBiker: number;
   bikerCommission?: number;
   updatedAt: string;
   __v: number;
@@ -59,8 +58,8 @@ export interface IOrderList {
   userOrdersCount: number;
   endTime?: string;
   promoCode?: {
-    code: string,
-    _id: string
+    code: string;
+    _id: string;
   };
   googleMapsLink: string;
   subscription?: {

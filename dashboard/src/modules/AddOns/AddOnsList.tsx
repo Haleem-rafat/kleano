@@ -1,29 +1,15 @@
 import { formatDate } from '@app/utils/helper';
 import { ROUTES } from '@constants/routes';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { Button, DataTable, EmtyState, FormSheet } from '@UI/Index';
 import { useState } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
 
 import addOnsService from '@services/addOns.service';
 import { IAddOns } from '@servicesTypes/addOns';
 import AddOnsForm from './_components/AddOnsForm';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
 
 export default function AddOnsList() {
   const navigate = useNavigate();
@@ -35,61 +21,65 @@ export default function AddOnsList() {
     addOnsService.getAllAddOnsList().then((data) => data.data)
   );
 
+  const columns: ColumnDef<IAddOns>[] = [
+    {
+      id: 'name',
+      header: t('addOnsName'),
+      accessorFn: (addOns) => addOns?.name?.[lang] || addOns?.name,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <img
+            className="h-8 w-8 rounded-full object-cover"
+            src={row.original?.icon?.iconLink}
+            alt=""
+          />
+          <span className="font-medium">{row.original?.name?.[lang] || row.original?.name}</span>
+        </div>
+      ),
+    },
+    {
+      id: 'price',
+      header: t('addOnsPrice'),
+      accessorKey: 'price',
+      cell: ({ row }) => `${row.original?.price} ${t('SAR')}`,
+    },
+    { id: 'stock', header: t('stock'), accessorKey: 'stock' },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original?.createdAt),
+    },
+  ];
+
   return (
     <div className="relative">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('addOns')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('addOns')}</h1>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('addNewAddOns')}</Button>
         </div>
       </div>
       <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[t('addOnsName'), t('addOnsPrice'), t('stock'), t('createddate')].map(
-                (head, index) => (
-                  <TableHead key={index}>{head}</TableHead>
-                )
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data &&
-              (data as IAddOns[])?.map((addOns) => (
-                <TableRow
-                  key={addOns._id}
-                  className="cursor-pointer hover:bg-primary/10"
-                  onClick={() =>
-                    navigate(generatePath(ROUTES.ADD_ONS_DETAILS, { addOnsId: addOns._id }))
-                  }>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <img className="h-10 w-10 rounded-full " src={addOns?.icon?.iconLink} />
-                      <p className="pt-2">{addOns?.name?.[lang] || addOns?.name}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{addOns?.price} SAR</TableCell>
-                  <TableCell>{addOns?.stock}</TableCell>
-                  <TableCell>{formatDate(addOns?.createdAt)}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        {data?.length === 0 && <EmtyState />}
+        <DataTable
+          columns={columns}
+          data={(data as IAddOns[]) ?? []}
+          isLoading={isLoading}
+          onRowClick={(addOns) =>
+            navigate(generatePath(ROUTES.ADD_ONS_DETAILS, { addOnsId: addOns._id }))
+          }
+          searchable
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('addNewAddOns')}</SheetTitle>
-            <SheetDescription>
-              <AddOnsForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet
+        open={openSheet}
+        onOpenChange={() => setOpenSheet(false)}
+        title={t('addNewAddOns')}>
+        <AddOnsForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 }

@@ -11,6 +11,8 @@ import {
   ColumnFiltersState,
   VisibilityState,
 } from '@tanstack/react-table';
+import { IoChevronUp, IoChevronDown, IoEyeOutline, IoSearchOutline } from 'react-icons/io5';
+import { ChevronUpDownIcon } from '@heroicons/react/24/solid';
 import {
   Table,
   TableBody,
@@ -19,16 +21,22 @@ import {
   TableHeader,
   TableRow,
 } from '@shadecn/components/ui/table';
-import { ThreeDotsLoader } from '@UI/Index';
-import { IoChevronUp, IoChevronDown, IoEyeOutline } from 'react-icons/io5';
 import { Button } from '@shadecn/components/ui/button';
-import { ChevronUpDownIcon } from '@heroicons/react/24/solid';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@shadecn/components/ui/dropdown-menu';
+import { cn } from '@/shadecn/lib/utils';
+
+/** Columns with these ids stay pinned to the end edge so row actions are always visible. */
+const PINNED_IDS = ['actions', 'action', 'delete'];
+const isPinned = (id: string) => PINNED_IDS.includes(id);
+const PINNED_HEAD =
+  'sticky end-0 z-[1] bg-card shadow-[inset_1px_0_0_hsl(var(--border))] rtl:shadow-[inset_-1px_0_0_hsl(var(--border))]';
+const PINNED_CELL =
+  'sticky end-0 z-[1] bg-card shadow-[inset_1px_0_0_hsl(var(--border))] group-hover:bg-muted rtl:shadow-[inset_-1px_0_0_hsl(var(--border))]';
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -45,6 +53,12 @@ export interface DataTableProps<TData, TValue> {
   initialColumnFilters?: ColumnFiltersState;
   initialColumnVisibility?: VisibilityState;
   showColumnToggle?: boolean;
+  /** Shows a search box that filters the loaded rows. */
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  /** Number of placeholder rows while loading. */
+  skeletonRows?: number;
+  getRowId?: (row: TData, index: number) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -62,6 +76,10 @@ export function DataTable<TData, TValue>({
   initialColumnFilters = [],
   initialColumnVisibility = {},
   showColumnToggle = true,
+  searchable = false,
+  searchPlaceholder,
+  skeletonRows = 6,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
   const { t } = useTranslation();
   const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
@@ -70,141 +88,160 @@ export function DataTable<TData, TValue>({
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>(initialColumnVisibility);
   const [rowSelection, setRowSelection] = React.useState({});
+  const [globalFilter, setGlobalFilter] = React.useState('');
 
   const table = useReactTable({
-    data,
+    data: data ?? [],
     columns,
+    getRowId,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: enableSorting ? getSortedRowModel() : undefined,
-    getFilteredRowModel: enableFilters ? getFilteredRowModel() : undefined,
+    getFilteredRowModel: enableFilters || searchable ? getFilteredRowModel() : undefined,
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
-    state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
-      rowSelection,
-    },
+    state: { sorting, columnFilters, columnVisibility, rowSelection, globalFilter },
     enableSorting,
-    enableFilters,
+    enableFilters: enableFilters || searchable,
     enableRowSelection,
   });
 
-  const handleRowClick = (rowData: TData) => {
-    if (onRowClick) {
-      onRowClick(rowData);
-    }
-  };
+  const rows = table.getRowModel().rows;
+  const visibleColumns = table.getVisibleLeafColumns().length || columns.length;
+  const hideableColumns = table.getAllColumns().filter((column) => column.getCanHide());
+  const showToggle = showColumnToggle && enableColumnVisibility && hideableColumns.length > 1;
 
   return (
-    <div className={`relative ${isLoading ? 'min-h-64' : ''} ${className}`}>
-      {isLoading && <ThreeDotsLoader />}
-
-      {!isLoading && (
-        <>
-          {/* Column Visibility Toggle */}
-          {showColumnToggle && enableColumnVisibility && (
-            <div className="mb-3 flex justify-end">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-8 gap-2">
-                    <IoEyeOutline className="h-4 w-4" />
-                    {t('columns')}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48">
-                  {table
-                    .getAllColumns()
-                    .filter((column) => column.getCanHide())
-                    .map((column) => {
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={column.id}
-                          className="capitalize"
-                          checked={column.getIsVisible()}
-                          onCheckedChange={(value) => column.toggleVisibility(!!value)}>
-                          {column.id}
-                        </DropdownMenuCheckboxItem>
-                      );
-                    })}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+    <div className={cn('space-y-3', className)}>
+      {(searchable || showToggle) && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          {searchable ? (
+            <label className="relative w-full sm:w-72">
+              <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="search"
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder={searchPlaceholder || t('search')}
+                aria-label={searchPlaceholder || t('search')}
+                className="h-9 w-full rounded-md border border-input bg-card pe-3 ps-9 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </label>
+          ) : (
+            <span />
           )}
-
-          <div>
-            <Table className="w-full">
-              <TableHeader>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
-                        {header.isPlaceholder ? null : (
-                          <div className="flex items-center gap-1">
-                            <span>
-                              {flexRender(header.column.columnDef.header, header.getContext())}
-                            </span>
-                            {header.column.getCanSort() && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 w-6 p-0 hover:bg-slate-200"
-                                onClick={header.column.getToggleSortingHandler()}>
-                                {header.column.getIsSorted() === 'asc' ? (
-                                  <IoChevronUp className="h-4 w-4 text-slate-600" />
-                                ) : header.column.getIsSorted() === 'desc' ? (
-                                  <IoChevronDown className="h-4 w-4 text-slate-600" />
-                                ) : (
-                                  <ChevronUpDownIcon className="h-4 w-4 text-slate-400" />
-                                )}
-                              </Button>
-                            )}
-                          </div>
-                        )}
-                      </TableHead>
-                    ))}
-                  </TableRow>
+          {showToggle && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 gap-2">
+                  <IoEyeOutline className="h-4 w-4" />
+                  {t('columns')}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {hideableColumns.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.id}
+                    className="capitalize"
+                    checked={column.getIsVisible()}
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}>
+                    {typeof column.columnDef.header === 'string'
+                      ? column.columnDef.header
+                      : column.id}
+                  </DropdownMenuCheckboxItem>
                 ))}
-              </TableHeader>
-              <TableBody>
-                {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                      className={onRowClick ? 'cursor-pointer' : undefined}
-                      onClick={() => handleRowClick(row.original)}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="whitespace-nowrap">
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="px-6 py-12 text-center">
-                      {emptyStateComponent || (
-                        <div className="py-12 text-center">
-                          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-                            <ChevronUpDownIcon className="h-8 w-8 text-slate-400" />
-                          </div>
-                          <h3 className="mb-1 text-sm font-medium text-slate-900">
-                            {t('noDataAvailable')}
-                          </h3>
-                          <p className="text-[13px] text-slate-500">{t('noResultsForFilters')}</p>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+        </div>
       )}
+
+      <div className="overflow-x-auto rounded-lg border border-border bg-card">
+        <Table className="w-full" aria-busy={isLoading}>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted();
+                  return (
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        'whitespace-nowrap',
+                        isPinned(header.column.id) && PINNED_HEAD
+                      )}>
+                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                        <button
+                          type="button"
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="-mx-1 inline-flex items-center gap-1 rounded px-1 hover:text-foreground">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {sorted === 'asc' ? (
+                            <IoChevronUp className="h-3.5 w-3.5" />
+                          ) : sorted === 'desc' ? (
+                            <IoChevronDown className="h-3.5 w-3.5" />
+                          ) : (
+                            <ChevronUpDownIcon className="h-3.5 w-3.5 opacity-40" />
+                          )}
+                        </button>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </TableHead>
+                  );
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {isLoading ? (
+              Array.from({ length: skeletonRows }).map((_, i) => (
+                <TableRow key={`skeleton-${i}`} className="hover:bg-transparent">
+                  {Array.from({ length: visibleColumns }).map((__, j) => (
+                    <TableCell key={j}>
+                      <div className="max-w-40 h-4 w-3/4 animate-pulse rounded bg-muted" />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : rows.length ? (
+              rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={cn('group', onRowClick && 'cursor-pointer hover:bg-primary/5')}
+                  onClick={onRowClick ? () => onRowClick(row.original) : undefined}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      onClick={isPinned(cell.column.id) ? (e) => e.stopPropagation() : undefined}
+                      className={cn('whitespace-nowrap', isPinned(cell.column.id) && PINNED_CELL)}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={visibleColumns} className="py-12 text-center">
+                  {globalFilter || !emptyStateComponent ? (
+                    <div>
+                      <p className="text-sm font-medium text-foreground">{t('noDataAvailable')}</p>
+                      <p className="mt-1 text-[13px] text-muted-foreground">
+                        {t('noResultsForFilters')}
+                      </p>
+                    </div>
+                  ) : (
+                    emptyStateComponent
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

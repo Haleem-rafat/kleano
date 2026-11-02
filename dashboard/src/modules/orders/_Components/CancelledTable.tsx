@@ -85,7 +85,14 @@ const CancelledTable = ({
     {
       accessorKey: 'washingServices',
       header: t('washingServices'),
-      cell: ({ row }) => row.original?.washingServices?.map((service) => service.name).join(', '),
+      // Names come as { en, ar } (or a plain string on old orders).
+      cell: ({ row }) =>
+        row.original?.washingServices
+          ?.map((service) =>
+            typeof service.name === 'string' ? service.name : service.name?.[lang]
+          )
+          .filter(Boolean)
+          .join(', ') || '—',
     },
     {
       accessorKey: 'refundAmount',

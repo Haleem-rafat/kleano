@@ -48,5 +48,4 @@ export enum ROUTES {
   BOOKING = '/app/booking',
   BOOKING_CALENDAR = '/app/booking-calendar',
   BOOKING_CALENDAR_2 = '/app/booking-calendar-2',
-
 }

@@ -5,7 +5,16 @@ import * as PopoverPrimitive from '@radix-ui/react-popover';
 
 import { cn } from '@/shadecn/lib/utils';
 
-const Popover = PopoverPrimitive.Root;
+/**
+ * Modal by default: sheets and dialogs lock wheel scrolling to themselves, and a
+ * non-modal popover (portaled outside) could not be scrolled while one is open.
+ */
+const Popover = ({
+  modal = true,
+  ...props
+}: React.ComponentProps<typeof PopoverPrimitive.Root>) => (
+  <PopoverPrimitive.Root modal={modal} {...props} />
+);
 
 const PopoverTrigger = PopoverPrimitive.Trigger;
 
@@ -20,7 +29,7 @@ const PopoverContent = React.forwardRef<
     align={align}
     sideOffset={sideOffset}
     className={cn(
-      'text-popover-foreground z-[999] max-h-[--radix-popover-content-available-height]  w-[--radix-popover-trigger-width] rounded-md border bg-white p-4 shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
+      'z-[999] max-h-[--radix-popover-content-available-height] w-[--radix-popover-trigger-width]  overflow-y-auto overscroll-contain rounded-xl border border-border bg-popover p-3 text-popover-foreground shadow-lg outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2',
       className
     )}
     {...props}

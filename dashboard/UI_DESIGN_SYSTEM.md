@@ -1,221 +1,93 @@
-# Kleano Admin Dashboard - UI Design System
+# Kleano admin dashboard — design system
 
-## 🎨 Design Philosophy
+The dashboard uses the same brand as the Kleano apps
+(design system page: https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk).
+Every page, dialog, sheet and form is built from the tokens and components below.
 
-This design system follows a **modern, professional dashboard aesthetic** with clean layouts,
-consistent spacing, and intuitive user interactions. The design prioritizes information hierarchy,
-visual clarity, and responsive behavior across all screen sizes.
+## Tokens
 
-## 🏗️ Core Design Principles
+Defined as HSL variables in `src/index.css` (`:root` and `.dark`) and mapped in
+`tailwind.config.js`. Use only these colour classes:
 
-### 1. **Card-Based Layout**
+| Use | Classes |
+| --- | --- |
+| Page / surface | `bg-background`, `bg-card`, `bg-muted` |
+| Text | `text-foreground`, `text-muted-foreground` |
+| Brand (#543063) | `bg-primary`, `text-primary`, `bg-primary/10`, `bg-accent` |
+| Status | `success`, `warning`, `destructive` (+ `/10` tints for chips) |
+| Lines | `border-border`, `border-input`, `ring-ring` |
 
-- All content sections are wrapped in cards with subtle shadows
-- Cards have rounded corners (`rounded-xl`) for modern appearance
-- Consistent border styling (`border-slate-200`)
-- White background with subtle shadow (`shadow-sm`)
+Radius comes from `--radius` (`rounded-lg`, `rounded-md`, `rounded-sm`). Font is the
+system stack (`font-sans`).
 
-### 2. **Gradient Headers**
+**Never**: Tailwind palette colours (`gray-*`, `blue-*`, `green-*` …), `bg-white`, hex
+values in classes, gradients on headers or buttons, class names built at runtime
+(`` `bg-${color}-500` `` never renders).
 
-- Each section has a gradient header with white text
-- Consistent header height and padding
-- Icon + title + description structure
-- Color coding for different content types:
-  - **Blue** (`from-blue-600 to-blue-700`): User/Profile information
-  - **Purple** (`from-purple-600 to-purple-700`): Vehicle/Asset information
-  - **Green** (`from-green-600 to-green-700`): Orders/Transactions
-  - **Emerald** (`from-emerald-600 to-emerald-700`): Statistics/Analytics
-  - **Orange** (`from-orange-600 to-orange-700`): Location/Geographic data
-  - **Indigo** (`from-indigo-600 to-indigo-700`): Biker/Service provider info
+## Components (`@UI/Index`)
 
-### 3. **Typography Hierarchy**
+- `PageHeader` — page title, subtitle and actions.
+- `SectionCard` — titled card for a group of content; `StatCard` — KPI tile.
+- `Button` — `primary`, `secondary`, `tertiary`, `success`, `danger`, `dangerOutline`.
+- `MainStatusChipe` — every status label and colour; don't style statuses inline.
+- `MainSelect`, `MainInput`, `MainPhoneNumberInpute`, … for form fields.
+- shadcn primitives in `src/shadecn/components/ui` (Dialog, Sheet, Table, Tabs …).
 
-- **Headers**: `text-2xl font-semibold` for main page titles
-- **Section Titles**: `text-lg font-semibold` for card headers
-- **Labels**: `text-xs font-medium uppercase tracking-wide text-slate-500`
-- **Values**: `text-lg font-semibold text-slate-900` for important data
-- **Descriptions**: `text-sm text-slate-500` for secondary information
+## Form controls and popups
 
-### 4. **Spacing & Layout**
+- Every control uses `fieldClass` from `src/shadecn/lib/field.ts`: 40px high, `border-input`,
+  `bg-card`, primary border plus a soft glow on focus. `Input`, `SelectTrigger`, `Textarea`,
+  `MainSelect`, `Combobox`, the date picker, colour and phone inputs all use it, so don't
+  restyle them per page.
+- Dropdown panels use `popupSurface` and their rows use `popupItem` (accent highlight; the
+  selected row is primary with a check).
+- **Sheets: only `FormSheet`** (`@UI/Index`). It floats (inset 12px, rounded), pins the title,
+  pads and scrolls the body, and pins the footer. Put a form's submit buttons in
+  `<SheetActions>`; it sits at the bottom of the sheet and never covers fields.
+  Importing `ui/sheet` in a page is a lint error. Inside a sheet, never use `h-screen`,
+  your own `overflow-y-*` scroll, or `absolute bottom-0` bars.
+- In a `DataTable`, a column with id `actions` / `action` / `delete` stays pinned to the end
+  edge, so row actions are always visible.
 
-- **Page Container**: `max-w-7xl mx-auto` for main content
-- **Card Padding**: `p-6` for card content
-- **Section Spacing**: `gap-6` between cards
-- **Grid Layouts**: Responsive grids with `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
-- **Internal Spacing**: `space-y-4` for vertical spacing within sections
+## Validation
 
-### 5. **Color Palette**
+- Every form has a yup schema built from `v` in `src/app/utils/validation.ts`
+  (`text`, `price`, `positive`, `count`, `percent`, `phone`, `digits`, `password`, `url`,
+  `bilingual`, `picked`, `options`, `file`). No form submits without a resolver.
+- Messages are `validation.*` i18n keys; `FormMessage` translates them (en/ar), including
+  nested fields such as `{ en, ar }`.
+- Every input has a label and a placeholder. Number fields start empty, never "undefined"
+  or 0.
 
-- **Primary Background**: `bg-slate-50` for page background
-- **Card Background**: `bg-white`
-- **Text Colors**:
-  - Primary: `text-slate-900`
-  - Secondary: `text-slate-600`
-  - Muted: `text-slate-500`
-  - Success: `text-green-600`
-  - Error: `text-red-600`
-  - Warning: `text-orange-600`
+## Page kit (every page)
 
-### 6. **Interactive Elements**
+- `PageHeader`: title (a real `h1`), one-line description, actions; details pages add
+  `onBack` and a `leading` avatar or icon.
+- `SectionCard`: every content group. No icon badges or extra header strips inside cards.
+- `InfoList`: label/value pairs on details pages (never grey boxes per value).
+- Stat tiles: `rounded-lg border bg-card px-4 py-3`, small label, `text-lg` value.
+- `CityAvailability`: where a service, plan or add-on is offered (pause/resume/add).
+- `RichTextEditor`: long formatted text (Terms). The app renders the saved HTML.
 
-- **Buttons**: Consistent styling with hover states
-- **Clickable Cards**: Hover effects with border color changes and shadow
-- **Navigation**: Clear visual indicators for clickable elements
-- **Transitions**: `transition-all duration-200` for smooth interactions
+## Patterns
 
-## 📱 Responsive Design
+- Lists: `PageHeader` + filter row + `Table` in a card; rows that open details get
+  `cursor-pointer hover:bg-primary/10`.
+- Details: `PageHeader` with back button + `SectionCard`s.
+- Create / edit forms open in a `Sheet`. Put the form inside
+  `<SheetDescription asChild><div>…</div></SheetDescription>` — a form inside the
+  default `<p>` is invalid HTML.
+- Every `Dialog` needs a `DialogTitle` (use `sr-only` if it shouldn't show).
+- Destructive actions confirm with `AlertDialog` and a `danger` button.
+- All text through `t()`, keys in both `en` and `ar` locales.
 
-### Breakpoints
+## Performance
 
-- **Mobile**: `grid-cols-1` (default)
-- **Tablet**: `sm:grid-cols-2` (640px+)
-- **Desktop**: `lg:grid-cols-3` (1024px+)
-- **Large Desktop**: `xl:grid-cols-3` (1280px+)
+- Heavy libraries (Leaflet, FullCalendar, charts) load lazily with their route.
+- Vendor chunks are split in `vite.config.ts` (`VENDOR_CHUNKS`).
+- The PWA precaches only the app shell.
 
-### Layout Patterns
+## Checks before committing
 
-- **Main Layout**: `grid grid-cols-1 xl:grid-cols-3 gap-6`
-- **Stats Grid**: `grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
-- **Form Layouts**: `grid grid-cols-1 sm:grid-cols-2 gap-4`
-
-## 🎯 Component Patterns
-
-### 1. **Section Headers**
-
-```tsx
-<div className="from-[color]-600 to-[color]-700 bg-gradient-to-r px-6 py-4">
-  <div className="flex items-center space-x-3">
-    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/20">
-      <Icon className="h-6 w-6 text-white" />
-    </div>
-    <div>
-      <h2 className="text-lg font-semibold text-white">{title}</h2>
-      <p className="text-[color]-100 text-sm">{description}</p>
-    </div>
-  </div>
-</div>
-```
-
-### 2. **Data Display Cards**
-
-```tsx
-<div className="rounded-lg bg-slate-50 p-4">
-  <h4 className="mb-2 text-sm font-semibold text-slate-700">{label}</h4>
-  <p className="text-lg font-bold text-slate-900">{value}</p>
-</div>
-```
-
-### 3. **Statistics Cards**
-
-```tsx
-<div className="text-center">
-  <div className="bg-[color]-100 mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full">
-    <Icon className="text-[color]-600 h-6 w-6" />
-  </div>
-  <p className="text-2xl font-bold text-slate-900">{value}</p>
-  <p className="text-sm text-slate-500">{label}</p>
-</div>
-```
-
-### 4. **Interactive Cards**
-
-```tsx
-<div className="hover:border-[color]-300 hover:shadow-[color]-100 cursor-pointer overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md">
-  {/* Card content */}
-</div>
-```
-
-## 🔧 Implementation Guidelines
-
-### 1. **Consistent Imports**
-
-```tsx
-import { Card, CardContent, CardHeader, CardTitle } from '@shadecn/components/ui/card';
-import { Badge } from '@shadecn/components/ui/badge';
-import { Button } from '@shadecn/components/ui/button';
-import { ImageModal } from '@UI/Index';
-```
-
-### 2. **Icon Usage**
-
-- Use `react-icons/io5` for consistency
-- Standard icon sizes: `h-4 w-4`, `h-5 w-5`, `h-6 w-6`
-- Color coding: `text-slate-400` for secondary icons, `text-[color]-600` for primary
-
-### 3. **Empty States**
-
-```tsx
-<div className="py-12 text-center">
-  <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-slate-100">
-    <Icon className="h-8 w-8 text-slate-400" />
-  </div>
-  <h3 className="mb-1 text-lg font-medium text-slate-900">{title}</h3>
-  <p className="text-slate-500">{description}</p>
-</div>
-```
-
-### 4. **Loading States**
-
-- Use `ThreeDotsLoader` component
-- Show loading state before data is available
-- Maintain layout structure during loading
-
-## 📋 Page Structure Template
-
-```tsx
-export default function PageName() {
-  return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Professional Header */}
-      <div className="border-b border-slate-200 bg-white shadow-sm">
-        <div className="px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button type="button" onClick={() => navigate(-1)}>
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
-                <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
-              </div>
-            </div>
-            {/* Action buttons */}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="p-6">
-        <div className="mx-auto max-w-[95%]">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">{/* Content sections */}</div>
-        </div>
-      </div>
-    </div>
-  );
-}
-```
-
-## 🎨 Visual Consistency Rules
-
-1. **Always use the gradient header pattern** for section identification
-2. **Maintain consistent spacing** using the defined spacing scale
-3. **Use color coding** to group related information
-4. **Implement hover states** for interactive elements
-5. **Ensure responsive behavior** across all breakpoints
-6. **Follow the typography hierarchy** for text elements
-7. **Use consistent border radius** (`rounded-xl` for cards, `rounded-lg` for smaller elements)
-8. **Apply consistent shadows** (`shadow-sm` for cards, `shadow-md` for hover states)
-
-## 🚀 Future Enhancements
-
-When implementing new UI components or pages, always:
-
-1. Reference this design system
-2. Follow the established patterns
-3. Maintain color consistency
-4. Ensure responsive design
-5. Test hover states and interactions
-6. Validate accessibility standards
-
-This design system ensures a cohesive, professional, and user-friendly experience across the entire
-Kleano Admin Dashboard.
+`npx tsc --noEmit`, `npx eslint src` (0 errors), `npx vite build`, then open the page
+and confirm no console errors.

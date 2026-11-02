@@ -1,27 +1,12 @@
 import { useState } from 'react';
 import { IwshaingServicesList } from '@servicesTypes/wshaingServices.types';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
 
 import useSWR from 'swr';
 import washingServicesService from '@services/washingServices.service';
 
-import pointIcon from '@assets/icons/point-icon.svg';
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@shadecn/components/ui/table';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
+import { Button, DataTable, EmtyState, FormSheet } from '@UI/Index';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@constants/routes';
 import { formatDate } from '@app/utils/helper';
@@ -38,67 +23,75 @@ export default function WashingServices() {
     washingServicesService.getWashingServicesList().then((data) => data)
   );
 
+  const columns: ColumnDef<IwshaingServicesList>[] = [
+    {
+      id: 'name',
+      header: t('servesName'),
+      accessorFn: (service) => service?.name?.[lang] || service?.name,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <img
+            className="h-8 w-8 rounded-full object-cover"
+            src={row.original?.icon?.iconLink}
+            alt=""
+          />
+          <span className="font-medium">{row.original?.name?.[lang] || row.original?.name}</span>
+        </div>
+      ),
+    },
+    {
+      id: 'duration',
+      header: t('durationTime'),
+      accessorKey: 'duration',
+      cell: ({ row }) => `${row.original.duration} min`,
+    },
+    {
+      id: 'price',
+      header: t('servesPrice'),
+      accessorKey: 'price',
+      cell: ({ row }) => `${row.original?.price} ${t('SAR')}`,
+    },
+    { id: 'type', header: t('type'), accessorKey: 'type' },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original?.createdAt),
+    },
+  ];
+
   return (
     <div className="relative">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('washingServices')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          {t('washingServices')}
+        </h1>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('addNewServices')}</Button>
         </div>
       </div>
       <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="min-w-[150px]"> {t('servesName')}</TableHead>
-              <TableHead className="min-w-[100px]"> {t('durationTime')}</TableHead>
-              <TableHead className="min-w-[100px]"> {t('servesPrice')} </TableHead>
-              <TableHead className="min-w-[100px]"> {t('type')} </TableHead>
-              <TableHead className="min-w-[100px]"> {t('createddate')}</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(data?.data as IwshaingServicesList[])?.map((wshaingServices) => (
-              <TableRow
-                key={wshaingServices?._id}
-                onClick={() =>
-                  navigate(
-                    generatePath(ROUTES.WASHING_SERVICES_DETAILS, {
-                      washingServicesId: wshaingServices._id,
-                    })
-                  )
-                }
-                className="cursor-pointer hover:bg-primary/10">
-                <TableCell className="flex gap-2 text-center">
-                  <img
-                    className="h-10 w-10 rounded-full "
-                    src={wshaingServices?.icon?.iconLink}
-                    alt="biker img"
-                  />
-                  <p className="pt-2">{wshaingServices?.name?.[lang] || wshaingServices?.name}</p>
-                </TableCell>
-                <TableCell> {wshaingServices.duration} min</TableCell>
-                <TableCell>{wshaingServices?.price} SAR</TableCell>
-                <TableCell>{wshaingServices?.type}</TableCell>
-                <TableCell>{formatDate(wshaingServices?.createdAt)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {data?.data?.length === 0 && <EmtyState />}
+        <DataTable
+          columns={columns}
+          data={(data?.data as IwshaingServicesList[]) ?? []}
+          isLoading={isLoading}
+          onRowClick={(service) =>
+            navigate(
+              generatePath(ROUTES.WASHING_SERVICES_DETAILS, { washingServicesId: service._id })
+            )
+          }
+          searchable
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('addNewServices')}</SheetTitle>
-            <SheetDescription>
-              <WashingServicesForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet
+        open={openSheet}
+        onOpenChange={() => setOpenSheet(false)}
+        title={t('addNewServices')}>
+        <WashingServicesForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 }

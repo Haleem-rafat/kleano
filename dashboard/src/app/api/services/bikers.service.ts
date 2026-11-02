@@ -1,3 +1,4 @@
+import { v } from '@app/utils/validation';
 import { EAPI } from '@constants/endpoints';
 import * as Yup from 'yup';
 import { IBikerParams, IBikers } from '@servicesTypes/bikers.types';
@@ -76,42 +77,36 @@ class bikersService {
     return data;
   }
 
-    public async getAreaId(latitude: number, longitude: number) {
-      const { data } = await api.get(`${EAPI.MAP_AREAS}?latitude=${latitude}&longitude=${longitude}`);
-      return data;
-    }
+  public async getAreaId(latitude: number, longitude: number) {
+    const { data } = await api.get(`${EAPI.MAP_AREAS}?latitude=${latitude}&longitude=${longitude}`);
+    return data;
+  }
 
   /* API SCHEMAS */
 
   baseBikerSchema = {
     image: Yup.mixed(),
-    userName: Yup.string().required('Required field').trim(),
-    phone: Yup.string().required('Required field').trim(),
-    nationalId: Yup.string().required('Required field').trim(),
-    commissionType: Yup.string()
-      .oneOf(['PERCENTAGE', 'FIXED'], 'Invalid commission type')
-      .required('Required field'),
+    userName: v.text(60),
+    phone: v.phone(),
+    nationalId: v.digits(),
+    commissionType: v.choice(),
     commission: Yup.number()
-      .typeError('Must be a number')
-      .required('Required field')
+      .transform((val, orig) => (orig === '' ? undefined : val))
+      .typeError('validation.number')
+      .required('validation.required')
       .when('commissionType', {
         is: 'PERCENTAGE',
-        then: (schema) => schema.min(0, 'Must be at least 0').max(100, 'Must be at most 100'),
-        otherwise: (schema) => schema.min(0, 'Must be a positive number'),
+        then: (schema) => schema.min(0, 'validation.min0').max(100, 'validation.percent'),
+        otherwise: (schema) => schema.min(0, 'validation.min0'),
       }),
-    ordersBeforeCommission: Yup.number()
-      .required('Required field')
-      .integer('Must be a whole number')
-      .min(0, 'Must be at least 0')
-      .typeError('Must be a number'),
-    minimumCommission: Yup.number()
-      .min(0, 'Must be at least 0')
-      .typeError('Must be a number'),
+    ordersBeforeCommission: v.count(),
+    minimumCommission: v.optionalNumber(),
+    weekendCommission: v.optionalNumber(),
   };
 
   public addBikerSchema = Yup.object({
     ...this.baseBikerSchema,
-    password: Yup.string().min(8).required('Required'),
+    password: v.password(),
   });
 
   public editBikerSchema = Yup.object(this.baseBikerSchema);

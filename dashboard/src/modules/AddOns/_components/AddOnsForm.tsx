@@ -7,8 +7,9 @@ import {
   MainInput,
   MainSelect,
   MianDescriptionListInputs,
-  ThreeDotsLoader,
   MainMultiLangInput,
+  SheetActions,
+  FormSkeleton,
 } from '@UI/Index';
 import { EFormFieldType } from '@constants/enums';
 import addOnsService from '@services/addOns.service';
@@ -38,7 +39,7 @@ export default function AddOnsForm({ setOpenSheet, oldData }: IAddOnsFormProps) 
     ),
     defaultValues: {
       name: typeof oldData?.name === 'object' ? oldData.name : { en: '', ar: '' },
-      price: `${oldData?.price}`,
+      price: oldData?.price ?? undefined,
       icon: { label: '', value: oldData?.icon?._id },
       stock: oldData?.stock,
     },
@@ -82,10 +83,14 @@ export default function AddOnsForm({ setOpenSheet, oldData }: IAddOnsFormProps) 
     : addOnsService.addAddOnsFormFields;
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingCitiesOptions && loadingiconsOptions && <ThreeDotsLoader />}
+    <div>
+      {(loadingCitiesOptions || loadingiconsOptions) && <FormSkeleton />}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5 ">
+        <form
+          onSubmit={form.handleSubmit(handelOnSubmit)}
+          className={`flex flex-col gap-4 ${
+            loadingCitiesOptions || loadingiconsOptions ? 'hidden' : ''
+          }`}>
           {viewPlansFormFields.map((plansFormField) => (
             <FormField
               key={plansFormField.name}
@@ -155,11 +160,11 @@ export default function AddOnsForm({ setOpenSheet, oldData }: IAddOnsFormProps) 
               )}
             />
           ))}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {oldData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

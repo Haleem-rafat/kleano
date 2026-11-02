@@ -1,3 +1,4 @@
+import '@app/utils/validation';
 import { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';

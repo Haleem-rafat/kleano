@@ -3,7 +3,6 @@ import { IRootOrder } from '@servicesTypes/order.types';
 import api from '..';
 
 class OrdersService {
-
   public async getAllOrders(params): Promise<IRootOrder> {
     const { data } = await api.get(EAPI.ORDERS_LIST, { params });
     return data;
@@ -24,7 +23,11 @@ class OrdersService {
     return data;
   }
 
-  public async cancelOrderByAdmin(body: { totalAmount: number; order: string; cancellationReason: string }): Promise<IRootOrder> {
+  public async cancelOrderByAdmin(body: {
+    totalAmount: number;
+    order: string;
+    cancellationReason: string;
+  }): Promise<IRootOrder> {
     const { data } = await api.patch(`${EAPI.ORDER_CANCEL_BY_ADMIN}`, body);
 
     return data;

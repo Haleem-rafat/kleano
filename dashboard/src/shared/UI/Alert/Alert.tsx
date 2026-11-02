@@ -36,9 +36,7 @@ const Alert = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>{t('confirmationMessage')}</AlertDialogTitle>
-          <AlertDialogDescription>
-            {description ?? t('cannotBeUndone')}
-          </AlertDialogDescription>
+          <AlertDialogDescription>{description ?? t('cannotBeUndone')}</AlertDialogDescription>
           {hasReason && (
             <div className="my-4 flex w-full flex-col gap-4">
               <Label>{t('addReason')} :</Label>

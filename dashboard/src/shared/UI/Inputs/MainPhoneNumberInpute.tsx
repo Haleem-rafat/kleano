@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ControllerRenderProps, FieldValues } from 'react-hook-form';
 import { PhoneInput } from 'react-international-phone';
+import { FormItem, FormLabel, FormMessage } from '@/shadecn/components/ui/form';
 
 import 'react-phone-number-input/style.css';
 
@@ -15,7 +16,11 @@ interface IMainPhoneNumberInputeProps {
   required?: boolean;
   disabled?: boolean;
 }
-export default function MainPhoneNumberInpute({ field }: IMainPhoneNumberInputeProps): JSX.Element {
+export default function MainPhoneNumberInpute({
+  field,
+  label,
+  placeholder,
+}: IMainPhoneNumberInputeProps): JSX.Element {
   const [value, setValue] = useState(field?.value ?? '');
 
   useEffect(() => {
@@ -25,11 +30,16 @@ export default function MainPhoneNumberInpute({ field }: IMainPhoneNumberInputeP
   }, [value]);
 
   return (
-    <PhoneInput
-      className="w-full "
-      inputClassName="w-full !border-0 !h-full !py-2 !px-4 !rounded-lg "
-      defaultCountry="sa"
-      {...field}
-    />
+    <FormItem>
+      {label && <FormLabel className="text-sm font-semibold text-foreground">{label}</FormLabel>}
+      <PhoneInput
+        className="w-full"
+        inputClassName="w-full"
+        defaultCountry="eg"
+        placeholder={placeholder}
+        {...field}
+      />
+      <FormMessage />
+    </FormItem>
   );
 }

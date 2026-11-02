@@ -23,7 +23,14 @@
       "jsx": true
     }
   },
-  "plugins": ["react", "react-refresh", "react-hooks", "import", "@typescript-eslint", "prettier"],
+  "plugins": [
+    "react",
+    "react-refresh",
+    "react-hooks",
+    "import",
+    "@typescript-eslint",
+    "prettier"
+  ],
   "rules": {
     "react/jsx-key": "warn",
     "react/prop-types": "off",
@@ -41,13 +48,34 @@
     "import/order": [
       "error",
       {
-        "groups": ["builtin", "external", "internal", "parent", "sibling"]
+        "groups": [
+          "builtin",
+          "external",
+          "internal",
+          "parent",
+          "sibling"
+        ]
       }
     ],
     "prettier/prettier": [
       "warn",
       {
         "endOfLine": "auto"
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@shadecn/components/ui/sheet",
+            "message": "Use FormSheet (and SheetActions) from @UI/Index: it owns the sheet layout."
+          },
+          {
+            "name": "@/shadecn/components/ui/sheet",
+            "message": "Use FormSheet (and SheetActions) from @UI/Index: it owns the sheet layout."
+          }
+        ]
       }
     ]
   },
@@ -57,8 +85,25 @@
     },
     "import/resolver": {
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+        "extensions": [
+          ".js",
+          ".jsx",
+          ".ts",
+          ".tsx"
+        ]
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/shared/UI/Sheet/**",
+        "src/shadecn/**",
+        "src/shared/Layouts/**"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ]
 }

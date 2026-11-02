@@ -56,7 +56,7 @@ const NotificationRow = ({ data }) => {
         return (
           <div key={e?._id}>
             {isNewSection && (
-              <div className="px-1 pb-1 pt-3 text-xs font-medium text-slate-500 sm:px-0">
+              <div className="px-1 pb-1 pt-3 text-xs font-medium text-muted-foreground sm:px-0">
                 {currentSection === 'old'
                   ? t('older')
                   : currentSection === 'yes'
@@ -69,9 +69,9 @@ const NotificationRow = ({ data }) => {
                 handleIsRead(e?._id);
                 navigate(generatePath(ROUTES.ORDER_DETAILS, { orderId: e.clickableItem }));
               }}
-              className={`my-2 rounded-xl border border-slate-200 p-3 ${
-                e?.isRead ? 'bg-white' : 'bg-brandTint/60'
-              } hover:border-primary/40 active:dark:bg-darkMood-whitBlack/90 hover:dark:bg-darkMood-whitBlack/50 flex cursor-pointer justify-between hover:rounded-xl hover:bg-secondary/30 hover:text-white active:rounded-xl active:bg-primary/90`}>
+              className={`my-2 rounded-xl border border-border p-3 ${
+                e?.isRead ? 'bg-card' : 'bg-brandTint/60'
+              } active:dark:bg-darkMood-whitBlack/90 hover:dark:bg-darkMood-whitBlack/50 flex cursor-pointer justify-between hover:rounded-xl hover:border-primary/40 hover:bg-secondary/30 hover:text-white active:rounded-xl active:bg-primary/90`}>
               <div className="flex gap-x-2">
                 <MainAvatar
                   src=""
@@ -84,18 +84,18 @@ const NotificationRow = ({ data }) => {
                 />
 
                 <div>
-                  <h2 className="text-[13px] font-medium text-slate-900">
+                  <h2 className="text-[13px] font-medium text-foreground">
                     {lang === 'en' ? e?.message?.enTitle : e?.message?.arTitle}
                   </h2>
-                  <p className="text-[13px] text-slate-500">
+                  <p className="text-[13px] text-muted-foreground">
                     {lang === 'en' ? e?.message?.enBody : e?.message?.arBody}
                   </p>
-                  <div className="block text-xs text-slate-500 sm:hidden">
+                  <div className="block text-xs text-muted-foreground sm:hidden">
                     {notificationDateData.displayDate}
                   </div>
                 </div>
               </div>
-              <div className="hidden shrink-0 px-2 text-xs text-slate-500 sm:block">
+              <div className="hidden shrink-0 px-2 text-xs text-muted-foreground sm:block">
                 {notificationDateData.displayDate}
               </div>
             </div>

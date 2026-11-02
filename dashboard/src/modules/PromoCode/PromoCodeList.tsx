@@ -1,7 +1,8 @@
 import promoCodeService from '@services/promoCode.service';
 import { Combobox } from '@UI/comboBox/ComboBox';
 import { DatePickerWithPresets } from '@UI/datePickerComponent/DatePicker';
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { Button, DataTable, EmtyState, PageHeader, FormSheet } from '@UI/Index';
+import { ColumnDef } from '@tanstack/react-table';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,13 +18,6 @@ import {
 } from '@shadecn/components/ui/select';
 
 import { formatDate } from '@app/utils/helper';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
 
 import { Tabs, TabsList, TabsTrigger } from '@shadecn/components/ui/tabs';
 import MainStatusChipe from '@UI/Status/MainStatusChipe';
@@ -35,14 +29,6 @@ import { ChartView } from './_Components/ChartView';
 
 import PromoCodeModelForm from './_Components/PromoCodeModelForm';
 import useGetCitiesOptions from '@/hooks/useGetCitiesOptions';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
 
 import useGetSegmentsOptions from '@/hooks/useGetSegmentsOptions';
 
@@ -140,22 +126,83 @@ const PromoCodeList = () => {
     }
   }, [searchParams, activeAudience]);
 
+  const isB2b = searchParams.get('targetAudience') === 'b2b';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnDef<any>[] = [
+    {
+      id: 'code',
+      header: t('promoCodeName'),
+      accessorKey: 'code',
+      cell: ({ row }) => <span className="font-medium text-foreground">{row.original.code}</span>,
+    },
+    isB2b
+      ? { id: 'business', header: t('business'), accessorFn: (p) => p.business || '—' }
+      : {
+          id: 'discountPercentage',
+          header: t('discountPercentage'),
+          accessorKey: 'discountPercentage',
+          cell: ({ row }) => `${row.original.discountPercentage}%`,
+        },
+    { id: 'numberOfUses', header: t('numberOfUses'), accessorKey: 'numberOfUses' },
+    { id: 'appliedCount', header: t('appliedCount'), accessorKey: 'appliedCount' },
+    { id: 'targetAudience', header: t('targetAudience'), accessorKey: 'targetAudience' },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: 'expiryDate',
+      header: t('expiredDate'),
+      accessorKey: 'expiryDate',
+      cell: ({ row }) => formatDate(row.original.expiryDate),
+    },
+    {
+      id: 'status',
+      header: t('status'),
+      accessorKey: 'status',
+      cell: ({ row }) => {
+        const promoCode = row.original;
+        if (promoCode.status === 'EXPIRED') return <MainStatusChipe status="EXPIRED" />;
+        return (
+          <Select
+            value={promoCode.status === 'ACTIVE' ? 'activate' : 'disable'}
+            onValueChange={(value: 'activate' | 'disable') => handleStatus(promoCode._id, value)}>
+            <SelectTrigger className="h-8 w-36 bg-transparent" aria-label={t('status')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {['activate', 'disable'].map((item) => (
+                  <SelectItem value={item} key={item}>
+                    <MainStatusChipe status={item} />
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="relative flex h-full w-full flex-col gap-3">
-      {isLoading && <ThreeDotsLoader />}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('promoCode')}</p>
-        <div>
-          <Button onClick={() => setOpenSheet(true)}>{t('addNewPromoCode')}</Button>
-        </div>
+      <div className="pb-2">
+        <PageHeader
+          title={t('promoCode')}
+          actions={<Button onClick={() => setOpenSheet(true)}>{t('addNewPromoCode')}</Button>}
+        />
       </div>
-      <div className="flex w-full flex-col flex-wrap items-center justify-between gap-3 rounded-lg p-4 shadow">
-        <div className="flex min-h-[3rem] w-full flex-col items-center justify-between gap-2 self-start md:flex-row ">
+      <div className="flex w-full flex-col gap-3 rounded-lg border border-border bg-card p-4">
+        <div className="flex w-full items-center gap-3">
+          {/* Tabs scroll inside their space so the view switch is never pushed off. */}
           <Tabs
-            className="w-full  scrollbar-hide"
+            className="min-w-0 flex-1"
             defaultValue={activeAudience.label}
             onValueChange={(value) => handleTabChange(tabs.find((tab) => tab.label === value))}>
-            <TabsList className="w-full overflow-scroll scrollbar-hide">
+            <TabsList className="w-full justify-start overflow-x-auto scrollbar-hide">
               {tabs.map((tab, index) => (
                 <TabsTrigger className="capitalize" value={tab.label} key={index}>
                   {tab.label}
@@ -163,27 +210,36 @@ const PromoCodeList = () => {
               ))}
             </TabsList>
           </Tabs>
-          {/* setIschart */}
-          <div className="flex items-center rounded-lg border  ">
-            <button
-              type="button"
-              className={`${
-                isChart ? 'bg-white text-gray-400' : 'bg-primary text-white'
-              } rounded-l-lg p-2 transition-colors  duration-300 ease-in`}
-              onClick={() => setIschart(false)}>
-              <FaThList size={30} />
-            </button>
-            <button
-              type="button"
-              className={`${
-                isChart ? 'bg-primary text-white' : 'bg-white text-gray-400'
-              } rounded-r-lg p-2 transition-colors duration-300 ease-in`}
-              onClick={() => setIschart(true)}>
-              <BsBarChartLineFill className="rotate-90" size={30} />
-            </button>
+          <div
+            role="group"
+            aria-label={t('view')}
+            className="flex shrink-0 overflow-hidden rounded-md border border-border">
+            {[
+              { chart: false, label: t('table'), icon: <FaThList size={16} /> },
+              {
+                chart: true,
+                label: t('chart'),
+                icon: <BsBarChartLineFill className="rotate-90" size={16} />,
+              },
+            ].map((view) => (
+              <button
+                key={view.label}
+                type="button"
+                aria-label={view.label}
+                aria-pressed={isChart === view.chart}
+                title={view.label}
+                className={`flex h-9 w-9 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
+                  isChart === view.chart
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-card text-muted-foreground hover:bg-accent'
+                }`}
+                onClick={() => setIschart(view.chart)}>
+                {view.icon}
+              </button>
+            ))}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-start gap-2 self-end md:flex-row ">
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:[&>*]:w-56">
           {activeAudience.searchParam === 'b2b' && (
             <div className="flex items-center justify-center gap-2">
               <Input
@@ -219,124 +275,32 @@ const PromoCodeList = () => {
       </div>
 
       {!isChart ? (
-        <div>
-          <Table className="scrollbar-hide">
-            <TableHeader>
-              <TableRow>
-                {[
-                  t('promoCodeName'),
-                  searchParams.get('targetAudience') !== 'b2b'
-                    ? t('discountPercentage')
-                    : 'business',
-                  t('numberOfUses'),
-                  t('appliedCount'),
-                  t('targetAudience'),
-                  t('createddate'),
-                  t('expiredDate'),
-                  t('status'),
-                  // t('action'),
-                ].map((item, index) => (
-                  <TableHead key={index}>{item}</TableHead>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data &&
-                data?.data.dataList?.map((promoCode) => (
-                  <TableRow className="cursor-pointer hover:bg-primary/10" key={promoCode._id}>
-                    <TableCell>{promoCode.code}</TableCell>
-                    <TableCell>
-                      {searchParams.get('targetAudience') !== 'b2b'
-                        ? promoCode.discountPercentage
-                        : promoCode.business || '-'}
-                    </TableCell>
-                    <TableCell>{promoCode.numberOfUses}</TableCell>
-                    <TableCell>{promoCode.appliedCount}</TableCell>
-                    <TableCell>{promoCode.targetAudience}</TableCell>
-                    <TableCell>{formatDate(promoCode.createdAt)}</TableCell>
-                    <TableCell>{formatDate(promoCode.expiryDate)}</TableCell>
-                    <TableCell>
-                      <Select
-                        disabled={promoCode.status === 'EXPIRED'}
-                        defaultValue={promoCode.status === 'ACTIVE' ? 'activate' : 'disable'}
-                        onValueChange={(value: 'activate' | 'disable') =>
-                          handleStatus(promoCode._id, value)
-                        }>
-                        <SelectTrigger className="bg-transparent">
-                          <SelectValue placeholder={promoCode.status} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            {['activate', 'disable'].map((item, index) => (
-                              <SelectItem value={item} key={index}>
-                                {promoCode.status === 'EXPIRED' ? (
-                                  <MainStatusChipe status={'EXPIRED'} />
-                                ) : (
-                                  <MainStatusChipe status={item} />
-                                )}
-                              </SelectItem>
-                            ))}
-                          </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    {/* <TableCell>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="primary">{t('Edit')}</Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-80">
-                          <div className="grid gap-4">
-                            <div className="space-y-2">
-                              <h4 className="font-medium leading-none">{t('Promo Name')}</h4>
-                              <p className="text-muted-foreground text-sm">{t('Edit your promo name')}</p>
-                            </div>
-
-                            <div className="flex flex-col gap-2 ">
-                              <Label htmlFor="name">{t('Name')}</Label>
-                              <Input
-                                ref={inputRef}
-                                id="name"
-                                defaultValue={promoCode.code}
-                                className="col-span-2 h-8"
-                              />
-                            </div>
-                            <Button onClick={() => handleEdit(promoCode._id)}>{t('Submit')}</Button>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                    </TableCell> */}
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
-          {data?.data?.dataList?.length === 0 && <EmtyState />}
-        </div>
+        <DataTable
+          columns={columns}
+          data={data?.data?.dataList ?? []}
+          isLoading={isLoading}
+          showColumnToggle={false}
+          getRowId={(promoCode) => promoCode._id}
+          emptyStateComponent={<EmtyState />}
+        />
       ) : (
         <ChartView data={data} />
       )}
-      {data && !isChart && (
+      {data?.data?.paginationData?.totalPages > 1 && !isChart && (
         <PaginationComponent
           page={data.data.paginationData.page}
           pages={data.data.paginationData.totalPages}
           setPageIndex={setPageIndex}
         />
       )}
-      <Sheet
+      <FormSheet
         open={openSheet}
         onOpenChange={() => {
           setOpenSheet(false);
         }}
-        modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('addNewPromoCode')}</SheetTitle>
-            <SheetDescription>
-              <PromoCodeModelForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+        title={t('addNewPromoCode')}>
+        <PromoCodeModelForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 };

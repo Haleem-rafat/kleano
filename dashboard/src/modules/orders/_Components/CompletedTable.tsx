@@ -100,7 +100,7 @@ const CompletedTable = ({
       cell: ({ row }) => {
         const index = row.index;
         return (
-          <div className="text-slate-600">
+          <div className="text-muted-foreground">
             {(data.pagination.page - 1) * data.pagination.perPage + index + 1}
           </div>
         );
@@ -112,7 +112,7 @@ const CompletedTable = ({
       enableSorting: true,
       enableHiding: true,
       cell: ({ row }) => (
-        <div className="font-medium text-slate-900">{row.original.user.userName}</div>
+        <div className="font-medium text-foreground">{row.original.user?.userName || '—'}</div>
       ),
     },
     {
@@ -120,28 +120,36 @@ const CompletedTable = ({
       header: t('phone'),
       enableSorting: true,
       enableHiding: true,
-      cell: ({ row }) => <div className="text-slate-600">{row.original.user.phone}</div>,
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">{row.original.user?.phone || '—'}</div>
+      ),
     },
     {
       accessorKey: 'bikerName',
       header: t('bikerName'),
       enableSorting: true,
       enableHiding: true,
-      cell: ({ row }) => <div className="text-slate-600">{row.original.biker.userName}</div>,
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">{row.original.biker?.userName || '—'}</div>
+      ),
     },
     {
       accessorKey: 'model',
       header: t('model'),
       enableSorting: true,
       enableHiding: true,
-      cell: ({ row }) => <div className="text-slate-600">{row.original.vehicle?.model || ''}</div>,
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">{row.original.vehicle?.model || ''}</div>
+      ),
     },
     {
       accessorKey: 'startTime',
       header: t('startTime'),
       enableSorting: true,
       enableHiding: true,
-      cell: ({ row }) => <div className="text-slate-600">{formatDate(row.original.startTime)}</div>,
+      cell: ({ row }) => (
+        <div className="text-muted-foreground">{formatDate(row.original.startTime)}</div>
+      ),
     },
 
     {
@@ -152,7 +160,7 @@ const CompletedTable = ({
       cell: ({ row }) => {
         const streetName = row.original.location?.streetName || '';
         return (
-          <p title={streetName} className="max-w-[200px] truncate text-gray-900">
+          <p title={streetName} className="max-w-[200px] truncate text-foreground">
             {streetName}
           </p>
         );

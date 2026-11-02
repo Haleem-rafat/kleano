@@ -1,288 +1,130 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router-dom';
+import useSWR, { mutate as globalMutate } from 'swr';
 import washingServicesService from '@services/washingServices.service';
 import { IwshaingServicesList } from '@servicesTypes/wshaingServices.types';
-import { Button, CitiesDialoge, ThreeDotsLoader } from '@UI/Index';
-import { useTranslation } from 'react-i18next';
 import {
-  IoArrowBackCircleOutline,
-  IoCarOutline,
-  IoDocumentTextOutline,
-  IoLocationOutline,
-  IoSettingsOutline,
-} from 'react-icons/io5';
-import { useNavigate, useParams } from 'react-router-dom';
-import useSWR from 'swr';
-import { FaEdit } from 'react-icons/fa';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
-import { useState } from 'react';
-import WashingServicesCitiesActionsTable from '../_components/WashingServicesCitiesActions';
+  Button,
+  CityAvailability,
+  FormSheet,
+  InfoList,
+  PageHeader,
+  SectionCard,
+  PageSkeleton,
+} from '@UI/Index';
+import { formatDate } from '@app/utils/helper';
 import WashingServicesForm from '../_components/WashingServicesForm';
+
+type Localized = string | { en?: string; ar?: string };
 
 export default function WashingServicesDetails() {
   const [openSheet, setOpenSheet] = useState(false);
-
   const { washingServicesId } = useParams();
   const navigate = useNavigate();
-
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
+  const local = (v?: Localized) => (typeof v === 'object' ? v?.[lang] || v?.en : v) || '';
 
-  const { data, isLoading } = useSWR(
-    ['get-washing-services-Details', washingServicesId],
-    () =>
-      washingServicesId &&
-      washingServicesService
-        .getWashingServicesDetails(washingServicesId)
-        .then((data) => data?.data as IwshaingServicesList)
+  const swrKey = ['get-washing-services-Details', washingServicesId];
+  const { data, isLoading, mutate } = useSWR(washingServicesId ? swrKey : null, () =>
+    washingServicesService
+      .getWashingServicesDetails(washingServicesId!)
+      .then((res) => res?.data as IwshaingServicesList)
   );
 
+  const body = (city: string) => ({ washingService: data!._id, city });
+  const descriptions = (data?.description ?? [])
+    .map((d) => local(d as unknown as Localized))
+    .filter(Boolean);
+
+  if (isLoading) return <PageSkeleton kind="details" />;
+
   return (
-    <div className="space-y-1">
-      {isLoading && <ThreeDotsLoader />}
+    <div className="space-y-5">
+      <PageHeader
+        onBack={() => navigate(-1)}
+        leading={
+          data?.icon?.iconLink && (
+            <img
+              src={data.icon.iconLink}
+              alt=""
+              className="h-10 w-10 shrink-0 rounded-full border border-border object-cover"
+            />
+          )
+        }
+        title={local(data?.name as Localized) || t('washingServicesDetails')}
+        description={data && `${t('washingServicesDetails')} · #${data._id.slice(-6)}`}
+        actions={
+          <Button onClick={() => setOpenSheet(true)} disabled={!data}>
+            {t('editServices')}
+          </Button>
+        }
+      />
 
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition-colors duration-200 hover:bg-slate-200">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">
-                  {t('washingServicesDetails')}
-                </h1>
-                <p className="mt-1 text-sm text-slate-500">Service ID: #{data?._id?.slice(-4)}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button onClick={() => setOpenSheet(true)}>{t('editServices')}</Button>
-            </div>
-          </div>
+      <div className="grid gap-5 xl:grid-cols-3">
+        <div className="space-y-5 xl:col-span-2">
+          <SectionCard title={t('servicesInfo')}>
+            <InfoList
+              items={[
+                { label: t('servesName'), value: local(data?.name as Localized) },
+                {
+                  label: t('type'),
+                  value: data?.type && (
+                    <span className="rounded-full bg-accent px-2.5 py-0.5 text-xs font-semibold capitalize text-primary">
+                      {t(data.type)}
+                    </span>
+                  ),
+                },
+                { label: t('durationTime'), value: data && `${data.duration} ${t('min')}` },
+                { label: t('price'), value: data && `${data.price} ${t('SAR')}` },
+                { label: t('pointsToPay'), value: data?.pointsToPay },
+                { label: t('createddate'), value: data && formatDate(data.createdAt) },
+              ]}
+            />
+          </SectionCard>
+
+          <SectionCard title={t('servicesDescription')}>
+            {descriptions.length ? (
+              <ul className="space-y-2">
+                {descriptions.map((text, i) => (
+                  <li key={i} className="flex gap-3 text-sm text-foreground">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="min-w-0 break-words">{text}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[13px] text-muted-foreground">{t('noDescription')}</p>
+            )}
+          </SectionCard>
+        </div>
+
+        <div className="xl:col-span-1">
+          {data && (
+            <CityAvailability
+              cities={data.cities as never}
+              description={t('cityAvailabilityHint')}
+              add={(city) => washingServicesService.addCityWashingServices(body(city))}
+              activate={(city) => washingServicesService.activeCityWashingServices(body(city))}
+              archive={(city) => washingServicesService.archiveCityWashingServices(body(city))}
+              onChanged={() => {
+                mutate();
+                globalMutate(
+                  (key) => Array.isArray(key) && key.includes('get-washing-services-list')
+                );
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pt-1">
-        <div className="w-full">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* Service Information Card */}
-            <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoCarOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('servicesInfo')}</h2>
-                      <p className="text-sm text-slate-500">{t('Service details and pricing')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('servicesIcon')}
-                      </h4>
-                      <div className="flex justify-center">
-                        <img
-                          src={data?.icon?.iconLink}
-                          alt="Service icon"
-                          className="h-16 w-16 rounded-full object-cover"
-                        />
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('servesName')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.name?.[lang] || data?.name}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('durationTime')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.duration} min</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('price')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.price} R.S</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Description Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoDocumentTextOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">
-                        {t('servicesDescription')}
-                      </h2>
-                      <p className="text-sm text-slate-500">{t('Service details and features')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="space-y-3">
-                    {data?.description?.map((description, index) => (
-                      <div
-                        key={index}
-                        className="rounded-lg border-l-4 border-purple-200 bg-purple-50 p-4">
-                        <p className="text-slate-700">
-                          {description && typeof description === 'object'
-                            ? (description as unknown as Record<string, string>)[lang]
-                            : description}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                        <IoLocationOutline className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-semibold text-slate-900">{t('servicesCities')}</h2>
-                        <p className="text-sm text-slate-500">{t('Available service locations')}</p>
-                      </div>
-                    </div>
-                    <CitiesDialoge
-                      buttonElement={
-                        <Button
-                          onClick={(e) => e.stopPropagation()}
-                          variant="secondary"
-                          size="sm"
-                          className="flex gap-x-2 rounded-xl border-2 border-white bg-white p-3 text-orange-600 hover:bg-orange-50">
-                          <p className="mt-0.5">{t('edit')}</p>
-                          <FaEdit size={16} />
-                        </Button>
-                      }
-                      title={t('servicesCitiesActions')}>
-                      <WashingServicesCitiesActionsTable
-                        servicesId={data?._id}
-                        cityData={data?.cities}
-                      />
-                    </CitiesDialoge>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="flex flex-wrap gap-3">
-                    {data?.cities?.map((city) => (
-                      <div
-                        key={city.city._id}
-                        className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                          city?.isArchived
-                            ? 'border-gray-300 bg-gray-200 text-gray-500'
-                            : 'border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100'
-                        }`}>
-                        {city?.city?.name?.[lang]}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions Card */}
-            <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoSettingsOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('Service Actions')}</h2>
-                      <p className="text-sm text-slate-500">{t('Manage service settings')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="space-y-4 p-6">
-                  {/* Edit Service */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('editServices')}</h4>
-                      <p className="text-xs text-slate-500">{t('Update service information')}</p>
-                    </div>
-                    <Button size="sm" onClick={() => setOpenSheet(true)}>
-                      {t('edit')}
-                    </Button>
-                  </div>
-
-                  {/* Manage Cities */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('Manage Cities')}</h4>
-                      <p className="text-xs text-slate-500">{t('Add or remove service cities')}</p>
-                    </div>
-                    <CitiesDialoge
-                      buttonElement={
-                        <Button
-                          onClick={(e) => e.stopPropagation()}
-                          variant="secondary"
-                          size="sm"
-                          className="flex gap-x-2">
-                          <FaEdit size={14} />
-                          {t('edit')}
-                        </Button>
-                      }
-                      title={t('servicesCitiesActions')}>
-                      <WashingServicesCitiesActionsTable
-                        servicesId={data?._id}
-                        cityData={data?.cities}
-                      />
-                    </CitiesDialoge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('editServices')}</SheetTitle>
-            <SheetDescription>
-              <WashingServicesForm setOpenSheet={setOpenSheet} oldData={data} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet
+        open={openSheet}
+        onOpenChange={() => setOpenSheet(false)}
+        title={t('editServices')}>
+        <WashingServicesForm setOpenSheet={setOpenSheet} oldData={data} />
+      </FormSheet>
     </div>
   );
 }

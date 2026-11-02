@@ -1,4 +1,3 @@
-import Lottie from 'lottie-react';
 // import noInternet from '@assets/animations/no-internet.json';
 // import { ReactComponent as MainZapicon } from '@assets/icons/main_zap_icon.svg';
 

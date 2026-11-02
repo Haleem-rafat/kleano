@@ -8,9 +8,9 @@ export interface IPlan {
   type: string;
   color: string;
   icon: {
-    _id: string,
-    iconPath: string,
-    iconLink: string
+    _id: string;
+    iconPath: string;
+    iconLink: string;
   };
   description: string[];
   price: number;

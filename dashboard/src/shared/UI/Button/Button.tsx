@@ -13,41 +13,22 @@ interface IButtonProps
   endIcon?: IconType; // react icons - hi2
 }
 
+// Variants use only the Kleano theme tokens (src/index.css).
 const buttonVariants = cva(
-  'inline-flex select-none relative rounded-lg items-center justify-center shrink-0 text-sm  disabled:pointer-events-none focus-visible:outline-none',
+  'inline-flex select-none relative rounded-lg items-center justify-center shrink-0 text-sm transition-colors disabled:pointer-events-none disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
   {
     variants: {
       variant: {
-        primary: cn(
-          'text-white',
-          'bg-primary hover:bg-primary/80 active:bg-primary',
-          'dark:bg-secondary-light-heavy dark:hover:bg-secondary-accent-heavier dark:active:bg-secondary-accent-heaviest',
-          'shadow-[0px_5px_30px_0px_rgba(103, 198, 185, 0.24) active:shadow-[0px_5px_10px_0px_rgba(103, 198, 185, 0.24) dark:shadow-[0px_5px_30px_0px_rgba(249,113,13,0.25)] disabled:shadow-none',
-          'disabled:bg-primary/80 '
-        ),
-
-        secondary: cn(
-          'bg-white text-primary dark:text-secondary-accent-heavy',
-          'border-primary disabled:border-disabled dark:border-secondary-accent-heavy border hover:border-primary-light-100',
-          'hover:bg-primary-light-100 active:bg-primary-light-300',
-          'dark:bg-secondary-accent-heavy dark:hover:bg-secondary-accent-heavier dark:active:bg-secondary-accent-heaviest',
-          'disabled:bg-surface-disabled'
-        ),
-
-        tertiary: cn(
-          'text-primary hover:text-primary-dark-700 hover:underline active:text-primary',
-          'disabled:text-disabled underline',
-          '!py-0 w-fit'
-        ),
-
-        danger: 'bg-red-500 text-white shadow-sm hover:bg-danger-heaviest/90 border border-red-500',
-        success: cn(
-          'text-white text-primary-heavy',
-          'bg-success-heavy hover:bg-success-heavier active:bg-success-heaviest',
-          'border border-success-heavy',
-          'hover:shadow-md active:shadow-sm',
-          'disabled:bg-surface-disabled disabled:border-disabled'
-        ),
+        primary:
+          'bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 active:bg-primary',
+        secondary: 'border border-input bg-card text-primary hover:bg-accent active:bg-accent/80',
+        tertiary: 'w-fit !py-0 text-primary underline-offset-4 hover:underline',
+        danger:
+          'bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 active:bg-destructive',
+        // Destructive action that opens a confirmation (e.g. Cancel order).
+        dangerOutline:
+          'border border-destructive/40 bg-card text-destructive hover:bg-destructive/10 active:bg-destructive/15',
+        success: 'bg-success text-white shadow-sm hover:bg-success/90 active:bg-success',
       },
       size: {
         xs: 'h-[1.9375rem] px-[0.625rem] py-[0.3125rem] text-sm font-medium',
@@ -92,8 +73,8 @@ const Button = React.forwardRef<HTMLButtonElement, IButtonProps>(
           buttonVariants({ variant, size, className }),
           'whitespace-nowrap transition-all duration-75 ease-in-out',
           { 'ps-12': !!startIcon, 'pe-12': !!endIcon },
-          { 'text-disabled pointer-events-none': isDisabled },
-          { 'bg-text-100 text-text-400': loading }
+          { 'pointer-events-none text-muted-foreground': isDisabled },
+          { 'bg-text-100 text-muted-foreground': loading }
         )}
         ref={ref}
         {...props}>

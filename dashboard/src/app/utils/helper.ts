@@ -26,12 +26,12 @@ export const formatToFilterDate = (date) => {
 
 export const changeLangHandler = (language: 'ar' | 'en') => {
   if (language == 'ar') {
-    localStorage.setItem('direction', 'rtl')
-    document.getElementsByTagName('html')[0].setAttribute('dir', 'rtl')
+    localStorage.setItem('direction', 'rtl');
+    document.getElementsByTagName('html')[0].setAttribute('dir', 'rtl');
   } else {
-    localStorage.setItem('direction', 'ltr')
-    document.getElementsByTagName('html')[0].setAttribute('dir', 'ltr')
+    localStorage.setItem('direction', 'ltr');
+    document.getElementsByTagName('html')[0].setAttribute('dir', 'ltr');
   }
-  document.getElementsByTagName('html')[0].setAttribute('lang', language)
-  i18n.changeLanguage(language)
-}
+  document.getElementsByTagName('html')[0].setAttribute('lang', language);
+  i18n.changeLanguage(language);
+};

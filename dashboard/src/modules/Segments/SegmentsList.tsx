@@ -1,32 +1,18 @@
 import useSWR from 'swr';
+import { IAllSegment } from '@servicesTypes/segments.types';
 
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { Button, DataTable, EmtyState, FormSheet } from '@UI/Index';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@constants/routes';
 import segmentsService from '@services/segments.service';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
 
 import { formatDate } from '@app/utils/helper';
 import { useState } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
 import SegmentsDialogeWrapper from './_Components/SegmentsDialogeWrapper';
 import ViewUsers from './_Components/ViewUsers';
 import SegmentModelForm from './_Components/SegmentModelForm';
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
 
 const SegmentsList = () => {
   const navigate = useNavigate();
@@ -37,67 +23,61 @@ const SegmentsList = () => {
     segmentsService.getAllSegments().then((data) => data)
   );
 
+  const columns: ColumnDef<IAllSegment>[] = [
+    { id: 'name', header: t('name'), accessorKey: 'name' },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: 'users',
+      header: t('selectedUser'),
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => (
+        <SegmentsDialogeWrapper
+          modal
+          triggerButtonElement={
+            <Button onClick={(e) => e.stopPropagation()} variant="secondary" size="sm">
+              {row.original.users.length} users
+            </Button>
+          }>
+          <ViewUsers segmentId={row.original._id} />
+        </SegmentsDialogeWrapper>
+      ),
+    },
+  ];
+
   return (
     <div className="relative">
-      {isLoading && <ThreeDotsLoader />}
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('segments')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('segments')}</h1>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('addNewSegments')}</Button>
         </div>
       </div>
       <div>
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[t('name'), t('createddate'), t('selectedUser')].map((item, index) => (
-                <TableHead key={index}>{item}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data &&
-              data?.data?.map((segment) => (
-                <TableRow
-                  className="cursor-pointer hover:bg-primary/10"
-                  onClick={() =>
-                    navigate(generatePath(ROUTES.SEGMENTS_DETAILS, { segmenId: segment._id }))
-                  }
-                  key={segment._id}>
-                  <TableCell>{segment.name}</TableCell>
-                  <TableCell>{formatDate(segment.createdAt)}</TableCell>
-                  <TableCell className="cursor-pointer underline">
-                    <SegmentsDialogeWrapper
-                      modal
-                      triggerButtonElement={
-                        <Button
-                          onClick={(e) => e.stopPropagation()}
-                          variant="secondary"
-                          size="sm"
-                          className="">
-                          {segment.users.length} users
-                        </Button>
-                      }>
-                      <ViewUsers segmentId={segment._id} />
-                    </SegmentsDialogeWrapper>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        {data?.data?.length === 0 && <EmtyState />}
+        <DataTable
+          columns={columns}
+          data={data?.data ?? []}
+          isLoading={isLoading}
+          onRowClick={(segment) =>
+            navigate(generatePath(ROUTES.SEGMENTS_DETAILS, { segmenId: segment._id }))
+          }
+          searchable
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('addNewSegments')}</SheetTitle>
-            <SheetDescription>
-              <SegmentModelForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet
+        open={openSheet}
+        onOpenChange={() => setOpenSheet(false)}
+        title={t('addNewSegments')}>
+        <SegmentModelForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 };

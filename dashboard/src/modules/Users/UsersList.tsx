@@ -1,22 +1,15 @@
+import { Loader2 } from 'lucide-react';
 import { ROUTES } from '@constants/routes';
 import usersService from '@services/users.service';
 import { Input } from '@shadecn/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@shadecn/components/ui/table';
-
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { ColumnDef } from '@tanstack/react-table';
+import { Button, DataTable, EmtyState, MainAvatar, PageHeader } from '@UI/Index';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import { toast } from 'react-toastify';
-import { IoAddCircleOutline } from 'react-icons/io5';
+import { IoAddCircleOutline, IoSearchOutline } from 'react-icons/io5';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import useDebounce from '@/hooks/useDebounce';
 import {
@@ -69,7 +62,7 @@ export default function UsersList() {
         .paginatedUsers({
           search: debouncedSearch,
           status: filter,
-          perPage: 19,
+          perPage: 20,
           page: page,
         })
         .then((data) => {
@@ -85,15 +78,16 @@ export default function UsersList() {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', 'users_export.xlsx');
+      document.body.appendChild(link);
       link.click();
-      link.parentNode.removeChild(link);
+      link.remove();
       window.URL.revokeObjectURL(url);
     } catch ({ response }) {
       const messages = response?.data?.message;
       const errList = Array.isArray(messages)
         ? messages.map((e, index) => <p key={index}>{e}</p>)
         : messages?.[lang] || t('An error occurred');
-      console.log(<p>{errList}</p>);
+      toast.error(<div>{errList}</div>);
     } finally {
       setloading(false);
     }
@@ -141,81 +135,96 @@ export default function UsersList() {
     }
   };
 
-  return (
-    <div className="relative">
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('users')}</p>
-        <div className="flex items-center justify-center gap-4">
-          <Select onValueChange={(e) => setFilter(e as 'SUSPENDED' | 'ACTIVE')}>
-            <SelectTrigger className="h-[48px] w-[180px]">
-              <SelectValue placeholder="Select a Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="ACTIVE">active</SelectItem>
-                <SelectItem value="SUSPENDED">blocked</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          <Input
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
-            placeholder="search..."
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnDef<any>[] = [
+    { id: 'serialNumber', header: t('userId'), accessorKey: 'serialNumber' },
+    {
+      id: 'userName',
+      header: t('name'),
+      accessorKey: 'userName',
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <MainAvatar
+            src={row.original?.imageLink}
+            name={row.original?.userName}
+            className="h-8 w-8"
           />
+          <span className="font-medium text-foreground">{row.original?.userName || '—'}</span>
         </div>
-        <div>
-          <Button loading={loading} onClick={() => handelExport()}>
+      ),
+    },
+    { id: 'email', header: t('email'), accessorFn: (user) => user?.email || '—' },
+    { id: 'phone', header: t('phone'), accessorFn: (user) => user?.phone || '—' },
+    {
+      id: 'actions',
+      header: t('action'),
+      enableSorting: false,
+      cell: ({ row }) => (
+        <Button variant="secondary" size="sm" onClick={(e) => handleTopUpClick(e, row.original)}>
+          <IoAddCircleOutline className="me-1.5 h-4 w-4" />
+          {t('topUp')}
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title={t('users')}
+        actions={
+          <Button variant="secondary" loading={loading} onClick={handelExport}>
             {t('Export')}
           </Button>
-        </div>
-      </div>
-      <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[t('userId'), t('name'), t('email'), t('phone'), t('action') || 'Actions'].map(
-                (head, index) => (
-                  <TableHead className="" key={index}>
-                    {head}
-                  </TableHead>
-                )
-              )}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.dataList.map((user) => (
-              <TableRow
-                key={user._id}
-                className="cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate(generatePath(ROUTES.USERS_DETAILS, { userId: user._id }))}>
-                <TableCell className="font-medium">{user?.serialNumber}</TableCell>
-                <TableCell className="font-medium">{user?.userName}</TableCell>
-                <TableCell className="font-medium">{user?.email}</TableCell>
-                <TableCell className="font-medium">{user?.phone}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={(e) => handleTopUpClick(e, user)}
-                    className="flex items-center gap-2">
-                    <IoAddCircleOutline className="h-4 w-4" />
-                    {t('topUp') || 'Top Up'}
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {data?.paginationData && (
-          <PaginationComponent
-            page={data?.paginationData?.page}
-            pages={data?.paginationData?.totalPages}
-            setPageIndex={setPage}
+        }
+      />
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="relative w-full sm:w-72">
+          <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="search"
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPage(1);
+            }}
+            value={search}
+            placeholder={t('search')}
+            aria-label={t('search')}
+            className="h-9 ps-9"
           />
-        )}
-        {data?.data?.length === 0 && <EmtyState />}
+        </label>
+        <Select
+          value={filter}
+          onValueChange={(e) => {
+            setFilter(e as 'SUSPENDED' | 'ACTIVE');
+            setPage(1);
+          }}>
+          <SelectTrigger className="h-9 w-40" aria-label={t('status')}>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="ACTIVE">{t('active')}</SelectItem>
+              <SelectItem value="SUSPENDED">{t('suspended')}</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
+      <DataTable
+        columns={columns}
+        data={data?.dataList ?? []}
+        isLoading={isLoading}
+        showColumnToggle={false}
+        onRowClick={(user) => navigate(generatePath(ROUTES.USERS_DETAILS, { userId: user._id }))}
+        emptyStateComponent={<EmtyState />}
+      />
+      {data?.paginationData?.totalPages > 1 && (
+        <PaginationComponent
+          page={data.paginationData.page}
+          pages={data.paginationData.totalPages}
+          setPageIndex={setPage}
+        />
+      )}
 
       <Dialog open={topUpDialogOpen} onOpenChange={setTopUpDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
@@ -278,7 +287,7 @@ export default function UsersList() {
             <AlertDialogAction onClick={handleConfirmTopUp} disabled={topUpLoading}>
               {topUpLoading ? (
                 <span className="flex items-center gap-2">
-                  <ThreeDotsLoader />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   {t('processing') || 'Processing...'}
                 </span>
               ) : (

@@ -1,69 +1,73 @@
 import { formatDate } from '@app/utils/helper';
-import { AdminStatus, EmtyState, MainAvatar } from '@UI/Index';
+import { AdminStatus, DataTable, EmtyState, MainAvatar } from '@UI/Index';
 import { useTranslation } from 'react-i18next';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
+import { ColumnDef } from '@tanstack/react-table';
 
-const TransactionsTable = ({ data = [] }: { data }) => {
-  const { t, i18n } = useTranslation();
-  const lang = i18n.language as 'en' | 'ar';
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Transaction = { _id: string; order?: any };
+
+const TransactionsTable = ({
+  data,
+  isLoading = false,
+}: {
+  data?: { data?: unknown };
+  isLoading?: boolean;
+}) => {
+  const { t } = useTranslation();
+
+  const columns: ColumnDef<Transaction>[] = [
+    {
+      id: 'name',
+      header: t('name'),
+      accessorFn: (tr) => tr.order?.user?.userName,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <MainAvatar
+            src={row.original.order?.user?.imageLink}
+            name={row.original.order?.user?.userName}
+            className="h-8 w-8"
+          />
+          <span className="font-medium text-foreground">{row.original.order?.user?.userName}</span>
+        </div>
+      ),
+    },
+    { id: 'phone', header: t('phone'), accessorFn: (tr) => tr.order?.user?.phone },
+    {
+      id: 'biker',
+      header: t('bikerName'),
+      accessorFn: (tr) => tr.order?.biker?.userName || '—',
+    },
+    { id: 'discount', header: t('discount'), accessorFn: (tr) => tr.order?.discount },
+    { id: 'paid', header: t('paied'), accessorFn: (tr) => tr.order?.totalPay },
+    { id: 'refund', header: t('refundAmount'), accessorFn: (tr) => tr.order?.refundAmount },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorFn: (tr) => tr.order?.createdAt,
+      cell: ({ row }) => formatDate(row.original.order?.createdAt),
+    },
+    {
+      id: 'paymentStatus',
+      header: t('paymentStatus'),
+      accessorFn: (tr) => tr.order?.paymentStatus,
+      cell: ({ row }) => t(row.original.order?.paymentStatus),
+    },
+    {
+      id: 'status',
+      header: t('status'),
+      accessorFn: (tr) => tr.order?.status,
+      cell: ({ row }) => <AdminStatus status={row.original.order?.status} />,
+    },
+  ];
 
   return (
-    <div>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {[t('name'),
-              t('phone'),
-              t('bikerName'),
-              t('discount'),
-              t('paied'), 
-              t('refundAmount'), 
-              t('createddate'), 
-              t('paymentStatus'), 
-              t('status')]
-              .map((head, index) => (
-                <TableHead key={index}>{head}</TableHead>
-              ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data?.data?.map((transaction) => {
-            const order = transaction?.order; // Extract order from transaction
-
-            return (
-              <TableRow key={transaction._id}>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <MainAvatar
-                      src={order?.user?.imageLink}
-                      name={order?.user?.userName}
-                      className="h-10 w-10"
-                    />
-                    <p className="font-medium text-slate-900">{order?.user?.userName}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{order?.user?.phone}</TableCell>
-                <TableCell>{order?.biker?.userName || "—"}</TableCell>
-                <TableCell>{order?.discount}</TableCell>
-                <TableCell>{order?.totalPay}</TableCell>
-                <TableCell>{order?.refundAmount}</TableCell>
-                <TableCell>{formatDate(order.createdAt)}</TableCell>
-                <TableCell>{t(order?.paymentStatus)}</TableCell>
-                <TableCell>{<AdminStatus status={order?.status} />}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-      {data?.data?.length === 0 && <EmtyState />}
-    </div>
+    <DataTable
+      columns={columns}
+      data={Array.isArray(data?.data) ? (data.data as Transaction[]) : []}
+      isLoading={isLoading}
+      showColumnToggle={false}
+      emptyStateComponent={<EmtyState />}
+    />
   );
 };
 

@@ -1,6 +1,9 @@
+import { v } from '@app/utils/validation';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
 import iconsService from '@services/icons.service';
 import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
-import { Button, ImgUpload } from '@UI/Index';
+import { Button, ImgUpload, SheetActions } from '@UI/Index';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +16,10 @@ export default function IconsForm({ setOpenSheet }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
 
-  const form = useForm();
+  const form = useForm({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: yupResolver(Yup.object({ file: v.file() })) as any,
+  });
 
   const handleOnSubmit = (values) => {
     setIsLoading(true);
@@ -39,9 +45,9 @@ export default function IconsForm({ setOpenSheet }) {
   };
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
+    <div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleOnSubmit)} className="flex flex-col gap-4 py-5">
+        <form onSubmit={form.handleSubmit(handleOnSubmit)} className="flex flex-col gap-4">
           <FormField
             control={form.control}
             name="file"
@@ -53,11 +59,11 @@ export default function IconsForm({ setOpenSheet }) {
               </FormItem>
             )}
           />
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" className="mt-3 w-full" loading={isLoading}>
               {t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

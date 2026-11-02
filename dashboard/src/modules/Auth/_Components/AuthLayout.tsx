@@ -1,5 +1,5 @@
 import kleano_main_logo from '@assets/img/kleano-main-logo.png';
-import auth_photo from '@assets/img/auth-photo.png';
+import auth_photo from '@assets/img/auth-photo.jpg';
 
 export default function AuthLayout({ children }) {
   return (

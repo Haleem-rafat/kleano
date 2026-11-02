@@ -1,7 +1,7 @@
 import { ImageOff } from 'lucide-react';
 import { useState } from 'react';
-import { IoClose, IoExpandOutline } from 'react-icons/io5';
-import { Dialog, DialogContent, DialogHeader } from '@shadecn/components/ui/dialog';
+import { IoClose } from 'react-icons/io5';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@shadecn/components/ui/dialog';
 import { Button } from '@shadecn/components/ui/button';
 
 interface ImageModalProps {
@@ -74,6 +74,7 @@ export default function ImageModal({
       {/* Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="max-h-[90vh] border-0 bg-black/95 p-0 sm:max-w-5xl">
+          <DialogTitle className="sr-only">{alt || 'Image'}</DialogTitle>
           <DialogHeader className="absolute right-4 top-4 z-10">
             <Button
               variant="ghost"

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
-import { EmtyState, MainAvatar, ThreeDotsLoader } from '@UI/Index';
+import { DataTable, EmtyState, MainAvatar } from '@UI/Index';
+import { ColumnDef } from '@tanstack/react-table';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@constants/routes';
@@ -8,15 +9,6 @@ import { formatDate } from '@app/utils/helper';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import MainStatusChipe from '@UI/Status/MainStatusChipe';
 import assignedOrdersService from '@services/assignedOrders.service';
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
 
 const AssignOrderList = () => {
   const navigate = useNavigate();
@@ -36,59 +28,58 @@ const AssignOrderList = () => {
         })
   );
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const columns: ColumnDef<any>[] = [
+    {
+      id: 'name',
+      header: t('name'),
+      accessorFn: (order) => order?.user?.userName,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-3">
+          <MainAvatar
+            src={row.original?.user?.imageLink}
+            name={row.original?.user?.userName}
+            className="h-8 w-8"
+          />
+          <span className="font-medium text-foreground">{row.original?.user?.userName}</span>
+        </div>
+      ),
+    },
+    { id: 'phone', header: t('phone'), accessorFn: (order) => order?.user?.phone || '—' },
+    { id: 'biker', header: t('bikerName'), accessorFn: (order) => order?.biker?.userName || '—' },
+    {
+      id: 'bikerPhone',
+      header: t('bikerPhone'),
+      accessorFn: (order) => order?.biker?.phone || '—',
+    },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+    {
+      id: 'status',
+      header: t('status'),
+      accessorKey: 'status',
+      cell: ({ row }) => row.original.status && <MainStatusChipe status={row.original.status} />,
+    },
+  ];
+
   return (
     <div className="relative flex h-full w-full flex-col gap-3">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('assignOrder')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('assignOrder')}</h1>
         <div></div>
       </div>
-      <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[
-                t('name'),
-                t('phone'),
-                t('bikerName'),
-                t('bikerPhone'),
-                t('createddate'),
-                t('status'),
-              ].map((head, index) => (
-                <TableHead key={index}>{head}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {assignedOrdersList &&
-              assignedOrdersList?.data.map((order) => (
-                <TableRow
-                  key={order._id}
-                  className="cursor-pointer hover:bg-primary/10"
-                  onClick={() =>
-                    navigate(generatePath(ROUTES.ORDER_DETAILS, { orderId: order._id }))
-                  }>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <MainAvatar
-                        src={order?.user?.imageLink}
-                        name={order?.user?.userName}
-                        className="h-10 w-10"
-                      />
-                      <p className="font-medium text-slate-900">{order?.user?.userName}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{order.user ? order.user.phone : '---'}</TableCell>
-                  <TableCell>{order.biker ? order.biker.userName : '---'}</TableCell>
-                  <TableCell>{order.biker ? order.biker.phone : '---'}</TableCell>
-                  <TableCell>{formatDate(order.createdAt)}</TableCell>
-                  <TableCell>{order.status && <MainStatusChipe status={order.status} />}</TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-        {assignedOrdersList?.data?.length === 0 && <EmtyState />}
-      </div>
+      <DataTable
+        columns={columns}
+        data={assignedOrdersList?.data ?? []}
+        isLoading={isLoading}
+        showColumnToggle={false}
+        onRowClick={(order) => navigate(generatePath(ROUTES.ORDER_DETAILS, { orderId: order._id }))}
+        emptyStateComponent={<EmtyState />}
+      />
       {assignedOrdersList && (
         <PaginationComponent
           page={assignedOrdersList.pagination.page}

@@ -66,7 +66,7 @@ export default function MapModal({
   return (
     isMapOpen && (
       <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div className="relative h-[70vh] w-11/12 rounded-lg bg-white p-4">
+        <div className="relative h-[70vh] w-11/12 rounded-lg bg-card p-4">
           <button onClick={() => setIsMapOpen(false)} className="absolute right-1 top-1 text-xl">
             <IoMdCloseCircle className="h-6 w-6" />
           </button>

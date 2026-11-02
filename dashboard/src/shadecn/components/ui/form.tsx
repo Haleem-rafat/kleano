@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import {
@@ -126,7 +127,7 @@ const FormDescription = React.forwardRef<
     <p
       ref={ref}
       id={formDescriptionId}
-      className={cn('text-muted-foreground text-[0.8rem]', className)}
+      className={cn('text-[0.8rem] text-muted-foreground', className)}
       {...props}
     />
   );
@@ -138,7 +139,13 @@ const FormMessage = React.forwardRef<
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, children, ...props }, ref) => {
   const { error, formMessageId } = useFormField();
-  const body = error ? String(error?.message) : children;
+  const { t } = useTranslation();
+  // Nested fields ({ en, ar }, { label, value }) keep their message one level down.
+  const message =
+    error?.message ||
+    Object.values((error ?? {}) as Record<string, { message?: string }>).find((e) => e?.message)
+      ?.message;
+  const body = error ? (message ? t(String(message)) : t('validation.required')) : children;
 
   if (!body) {
     return null;
@@ -148,7 +155,8 @@ const FormMessage = React.forwardRef<
     <p
       ref={ref}
       id={formMessageId}
-      className={cn('text-[0.8rem] font-medium text-red-500', className)}
+      role="alert"
+      className={cn('text-[13px] font-medium text-destructive', className)}
       {...props}>
       {body}
     </p>

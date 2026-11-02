@@ -1,5 +1,5 @@
 import bikersService from '@services/bikers.service';
-import { AdminStatus, Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { Button, EmtyState, TableSkeleton } from '@UI/Index';
 import { useTranslation } from 'react-i18next';
 import useSWR, { mutate } from 'swr';
 import { IBikers } from '@servicesTypes/bikers.types';
@@ -45,30 +45,33 @@ const AssignedBikerTable = ({ orderId, setOpenSheet, areaId }) => {
 
   return (
     <div className="relative">
-      {isLoading && <ThreeDotsLoader />}
-      <Table className="table-fixed">
-        <TableHeader>
-          <TableRow>
-            {[t('name'), t('phone'), t('Assigne')].map((head, index) => (
-              <TableHead key={index}>{head}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data &&
-            data?.map((biker) => (
-              <TableRow key={biker?._id}>
-                <TableCell>{biker?.userName}</TableCell>
-                <TableCell>{biker.phone}</TableCell>
-                <TableCell>
-                  <Button size="sm" onClick={() => handelOnAssigne(orderId, biker?._id)}>
-                    <RiFocus3Line size={20} />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
+      {isLoading ? (
+        <TableSkeleton rows={5} columns={3} />
+      ) : (
+        <Table className="table-fixed">
+          <TableHeader>
+            <TableRow>
+              {[t('name'), t('phone'), t('Assigne')].map((head, index) => (
+                <TableHead key={index}>{head}</TableHead>
+              ))}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data &&
+              data?.map((biker) => (
+                <TableRow key={biker?._id}>
+                  <TableCell>{biker?.userName}</TableCell>
+                  <TableCell>{biker.phone}</TableCell>
+                  <TableCell>
+                    <Button size="sm" onClick={() => handelOnAssigne(orderId, biker?._id)}>
+                      <RiFocus3Line size={20} />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      )}
       {data?.length === 0 && <EmtyState />}
     </div>
   );

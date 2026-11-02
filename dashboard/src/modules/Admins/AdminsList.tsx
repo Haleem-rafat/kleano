@@ -1,6 +1,7 @@
+import { IoSearchOutline } from 'react-icons/io5';
 import React, { useState } from 'react';
 import { generatePath, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, EmtyState, DataTable } from '@UI/Index';
+import { Button, EmtyState, DataTable, FormSheet, PageHeader } from '@UI/Index';
 import adminsService from '@services/admins.service';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
@@ -8,13 +9,6 @@ import { ROUTES } from '@constants/routes';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import { Tabs, TabsList, TabsTrigger } from '@shadecn/components/ui/tabs';
 
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
 import { Input } from '@shadecn/components/ui/input';
 import { createAdminColumns } from '@UI/DataTable/columns/adminColumns';
 import { IAdmin } from '@servicesTypes/admins.types';
@@ -68,48 +62,35 @@ const AdminsList = () => {
     navigate(generatePath(ROUTES.ADMIN_DETAILS, { adminId: admin._id }));
   };
   return (
-    <div className="space-y-1">
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('admins')}</h1>
-                <p className="mt-1 text-sm text-slate-500">{t('Manage admin users and permissions')}</p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Input
-                  onChange={(e) => setSearch(e.target.value)}
-                  value={search}
-                  placeholder="Search admins..."
-                  className="w-full sm:w-64"
-                />
-              </div>
-              <Button onClick={() => setOpenSheet(true)} className="bg-primary">
-                {t('addNewAdmin')}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-4">
+      <PageHeader
+        title={t('admins')}
+        description={t('Manage admin users and permissions')}
+        actions={<Button onClick={() => setOpenSheet(true)}>{t('addNewAdmin')}</Button>}
+      />
+      <label className="relative block w-full sm:w-72">
+        <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          type="search"
+          onChange={(e) => setSearch(e.target.value)}
+          value={search}
+          placeholder={t('search')}
+          aria-label={t('search')}
+          className="h-9 ps-9"
+        />
+      </label>
 
       {/* Main Content */}
-      <div className="pt-1">
-        <div className="mx-auto max-w-[95%]">
+      <div>
+        <div>
           {/* Filter Tabs */}
           <div className="mb-6">
             <Tabs
               defaultValue={tabs[0].status}
               onValueChange={(value) => handleTabChange(tabs.find((tab) => tab.status === value))}>
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-3 border border-slate-200 bg-white">
+              <TabsList>
                 {tabs.map((tab, index) => (
-                  <TabsTrigger
-                    value={tab.status}
-                    key={index}
-                    className="">
+                  <TabsTrigger value={tab.status} key={index} className="">
                     {t(tab.title)}
                   </TabsTrigger>
                 ))}
@@ -142,16 +123,9 @@ const AdminsList = () => {
       </div>
 
       {/* Add Admin Sheet */}
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('manageAdmin')}</SheetTitle>
-            <SheetDescription>
-              <AdminModelForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet open={openSheet} onOpenChange={() => setOpenSheet(false)} title={t('manageAdmin')}>
+        <AdminModelForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 };

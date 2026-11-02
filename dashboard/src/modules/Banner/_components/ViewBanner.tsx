@@ -1,9 +1,7 @@
-import React from 'react'
+import React from 'react';
 
 const ViewBanner = () => {
-  return (
-    <div>ViewBanner</div>
-  )
-}
+  return <div>ViewBanner</div>;
+};
 
-export default ViewBanner
+export default ViewBanner;

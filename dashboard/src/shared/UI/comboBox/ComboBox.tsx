@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shadecn/lib/utils';
+import { fieldClass } from '@/shadecn/lib/field';
 import { Button } from '@/shadecn/components/ui/button';
 
 import {
@@ -61,11 +62,15 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between">
+          className={cn(
+            fieldClass,
+            'h-10 justify-between font-normal hover:bg-card',
+            !value && 'text-muted-foreground'
+          )}>
           {value && dataArray
             ? getButtonValue(dataArray, value)
             : `${t('select')} ${placeholder}...`}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="ms-2 h-4 w-4 shrink-0 text-muted-foreground" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="max-h-[--radix-popover-content-available-height]  w-[--radix-popover-trigger-width] min-w-full p-0">

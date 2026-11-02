@@ -1,7 +1,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useAppDispatch } from '@hooks';
 import authService from '@services/auth.service';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '@shadecn/components/ui/form';
+import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
 import { loginAction } from '@store/slices/auth.slice';
 import { Button, MainInput } from '@UI/Index';
 import { useState } from 'react';
@@ -48,7 +48,7 @@ export default function Login() {
   };
   return (
     <AuthLayout>
-      <div className="w-full max-w-sm rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5">
@@ -78,7 +78,7 @@ export default function Login() {
           </Form>
         </div>
         <div className="flex items-center justify-center">
-          <span className="w-full text-center text-sm text-gray-500">v1.3.0</span>
+          <span className="w-full text-center text-sm text-muted-foreground">v1.3.0</span>
         </div>
       </div>
     </AuthLayout>

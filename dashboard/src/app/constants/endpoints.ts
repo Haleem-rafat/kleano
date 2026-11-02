@@ -113,5 +113,5 @@ export enum EAPI {
   BOOKING_ALL = '/admin/biker-schedules',
   // Transactions
   TRANSACTIONS_LIST = '/payments/admins/all',
-  TRANSACTIONS_DETAILS = '/payments/admins/payment-details'
+  TRANSACTIONS_DETAILS = '/payments/admins/payment-details',
 }

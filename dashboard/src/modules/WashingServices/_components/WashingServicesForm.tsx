@@ -7,9 +7,10 @@ import {
   Button,
   MainInput,
   MainSelect,
-  ThreeDotsLoader,
   MainMultiLangInput,
   MultiLangDescriptionListInputs,
+  SheetActions,
+  FormSkeleton,
 } from '@UI/Index'; // Ensure these components are correctly imported
 import { EFormFieldType } from '@constants/enums';
 import { toast } from 'react-toastify';
@@ -56,10 +57,10 @@ export default function WashingServicesForm({ setOpenSheet, oldData }: IWashingS
     resolver: yupResolver(washingServicesService.WashingServicesFormSchema),
     defaultValues: {
       servicesName: typeof oldData?.name === 'object' ? oldData.name : { en: '', ar: '' },
-      duration: `${oldData?.duration}` || '',
-      price: `${oldData?.price}` || '',
-      pointsToPay: `${oldData?.pointsToPay ?? 0}`,
-      icon: { label: '', value: oldData?.icon._id },
+      duration: oldData?.duration ?? undefined,
+      price: oldData?.price ?? undefined,
+      pointsToPay: oldData?.pointsToPay ?? 0,
+      icon: { label: '', value: oldData?.icon?._id },
       type: { label: oldData?.type, value: oldData?.type },
       city:
         oldData?.cities?.map((e) => ({ label: e?.city?.name[lang], value: e?.city?._id })) || [],
@@ -105,10 +106,14 @@ export default function WashingServicesForm({ setOpenSheet, oldData }: IWashingS
   };
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingCitiesOptions && loadingiconsOptions && <ThreeDotsLoader />}
+    <div>
+      {(loadingCitiesOptions || loadingiconsOptions) && <FormSkeleton />}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5 ">
+        <form
+          onSubmit={form.handleSubmit(handelOnSubmit)}
+          className={`flex flex-col gap-4 ${
+            loadingCitiesOptions || loadingiconsOptions ? 'hidden' : ''
+          }`}>
           {washingServicesService.WashingServicesFormFields.map((WashingServicesFormField) => (
             <FormField
               key={WashingServicesFormField.name}
@@ -197,11 +202,11 @@ export default function WashingServicesForm({ setOpenSheet, oldData }: IWashingS
               )}
             />
           ))}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {oldData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

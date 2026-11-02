@@ -1,21 +1,16 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  IoArrowBackCircleOutline,
-  IoCalendarOutline,
-  IoPersonCircleOutline,
-  IoTimeOutline,
-  IoLocationOutline,
+  IoArrowBack,
   IoCopyOutline,
   IoSearchOutline,
-  IoCheckmarkCircle,
+  IoCheckmark,
+  IoClose,
   IoTrashOutline,
 } from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import useSWR, { mutate } from 'swr';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@shadecn/components/ui/tabs';
-import { Button } from '@shadecn/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -24,416 +19,365 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@shadecn/components/ui/dialog';
+import { Switch } from '@shadecn/components/ui/switch';
+import { Input } from '@shadecn/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@shadecn/components/ui/select';
 import bikersService from '@services/bikers.service';
 import staticService from '@services/static.service';
 import { IBikers } from '@servicesTypes/bikers.types';
 import { ROUTES } from '@constants/routes';
 import { Icities } from '@servicesTypes/cities.types';
+import {
+  Button,
+  MainAvatar,
+  SectionCard,
+  PageSkeleton,
+  TilesSkeleton,
+  CardSkeleton,
+  Skeleton,
+} from '@UI/Index';
 import useGetCitiesOptions from '@/hooks/useGetCitiesOptions';
+import { cn } from '@/shadecn/lib/utils';
 
-// Generate time slots for 24 hours in 15-minute intervals
-const generateTimeSlots = () => {
-  const slots = [];
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      const timeString = `${hour.toString().padStart(2, '0')}:${minute
-        .toString()
-        .padStart(2, '0')}`;
-      slots.push(timeString);
-    }
-  }
-  return slots;
-};
+const TIME_SLOTS = Array.from(
+  { length: 96 },
+  (_, i) =>
+    `${Math.floor(i / 4)
+      .toString()
+      .padStart(2, '0')}:${((i % 4) * 15).toString().padStart(2, '0')}`
+);
 
-const TIME_SLOTS = generateTimeSlots();
+/** Quick ranges an admin usually wants; `to` is exclusive. */
+const PRESETS = [
+  { key: 'morning', from: '08:00', to: '12:00' },
+  { key: 'afternoon', from: '12:00', to: '17:00' },
+  { key: 'evening', from: '17:00', to: '22:00' },
+  { key: 'fullDay', from: '08:00', to: '22:00' },
+];
 
 const DAYS_OF_WEEK = [
-  { value: 'saturday', label: { en: 'SATURDAY', ar: 'السبت' } },
-  { value: 'sunday', label: { en: 'SUNDAY', ar: 'الأحد' } },
-  { value: 'monday', label: { en: 'MONDAY', ar: 'الإثنين' } },
-  { value: 'tuesday', label: { en: 'TUESDAY', ar: 'الثلاثاء' } },
-  { value: 'wednesday', label: { en: 'WEDNESDAY', ar: 'الأربعاء' } },
-  { value: 'thursday', label: { en: 'THURSDAY', ar: 'الخميس' } },
-  { value: 'friday', label: { en: 'FRIDAY', ar: 'الجمعة' } },
+  { value: 'saturday', label: { en: 'Saturday', ar: 'السبت' } },
+  { value: 'sunday', label: { en: 'Sunday', ar: 'الأحد' } },
+  { value: 'monday', label: { en: 'Monday', ar: 'الإثنين' } },
+  { value: 'tuesday', label: { en: 'Tuesday', ar: 'الثلاثاء' } },
+  { value: 'wednesday', label: { en: 'Wednesday', ar: 'الأربعاء' } },
+  { value: 'thursday', label: { en: 'Thursday', ar: 'الخميس' } },
+  { value: 'friday', label: { en: 'Friday', ar: 'الجمعة' } },
 ];
+
+type LocalName = { en: string; ar: string };
 
 interface ScheduleData {
   areas: string[];
   timeSlots: string[];
   areaPriorities: Record<string, number>;
   areaCities: Record<string, string>;
-  areaNames: Record<string, { en: string; ar: string }>;
+  areaNames: Record<string, LocalName>;
 }
+
+interface Shift {
+  day?: string;
+  area?: { _id: string; name?: LocalName } | string;
+  city?: { _id: string } | string;
+  timeSlot?: string;
+  priorityLevel?: number;
+}
+
+const emptyDay = (): ScheduleData => ({
+  areas: [],
+  timeSlots: [],
+  areaPriorities: {},
+  areaCities: {},
+  areaNames: {},
+});
+
+const emptyWeek = () =>
+  Object.fromEntries(DAYS_OF_WEEK.map((d) => [d.value, emptyDay()])) as Record<
+    string,
+    ScheduleData
+  >;
+
+/** Builds the editor state straight from the saved shifts (names come with the shift). */
+const parseShifts = (shifts: Shift[]) => {
+  const week = emptyWeek();
+  shifts.forEach((shift) => {
+    const day = week[shift?.day?.toLowerCase() ?? ''];
+    const areaId = typeof shift?.area === 'object' ? shift.area?._id : shift?.area;
+    const cityId = typeof shift?.city === 'object' ? shift.city?._id : shift?.city;
+    if (!day || !areaId || !cityId) return;
+    if (!day.areas.includes(areaId)) day.areas.push(areaId);
+    if (shift.timeSlot && !day.timeSlots.includes(shift.timeSlot)) {
+      day.timeSlots.push(shift.timeSlot);
+    }
+    day.areaPriorities[areaId] = shift.priorityLevel || 1;
+    day.areaCities[areaId] = cityId;
+    day.areaNames[areaId] =
+      typeof shift.area === 'object' && shift.area?.name
+        ? shift.area.name
+        : { en: areaId, ar: areaId };
+  });
+  return week;
+};
+
+const toMinutes = (slot: string) => {
+  if (!slot) return 0;
+  const [h, m] = slot.split(':').map(Number);
+  return h * 60 + m;
+};
+const fromMinutes = (min: number) =>
+  `${Math.floor(min / 60)
+    .toString()
+    .padStart(2, '0')}:${(min % 60).toString().padStart(2, '0')}`;
+
+/** "08:00–12:00, 14:00–18:00" from a set of 15-minute slots. */
+const summarizeSlots = (slots: string[]) => {
+  const sorted = [...slots].sort((a, b) => toMinutes(a) - toMinutes(b));
+  const ranges: string[] = [];
+  let start: number | null = null;
+  let prev = -1;
+  sorted.forEach((slot) => {
+    const min = toMinutes(slot);
+    if (start === null) start = min;
+    else if (min !== prev + 15) {
+      ranges.push(`${fromMinutes(start)}–${fromMinutes(prev + 15)}`);
+      start = min;
+    }
+    prev = min;
+  });
+  if (start !== null) ranges.push(`${fromMinutes(start)}–${fromMinutes(prev + 15)}`);
+  return ranges;
+};
+
+const rangesOf = (slots: string[]) =>
+  summarizeSlots(slots).map((r) => {
+    const [from, to] = r.split('–');
+    return { from, to };
+  });
+
+/** 270 → "4h 30m" */
+const formatDuration = (min: number) => {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return [h ? `${h}h` : '', m ? `${m}m` : ''].filter(Boolean).join(' ') || '0h';
+};
+
+const END_TIMES = [...TIME_SLOTS.slice(1), '24:00'];
+
+/** Design-system select for a time value. */
+const TimeSelect = ({
+  value,
+  options,
+  label,
+  onChange,
+}: {
+  value: string;
+  options: string[];
+  label: string;
+  onChange: (v: string) => void;
+}) => (
+  <Select value={value} onValueChange={onChange}>
+    <SelectTrigger className="h-9 w-28 tabular-nums" aria-label={label}>
+      <SelectValue />
+    </SelectTrigger>
+    <SelectContent className="max-h-64">
+      {options.map((o) => (
+        <SelectItem key={o} value={o} className="tabular-nums">
+          {o}
+        </SelectItem>
+      ))}
+    </SelectContent>
+  </Select>
+);
+
+const slotsBetween = (from: string, to: string) =>
+  TIME_SLOTS.filter((s) => toMinutes(s) >= toMinutes(from) && toMinutes(s) < toMinutes(to));
 
 export default function BikersSchedule() {
   const { bikerId } = useParams();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
+  const nameOf = (name?: LocalName | string) =>
+    typeof name === 'string' ? name : name?.[lang] || name?.en || '';
 
   const { data: bikerData, isLoading: isLoadingBiker } = useSWR(
-    ['get-biker-details', bikerId],
-    () => bikerId && bikersService.getBikerById(bikerId).then((data) => data?.data as IBikers)
+    bikerId ? ['get-biker-details', bikerId] : null,
+    () => bikersService.getBikerById(bikerId).then((data) => data?.data as IBikers)
   );
 
-  const { data: scheduleData } = useSWR(
-    ['get-biker-schedule', bikerId],
-    () => bikerId && bikersService.getBikerSchedule(bikerId)
+  const {
+    data: scheduleData,
+    error: scheduleError,
+    isLoading: isLoadingSchedule,
+  } = useSWR(bikerId ? ['get-biker-schedule', bikerId] : null, () =>
+    bikersService.getBikerSchedule(bikerId)
   );
 
   const { citiesOptions } = useGetCitiesOptions();
-  const [selectedCityId, setSelectedCityId] = useState<string>('');
-  const [citySearchQuery, setCitySearchQuery] = useState<string>('');
-  const [areaSearchQuery, setAreaSearchQuery] = useState<string>('');
+  const [selectedCityId, setSelectedCityId] = useState('');
+  const [areaSearchQuery, setAreaSearchQuery] = useState('');
 
   const { data: areasData, isLoading: isLoadingAreas } = useSWR(
-    ['get-Areas', selectedCityId],
-    () => selectedCityId && staticService.getAreasOptions(selectedCityId)
+    selectedCityId ? ['get-Areas', selectedCityId] : null,
+    () => staticService.getAreasOptions(selectedCityId)
   );
 
-  const areas = useMemo(() => {
-    if (!areasData?.data) return [];
-    return (areasData.data as Icities[]).map((area) => ({
-      id: area?._id,
-      name: area?.name,
-    }));
-  }, [areasData]);
-
-  const filteredCities = useMemo(() => {
-    if (!citySearchQuery.trim()) return citiesOptions;
-    const query = citySearchQuery.toLowerCase().trim();
-    return citiesOptions.filter((city) => city.label.toLowerCase().includes(query));
-  }, [citiesOptions, citySearchQuery]);
+  const areas = useMemo(
+    () =>
+      ((areasData?.data as Icities[]) ?? [])
+        .filter((area) => area?._id)
+        .map((area) => ({ id: area._id, name: area.name as unknown as LocalName })),
+    [areasData]
+  );
 
   const filteredAreas = useMemo(() => {
-    if (!areaSearchQuery.trim()) return areas;
     const query = areaSearchQuery.toLowerCase().trim();
+    if (!query) return areas;
     return areas.filter(
-      (area) => area?.name.en.toLowerCase().includes(query) || area?.name.ar.includes(query)
+      (area) => area.name?.en?.toLowerCase().includes(query) || area.name?.ar?.includes(query)
     );
   }, [areas, areaSearchQuery]);
 
   const [activeDay, setActiveDay] = useState('saturday');
-  const [schedule, setSchedule] = useState<Record<string, ScheduleData>>(() => {
-    const initialSchedule: Record<string, ScheduleData> = {};
-    DAYS_OF_WEEK.forEach((day) => {
-      initialSchedule[day.value] = {
-        areas: [],
-        timeSlots: [],
-        areaPriorities: {},
-        areaCities: {},
-        areaNames: {},
-      };
-    });
-    return initialSchedule;
-  });
+  const [schedule, setSchedule] = useState<Record<string, ScheduleData>>(emptyWeek);
+  const [weekends, setWeekends] = useState<string[]>([]);
+  const [isScheduleLoaded, setIsScheduleLoaded] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isCopyDialogOpen, setIsCopyDialogOpen] = useState(false);
   const [copyToDays, setCopyToDays] = useState<string[]>([]);
-  const [sourceDay, setSourceDay] = useState<string>('');
-  const [isScheduleLoaded, setIsScheduleLoaded] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [weekends, setWeekends] = useState<string[]>([]);
 
+  // Load once the request settles, whether the biker has a schedule or not.
   useEffect(() => {
-    if (scheduleData?.data?.weekends && Array.isArray(scheduleData.data.weekends)) {
-      setWeekends(scheduleData.data.weekends);
-    }
-  }, [scheduleData]);
+    if (isScheduleLoaded || isLoadingSchedule) return;
+    if (scheduleData === undefined && !scheduleError) return;
+    const saved = scheduleData?.data;
+    const shifts: Shift[] = Array.isArray(saved?.shifts) ? saved.shifts : [];
+    setSchedule(parseShifts(shifts));
+    setWeekends(Array.isArray(saved?.weekends) ? saved.weekends : []);
+    const firstCity = shifts.find((s) => s?.city)?.city;
+    const cityId = typeof firstCity === 'object' ? firstCity?._id : firstCity;
+    if (cityId) setSelectedCityId(cityId);
+    setIsScheduleLoaded(true);
+  }, [scheduleData, scheduleError, isLoadingSchedule, isScheduleLoaded]);
 
+  // Default the city to the biker's own city when nothing is saved yet.
   useEffect(() => {
-    if (
-      scheduleData?.data &&
-      scheduleData.data.shifts &&
-      scheduleData.data.shifts.length > 0 &&
-      !isScheduleLoaded
-    ) {
-      const shifts = scheduleData.data.shifts;
-      const firstShift = shifts[0];
-      const cityId = firstShift.city?._id || firstShift.city;
+    if (!isScheduleLoaded || selectedCityId) return;
+    const fallback = bikerData?.city?._id || citiesOptions[0]?.value;
+    if (fallback) setSelectedCityId(fallback);
+  }, [isScheduleLoaded, selectedCityId, bikerData, citiesOptions]);
 
-      if (cityId && !selectedCityId) {
-        setSelectedCityId(cityId);
-      }
-    } else if (scheduleData?.data === null && !isScheduleLoaded) {
-      setIsScheduleLoaded(true);
-    }
-  }, [scheduleData, isScheduleLoaded, selectedCityId]);
+  const updateDay = (day: string, update: (d: ScheduleData) => ScheduleData) => {
+    setSchedule((prev) => ({ ...prev, [day]: update(prev[day]) }));
+    setIsDirty(true);
+  };
 
-  useEffect(() => {
-    if (
-      scheduleData?.data?.shifts &&
-      scheduleData.data.shifts.length > 0 &&
-      !isScheduleLoaded &&
-      selectedCityId &&
-      areas.length > 0
-    ) {
-      const shifts = scheduleData.data.shifts;
-      const parsedSchedule: Record<string, ScheduleData> = {};
-      DAYS_OF_WEEK.forEach((day) => {
-        parsedSchedule[day.value] = {
-          areas: [],
-          timeSlots: [],
-          areaPriorities: {},
-          areaCities: {},
-          areaNames: {},
-        };
-      });
-
-      shifts.forEach(
-        (shift: {
-          day: string;
-          area: { _id: string; name?: { en: string; ar: string } } | string;
-          city: { _id: string } | string;
-          timeSlot: string;
-          priorityLevel?: number;
-        }) => {
-          const dayName = shift?.day.toLowerCase();
-          const areaId = typeof shift?.area === 'object' ? shift?.area?._id : shift?.area;
-          const areaName =
-            typeof shift?.area === 'object' && shift?.area?.name
-              ? shift?.area?.name
-              : { en: areaId, ar: areaId };
-          const cityId = typeof shift?.city === 'object' ? shift?.city?._id : shift?.city;
-          const timeSlot = shift?.timeSlot;
-          const priorityLevel = shift?.priorityLevel || 1;
-
-          if (parsedSchedule[dayName]) {
-            if (!parsedSchedule[dayName].areas.includes(areaId)) {
-              parsedSchedule[dayName].areas.push(areaId);
-            }
-            if (!parsedSchedule[dayName].timeSlots.includes(timeSlot)) {
-              parsedSchedule[dayName].timeSlots.push(timeSlot);
-            }
-            parsedSchedule[dayName].areaPriorities[areaId] = priorityLevel;
-            parsedSchedule[dayName].areaCities[areaId] = cityId;
-            parsedSchedule[dayName].areaNames[areaId] = areaName;
-          }
-        }
-      );
-
-      setSchedule(parsedSchedule);
-      setIsScheduleLoaded(true);
-    }
-  }, [scheduleData, isScheduleLoaded, selectedCityId, areas]);
-
-  const toggleArea = (day: string, areaId: string) => {
-    setSchedule((prev) => {
-      const daySchedule = prev[day];
-      const isSelected = daySchedule.areas.includes(areaId);
-      const newAreas = isSelected
-        ? daySchedule.areas.filter((id) => id !== areaId)
-        : [...daySchedule.areas, areaId];
-      const newPriorities = { ...daySchedule.areaPriorities };
-      const newAreaCities = { ...daySchedule.areaCities };
-      const newAreaNames = { ...daySchedule.areaNames };
-      if (isSelected) {
-        delete newPriorities[areaId];
-        delete newAreaCities[areaId];
-        delete newAreaNames[areaId];
+  const setAreasSelected = (day: string, ids: string[], selected: boolean) =>
+    updateDay(day, (d) => {
+      const next = {
+        ...d,
+        areaPriorities: { ...d.areaPriorities },
+        areaCities: { ...d.areaCities },
+        areaNames: { ...d.areaNames },
+      };
+      if (selected) {
+        next.areas = [...new Set([...d.areas, ...ids])];
+        ids.forEach((id) => {
+          if (d.areas.includes(id)) return;
+          next.areaPriorities[id] = 1;
+          next.areaCities[id] = selectedCityId;
+          const area = areas.find((a) => a.id === id);
+          if (area) next.areaNames[id] = area.name;
+        });
       } else {
-        const area = areas.find((a) => a.id === areaId);
-        newPriorities[areaId] = 1;
-        newAreaCities[areaId] = selectedCityId;
-        if (area) {
-          newAreaNames[areaId] = area?.name;
-        }
+        next.areas = d.areas.filter((id) => !ids.includes(id));
+        ids.forEach((id) => {
+          delete next.areaPriorities[id];
+          delete next.areaCities[id];
+          delete next.areaNames[id];
+        });
       }
-      return {
-        ...prev,
-        [day]: {
-          ...daySchedule,
-          areas: newAreas,
-          areaPriorities: newPriorities,
-          areaCities: newAreaCities,
-          areaNames: newAreaNames,
-        },
-      };
+      return next;
     });
+
+  const setPriority = (day: string, areaId: string, priority: number) =>
+    updateDay(day, (d) => ({ ...d, areaPriorities: { ...d.areaPriorities, [areaId]: priority } }));
+
+  const setSlots = (day: string, slots: string[], selected: boolean) =>
+    updateDay(day, (d) => ({
+      ...d,
+      timeSlots: selected
+        ? [...new Set([...d.timeSlots, ...slots])]
+        : d.timeSlots.filter((s) => !slots.includes(s)),
+    }));
+
+  const toggleWeekend = (day: string) => {
+    const name = day.toUpperCase();
+    setWeekends((prev) => (prev.includes(name) ? prev.filter((d) => d !== name) : [...prev, name]));
+    setIsDirty(true);
   };
 
-  const handleSelectAllAreas = (day: string) => {
-    const daySchedule = schedule[day];
-    const filteredAreaIds = filteredAreas.map((area) => area.id);
-    const allSelected = filteredAreaIds.every((id) => daySchedule.areas.includes(id));
-
-    if (allSelected) {
-      setSchedule((prev) => {
-        const daySchedule = prev[day];
-        const newAreas = daySchedule.areas.filter((id) => !filteredAreaIds.includes(id));
-        const newPriorities = { ...daySchedule.areaPriorities };
-        const newAreaCities = { ...daySchedule.areaCities };
-        const newAreaNames = { ...daySchedule.areaNames };
-        filteredAreaIds.forEach((id) => {
-          delete newPriorities[id];
-          delete newAreaCities[id];
-          delete newAreaNames[id];
-        });
-        return {
-          ...prev,
-          [day]: {
-            ...daySchedule,
-            areas: newAreas,
-            areaPriorities: newPriorities,
-            areaCities: newAreaCities,
-            areaNames: newAreaNames,
-          },
-        };
-      });
-    } else {
-      setSchedule((prev) => {
-        const daySchedule = prev[day];
-        const newAreas = [...new Set([...daySchedule.areas, ...filteredAreaIds])];
-        const newPriorities = { ...daySchedule.areaPriorities };
-        const newAreaCities = { ...daySchedule.areaCities };
-        const newAreaNames = { ...daySchedule.areaNames };
-        filteredAreaIds.forEach((id) => {
-          if (!daySchedule.areas.includes(id)) {
-            newPriorities[id] = 1;
-            newAreaCities[id] = selectedCityId;
-            const area = areas.find((a) => a.id === id);
-            if (area) {
-              newAreaNames[id] = area?.name;
-            }
-          }
-        });
-        return {
-          ...prev,
-          [day]: {
-            ...daySchedule,
-            areas: newAreas,
-            areaPriorities: newPriorities,
-            areaCities: newAreaCities,
-            areaNames: newAreaNames,
-          },
-        };
-      });
-    }
-  };
-
-  const updateAreaPriority = (day: string, areaId: string, priority: number) => {
-    setSchedule((prev) => {
-      const daySchedule = prev[day];
-      return {
-        ...prev,
-        [day]: {
-          ...daySchedule,
-          areaPriorities: {
-            ...daySchedule.areaPriorities,
-            [areaId]: priority,
-          },
-        },
-      };
-    });
-  };
-
-  const toggleTimeSlot = (day: string, timeSlot: string) => {
-    setSchedule((prev) => {
-      const daySchedule = prev[day];
-      const isSelected = daySchedule.timeSlots.includes(timeSlot);
-      return {
-        ...prev,
-        [day]: {
-          ...daySchedule,
-          timeSlots: isSelected
-            ? daySchedule.timeSlots.filter((time) => time !== timeSlot)
-            : [...daySchedule.timeSlots, timeSlot],
-        },
-      };
-    });
-  };
-
-  const hasExistingSchedule = useMemo(() => !!scheduleData?.data?._id, [scheduleData]);
+  const hasExistingSchedule = !!scheduleData?.data?._id;
 
   const handleSave = async () => {
-    setIsSaving(true);
-
     if (!bikerId || !bikerData) {
       toast.error(t('bikerNotFound'));
-      setIsSaving(false);
+      return;
+    }
+    const shifts = DAYS_OF_WEEK.flatMap((day) => {
+      const d = schedule[day.value];
+      return d.areas.flatMap((areaId) => {
+        const city = d.areaCities[areaId];
+        if (!city) return [];
+        return d.timeSlots.map((timeSlot) => ({
+          timeSlot,
+          city,
+          area: areaId,
+          day: day.value.toUpperCase(),
+          priorityLevel: d.areaPriorities[areaId] || 1,
+        }));
+      });
+    });
+    const incomplete = DAYS_OF_WEEK.filter((day) => {
+      const d = schedule[day.value];
+      return (
+        !weekends.includes(day.value.toUpperCase()) && d.areas.length > 0 !== d.timeSlots.length > 0
+      );
+    });
+    if (incomplete.length) {
+      toast.warning(
+        `${t('scheduleIncomplete')}: ${incomplete.map((d) => d.label[lang]).join(', ')}`
+      );
       return;
     }
 
-    const bikerIdValue = bikerId;
-
-    const shifts: Array<{
-      timeSlot: string;
-      city: string;
-      area: string;
-      day: string;
-      priorityLevel: number;
-    }> = [];
-
-    DAYS_OF_WEEK.forEach((day) => {
-      const daySchedule = schedule[day.value];
-      const dayName = day.label.en.toUpperCase();
-
-      daySchedule.areas.forEach((areaId) => {
-        const priorityLevel = daySchedule.areaPriorities[areaId] || 1;
-        const cityId = daySchedule.areaCities[areaId];
-
-        if (!cityId) {
-          return;
-        }
-
-        daySchedule.timeSlots.forEach((timeSlot) => {
-          shifts.push({
-            timeSlot,
-            city: cityId,
-            area: areaId,
-            day: dayName,
-            priorityLevel,
-          });
-        });
-      });
-    });
-
-    const apiPayload: {
-      biker: string;
-      shifts: Array<{
-        timeSlot: string;
-        city: string;
-        area: string;
-        day: string;
-        priorityLevel: number;
-      }>;
-      weekends?: string[];
-    } = {
-      biker: bikerIdValue,
-      shifts,
-    };
-
-    if (weekends.length > 0) {
-      apiPayload.weekends = weekends;
-    }
+    setIsSaving(true);
     try {
+      const payload = { biker: bikerId, shifts, weekends };
       const response = hasExistingSchedule
-        ? await bikersService.updateBikerSchedule(bikerIdValue, apiPayload)
-        : await bikersService.createBikerSchedule(apiPayload);
-      if (response.success) {
+        ? await bikersService.updateBikerSchedule(bikerId, payload)
+        : await bikersService.createBikerSchedule(payload);
+      if (response?.success) {
         toast.success(t('scheduleSaved'));
-        mutate(['get-biker-schedule', bikerIdValue]);
+        setIsDirty(false);
+        mutate(['get-biker-schedule', bikerId]);
       } else {
         toast.error(t('scheduleSaveError'));
       }
-    } catch (error) {
+    } catch {
       toast.error(t('scheduleSaveError'));
     } finally {
       setIsSaving(false);
     }
-  };
-
-  const handleCopyToClick = (day: string) => {
-    setSourceDay(day);
-    setCopyToDays([]);
-    setIsCopyDialogOpen(true);
-  };
-
-  const toggleCopyToDay = (dayValue: string) => {
-    setCopyToDays((prev) =>
-      prev.includes(dayValue) ? prev.filter((d) => d !== dayValue) : [...prev, dayValue]
-    );
   };
 
   const handleCopyConfirm = () => {
@@ -441,646 +385,529 @@ export default function BikersSchedule() {
       toast.warning(t('selectDaysToCopy'));
       return;
     }
-
-    const sourceSchedule = schedule[sourceDay];
+    const source = schedule[activeDay];
     setSchedule((prev) => {
       const updated = { ...prev };
       copyToDays.forEach((day) => {
         updated[day] = {
-          areas: [...sourceSchedule.areas],
-          timeSlots: [...sourceSchedule.timeSlots],
-          areaPriorities: { ...sourceSchedule.areaPriorities },
-          areaCities: { ...sourceSchedule.areaCities },
-          areaNames: { ...sourceSchedule.areaNames },
+          areas: [...source.areas],
+          timeSlots: [...source.timeSlots],
+          areaPriorities: { ...source.areaPriorities },
+          areaCities: { ...source.areaCities },
+          areaNames: { ...source.areaNames },
         };
       });
       return updated;
     });
-
+    setIsDirty(true);
     setIsCopyDialogOpen(false);
     setCopyToDays([]);
     toast.success(t('scheduleCopied'));
   };
 
-  const getOtherDays = (currentDay: string) => {
-    return DAYS_OF_WEEK.filter((day) => day.value !== currentDay);
-  };
-
   const handleDeleteSchedule = async () => {
-    if (!bikerId) {
-      toast.error(t('bikerNotFound'));
-      return;
-    }
-
+    if (!bikerId) return;
     setIsDeleting(true);
     try {
       const response = await bikersService.deleteBikerSchedule(bikerId);
-      if (response.success) {
+      if (response?.success) {
         toast.success(t('scheduleDeleted'));
         mutate(['get-biker-schedule', bikerId]);
-        setSchedule(() => {
-          const initialSchedule: Record<string, ScheduleData> = {};
-          DAYS_OF_WEEK.forEach((day) => {
-            initialSchedule[day.value] = {
-              areas: [],
-              timeSlots: [],
-              areaPriorities: {},
-              areaCities: {},
-              areaNames: {},
-            };
-          });
-          return initialSchedule;
-        });
-        setWeekends([]);
-        setSelectedCityId('');
-        setIsScheduleLoaded(false);
         setIsDeleteDialogOpen(false);
         navigate(ROUTES.BIKERS);
       } else {
         toast.error(t('scheduleDeleteError'));
       }
-    } catch (error) {
+    } catch {
       toast.error(t('scheduleDeleteError'));
     } finally {
       setIsDeleting(false);
     }
   };
 
-  const selectedAreasByCity = useMemo(() => {
-    const daySchedule = schedule[activeDay];
-    const grouped: Record<
-      string,
-      { cityName: string; areas: Array<{ id: string; name: { en: string; ar: string } }> }
-    > = {};
+  const day = schedule[activeDay];
+  const activeLabel = DAYS_OF_WEEK.find((d) => d.value === activeDay)?.label[lang];
+  const isDayOff = weekends.includes(activeDay.toUpperCase());
+  const cityName = (id: string) => citiesOptions.find((c) => c.value === id)?.label ?? '';
+  const dayRanges = rangesOf(day.timeSlots);
 
-    daySchedule.areas.forEach((areaId) => {
-      const cityId = daySchedule.areaCities[areaId];
-      if (!cityId) return;
+  const replaceRange = (index: number, from: string, to: string) => {
+    if (toMinutes(to) <= toMinutes(from)) {
+      toast.warning(t('endAfterStart'));
+      return;
+    }
+    const others = dayRanges.filter((_, i) => i !== index);
+    updateDay(activeDay, (d) => ({
+      ...d,
+      timeSlots: [
+        ...new Set([
+          ...others.flatMap((r) => slotsBetween(r.from, r.to)),
+          ...slotsBetween(from, to),
+        ]),
+      ],
+    }));
+  };
 
-      const city = citiesOptions.find((c) => c.value === cityId);
-      if (!city) return;
+  const addNextRange = () => {
+    const last = dayRanges[dayRanges.length - 1];
+    const start = last ? Math.min(toMinutes(last.to) + 60, 23 * 60) : 8 * 60;
+    const end = Math.min(start + 4 * 60, 24 * 60);
+    setSlots(activeDay, slotsBetween(fromMinutes(start), fromMinutes(end)), true);
+  };
 
-      if (!grouped[cityId]) {
-        grouped[cityId] = {
-          cityName: city.label,
-          areas: [],
-        };
-      }
-
-      const storedName = daySchedule.areaNames[areaId];
-      if (storedName) {
-        grouped[cityId].areas.push({
-          id: areaId,
-          name: storedName,
-        });
-      } else {
-        const area = areas.find((a) => a.id === areaId);
-        if (area) {
-          grouped[cityId].areas.push(area);
-        } else {
-          grouped[cityId].areas.push({
-            id: areaId,
-            name: { en: areaId, ar: areaId },
-          });
-        }
-      }
-    });
-
-    return Object.values(grouped);
-  }, [schedule, activeDay, citiesOptions, areas]);
+  const allFilteredSelected =
+    filteredAreas.length > 0 && filteredAreas.every((a) => day.areas.includes(a.id));
 
   if (isLoadingBiker) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-slate-600">{t('loading')}...</div>
-      </div>
-    );
+    return <PageSkeleton kind="details" />;
   }
 
   if (!bikerData) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-red-600">{t('bikerNotFound')}</div>
-      </div>
-    );
+    return <div className="py-24 text-center text-destructive">{t('bikerNotFound')}</div>;
   }
 
   return (
-    <div className="space-y-1">
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition-colors duration-200 hover:bg-slate-200">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikerSchedule')}</h1>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t('bikerId')}: #{bikerId?.slice(-4) || bikerData?._id?.slice(-4)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 space-x-3 ">
-              {hasExistingSchedule && (
-                <Button
+    <div className="space-y-5 pb-24">
+      {/* Header */}
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(-1)}
+            aria-label={t('back')}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-foreground hover:bg-accent">
+            <IoArrowBack className="h-4 w-4 rtl:rotate-180" />
+          </button>
+          <MainAvatar src={bikerData.imageLink} name={bikerData.userName} className="h-10 w-10" />
+          <div className="min-w-0">
+            <h1 className="truncate text-xl font-semibold tracking-tight text-foreground">
+              {t('bikerSchedule')} · {bikerData.userName}
+            </h1>
+            <p className="text-[13px] text-muted-foreground">
+              {bikerData.phone}
+              {bikerData.city?.name?.[lang] ? ` · ${bikerData.city.name[lang]}` : ''}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {hasExistingSchedule && (
+            <Button variant="dangerOutline" size="md" onClick={() => setIsDeleteDialogOpen(true)}>
+              <IoTrashOutline className="me-1.5 h-4 w-4" />
+              {t('deleteSchedule')}
+            </Button>
+          )}
+          <Button
+            size="md"
+            onClick={handleSave}
+            loading={isSaving}
+            disabled={!isScheduleLoaded || isSaving || !isDirty}>
+            {t('save')}
+          </Button>
+        </div>
+      </header>
+
+      {!isScheduleLoaded ? (
+        <div className="space-y-5">
+          <TilesSkeleton count={4} />
+          <CardSkeleton rows={6} />
+        </div>
+      ) : (
+        <>
+          {/* Week overview: pick a day, see what each day has at a glance */}
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-7">
+            {DAYS_OF_WEEK.map((d) => {
+              const s = schedule[d.value];
+              const off = weekends.includes(d.value.toUpperCase());
+              const ranges = summarizeSlots(s.timeSlots);
+              const active = d.value === activeDay;
+              return (
+                <button
+                  key={d.value}
                   type="button"
-                  onClick={() => setIsDeleteDialogOpen(true)}
-                  variant="destructive"
-                  className="bg-red-600 hover:bg-red-700">
-                  <IoTrashOutline className="mr-2 h-4 w-4" />
-                  {t('deleteSchedule')}
-                </Button>
-              )}
+                  onClick={() => {
+                    setActiveDay(d.value);
+                    setAreaSearchQuery('');
+                  }}
+                  aria-pressed={active}
+                  className={cn(
+                    'min-w-0 rounded-lg border p-3 text-start transition-colors',
+                    active
+                      ? 'border-primary bg-accent ring-1 ring-primary'
+                      : 'border-border bg-card hover:bg-muted'
+                  )}>
+                  <p className="text-sm font-semibold text-foreground">{d.label[lang]}</p>
+                  {off ? (
+                    <p className="mt-1 text-xs font-medium text-warning">{t('dayOff')}</p>
+                  ) : s.areas.length || s.timeSlots.length ? (
+                    <>
+                      <p className="mt-1 truncate text-xs text-foreground">
+                        {ranges.length ? ranges.join(', ') : '—'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {s.areas.length} {t('areas')}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-1 text-xs text-muted-foreground">{t('notScheduled')}</p>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Day editor */}
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-5 py-3">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">{activeLabel}</h2>
+              <p className="text-[13px] text-muted-foreground">
+                {isDayOff
+                  ? t('dayOffHint')
+                  : `${day.areas.length} ${t('areas')} · ${
+                      summarizeSlots(day.timeSlots).join(', ') || t('noHoursSelected')
+                    }`}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <label className="flex cursor-pointer items-center gap-2 text-[13px] font-medium text-foreground">
+                <Switch checked={isDayOff} onCheckedChange={() => toggleWeekend(activeDay)} />
+                {t('dayOff')}
+              </label>
               <Button
-                onClick={handleSave}
-                disabled={isSaving}
-                className="bg-primary hover:bg-primary">
-                {isSaving ? t('saving') : t('save')}
+                variant="secondary"
+                size="sm"
+                disabled={!day.areas.length && !day.timeSlots.length}
+                onClick={() => {
+                  setCopyToDays([]);
+                  setIsCopyDialogOpen(true);
+                }}>
+                <IoCopyOutline className="me-1.5 h-4 w-4" />
+                {t('copyTo')}
               </Button>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="pt-1">
-        <div className="w-full">
-          {/* Weekend Selection Card */}
-          <div className="mb-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-            <div className="border-b border-slate-100 bg-white px-5 py-3">
-              <div className="flex items-center space-x-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                  <IoCalendarOutline className="h-4 w-4 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-sm font-semibold text-slate-900">{t('weekendDays')}</h2>
-                  <p className="text-sm text-slate-500">{t('selectWeekendDays')}</p>
-                </div>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7">
-                {DAYS_OF_WEEK.map((day) => {
-                  const dayName = day.label.en.toUpperCase();
-                  const isSelected = weekends.includes(dayName);
-                  return (
-                    <button
-                      key={day.value}
-                      type="button"
-                      onClick={() => {
-                        setWeekends((prev) =>
-                          isSelected ? prev.filter((d) => d !== dayName) : [...prev, dayName]
-                        );
-                      }}
-                      className={`flex items-center space-x-2 rounded-lg border-2 p-3 text-left transition-all duration-200 ${
-                        isSelected
-                          ? 'border-primary bg-brandTint text-primary'
-                          : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30 hover:bg-brandTint'
-                      }`}>
-                      <div
-                        className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
-                          isSelected
-                            ? 'border-primary bg-primary'
-                            : 'border-slate-300 bg-white'
-                        }`}>
-                        {isSelected && (
-                          <svg
-                            className="h-3 w-3 text-white"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                      </div>
-                      <span className="text-sm font-medium">{day.label[lang]}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* Schedule Card */}
-            <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoCalendarOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerSchedule')}</h2>
-                      <p className="text-sm text-slate-500">{t('manageWeeklySchedule')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <Tabs value={activeDay} onValueChange={setActiveDay} className="w-full">
-                    <TabsList className="mb-6 grid w-full grid-cols-7">
-                      {DAYS_OF_WEEK.map((day) => (
-                        <TabsTrigger
-                          key={day.value}
-                          value={day.value}
-                          className="text-xs data-[state=active]:shadow-md">
-                          {day.label[lang]}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-
-                    {DAYS_OF_WEEK.map((day) => (
-                      <TabsContent key={day.value} value={day.value} className="space-y-6">
-                        {/* Copy To Button */}
-                        <div className="flex justify-end">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => handleCopyToClick(day.value)}
-                            className="flex items-center space-x-2 border-primary/30 text-primary hover:bg-brandTint">
-                            <IoCopyOutline className="h-4 w-4" />
-                            <span>{t('copyTo')}</span>
-                          </Button>
-                        </div>
-                        {/* Selected Areas Summary Card */}
-                        {selectedAreasByCity.length > 0 && (
-                          <div className="mb-6 rounded-lg border-2 border-primary/30 bg-brandTint p-4">
-                            <div className="mb-3 flex items-center space-x-2">
-                              <IoCheckmarkCircle className="h-5 w-5 text-primary" />
-                              <h3 className="text-base font-semibold text-primary">
-                                {t('selectedAreas')} ({day.label[lang]})
-                              </h3>
-                            </div>
-                            <div className="space-y-3">
-                              {selectedAreasByCity.map((cityGroup) => (
-                                <div
-                                  key={cityGroup.cityName}
-                                  className="rounded-lg border border-primary/30 bg-white p-3">
-                                  <div className="mb-2 flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                      <IoLocationOutline className="h-4 w-4 text-primary" />
-                                      <span className="text-sm font-semibold text-slate-900">
-                                        {cityGroup.cityName}
-                                      </span>
-                                    </div>
-                                    <span className="text-xs font-medium text-slate-500">
-                                      {cityGroup.areas.length} {t('areas')}
-                                    </span>
-                                  </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    {cityGroup.areas.map((area) => {
-                                      const priority =
-                                        schedule[day.value].areaPriorities[area.id] || 1;
-                                      return (
-                                        <div
-                                          key={area.id}
-                                          className="flex items-center space-x-1.5 rounded-md border border-primary/30 bg-brandTint px-2.5 py-1">
-                                          <span className="text-xs font-medium text-primary">
-                                            {area?.name[lang]}
-                                          </span>
-                                          <span className="text-xs font-semibold text-primary">
-                                            (P{priority})
-                                          </span>
-                                        </div>
-                                      );
-                                    })}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* City Selection */}
-                        <div>
-                          <div className="mb-4 flex items-center space-x-2">
-                            <IoLocationOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-sm font-semibold text-slate-900">{t('city')}</h3>
-                          </div>
-                          {citiesOptions.length === 0 ? (
-                            <div className="flex items-center justify-center py-8">
-                              <div className="text-sm text-slate-500">{t('loading')}...</div>
-                            </div>
-                          ) : (
-                            <>
-                              {/* Search Bar */}
-                              <div className="mb-4">
-                                <div className="relative">
-                                  <IoSearchOutline className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                                  <input
-                                    type="text"
-                                    placeholder={t('searchCities')}
-                                    value={citySearchQuery}
-                                    onChange={(e) => setCitySearchQuery(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-1"
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Cities Grid */}
-                              {filteredCities.length === 0 ? (
-                                <div className="mb-6 flex items-center justify-center py-8">
-                                  <div className="text-sm text-slate-500">{t('noCitiesFound')}</div>
-                                </div>
-                              ) : (
-                                <div className="mb-6 grid max-h-96 grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
-                                  {filteredCities.map((city) => {
-                                    const isSelected = selectedCityId === city.value;
-                                    return (
-                                      <button
-                                        key={city.value}
-                                        type="button"
-                                        onClick={() => {
-                                          setSelectedCityId(city.value);
-                                          setAreaSearchQuery('');
-                                        }}
-                                        className={`flex w-full items-center space-x-2 rounded-lg border-2 p-3 text-left transition-all duration-200 ${
-                                          isSelected
-                                            ? 'border-primary bg-brandTint text-primary'
-                                            : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30 hover:bg-brandTint'
-                                        }`}>
-                                        <div
-                                          className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
-                                            isSelected
-                                              ? 'border-primary bg-primary'
-                                              : 'border-slate-300 bg-white'
-                                          }`}>
-                                          {isSelected && (
-                                            <svg
-                                              className="h-3 w-3 text-white"
-                                              fill="none"
-                                              strokeLinecap="round"
-                                              strokeLinejoin="round"
-                                              strokeWidth="2"
-                                              viewBox="0 0 24 24"
-                                              stroke="currentColor">
-                                              <path d="M5 13l4 4L19 7" />
-                                            </svg>
-                                          )}
-                                        </div>
-                                        <span className="text-sm font-medium">{city.label}</span>
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-
-                        {/* Areas Section */}
-                        <div>
-                          <div className="mb-4 flex items-center space-x-2">
-                            <IoLocationOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-sm font-semibold text-slate-900">
-                              {t('selectAreas')}
-                            </h3>
-                          </div>
-                          {!selectedCityId ? (
-                            <div className="flex items-center justify-center py-8">
-                              <div className="text-sm text-slate-500">
-                                {t('pleaseSelectCityFirst')}
-                              </div>
-                            </div>
-                          ) : isLoadingAreas ? (
-                            <div className="flex items-center justify-center py-8">
-                              <div className="text-sm text-slate-500">{t('loading')}...</div>
-                            </div>
-                          ) : areas.length === 0 ? (
-                            <div className="flex items-center justify-center py-8">
-                              <div className="text-sm text-slate-500">{t('noAreasAvailable')}</div>
-                            </div>
-                          ) : (
-                            <>
-                              {/* Search Bar and Select All */}
-                              <div className="mb-4 space-y-3">
-                                <div className="relative">
-                                  <IoSearchOutline className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
-                                  <input
-                                    type="text"
-                                    placeholder={t('searchAreas')}
-                                    value={areaSearchQuery}
-                                    onChange={(e) => setAreaSearchQuery(e.target.value)}
-                                    className="w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-700 placeholder-slate-400 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/40 focus:ring-offset-1"
-                                  />
-                                </div>
-                                {filteredAreas.length > 0 && (
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => handleSelectAllAreas(day.value)}
-                                    className="w-full border-primary/30 text-primary hover:bg-brandTint">
-                                    {filteredAreas.every((area) =>
-                                      schedule[day.value].areas.includes(area.id)
-                                    )
-                                      ? t('deselectAll')
-                                      : t('selectAll')}
-                                  </Button>
-                                )}
-                              </div>
-
-                              {/* Areas Grid */}
-                              {filteredAreas.length === 0 ? (
-                                <div className="flex items-center justify-center py-8">
-                                  <div className="text-sm text-slate-500">{t('noAreasFound')}</div>
-                                </div>
-                              ) : (
-                                <div className="grid max-h-96 grid-cols-1 sm:grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4">
-                                  {filteredAreas.map((area) => {
-                                    const isSelected = schedule[day.value].areas.includes(area.id);
-                                    const priority =
-                                      schedule[day.value].areaPriorities[area.id] || 1;
-                                    return (
-                                      <div key={area.id} className="space-y-2">
-                                        <button
-                                          type="button"
-                                          onClick={() => toggleArea(day.value, area.id)}
-                                          className={`flex w-full items-center space-x-2 rounded-lg border-2 p-3 text-left transition-all duration-200 ${
-                                            isSelected
-                                              ? 'border-primary bg-brandTint text-primary'
-                                              : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30 hover:bg-brandTint'
-                                          }`}>
-                                          <div
-                                            className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
-                                              isSelected
-                                                ? 'border-primary bg-primary'
-                                                : 'border-slate-300 bg-white'
-                                            }`}>
-                                            {isSelected && (
-                                              <svg
-                                                className="h-3 w-3 text-white"
-                                                fill="none"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth="2"
-                                                viewBox="0 0 24 24"
-                                                stroke="currentColor">
-                                                <path d="M5 13l4 4L19 7" />
-                                              </svg>
-                                            )}
-                                          </div>
-                                          <span className="text-sm font-medium">
-                                            {area?.name[lang]}
-                                          </span>
-                                        </button>
-                                        {isSelected && (
-                                          <div className="flex items-center space-x-2">
-                                            <label className="text-xs font-medium text-slate-600">
-                                              {t('priority')}:
-                                            </label>
-                                            <select
-                                              value={priority}
-                                              onChange={(e) =>
-                                                updateAreaPriority(
-                                                  day.value,
-                                                  area.id,
-                                                  parseInt(e.target.value, 10)
-                                                )
-                                              }
-                                              onClick={(e) => e.stopPropagation()}
-                                              className="h-8 rounded border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary/40">
-                                              <option value={1}>1</option>
-                                              <option value={2}>2</option>
-                                              <option value={3}>3</option>
-                                            </select>
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </>
-                          )}
-                        </div>
-
-                        {/* Time Slots Section */}
-                        <div>
-                          <div className="mb-4 flex items-center space-x-2">
-                            <IoTimeOutline className="h-5 w-5 text-primary" />
-                            <h3 className="text-sm font-semibold text-slate-900">
-                              {t('selectTimeSlots')}
-                            </h3>
-                          </div>
-                          <div className="max-h-96 space-y-2 overflow-y-auto rounded-lg border border-slate-200 bg-slate-50 p-4">
-                            <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10">
-                              {TIME_SLOTS.map((timeSlot) => {
-                                const isSelected = schedule[day.value].timeSlots.includes(timeSlot);
-                                return (
-                                  <button
-                                    key={timeSlot}
-                                    type="button"
-                                    onClick={() => toggleTimeSlot(day.value, timeSlot)}
-                                    className={`rounded-md border-2 px-2 py-1.5 text-xs font-medium transition-all duration-200 ${
-                                      isSelected
-                                        ? 'border-primary bg-primary text-white'
-                                        : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30 hover:bg-brandTint'
-                                    }`}>
-                                    {timeSlot}
-                                  </button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      </TabsContent>
+          <div className={cn('grid gap-5 xl:grid-cols-2', isDayOff && 'opacity-60')}>
+            {/* Step 1: areas */}
+            <SectionCard
+              title={`1 · ${t('chooseAreas')}`}
+              action={
+                <Select
+                  value={selectedCityId}
+                  onValueChange={(v) => {
+                    setSelectedCityId(v);
+                    setAreaSearchQuery('');
+                  }}>
+                  <SelectTrigger className="h-9 w-44" aria-label={t('city')}>
+                    <SelectValue placeholder={t('city')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {citiesOptions.map((c) => (
+                      <SelectItem key={c.value} value={c.value}>
+                        {c.label}
+                      </SelectItem>
                     ))}
-                  </Tabs>
+                  </SelectContent>
+                </Select>
+              }>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <label className="relative min-w-0 flex-1">
+                    <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      type="search"
+                      value={areaSearchQuery}
+                      onChange={(e) => setAreaSearchQuery(e.target.value)}
+                      placeholder={t('searchAreas')}
+                      aria-label={t('searchAreas')}
+                      className="h-9 ps-9"
+                    />
+                  </label>
+                  <Button
+                    variant="secondary"
+                    size="md"
+                    disabled={!filteredAreas.length}
+                    onClick={() =>
+                      setAreasSelected(
+                        activeDay,
+                        filteredAreas.map((a) => a.id),
+                        !allFilteredSelected
+                      )
+                    }>
+                    {allFilteredSelected ? t('deselectAll') : t('selectAll')}
+                  </Button>
+                </div>
+                <div className="h-80 overflow-y-auto rounded-md border border-border">
+                  {isLoadingAreas ? (
+                    <div className="space-y-2 p-3">
+                      {Array.from({ length: 6 }).map((_, i) => (
+                        <Skeleton key={i} className="h-8 w-full" />
+                      ))}
+                    </div>
+                  ) : !filteredAreas.length ? (
+                    <p className="p-6 text-center text-[13px] text-muted-foreground">
+                      {areas.length ? t('noAreasFound') : t('noAreasAvailable')}
+                    </p>
+                  ) : (
+                    <ul className="divide-y divide-border">
+                      {filteredAreas.map((area) => {
+                        const selected = day.areas.includes(area.id);
+                        return (
+                          <li key={area.id}>
+                            <button
+                              type="button"
+                              onClick={() => setAreasSelected(activeDay, [area.id], !selected)}
+                              aria-pressed={selected}
+                              className={cn(
+                                'flex w-full items-center gap-3 px-3 py-2.5 text-start text-sm hover:bg-muted',
+                                selected && 'bg-accent/60'
+                              )}>
+                              <span
+                                className={cn(
+                                  'flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border',
+                                  selected
+                                    ? 'border-primary bg-primary text-primary-foreground'
+                                    : 'border-input bg-card'
+                                )}>
+                                {selected && <IoCheckmark className="h-3 w-3" />}
+                              </span>
+                              <span className="truncate text-foreground">{nameOf(area.name)}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
                 </div>
               </div>
-            </div>{' '}
-            {/* Biker Information Card */}
-            <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
-                      <p className="text-sm text-slate-500">{t('basicInformation')}</p>
-                    </div>
+            </SectionCard>
+
+            {/* Step 2: priority */}
+            <SectionCard title={`2 · ${t('priority')}`}>
+              <p className="mb-3 text-[13px] text-muted-foreground">{t('priorityHint')}</p>
+              {day.areas.length === 0 ? (
+                <div className="flex h-72 items-center justify-center rounded-md border border-dashed border-border text-[13px] text-muted-foreground">
+                  {t('pickAreasFirst')}
+                </div>
+              ) : (
+                <ul className="max-h-80 divide-y divide-border overflow-y-auto rounded-md border border-border">
+                  {day.areas.map((id) => (
+                    <li key={id} className="flex items-center gap-3 px-3 py-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium text-foreground">
+                          {nameOf(day.areaNames[id]) || id}
+                        </p>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {cityName(day.areaCities[id])}
+                        </p>
+                      </div>
+                      <div
+                        role="radiogroup"
+                        aria-label={t('priority')}
+                        className="flex shrink-0 rounded-md bg-muted p-0.5">
+                        {[1, 2, 3, 4, 5].map((p) => {
+                          const on = (day.areaPriorities[id] || 1) === p;
+                          return (
+                            <button
+                              key={p}
+                              type="button"
+                              role="radio"
+                              aria-checked={on}
+                              onClick={() => setPriority(activeDay, id, p)}
+                              className={cn(
+                                'h-7 w-7 rounded text-xs font-semibold tabular-nums transition-colors',
+                                on
+                                  ? 'bg-primary text-primary-foreground shadow-sm'
+                                  : 'text-muted-foreground hover:text-foreground'
+                              )}>
+                              {p}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAreasSelected(activeDay, [id], false)}
+                        aria-label={t('remove')}
+                        title={t('remove')}
+                        className="rounded-full p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                        <IoClose className="h-4 w-4" />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </SectionCard>
+
+            {/* Step 3: hours */}
+            <SectionCard
+              className="xl:col-span-2"
+              title={`3 · ${t('workingHours')}`}
+              action={
+                day.timeSlots.length > 0 && (
+                  <Button
+                    variant="tertiary"
+                    size="sm"
+                    onClick={() => setSlots(activeDay, TIME_SLOTS, false)}>
+                    {t('clear')}
+                  </Button>
+                )
+              }>
+              <div className="space-y-5">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-[13px] text-muted-foreground">
+                    {t('hoursHint', { day: activeLabel })}
+                  </p>
+                  {dayRanges.length > 0 && (
+                    <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-primary">
+                      {t('hoursTotal', {
+                        hours: formatDuration(day.timeSlots.length * 15),
+                        count: dayRanges.length,
+                      })}
+                    </span>
+                  )}
+                </div>
+
+                {/* Day timeline: one block per shift on a 24h scale */}
+                <div>
+                  <div className="relative h-10 rounded-md bg-muted">
+                    {[3, 6, 9, 12, 15, 18, 21].map((h) => (
+                      <span
+                        key={h}
+                        className="absolute inset-y-0 w-px bg-border"
+                        style={{ insetInlineStart: `${(h / 24) * 100}%` }}
+                      />
+                    ))}
+                    {dayRanges.map((r) => {
+                      const start = toMinutes(r.from);
+                      const len = toMinutes(r.to) - start;
+                      return (
+                        <span
+                          key={`${r.from}-${r.to}`}
+                          title={`${r.from}–${r.to}`}
+                          className="absolute inset-y-1 flex items-center justify-center overflow-hidden rounded bg-primary px-1 text-[11px] font-medium tabular-nums text-primary-foreground"
+                          style={{
+                            insetInlineStart: `${(start / 1440) * 100}%`,
+                            width: `${(len / 1440) * 100}%`,
+                          }}>
+                          {len >= 180 && `${r.from}–${r.to}`}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <div className="relative mt-1 h-4 text-[11px] tabular-nums text-muted-foreground">
+                    {[0, 3, 6, 9, 12, 15, 18, 21, 24].map((h) => (
+                      <span
+                        key={h}
+                        className={cn(
+                          'absolute',
+                          h === 0
+                            ? ''
+                            : h === 24
+                            ? '-translate-x-full rtl:translate-x-full'
+                            : '-translate-x-1/2 rtl:translate-x-1/2'
+                        )}
+                        style={{ insetInlineStart: `${(h / 24) * 100}%` }}>
+                        {h.toString().padStart(2, '0')}
+                      </span>
+                    ))}
                   </div>
                 </div>
 
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="space-y-4">
-                    <div className="flex justify-center">
-                      <img
-                        className="h-24 w-24 rounded-full object-cover"
-                        src={bikerData?.imageLink || 'https://via.placeholder.com/150'}
-                        alt={t('bikerProfile')}
-                      />
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium text-slate-500">
-                        {t('name')}
-                      </h4>
-                      <p className="text-sm font-semibold text-slate-900">{bikerData?.userName}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium text-slate-500">
-                        {t('phone')}
-                      </h4>
-                      <p className="text-sm font-semibold text-slate-900">{bikerData?.phone}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-xs font-medium text-slate-500">
-                        {t('city')}
-                      </h4>
-                      <p className="text-sm font-semibold text-slate-900">
-                        {bikerData?.city?.name?.[lang] || '-'}
-                      </p>
-                    </div>
+                {/* Shifts */}
+                {dayRanges.length === 0 ? (
+                  <div className="rounded-md border border-dashed border-border px-4 py-6 text-center">
+                    <p className="text-sm font-medium text-foreground">{t('noHoursSelected')}</p>
+                    <p className="mt-1 text-[13px] text-muted-foreground">{t('noHoursHint')}</p>
+                  </div>
+                ) : (
+                  <ul className="divide-y divide-border rounded-md border border-border">
+                    {dayRanges.map((r, i) => (
+                      <li
+                        key={`${r.from}-${r.to}`}
+                        className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3 py-2.5">
+                        <span className="w-16 shrink-0 text-[13px] font-semibold text-foreground">
+                          {t('shift')} {i + 1}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <TimeSelect
+                            value={r.from}
+                            options={TIME_SLOTS}
+                            label={t('from')}
+                            onChange={(v) => replaceRange(i, v, r.to)}
+                          />
+                          <span className="text-[13px] text-muted-foreground">{t('to')}</span>
+                          <TimeSelect
+                            value={r.to}
+                            options={END_TIMES}
+                            label={t('to')}
+                            onChange={(v) => replaceRange(i, r.from, v)}
+                          />
+                        </div>
+                        <span className="text-[13px] tabular-nums text-muted-foreground">
+                          {formatDuration(toMinutes(r.to) - toMinutes(r.from))}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSlots(activeDay, slotsBetween(r.from, r.to), false)}
+                          aria-label={t('remove')}
+                          title={t('remove')}
+                          className="ms-auto rounded-full p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive">
+                          <IoTrashOutline className="h-4 w-4" />
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                <div className="space-y-2">
+                  <Button variant="secondary" size="sm" onClick={addNextRange}>
+                    + {t('addShift')}
+                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[13px] text-muted-foreground">{t('quickAdd')}</span>
+                    {PRESETS.map((p) => (
+                      <button
+                        key={p.key}
+                        type="button"
+                        onClick={() => setSlots(activeDay, slotsBetween(p.from, p.to), true)}
+                        className="rounded-full border border-input bg-card px-3 py-1 text-xs text-foreground hover:bg-accent">
+                        {t(p.key)}{' '}
+                        <span className="tabular-nums text-muted-foreground">
+                          {p.from}–{p.to}
+                        </span>
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </SectionCard>
           </div>
+        </>
+      )}
+
+      {/* Unsaved changes bar */}
+      {isDirty && (
+        <div className="fixed inset-x-0 bottom-4 z-40 mx-auto flex w-fit items-center gap-3 rounded-full border border-border bg-card px-4 py-2 shadow-lg">
+          <span className="text-[13px] text-foreground">{t('unsavedChanges')}</span>
+          <Button size="sm" onClick={handleSave} loading={isSaving} disabled={isSaving}>
+            {t('save')}
+          </Button>
         </div>
-      </div>
+      )}
 
       {/* Delete Schedule Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-sm font-semibold text-slate-900">
-              {t('deleteSchedule')}
-            </DialogTitle>
-            <DialogDescription className="text-sm text-slate-500">
-              {t('deleteScheduleConfirmation')}
-            </DialogDescription>
+            <DialogTitle>{t('deleteSchedule')}</DialogTitle>
+            <DialogDescription>{t('deleteScheduleConfirmation')}</DialogDescription>
           </DialogHeader>
-
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsDeleteDialogOpen(false)}
-              disabled={isDeleting}>
+            <Button variant="secondary" onClick={() => setIsDeleteDialogOpen(false)}>
               {t('cancel')}
             </Button>
-            <Button
-              type="button"
-              onClick={handleDeleteSchedule}
-              disabled={isDeleting}
-              variant="destructive"
-              className="bg-red-600 hover:bg-red-700">
-              {isDeleting ? t('deleting') : t('delete')}
+            <Button variant="danger" onClick={handleDeleteSchedule} loading={isDeleting}>
+              {t('delete')}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -1088,68 +915,51 @@ export default function BikersSchedule() {
 
       {/* Copy To Dialog */}
       <Dialog open={isCopyDialogOpen} onOpenChange={setIsCopyDialogOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-sm font-semibold text-slate-900">
-              {t('copyScheduleTo')}
+            <DialogTitle>
+              {t('copyScheduleTo')} · {activeLabel}
             </DialogTitle>
-            <DialogDescription className="text-sm text-slate-500">
-              {t('selectDaysToCopySchedule')}
-            </DialogDescription>
+            <DialogDescription>{t('selectDaysToCopySchedule')}</DialogDescription>
           </DialogHeader>
-
-          <div className="py-4">
-            <div className="space-y-2">
-              {getOtherDays(sourceDay).map((day) => {
-                const isSelected = copyToDays.includes(day.value);
-                return (
-                  <button
-                    key={day.value}
-                    type="button"
-                    onClick={() => toggleCopyToDay(day.value)}
-                    className={`flex w-full items-center space-x-3 rounded-lg border-2 p-3 text-left transition-all duration-200 ${
-                      isSelected
-                        ? 'border-primary bg-brandTint text-primary'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-primary/30 hover:bg-brandTint'
-                    }`}>
-                    <div
-                      className={`flex h-5 w-5 items-center justify-center rounded border-2 ${
-                        isSelected ? 'border-primary bg-primary' : 'border-slate-300 bg-white'
-                      }`}>
-                      {isSelected && (
-                        <svg
-                          className="h-3 w-3 text-white"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor">
-                          <path d="M5 13l4 4L19 7" />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="text-sm font-medium">{day.label[lang]}</span>
-                  </button>
-                );
-              })}
-            </div>
+          <div className="grid grid-cols-2 gap-2">
+            {DAYS_OF_WEEK.filter((d) => d.value !== activeDay).map((d) => {
+              const selected = copyToDays.includes(d.value);
+              return (
+                <button
+                  key={d.value}
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() =>
+                    setCopyToDays((prev) =>
+                      selected ? prev.filter((x) => x !== d.value) : [...prev, d.value]
+                    )
+                  }
+                  className={cn(
+                    'flex items-center gap-2 rounded-md border px-3 py-2 text-start text-sm',
+                    selected
+                      ? 'border-primary bg-accent text-primary'
+                      : 'border-border bg-card text-foreground hover:bg-muted'
+                  )}>
+                  <span
+                    className={cn(
+                      'flex h-4 w-4 shrink-0 items-center justify-center rounded border',
+                      selected
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-input'
+                    )}>
+                    {selected && <IoCheckmark className="h-3 w-3" />}
+                  </span>
+                  {d.label[lang]}
+                </button>
+              );
+            })}
           </div>
-
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setIsCopyDialogOpen(false);
-                setCopyToDays([]);
-              }}>
+            <Button variant="secondary" onClick={() => setIsCopyDialogOpen(false)}>
               {t('cancel')}
             </Button>
-            <Button
-              type="button"
-              onClick={handleCopyConfirm}
-              className="bg-primary hover:bg-primary">
+            <Button onClick={handleCopyConfirm} disabled={!copyToDays.length}>
               {t('copy')}
             </Button>
           </DialogFooter>

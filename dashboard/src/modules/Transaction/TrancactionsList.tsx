@@ -1,11 +1,9 @@
 import { useState } from 'react';
-import { ThreeDotsLoader } from '@UI/Index';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
-import TransactionsService from '@services/transactions.service'
+import TransactionsService from '@services/transactions.service';
 import TransactionsTable from './_Components/TransactionsTable';
-
 
 const TrancactionsList = () => {
   const [pageIndex, setPageIndex] = useState(1);
@@ -23,13 +21,13 @@ const TrancactionsList = () => {
 
   return (
     <div className="relative">
-      {transactionsListLoading && <ThreeDotsLoader />}
-
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('transactions')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          {t('transactions')}
+        </h1>
       </div>
       <div>
-        {transactionsListData && <TransactionsTable data={transactionsListData} />}
+        <TransactionsTable data={transactionsListData} isLoading={transactionsListLoading} />
       </div>
 
       {transactionsListData && (

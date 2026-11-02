@@ -3,7 +3,6 @@ import { IRootTransactionsList } from '@servicesTypes/order.types';
 import api from '..';
 
 class TransactionsService {
-
   public async getAllTransactions(params): Promise<IRootTransactionsList> {
     const { data } = await api.get(EAPI.TRANSACTIONS_LIST, { params });
     return data;

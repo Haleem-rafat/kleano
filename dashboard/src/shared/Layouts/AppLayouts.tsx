@@ -5,7 +5,7 @@ import { FiUser } from 'react-icons/fi';
 import { FaBiking } from 'react-icons/fa';
 import { RiCarWashingLine } from 'react-icons/ri';
 import { BsBoxSeam, BsCardHeading } from 'react-icons/bs';
-import { TbDiscount2, TbViewfinder } from 'react-icons/tb';
+import { TbDiscount2 } from 'react-icons/tb';
 import { MdCardGiftcard } from 'react-icons/md';
 import { PiLineSegments } from 'react-icons/pi';
 import { BiNotification } from 'react-icons/bi';
@@ -151,14 +151,20 @@ export default function AppLayouts({ children }) {
             <div className="flex items-center space-x-4">
               <button
                 type="button"
-                className="flex h-8 w-8 items-center justify-center rounded-md md:hidden bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 md:hidden"
+                className="flex h-8 w-8 items-center justify-center rounded-md bg-slate-100 text-slate-600 transition-colors hover:bg-slate-200 md:hidden md:hidden"
                 onClick={() => setIsOpen(true)}>
                 <GoSidebarCollapse size={20} />
               </button>
-              <nav className="hidden items-center gap-2 text-[13px] md:flex" aria-label="Breadcrumb">
+              <nav
+                className="hidden items-center gap-2 text-[13px] md:flex"
+                aria-label="Breadcrumb">
                 {crumbGroup && <span className="text-slate-400">{t(crumbGroup.title)}</span>}
                 {crumbGroup && <span className="text-slate-300">/</span>}
-                {crumbItem && <span className="font-medium capitalize text-slate-900">{t(crumbItem.label)}</span>}
+                {crumbItem && (
+                  <span className="font-medium capitalize text-slate-900">
+                    {t(crumbItem.label)}
+                  </span>
+                )}
               </nav>
             </div>
 
@@ -195,57 +201,58 @@ export default function AppLayouts({ children }) {
           </div>
         </div>
       </div>
-        {isOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-20 bg-black/50 md:hidden"
-              onClick={() => setIsOpen(false)}></div>
-            <aside
-              className={classNames(
-                'flex shrink-0 grow-0 flex-col bg-[#1A1220]',
-                'fixed z-20 h-screen w-60'
-              )}>
-              {/* Fixed Sidebar Header */}
-              <div className="flex-shrink-0 px-5 pb-2 pt-5">
-                <img className="h-9 w-auto" src={kleano_white_logo} alt="Kleano Logo" />
-              </div>
+      {isOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-20 bg-black/50 md:hidden"
+            onClick={() => setIsOpen(false)}></div>
+          <aside
+            className={classNames(
+              'flex shrink-0 grow-0 flex-col bg-sidebar',
+              'fixed z-20 h-screen w-60'
+            )}>
+            {/* Fixed Sidebar Header */}
+            <div className="flex-shrink-0 px-5 pb-2 pt-5">
+              <img className="h-9 w-auto" src={kleano_white_logo} alt="Kleano Logo" />
+            </div>
 
-              {/* Scrollable Navigation Items */}
-              <div className="flex-1 overflow-y-auto scrollbar-hide">
-                <div className="px-3 py-4">
-                  <div className="space-y-5">
-                    {navGroups.map((group) => (
-                      <div key={group.title} className="space-y-1">
-                        <p className="px-3 pb-1 text-[11px] font-medium text-white/40">{t(group.title)}</p>
-                        {navItems
-                          .filter((item) => group.labels.includes(item.label))
-                          .map((item) => (
-                            <NavLink
-                        to={item.link}
-                        key={item.label}
-                        onClick={() => handleOverlayClick()}
-                        className={({ isActive }): string =>
-                          classNames(
-                            'flex cursor-pointer items-center gap-3 rounded-md px-3 py-1.5 text-[13px] text-sm font-medium capitalize transition-all duration-200',
-                            { 'bg-white/10 text-white': isActive },
-                            {
-                              'text-white/60 hover:bg-white/5 hover:text-white':
-                                !isActive,
-                            }
-                          )
-                        }>
-                        <span className="flex-shrink-0">{item.icon}</span>
-                        <span className="truncate">{t(item.label)}</span>
-                      </NavLink>
-                          ))}
-                      </div>
-                    ))}
-                  </div>
+            {/* Scrollable Navigation Items */}
+            <div className="flex-1 overflow-y-auto scrollbar-hide">
+              <div className="px-3 py-4">
+                <div className="space-y-5">
+                  {navGroups.map((group) => (
+                    <div key={group.title} className="space-y-1">
+                      <p className="px-3 pb-1 text-[11px] font-medium text-white/40">
+                        {t(group.title)}
+                      </p>
+                      {navItems
+                        .filter((item) => group.labels.includes(item.label))
+                        .map((item) => (
+                          <NavLink
+                            to={item.link}
+                            key={item.label}
+                            onClick={() => handleOverlayClick()}
+                            className={({ isActive }): string =>
+                              classNames(
+                                'flex cursor-pointer items-center gap-3 rounded-md px-3 py-1.5 text-[13px] text-sm font-medium capitalize transition-all duration-200',
+                                { 'bg-white/10 text-white': isActive },
+                                {
+                                  'text-white/60 hover:bg-white/5 hover:text-white': !isActive,
+                                }
+                              )
+                            }>
+                            <span className="flex-shrink-0">{item.icon}</span>
+                            <span className="truncate">{t(item.label)}</span>
+                          </NavLink>
+                        ))}
+                    </div>
+                  ))}
                 </div>
               </div>
-            </aside>
-          </>
-        )}
+            </div>
+          </aside>
+        </>
+      )}
 
       <div className="min-h-screen bg-background ltr:md:ml-60 rtl:md:mr-60">
         <main className="pt-14">

@@ -1,243 +1,105 @@
-import addOnsService from '@services/addOns.service';
-import { Button, CitiesDialoge, ThreeDotsLoader } from '@UI/Index';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaEdit } from 'react-icons/fa';
-import {
-  IoArrowBackCircleOutline,
-  IoExtensionPuzzleOutline,
-  IoLocationOutline,
-  IoSettingsOutline,
-} from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
-import useSWR from 'swr';
+import useSWR, { mutate as globalMutate } from 'swr';
+import addOnsService from '@services/addOns.service';
 import { IAddOns } from '@servicesTypes/addOns';
+import { formatDate } from '@app/utils/helper';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
-import AddOnsCitiesActions from '../_components/AddOnsCitiesActions';
+  Button,
+  CityAvailability,
+  FormSheet,
+  InfoList,
+  PageHeader,
+  SectionCard,
+  PageSkeleton,
+} from '@UI/Index';
 import AddOnsForm from '../_components/AddOnsForm';
+
+type Localized = string | { en?: string; ar?: string };
 
 export default function AddOnsDetails() {
   const navigate = useNavigate();
   const { addOnsId } = useParams();
-
   const [openSheet, setOpenSheet] = useState(false);
-
   const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
+  const local = (v?: Localized) => (typeof v === 'object' ? v?.[lang] || v?.en : v) || '';
 
-  const { data, isLoading } = useSWR(
-    ['get-all-add-ons-details', addOnsId],
-    () => addOnsId && addOnsService.getAddOnsDetails(addOnsId).then((data) => data.data as IAddOns)
+  const { data, isLoading, mutate } = useSWR(
+    addOnsId ? ['get-all-add-ons-details', addOnsId] : null,
+    () => addOnsService.getAddOnsDetails(addOnsId!).then((res) => res.data as IAddOns)
   );
+
+  const body = (city: string) => ({ addOns: data!._id, city });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const item = data as any;
+
+  if (isLoading) return <PageSkeleton kind="details" />;
+
   return (
-    <div className="space-y-1">
-      {isLoading && <ThreeDotsLoader />}
+    <div className="space-y-5">
+      <PageHeader
+        onBack={() => navigate(-1)}
+        leading={
+          item?.icon?.iconLink && (
+            <img
+              src={item.icon.iconLink}
+              alt=""
+              className="h-10 w-10 shrink-0 rounded-full border border-border object-cover"
+            />
+          )
+        }
+        title={local(item?.name) || t('addOnsDetails')}
+        description={item && `${t('addOnsDetails')} · #${item._id.slice(-6)}`}
+        actions={
+          <Button onClick={() => setOpenSheet(true)} disabled={!data}>
+            {t('editAddOns')}
+          </Button>
+        }
+      />
 
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition-colors duration-200 hover:bg-slate-200">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div>
-                <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('addOnsDetails')}</h1>
-                <p className="mt-1 text-sm text-slate-500">
-                  {t('addOnsID')}: #{data?._id?.slice(-4)}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              <Button onClick={() => setOpenSheet(true)}>{t('editAddOns')}</Button>
-            </div>
-          </div>
+      <div className="grid gap-5 xl:grid-cols-3">
+        <div className="xl:col-span-2">
+          <SectionCard title={t('addOnsInfo')}>
+            <InfoList
+              items={[
+                { label: t('addOnsName'), value: local(item?.name) },
+                { label: t('addOnsPrice'), value: item && `${item.price} ${t('SAR')}` },
+                {
+                  label: t('stock'),
+                  value: item && (
+                    <span className={item.stock > 0 ? 'text-foreground' : 'text-destructive'}>
+                      {item.stock}
+                    </span>
+                  ),
+                },
+                { label: t('createddate'), value: item?.createdAt && formatDate(item.createdAt) },
+              ]}
+            />
+          </SectionCard>
+        </div>
+
+        <div className="xl:col-span-1">
+          {item && (
+            <CityAvailability
+              cities={item.cities}
+              description={t('cityAvailabilityHint')}
+              add={(city) => addOnsService.addCityPlan(body(city))}
+              activate={(city) => addOnsService.activeCityPlan(body(city))}
+              archive={(city) => addOnsService.archiveCityPlan(body(city))}
+              onChanged={() => {
+                mutate();
+                globalMutate((key) => Array.isArray(key) && key.includes('get-all-add-ons-list'));
+              }}
+            />
+          )}
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="pt-1">
-        <div className="w-full">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* AddOn Information Card */}
-            <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoExtensionPuzzleOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('addOnsInfo')}</h2>
-                      <p className="text-sm text-slate-500">Add-on details and pricing</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('addOnsIcon')}
-                      </h4>
-                      <div className="flex justify-center">
-                        <img
-                          src={data?.icon?.iconLink}
-                          alt="Add-on icon"
-                          className="h-16 w-16 rounded-full object-cover"
-                        />
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('addOnsName')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.name?.[lang] || data?.name}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('addOnsPrice')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.price} R.S</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('stock')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.stock}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                        <IoLocationOutline className="h-4 w-4 text-primary" />
-                      </div>
-                      <div>
-                        <h2 className="text-sm font-semibold text-slate-900">{t('addOnsCities')}</h2>
-                        <p className="text-sm text-slate-500">Available add-on locations</p>
-                      </div>
-                    </div>
-                    <CitiesDialoge
-                      buttonElement={
-                        <Button
-                          onClick={(e) => e.stopPropagation()}
-                          variant="secondary"
-                          size="sm"
-                          className="flex gap-x-2 rounded-xl border-2 border-white bg-white p-3 text-orange-600 hover:bg-orange-50">
-                          <p className="mt-0.5">{t('edit')}</p>
-                          <FaEdit size={16} />
-                        </Button>
-                      }
-                      title={t('servicesCitiesActions')}>
-                      <AddOnsCitiesActions servicesId={data?._id} cityData={data?.cities} />
-                    </CitiesDialoge>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="flex flex-wrap gap-3">
-                    {data?.cities?.map((city) => (
-                      <div
-                        key={city}
-                        className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-colors duration-200 ${
-                          city?.isArchived
-                            ? 'border-gray-300 bg-gray-200 text-gray-500'
-                            : 'border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100'
-                        }`}>
-                        {city?.city?.name[lang]}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Actions Card */}
-            <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoSettingsOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">Add-on Actions</h2>
-                      <p className="text-sm text-slate-500">Manage add-on settings</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="space-y-4 p-6">
-                  {/* Edit Add-on */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('editAddOns')}</h4>
-                      <p className="text-xs text-slate-500">Update add-on information</p>
-                    </div>
-                    <Button size="sm" onClick={() => setOpenSheet(true)}>
-                      {t('edit')}
-                    </Button>
-                  </div>
-
-                  {/* Manage Cities */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('Manage Cities')}</h4>
-                      <p className="text-xs text-slate-500">Add or remove add-on cities</p>
-                    </div>
-                    <CitiesDialoge
-                      buttonElement={
-                        <Button
-                          onClick={(e) => e.stopPropagation()}
-                          variant="secondary"
-                          size="sm"
-                          className="flex gap-x-2">
-                          <FaEdit size={14} />
-                          {t('edit')}
-                        </Button>
-                      }
-                      title={t('servicesCitiesActions')}>
-                      <AddOnsCitiesActions servicesId={data?._id} cityData={data?.cities} />
-                    </CitiesDialoge>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('editAddOns')}</SheetTitle>
-            <SheetDescription>
-              <AddOnsForm setOpenSheet={setOpenSheet} oldData={data} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet open={openSheet} onOpenChange={() => setOpenSheet(false)} title={t('editAddOns')}>
+        <AddOnsForm setOpenSheet={setOpenSheet} oldData={data} />
+      </FormSheet>
     </div>
   );
 }

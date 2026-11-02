@@ -335,10 +335,10 @@ const Booking = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
               {t('bookingSchedule') || 'Booking Schedule'}
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-muted-foreground">
               {t('viewBikerSchedule') || 'View biker schedules by day, city, and area'}
             </p>
           </div>
@@ -371,9 +371,9 @@ const Booking = () => {
         </div>
 
         {/* Filters */}
-        <div className="mb-6 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+        <div className="mb-6 rounded-lg border border-border bg-card p-4 shadow-sm">
           <Form {...form}>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3 [&>*]:min-w-0">
               {/* Day Select */}
               <MainSelect
                 title={t('day') || 'Day'}
@@ -428,11 +428,11 @@ const Booking = () => {
               {/* Area Select */}
               <div className="relative">
                 <div className="flex items-center gap-2">
-                  <label className="text-text-600 text-sm font-semibold">
+                  <label className="text-sm font-medium text-foreground">
                     {t('area') || 'Area'}
                   </label>
                   {loadingAreasOptions && (
-                    <Loader2 className="h-4 w-4 animate-spin text-slate-500" />
+                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                   )}
                 </div>
                 <div className="[&_label]:hidden">
@@ -472,17 +472,17 @@ const Booking = () => {
 
         {/* Timeline View */}
         {isLoading ? (
-          <div className="flex items-center justify-center rounded-lg border border-slate-200 bg-white p-12">
-            <div className="text-slate-600">{t('loading') || 'Loading...'}</div>
+          <div className="flex items-center justify-center rounded-lg border border-border bg-card p-12">
+            <div className="text-muted-foreground">{t('loading') || 'Loading...'}</div>
           </div>
         ) : !selectedDay || !selectedCity || !selectedArea ? (
-          <div className="flex items-center justify-center rounded-lg border border-slate-200 bg-white p-12">
-            <div className="text-slate-500">
+          <div className="flex items-center justify-center rounded-lg border border-border bg-card p-12">
+            <div className="text-muted-foreground">
               {t('selectFilters') || 'Please select day, city, and area to view schedule'}
             </div>
           </div>
         ) : (
-          <div className="rounded-lg border border-slate-200 bg-white shadow-sm">
+          <div className="rounded-lg border border-border bg-card shadow-sm">
             <div className="flex h-[calc(100vh-300px)] overflow-y-auto">
               {/* Timeline Content Area */}
               <div className="no-scrollbar flex-1">
@@ -498,7 +498,7 @@ const Booking = () => {
                         ref={(el) => {
                           if (el) hourRowRefs.current[slot.hour24] = el;
                         }}
-                        className="relative border-b border-slate-100"
+                        className="relative border-b border-border"
                         style={{ minHeight: '100px' }}>
                         {/* Time Slot Content */}
                         <div className="flex min-h-full">
@@ -516,15 +516,15 @@ const Booking = () => {
                                         );
                                       }}
                                       key={`${biker._id}-${timeSlot}-${index}`}
-                                      className="group relative flex-shrink-0 cursor-pointer rounded-lg border-l-4 border-green-500 bg-green-50 p-2 shadow-sm transition-shadow hover:shadow-md"
+                                      className="group relative flex-shrink-0 cursor-pointer rounded-lg border-l-4 border-success bg-success/10 p-2 shadow-sm transition-shadow hover:shadow-md"
                                       style={{ minWidth: '300px', maxWidth: '380px' }}>
                                       <div className="flex flex-col">
                                         <div className="flex items-start justify-between gap-2">
                                           <div className="min-w-0 flex-1">
-                                            <h3 className="truncate text-sm font-medium text-slate-900">
+                                            <h3 className="truncate text-sm font-medium text-foreground">
                                               {biker.userName}
                                             </h3>
-                                            <p className="mt-0.5 text-xs text-slate-500">
+                                            <p className="mt-0.5 text-xs text-muted-foreground">
                                               {/* convert timeSlot to 12 hour format */}
                                               {t('time') || 'Time'}:{' '}
                                               {convertTimeSlotTo12HourFormat(timeSlot)}
@@ -548,16 +548,18 @@ const Booking = () => {
               </div>
 
               {/* Timeline Labels (Right Side) - Scrolls with content */}
-              <div className="order-first w-24 flex-shrink-0 border-e border-slate-200 bg-slate-50">
+              <div className="order-first w-24 flex-shrink-0 border-e border-border bg-muted">
                 {HOURLY_SLOTS.map((slot) => {
                   const rowHeight = hourHeights[slot.hour24] || 100;
 
                   return (
                     <div
                       key={slot.value}
-                      className="flex items-start border-b border-slate-100 px-3 py-2"
+                      className="flex items-start border-b border-border px-3 py-2"
                       style={{ minHeight: '100px', height: `${rowHeight}px` }}>
-                      <span className="text-xs font-medium tabular-nums text-slate-500">{slot.label}</span>
+                      <span className="text-xs font-medium tabular-nums text-muted-foreground">
+                        {slot.label}
+                      </span>
                     </div>
                   );
                 })}

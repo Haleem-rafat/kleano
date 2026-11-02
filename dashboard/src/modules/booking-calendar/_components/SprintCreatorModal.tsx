@@ -107,9 +107,9 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
 
       {/* Sprint Info */}
       {dateRange?.from && dateRange?.to && (
-        <div className="rounded-lg border bg-gray-50 p-3">
-          <h4 className="text-sm font-medium text-gray-700">{t('Sprint Details')}</h4>
-          <div className="mt-2 space-y-1 text-sm text-gray-600">
+        <div className="rounded-lg border bg-muted p-3">
+          <h4 className="text-sm font-medium text-foreground">{t('Sprint Details')}</h4>
+          <div className="mt-2 space-y-1 text-sm text-muted-foreground">
             <p>
               <strong>Duration:</strong>{' '}
               {Math.ceil(
@@ -126,7 +126,9 @@ const SprintCreatorModal: React.FC<SprintCreatorModalProps> = ({ onClose, onSucc
           </div>
           {Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24)) +
             1 !==
-            14 && <p className="mt-2 text-sm text-red-600">⚠️ Sprint must be exactly 14 days</p>}
+            14 && (
+            <p className="mt-2 text-sm text-destructive">⚠️ Sprint must be exactly 14 days</p>
+          )}
         </div>
       )}
 

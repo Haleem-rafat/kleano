@@ -8,7 +8,7 @@ export interface IwshaingServicesList {
   pointsToPay: number;
   icon: Icon;
   createdAt: string;
-  type: 'main' | 'extra'
+  type: 'main' | 'extra';
   updatedAt: string;
   __v: number;
   cities: City[];

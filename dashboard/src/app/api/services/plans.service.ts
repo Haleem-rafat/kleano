@@ -1,3 +1,5 @@
+import * as Yup from 'yup';
+import { v } from '@app/utils/validation';
 import { EAPI } from '@constants/endpoints';
 import i18n from '@app/locales/i18n';
 
@@ -46,7 +48,8 @@ class plansService {
       title: i18n.t('planType'),
       placeholder: i18n.t('planType'),
       type: EFormFieldType.TEXT,
-    }, {
+    },
+    {
       name: 'description',
       title: i18n.t('description'),
       placeholder: i18n.t('description'),
@@ -57,7 +60,7 @@ class plansService {
       title: i18n.t('color'),
       placeholder: i18n.t('color'),
       type: EFormFieldType.COLOR_PICKER,
-    }, 
+    },
     {
       name: 'icon',
       title: i18n.t('icon'),
@@ -107,5 +110,16 @@ class plansService {
       type: EFormFieldType.MULTI_SELECT,
     },
   ];
+
+  public plansSchema = Yup.object({
+    type: v.bilingual(),
+    color: v.text(20),
+    icon: v.picked(),
+    price: v.price(),
+    duration: v.positive(),
+    usageCount: v.count(),
+    washingServices: v.options(),
+    cities: v.options(),
+  });
 }
 export default Object.freeze(new plansService());

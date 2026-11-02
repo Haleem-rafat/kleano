@@ -1,7 +1,7 @@
 import { EFormFieldType } from '@constants/enums';
 import promoCodeService from '@services/promoCode.service';
 import { Form, FormControl, FormField, FormItem } from '@shadecn/components/ui/form';
-import { Button, MainInput, MainSelect, ThreeDotsLoader } from '@UI/Index';
+import { Button, MainInput, MainSelect, SheetActions, FormSkeleton } from '@UI/Index';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -146,10 +146,12 @@ export default function PromoCodeModelForm({ setOpenSheet }: IPromoCodeModelForm
   }, [durationName, durationNumber, selectedPromoType, form]);
 
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingSegmentsOptions && <ThreeDotsLoader />}
+    <div>
+      {loadingSegmentsOptions && <FormSkeleton />}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handelOnSubmit)} className="flex flex-col gap-4 py-5">
+        <form
+          onSubmit={form.handleSubmit(handelOnSubmit)}
+          className={`flex flex-col gap-4 ${loadingSegmentsOptions ? 'hidden' : ''}`}>
           {getFormFields().map((formField) => {
             // Conditionally render discount fields
             if (
@@ -250,11 +252,11 @@ export default function PromoCodeModelForm({ setOpenSheet }: IPromoCodeModelForm
               )}
             />
           )}
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button type="submit" size="md" className="mt-3 w-full" loading={isloading}>
               {t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

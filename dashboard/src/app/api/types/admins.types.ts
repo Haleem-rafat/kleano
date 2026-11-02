@@ -30,7 +30,7 @@ export interface IAdminParams {
   status?: 'SUSPENDED' | 'ACTIVE' | undefined;
   page: number;
   perPage: number;
-  search: string
+  search: string;
 }
 
 export interface Name {

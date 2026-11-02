@@ -1,28 +1,23 @@
 import { formatDate } from '@app/utils/helper';
 import { ROUTES } from '@constants/routes';
 import plansService from '@services/plans.service';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
+import { Button, DataTable, EmtyState, FormSheet } from '@UI/Index';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
 import { generatePath, useNavigate } from 'react-router-dom';
 import useSWR from 'swr';
 import PlansModelForm from './_Components/PlansModelForm';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/shadecn/components/ui/table';
+interface IPlan {
+  _id: string;
+  type: { en: string; ar: string } | string;
+  color: string;
+  duration: number;
+  price: number;
+  usageCount: number;
+  createdAt: string;
+}
 
 export default function Plans() {
   const navigate = useNavigate();
@@ -35,67 +30,62 @@ export default function Plans() {
     plansService.getAllPlansList().then((data) => data)
   );
 
+  const columns: ColumnDef<IPlan>[] = [
+    {
+      id: 'type',
+      header: t('planType'),
+      accessorFn: (plan) => plan.type?.[lang] || plan.type,
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <span className="h-8 w-8 rounded-full" style={{ backgroundColor: row.original.color }} />
+          <span className="font-medium">{row.original.type?.[lang] || row.original.type}</span>
+        </div>
+      ),
+    },
+    {
+      id: 'duration',
+      header: t('durationByMonth'),
+      accessorKey: 'duration',
+      cell: ({ row }) => `${row.original.duration} ${t('month')}`,
+    },
+    {
+      id: 'price',
+      header: t('servesPrice'),
+      accessorKey: 'price',
+      cell: ({ row }) => `${row.original.price} ${t('SAR')}`,
+    },
+    { id: 'usageCount', header: t('usageCount'), accessorKey: 'usageCount' },
+    {
+      id: 'createdAt',
+      header: t('createddate'),
+      accessorKey: 'createdAt',
+      cell: ({ row }) => formatDate(row.original.createdAt),
+    },
+  ];
+
   return (
     <div className="relative">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('plans')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('plans')}</h1>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('AddNewPlan')}</Button>
         </div>
       </div>
       <div>
-        {isLoading && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[
-                t('planType'),
-                t('durationByMonth'),
-                t('servesPrice'),
-                t('usageCount'),
-                t('createddate'),
-              ].map((head, index) => (
-                <TableHead key={index}>{head}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.data?.map((plan) => (
-              <TableRow
-                key={plan._id}
-                className="cursor-pointer hover:bg-primary/10"
-                onClick={() => navigate(generatePath(ROUTES.PLANS_DETAILS, { plansId: plan._id }))}>
-                <TableCell className="font-medium">
-                  <div className="flex items-center justify-start gap-2">
-                    <div
-                      className="h-10 w-10 rounded-full"
-                      style={{
-                        backgroundColor: `${plan.color}`,
-                      }}></div>
-                    <p>{plan.type?.[lang] || plan.type}</p>
-                  </div>
-                </TableCell>
-                <TableCell>{plan.duration} {t('month')}</TableCell>
-                <TableCell>{plan.price} {t('SAR')}</TableCell>
-                <TableCell>{plan.usageCount}</TableCell>
-                <TableCell>{formatDate(plan.createdAt)}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {data?.data?.length === 0 && <EmtyState />}
+        <DataTable
+          columns={columns}
+          data={data?.data ?? []}
+          isLoading={isLoading}
+          onRowClick={(plan) => navigate(generatePath(ROUTES.PLANS_DETAILS, { plansId: plan._id }))}
+          searchable
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('AddNewPlan')}</SheetTitle>
-            <SheetDescription>
-              <PlansModelForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet open={openSheet} onOpenChange={() => setOpenSheet(false)} title={t('AddNewPlan')}>
+        <PlansModelForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { EAPI } from '@constants/endpoints';
 import { IAssignedOrdersList } from '@servicesTypes/assignOrder.types';
 
-import { IIcons } from '@servicesTypes/static.types';
 import api from '..';
 
 class IconsService {

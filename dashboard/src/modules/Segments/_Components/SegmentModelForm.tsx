@@ -9,7 +9,7 @@ import segmentsService from '@services/segments.service';
 import { ISegment } from '@servicesTypes/segments.types';
 
 import { Form, FormField } from '@shadecn/components/ui/form';
-import { Button, MainInput, MainSelect, ThreeDotsLoader } from '@UI/Index';
+import { Button, MainInput, MainSelect, SheetActions, FormSkeleton } from '@UI/Index';
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import useGetUsersOptions from '@/hooks/useGetUsersOptions';
@@ -61,10 +61,12 @@ const SegmentModelForm = ({ setOpenSheet, segmentData }: ISegmentModelFormProps)
       });
   };
   return (
-    <div className="h-screen overflow-y-scroll pb-36 scrollbar-hide">
-      {loadingUsersOptions && <ThreeDotsLoader />}
+    <div>
+      {loadingUsersOptions && <FormSkeleton />}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleOnSubmitSegment)} className="flex flex-col gap-4">
+        <form
+          onSubmit={form.handleSubmit(handleOnSubmitSegment)}
+          className={`flex flex-col gap-4 ${loadingUsersOptions ? 'hidden' : ''}`}>
           <FormField
             control={form.control}
             name={'segmentName'}
@@ -91,11 +93,11 @@ const SegmentModelForm = ({ setOpenSheet, segmentData }: ISegmentModelFormProps)
             )}
           />
 
-          <div className="absolute bottom-0 left-0 w-full border-t-2 bg-white p-4">
+          <SheetActions>
             <Button loading={loading} className="w-full" type="submit">
               {segmentData ? t('applyEdit') : t('add')}
             </Button>
-          </div>
+          </SheetActions>
         </form>
       </Form>
     </div>

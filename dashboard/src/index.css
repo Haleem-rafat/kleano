@@ -15,12 +15,12 @@
 .fc-toolbar-title {
   font-size: 1.5rem !important;
   font-weight: 600 !important;
-  color: #1f2937 !important;
+  color: hsl(var(--foreground)) !important;
 }
 
 .fc-button-primary {
-  background-color: #533063 !important;
-  border-color: #533063 !important;
+  background-color: hsl(var(--primary)) !important;
+  border-color: hsl(var(--primary)) !important;
   color: white !important;
   border-radius: 0.375rem !important;
   font-weight: 500 !important;
@@ -28,13 +28,13 @@
 }
 
 .fc-button-primary:hover {
-  background-color: #3f2350 !important;
-  border-color: #3f2350 !important;
+  background-color: hsl(var(--primary) / 0.9) !important;
+  border-color: hsl(var(--primary) / 0.9) !important;
 }
 
 .fc-button-primary:disabled {
-  background-color: #9ca3af !important;
-  border-color: #9ca3af !important;
+  background-color: hsl(var(--muted-foreground)) !important;
+  border-color: hsl(var(--muted-foreground)) !important;
 }
 
 .fc-event {
@@ -165,8 +165,61 @@ html {
 }
 /* /////////////////////////////////////////////// */
 
-/* Design System */
+/* Design System — Kleano tokens (same values as the apps' lib/core/design/tokens.dart).
+   shadcn components read these; never hard-code colours in pages. */
 @layer base {
+  :root {
+    --background: 240 24% 96%; /* #F2F2F7 */
+    --foreground: 240 3% 11%; /* #1C1C1E */
+    --card: 0 0% 100%;
+    --card-foreground: 240 3% 11%;
+    --sidebar: 274 28% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 3% 11%;
+    --primary: 281 35% 29%; /* brand #543063 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 281 30% 50%; /* brandLight #8E5BA6 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 12% 94%;
+    --muted-foreground: 240 2% 44%; /* #6E6E73 */
+    --accent: 282 20% 92%; /* brandTint #ECE6EF */
+    --accent-foreground: 281 35% 29%;
+    --destructive: 354 100% 42%; /* #D70015, readable on white */
+    --destructive-foreground: 0 0% 100%;
+    --success: 137 63% 33%; /* #1F8A3D */
+    --warning: 29 100% 38%; /* #C25E00 */
+    --border: 240 10% 90%;
+    --input: 240 10% 86%;
+    --ring: 281 35% 29%;
+    --radius: 0.875rem; /* 14px, the apps' field radius */
+  }
+  .dark {
+    --background: 0 0% 0%;
+    --foreground: 0 0% 100%;
+    --card: 240 3% 11%; /* #1C1C1E */
+    --card-foreground: 0 0% 100%;
+    --sidebar: 274 20% 7%;
+    --popover: 240 3% 11%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 279 39% 68%; /* #B88CD0 */
+    --primary-foreground: 240 3% 11%; /* dark text: white fails contrast */
+    --secondary: 281 30% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 3% 18%;
+    --muted-foreground: 240 3% 61%; /* #98989F */
+    --accent: 281 20% 22%;
+    --accent-foreground: 279 39% 80%;
+    --destructive: 3 100% 61%; /* #FF453A */
+    --destructive-foreground: 0 0% 100%;
+    --success: 135 64% 50%;
+    --warning: 35 100% 52%;
+    --border: 240 3% 22%;
+    --input: 240 3% 26%;
+    --ring: 279 39% 68%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
   h1 {
     font-size: 48px;
   }
@@ -204,7 +257,7 @@ html {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #533063;
+  background: hsl(var(--primary));
   border-radius: 20px;
 }
 
@@ -334,8 +387,8 @@ table tbody tr:hover {
   box-shadow: none !important;
 }
 [role='tab'][data-state='active'] {
-  color: #533063;
-  border-bottom-color: #533063;
+  color: hsl(var(--primary));
+  border-bottom-color: hsl(var(--primary));
 }
 ::-webkit-scrollbar-thumb {
   background: #d4d4d8;
@@ -357,4 +410,66 @@ main {
     flex-wrap: wrap;
     gap: 8px;
   }
+}
+
+/* Phone field (react-international-phone) matches the shared `field` style */
+.react-international-phone-input-container {
+  @apply flex w-full overflow-hidden rounded-md border border-input bg-card transition-[border-color,box-shadow];
+  height: 2.5rem !important;
+}
+.react-international-phone-input-container:focus-within {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.15);
+}
+.react-international-phone-input-container .react-international-phone-country-selector-button {
+  @apply border-0 border-e border-input bg-muted px-2;
+  height: 100% !important;
+  border-radius: 0 !important;
+}
+.react-international-phone-input-container .react-international-phone-input {
+  @apply flex-1 bg-transparent px-3 text-sm text-foreground outline-none;
+  height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+.react-international-phone-country-selector-dropdown {
+  @apply z-[1000] rounded-lg border border-border bg-popover text-popover-foreground shadow-lg;
+}
+
+/* Rich text (TipTap editor and read views) */
+.rich-text {
+  @apply text-sm leading-7 text-foreground;
+  overflow-wrap: anywhere;
+}
+.rich-text > * + * {
+  @apply mt-3;
+}
+.rich-text h2 {
+  @apply mt-6 text-lg font-semibold leading-snug;
+}
+.rich-text h3 {
+  @apply mt-5 text-base font-semibold leading-snug;
+}
+.rich-text ul {
+  @apply list-disc ps-6;
+}
+.rich-text ol {
+  @apply list-decimal ps-6;
+}
+.rich-text li + li {
+  @apply mt-1;
+}
+.rich-text li > p {
+  @apply m-0;
+}
+.rich-text a {
+  @apply text-primary underline underline-offset-2;
+}
+.rich-text blockquote {
+  @apply border-s-2 border-border ps-4 text-muted-foreground;
+}
+.rich-text p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: inline-start;
+  @apply pointer-events-none h-0 text-muted-foreground;
 }

@@ -6,6 +6,12 @@ import { toast } from 'react-toastify';
 import bookingService from '@services/booking.service';
 
 // Shadcn UI
+import { EnhancedSprint } from '../_types/calendar.types';
+import {
+  generateTimeSlots,
+  extractHoursFromTimeSlots,
+  createTimeSlotPayload,
+} from '../_utils/dateHelpers';
 import {
   Dialog,
   DialogContent,
@@ -17,12 +23,6 @@ import { Switch } from '@/shadecn/components/ui/switch';
 import { Label } from '@/shadecn/components/ui/label';
 
 // Types and Utils
-import { EnhancedSprint } from '../_types/calendar.types';
-import {
-  generateTimeSlots,
-  extractHoursFromTimeSlots,
-  createTimeSlotPayload,
-} from '../_utils/dateHelpers';
 
 interface TimeSlotEditorModalProps {
   open: boolean;
@@ -129,7 +129,9 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
           <div className="flex items-center justify-between rounded-lg border p-4">
             <div>
               <h3 className="font-medium">{t('Sprint Status')}</h3>
-              <p className="text-sm text-gray-600">{t('Enable or disable the entire sprint')}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('Enable or disable the entire sprint')}
+              </p>
             </div>
             <div className="flex items-center space-x-2">
               <Switch
@@ -145,7 +147,9 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-medium">{t('Available Time Slots')}</h3>
-              <div className="text-sm text-gray-600">Selected: {selectedHours.length} slots</div>
+              <div className="text-sm text-muted-foreground">
+                Selected: {selectedHours.length} slots
+              </div>
             </div>
 
             {/* Time Slot Grid */}
@@ -164,7 +168,7 @@ const TimeSlotEditorModal: React.FC<TimeSlotEditorModalProps> = ({
                         ${
                           isSelected
                             ? 'bg-primary text-white hover:bg-primary'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-muted text-foreground hover:bg-muted'
                         }
                         ${loading ? 'cursor-not-allowed opacity-50' : ''}
                       `}>

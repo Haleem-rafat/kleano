@@ -1,26 +1,11 @@
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@shadecn/components/ui/table';
 import Alert from '@UI/Alert/Alert';
-import { Button, EmtyState, ThreeDotsLoader } from '@UI/Index';
-import { t } from 'i18next';
-import { useState } from 'react';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
+import { Button, DataTable, EmtyState, FormSheet } from '@UI/Index';
+import React, { useState } from 'react';
 import iconsService from '@services/icons.service';
 import { toast } from 'react-toastify';
 import { mutate } from 'swr';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
 import IconsForm from './_components/IconsForm';
 import useGetIconsOptions from '@/hooks/useGetIconsOptions';
 
@@ -52,57 +37,54 @@ export default function Icons() {
       });
   };
 
+  const columns: ColumnDef<{ value: string; label: React.ReactNode }>[] = [
+    {
+      id: 'label',
+      header: t('Title'),
+      enableSorting: false,
+      cell: ({ row }) => row.original.label,
+    },
+    {
+      id: 'delete',
+      header: t('delete'),
+      enableSorting: false,
+      enableGlobalFilter: false,
+      cell: ({ row }) => (
+        <Alert
+          id=""
+          description={t('deleteIconConfirm')}
+          handler={() => handelDelete(row.original?.value)}
+          buttonComponent={
+            <Button variant="danger" size="sm" loading={isloading}>
+              {t('Deleteimg')}
+            </Button>
+          }
+        />
+      ),
+    },
+  ];
+
   return (
     <div className="relative">
       <div className="flex flex-wrap items-center justify-between gap-3 pb-6">
-        <p className="text-xl font-semibold capitalize tracking-tight text-slate-900">{t('Icons')}</p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">{t('Icons')}</h1>
         <div>
           <Button onClick={() => setOpenSheet(true)}>{t('AddNewIcons')}</Button>
         </div>
       </div>
       <div>
-        {loadingiconsOptions && <ThreeDotsLoader />}
-        <Table className="scrollbar-hide">
-          <TableHeader>
-            <TableRow>
-              {[t('Title'), t('delete')].map((head, index) => (
-                <TableHead key={index}>{head}</TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {iconsOptions.map((e) => (
-              <TableRow key={e.value} className="cursor-pointer hover:bg-primary/10">
-                <TableCell className="font-medium">{e.label}</TableCell>
-                <TableCell className="font-medium">
-                  <Alert
-                    id=""
-                    description={t('deleteIconConfirm')}
-                    handler={() => handelDelete(e?.value)}
-                    buttonComponent={
-                      <Button variant="danger" size="sm" loading={isloading}>
-                        {t('Deleteimg')}
-                      </Button>
-                    }
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        {iconsOptions?.length === 0 && <EmtyState />}
+        <DataTable
+          columns={columns}
+          data={iconsOptions ?? []}
+          isLoading={loadingiconsOptions}
+          showColumnToggle={false}
+          emptyStateComponent={<EmtyState />}
+        />
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('AddNewIcons')}</SheetTitle>
-            <SheetDescription>
-              <IconsForm setOpenSheet={setOpenSheet} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet open={openSheet} onOpenChange={() => setOpenSheet(false)} title={t('AddNewIcons')}>
+        <IconsForm setOpenSheet={setOpenSheet} />
+      </FormSheet>
     </div>
   );
 }

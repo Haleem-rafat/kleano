@@ -5,12 +5,13 @@ import authService from '@services/auth.service';
 import App from '@/App';
 import ErrorBoundary from '@/shared/Layouts/ErrorBoundary';
 import Login from '@/modules/Auth/Login';
-import ErrorComponent from '@/shared/Layouts/ErrorComponent';
 
 const PromoCodeList = lazy(() => import('@/modules/PromoCode/PromoCodeList'));
 const SegmentsList = lazy(() => import('@/modules/Segments/SegmentsList'));
 const WashingServices = lazy(() => import('@/modules/WashingServices/WashingServices'));
-const WashingServicesDetails = lazy(() => import('@/modules/WashingServices/_view/WashingServicesDetails'));
+const WashingServicesDetails = lazy(
+  () => import('@/modules/WashingServices/_view/WashingServicesDetails')
+);
 const SegmentDetails = lazy(() => import('@/modules/Segments/_view/SegmentDetails'));
 const BikersList = lazy(() => import('@/modules/Bikers/BikersList'));
 const BikersDetails = lazy(() => import('@/modules/Bikers/_view/BikersDetails'));
@@ -87,7 +88,10 @@ const router = createBrowserRouter([
       { path: ROUTES.APP_BANNER, element: <BannerList /> },
       { path: ROUTES.CONTACT_INFO, element: <ContactInfo /> },
       { path: ROUTES.BOOKING, element: <Booking /> },
-      { path: ROUTES.BOOKING_CALENDAR, element: <Navigate to={ROUTES.BOOKING_CALENDAR_2} replace /> },
+      {
+        path: ROUTES.BOOKING_CALENDAR,
+        element: <Navigate to={ROUTES.BOOKING_CALENDAR_2} replace />,
+      },
       { path: ROUTES.BOOKING_CALENDAR_2, element: <BookingCalendarV /> },
       { path: ROUTES.PROFILE, element: <Profile /> },
 

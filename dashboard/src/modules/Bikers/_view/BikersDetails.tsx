@@ -1,26 +1,23 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { ROUTES } from '@constants/routes';
 import { toast } from 'react-toastify';
-import {
-  IoArrowBackCircleOutline,
-  IoPersonCircleOutline,
-  IoSettingsOutline,
-} from 'react-icons/io5';
 import { useTranslation } from 'react-i18next';
 
 import useSWR, { mutate } from 'swr';
 import bikersService from '@services/bikers.service';
 import { IBikers } from '@servicesTypes/bikers.types';
 import Alert from '@UI/Alert/Alert';
-import { AdminStatus, Button, ThreeDotsLoader } from '@UI/Index';
-import { t } from 'i18next';
 import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@shadecn/components/ui/sheet';
+  AdminStatus,
+  Button,
+  FormSheet,
+  InfoList,
+  MainAvatar,
+  PageHeader,
+  SectionCard,
+  PageSkeleton,
+} from '@UI/Index';
 import {
   Form,
   FormControl,
@@ -36,7 +33,6 @@ import * as yup from 'yup';
 import { formatDate } from '@app/utils/helper';
 import { Input } from '@shadecn/components/ui/input';
 import BikersFrom from '../_components/BikersFrom';
-import PicViewModel from '../_components/PicViewModel';
 import {
   Dialog,
   DialogContent,
@@ -45,12 +41,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/shadecn/components/ui/dialog';
-import SegmentsDialogeWrapper from '@/modules/Segments/_Components/SegmentsDialogeWrapper';
 export default function BikersDetails() {
   const { bikerId } = useParams();
   const navigate = useNavigate();
 
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const lang = i18n.language as 'en' | 'ar';
 
   const [isloading, setIsLoading] = useState(false);
@@ -90,10 +85,7 @@ export default function BikersDetails() {
     },
     resolver: yupResolver(
       yup.object({
-        password: yup
-          .string()
-          .required('Required')
-          .min(8, 'Password must be at least 8 characters'),
+        password: yup.string().required('validation.required').min(8, 'validation.password'),
       })
     ),
   });
@@ -104,12 +96,12 @@ export default function BikersDetails() {
       .then(() => {
         setIsLoading(false);
         setOpen(false);
-        toast.success('Password updated successfully');
+        toast.success(t('passwordUpdated'));
       })
       .catch((e) => {
         setIsLoading(false);
 
-        toast.error(e.response.localizedMessage['en']);
+        toast.error(e?.response?.data?.localizedMessage?.[lang] || t('somethingWentWrong'));
       });
   };
   const handelActionBiker = (id: string, state: string) => {
@@ -135,372 +127,187 @@ export default function BikersDetails() {
         setIsLoading(false);
       });
   };
-  if (isLoading && isloading)
-    return (
-      <div className="relative">
-        <ThreeDotsLoader />
-      </div>
-    );
-  return (
-    <div className="space-y-1">
-      {(isLoading || isloading) && <ThreeDotsLoader />}
+  if (isLoading) return <PageSkeleton kind="details" />;
+  if (!data) return <p className="py-24 text-center text-muted-foreground">{t('bikerNotFound')}</p>;
 
-      {/* Professional Header */}
-      <div className="pb-4">
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => navigate(-1)}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 transition-colors duration-200 hover:bg-slate-200">
-                <IoArrowBackCircleOutline className="h-5 w-5 text-slate-600" />
-              </button>
-              <div className="flex items-center gap-3">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <h1 className="text-xl font-semibold tracking-tight text-slate-900">{t('bikerDetails')}</h1>
-                  </div>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {t('bikerId')}: #{data?._id?.slice(-4)}
+  const suspended = data.status === 'SUSPENDED';
+  const pct = data.commissionType === 'PERCENTAGE' ? '%' : ` ${t('SAR')}`;
+  const money = (v?: number) => `${(v ?? 0).toFixed(2)} ${t('SAR')}`;
+  const tiles = [
+    {
+      label: t('today'),
+      value: money(totalCommission?.today?.totalCommission),
+      sub: totalCommission?.today?.ordersCount,
+    },
+    {
+      label: t('allWeekends'),
+      value: money(totalCommission?.allWeekends?.totalCommission),
+      sub: totalCommission?.allWeekends?.ordersCount,
+    },
+    {
+      label: t('allTime'),
+      value: money(totalCommission?.allTime?.totalCommission),
+      sub: totalCommission?.allTime?.ordersCount,
+    },
+  ];
+
+  return (
+    <div className="space-y-5">
+      <PageHeader
+        onBack={() => navigate(-1)}
+        leading={<MainAvatar src={data.imageLink} name={data.userName} className="h-10 w-10" />}
+        title={data.userName}
+        description={<span dir="ltr">{data.phone}</span>}
+        actions={
+          <>
+            <AdminStatus status={data.status} />
+            <Button
+              variant="secondary"
+              onClick={() => navigate(generatePath(ROUTES.BIKERS_SCHEDULE, { bikerId: data._id }))}>
+              {t('schedule')}
+            </Button>
+            <Button onClick={() => setOpenSheet(true)}>{t('edit')}</Button>
+          </>
+        }
+      />
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        {tiles.map((tile) => (
+          <div key={tile.label} className="rounded-lg border border-border bg-card px-4 py-3">
+            <p className="text-xs font-medium text-muted-foreground">
+              {t('totalCommission')} · {tile.label}
+            </p>
+            <p className="mt-1 text-lg font-semibold tabular-nums text-foreground">{tile.value}</p>
+            {tile.sub !== undefined && (
+              <p className="text-xs text-muted-foreground">
+                {t('ordersCountN', { count: tile.sub })}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-3">
+        <div className="space-y-5 xl:col-span-2">
+          <SectionCard title={t('bikerInfo')}>
+            <InfoList
+              items={[
+                { label: t('name'), value: data.userName },
+                { label: t('phone'), value: <span dir="ltr">{data.phone}</span> },
+                { label: t('nationalId'), value: data.nationalId },
+                { label: t('createddate'), value: data.createdAt && formatDate(data.createdAt) },
+                { label: t('thisBikerCreatedBy'), value: data.createdBy?.userName },
+              ]}
+            />
+          </SectionCard>
+
+          <SectionCard title={t('commission')}>
+            <InfoList
+              items={[
+                {
+                  label: t('commissionType'),
+                  value: data.commissionType && t(data.commissionType),
+                },
+                {
+                  label: t('commission'),
+                  value: data.commission != null && `${data.commission}${pct}`,
+                },
+                { label: t('ordersBeforeCommission'), value: data.ordersBeforeCommission },
+                {
+                  label: t('Minimum Commission'),
+                  value: data.minimumCommission != null && `${data.minimumCommission} ${t('SAR')}`,
+                },
+                {
+                  label: t('weekendCommission'),
+                  value: data.weekendCommission != null && `${data.weekendCommission}${pct}`,
+                },
+              ]}
+            />
+          </SectionCard>
+        </div>
+
+        <div className="xl:col-span-1">
+          <SectionCard title={t('bikerActions')}>
+            <ul className="divide-y divide-border">
+              <li className="flex items-center justify-between gap-3 py-3 first:pt-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">{t('editPassword')}</p>
+                  <p className="text-xs text-muted-foreground">{t('resetPasswordHint')}</p>
+                </div>
+                <Dialog open={open} onOpenChange={setOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="secondary" size="sm">
+                      {t('editPassword')}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>{t('editPassword')}</DialogTitle>
+                      <DialogDescription>{t('resetPasswordHint')}</DialogDescription>
+                    </DialogHeader>
+                    <Form {...newPasswrodForm}>
+                      <form
+                        className="flex w-full flex-col gap-3"
+                        onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
+                        <FormField
+                          control={newPasswrodForm.control}
+                          name="password"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel />
+                              <FormControl>
+                                <Input type="password" {...field} />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <Button
+                          disabled={isLoading}
+                          loading={isLoading}
+                          type="submit"
+                          className="w-full">
+                          {t('Save changes')}
+                        </Button>
+                      </form>
+                    </Form>
+                  </DialogContent>
+                </Dialog>
+              </li>
+              <li className="flex items-center justify-between gap-3 py-3 last:pb-0">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-foreground">
+                    {suspended ? t('activate') : t('suspend')}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {suspended ? t('restoreBikerAccess') : t('suspendBikerAccess')}
                   </p>
                 </div>
-              </div>
-            </div>
-            <div className="flex items-center space-x-3">
-              {data?.status && (
-                <div className="mt-1">
-                  <AdminStatus status={data?.status} />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="pt-1">
-        <div className="w-full">
-          <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-            {/* Biker Information Card */}
-            <div className="xl:col-span-2">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoPersonCircleOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerInfo')}</h2>
-                      <p className="text-sm text-slate-500">{t('Personal and contact information')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('bikerImage')}
-                      </h4>
-                      <div className="flex justify-center">
-                        <SegmentsDialogeWrapper
-                          modal
-                          triggerButtonElement={
-                            <img
-                              className="h-20 w-32 cursor-pointer rounded-lg object-cover transition-opacity duration-200 hover:opacity-80"
-                              src={data?.imageLink}
-                              alt="Biker profile"
-                            />
-                          }>
-                          <PicViewModel pic={data?.imageLink} />
-                        </SegmentsDialogeWrapper>
-                      </div>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('name')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.userName}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">{t('phone')}</h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.phone}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('nationalId')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">{data?.nationalId}</p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('thisBikerCreatedBy')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.createdBy?.userName || '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('createddate')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {formatDate(data?.createdAt)}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('commissionType')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.commissionType ? t(data.commissionType) : '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('commission')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.commission !== undefined && data?.commission !== null
-                          ? `${data.commission}${data?.commissionType === 'PERCENTAGE' ? '%' : ''}`
-                          : '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('ordersBeforeCommission')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.ordersBeforeCommission !== undefined &&
-                        data?.ordersBeforeCommission !== null
-                          ? data.ordersBeforeCommission
-                          : '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('Minimum Commission')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.minimumCommission !== undefined && data?.minimumCommission !== null
-                          ? data.minimumCommission
-                          : '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('weekendCommission')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {data?.weekendCommission !== undefined && data?.weekendCommission !== null
-                          ? data.weekendCommission
-                          : '--'}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-slate-50 p-4">
-                      <h4 className="mb-2 text-sm font-semibold text-slate-700">
-                        {t('totalCommission')}
-                      </h4>
-                      <p className="text-lg font-bold text-slate-900">
-                        {totalCommission?.today?.totalCommission} {t('today')}
-                      </p>
-                      <p className="text-lg font-bold text-slate-900">
-                        {totalCommission?.allTime?.totalCommission} {t('allTime')}
-                      </p>
-                      <p className="text-lg font-bold text-slate-900">
-                        {totalCommission?.allWeekends?.totalCommission} {t('allWeekends')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Areas Card */}
-              {/* <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white"> */}
-              {/* Gradient Header */}
-              {/* <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoLocationOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerAreas')}</h2>
-                      <p className="text-sm text-slate-500">{t('Assigned service areas')}</p>
-                    </div>
-                  </div>
-                </div> */}
-
-              {/* Card Content */}
-              {/* <div className="p-6">
-                  <div className="flex flex-wrap gap-3">
-                    {data?.areas?.map((e) => (
-                      <div
-                        key={e?._id}
-                        className="rounded-full border-2 border-orange-200 bg-orange-50 px-4 py-2 text-sm font-medium text-orange-700 transition-colors duration-200 hover:bg-orange-100">
-                        {e.name?.[lang]}
-                      </div>
-                    ))}
-                  </div>
-                </div> */}
-              {/* </div> */}
-
-              {/* Cities Card */}
-              <div className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                {/* <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoLocationOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerCities')}</h2>
-                      <p className="text-sm text-slate-500">{t('Assigned cities')}</p>
-                    </div>
-                  </div>
-                </div> */}
-
-                {/* Card Content */}
-                {/* <div className="p-6">
-                  <div className="flex flex-wrap gap-3">
-                    <div className="rounded-full border-2 border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors duration-200 hover:bg-emerald-100">
-                      {data?.city?.name?.[lang]}
-                    </div>
-                  </div>
-                </div> */}
-              </div>
-            </div>
-
-            {/* Actions Card */}
-            <div className="xl:col-span-1">
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
-                {/* Gradient Header */}
-                <div className="border-b border-slate-100 bg-white px-5 py-3">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brandTint">
-                      <IoSettingsOutline className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-semibold text-slate-900">{t('bikerActions')}</h2>
-                      <p className="text-sm text-slate-500">{t('Manage biker settings')}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="space-y-4 p-6">
-                  {/* Edit Password */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('editPassword')}</h4>
-                      <p className="text-xs text-slate-500">{t('Update biker password')}</p>
-                    </div>
-                    <Dialog open={open} onOpenChange={setOpen}>
-                      <DialogTrigger asChild>
-                        <Button variant="secondary" size="sm" className="min-w-[8rem]">
-                          {t('editPassword')}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-[425px]">
-                        <DialogHeader>
-                          <DialogTitle>{t('editPassword')}</DialogTitle>
-                          <DialogDescription>
-                            Make changes to your Password here. Click save when you&lsquo;re done.
-                          </DialogDescription>
-                        </DialogHeader>
-
-                        <div className="w-full">
-                          <Form {...newPasswrodForm}>
-                            <form
-                              className="flex w-full flex-col gap-3"
-                              onSubmit={newPasswrodForm.handleSubmit(onEditPassword)}>
-                              <FormField
-                                control={newPasswrodForm.control}
-                                name="password"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel />
-                                    <FormControl>
-                                      <Input type="password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                              <Button
-                                disabled={isLoading}
-                                loading={isLoading}
-                                type="submit"
-                                className="w-full">
-                                {t('Save changes')}
-                              </Button>
-                            </form>
-                          </Form>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-
-                  {/* Edit Info */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t('editInfo')}</h4>
-                      <p className="text-xs text-slate-500">{t('Update biker information')}</p>
-                    </div>
-                    <Button size="sm" loading={isloading} onClick={() => setOpenSheet(true)}>
-                      {t('edit')}
+                <Alert
+                  id={data._id}
+                  description={suspended ? t('activate') : t('suspendBikerConfirm')}
+                  handler={() => handelActionBiker(data._id, data.status)}
+                  buttonComponent={
+                    <Button
+                      size="sm"
+                      variant={suspended ? 'secondary' : 'dangerOutline'}
+                      loading={isloading}>
+                      {suspended ? t('activate') : t('suspend')}
                     </Button>
-                  </div>
-
-                  {/* Status Toggle */}
-                  <div className="flex items-center justify-between rounded-lg border border-slate-200 p-4 transition-all duration-200 hover:border-primary/30 hover:shadow-indigo-100">
-                    <div>
-                      <h4 className="text-sm font-semibold text-slate-700">{t(data?.status)}</h4>
-                      <p className="text-xs text-slate-500">
-                        {data?.status !== 'SUSPENDED'
-                          ? 'Suspend biker access'
-                          : data?.status === 'SUSPENDED'
-                          ? 'Restore biker access'
-                          : ''}
-                      </p>
-                    </div>
-                    <Alert
-                      id=""
-                      description={
-                        data?.status !== 'SUSPENDED' ? t('suspendBikerConfirm') : t('activate')
-                      }
-                      handler={() => handelActionBiker(data?._id, data?.status)}
-                      buttonComponent={
-                        <Button
-                          size="sm"
-                          loading={isloading}
-                          className={
-                            data?.status !== 'SUSPENDED'
-                              ? 'bg-red-600 text-white hover:bg-red-700'
-                              : 'bg-green-600 text-white hover:bg-green-700'
-                          }>
-                          {data?.status !== 'SUSPENDED' ? t('suspend') : t('activate')}
-                        </Button>
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+                  }
+                />
+              </li>
+            </ul>
+          </SectionCard>
         </div>
       </div>
 
-      <Sheet open={openSheet} onOpenChange={() => setOpenSheet(false)} modal={true}>
-        <SheetContent>
-          <SheetHeader>
-            <SheetTitle>{t('editBikerInfo')}</SheetTitle>
-            <SheetDescription>
-              <BikersFrom setOpenSheet={setOpenSheet} oldData={data} />
-            </SheetDescription>
-          </SheetHeader>
-        </SheetContent>
-      </Sheet>
+      <FormSheet
+        open={openSheet}
+        onOpenChange={() => setOpenSheet(false)}
+        title={t('editBikerInfo')}>
+        <BikersFrom setOpenSheet={setOpenSheet} oldData={data} />
+      </FormSheet>
     </div>
   );
 }

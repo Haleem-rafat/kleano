@@ -47,11 +47,11 @@ export default function MainMultiLangInput({
 
   return (
     <FormItem className={classNames({ 'pointer-events-none opacity-50': disabled })}>
-      {label && <FormLabel className="text-text-600 text-sm font-semibold">{label}</FormLabel>}
+      {label && <FormLabel className="text-sm font-semibold text-foreground">{label}</FormLabel>}
       <FormControl>
         <div className="space-y-2">
           <div>
-            <label className="mb-1 block text-xs text-slate-600">English (EN)</label>
+            <label className="mb-1 block text-xs text-muted-foreground">English (EN)</label>
             <Input
               type="text"
               placeholder={placeholderEn}
@@ -63,7 +63,7 @@ export default function MainMultiLangInput({
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-slate-600">Arabic (AR)</label>
+            <label className="mb-1 block text-xs text-muted-foreground">Arabic (AR)</label>
             <Input
               type="text"
               placeholder={placeholderAr}
