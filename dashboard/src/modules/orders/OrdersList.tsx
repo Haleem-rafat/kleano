@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, PageHeader, TableSkeleton } from '@UI/Index';
+import { Button, PageHeader, TableSkeleton, FilterPanel, FilterSearch, Segmented } from '@UI/Index';
 import { toast } from 'react-toastify';
-import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import useSWR from 'swr';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsList, TabsTrigger } from '@shadecn/components/ui/tabs';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import ordersService from '@services/orders.service';
-import { Input } from '@shadecn/components/ui/input';
 import WaitingAssignTable from './_Components/WaitingAssignTable';
 import LifeOrderTable from './_Components/LifeOrderTable';
 import CompletedTable from './_Components/CompletedTable';
@@ -94,25 +92,22 @@ const OrdersList = () => {
   };
   const renderSubFilters = () => {
     if (!activeTab?.subFilters) return null;
+    const statuses = searchParams.getAll('status');
+    const current =
+      activeTab.subFilters.find((sub) => statuses.includes(sub.status))?.status ||
+      defaultSubFilterStatus;
     return (
-      <div className="w-full">
-        <Tabs
-          defaultValue={
-            activeTab.subFilters.find((sub) => sub.status === defaultSubFilterStatus)?.title
-          }
-          onValueChange={(value) => {
-            const selectedSubFilter = activeTab.subFilters.find((sub) => sub.title === value);
-            if (selectedSubFilter) handleSubFilterChange(selectedSubFilter.status);
-          }}
-          className="my-4">
-          <TabsList className="flex max-w-full">
-            {activeTab.subFilters.map((subFilter, index) => (
-              <TabsTrigger value={subFilter.title} key={index} className="me-2">
-                {t(subFilter.title)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          {t('stage')}
+        </span>
+        <Segmented
+          variant="steps"
+          label={t('stage')}
+          value={current}
+          onChange={handleSubFilterChange}
+          options={activeTab.subFilters.map((sub) => ({ value: sub.status, label: sub.title }))}
+        />
       </div>
     );
   };
@@ -171,46 +166,37 @@ const OrdersList = () => {
   }, [activeTab, searchParams]);
   return (
     <div className="relative">
-      <div className="pb-5">
-        <PageHeader
-          title={t('orders')}
-          actions={
-            <>
-              <div className="relative w-64 max-w-full">
-                <MagnifyingGlassIcon className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  onChange={(e) => setSearch(e.target.value)}
-                  value={search}
-                  placeholder={t('search')}
-                  aria-label={t('search')}
-                  className="ps-9"
-                />
-              </div>
-              <Button loading={loading} onClick={() => handelExport()}>
-                {t('Export')}
-              </Button>
-            </>
-          }
-        />
-      </div>
-      <div className="mb-5 flex w-full flex-col items-start justify-start">
-        <Tabs
-          value={activeTab?.title}
-          defaultValue={activeTab?.title}
-          onValueChange={(value) => {
-            const selectedTab = TABS.find((tab) => tab.title === value);
-            handleTabChange(selectedTab, true);
-          }}>
-          <TabsList className="flex max-w-full">
-            {TABS.map((tab, index) => (
-              <TabsTrigger value={tab.title} key={index} className="me-2">
-                {t(tab.title)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-        {renderSubFilters()}
-      </div>
+      <PageHeader
+        title={t('orders')}
+        actions={
+          <Button variant="secondary" loading={loading} onClick={() => handelExport()}>
+            {t('Export')}
+          </Button>
+        }
+      />
+      <FilterPanel
+        className="my-5"
+        tabs={
+          <>
+            <Tabs
+              value={activeTab?.title}
+              onValueChange={(value) => {
+                const selectedTab = TABS.find((tab) => tab.title === value);
+                handleTabChange(selectedTab, true);
+              }}>
+              <TabsList>
+                {TABS.map((tab, index) => (
+                  <TabsTrigger value={tab.title} key={index}>
+                    {t(tab.title)}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            {renderSubFilters()}
+          </>
+        }>
+        <FilterSearch value={search} onChange={setSearch} placeholder={t('search')} />
+      </FilterPanel>
       <div>
         {ordersListLoading ? (
           <TableSkeleton columns={7} />

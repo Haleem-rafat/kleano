@@ -684,5 +684,7 @@
   "noRefund": "بدون استرداد",
   "fullRefund": "استرداد كامل",
   "keepOrder": "إبقاء الطلب",
-  "cancelOrder": "إلغاء الطلب"
+  "cancelOrder": "إلغاء الطلب",
+  "searchBusiness": "ابحث عن جهة…",
+  "stage": "المرحلة"
 }

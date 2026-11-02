@@ -1,7 +1,17 @@
+import { IoSearchOutline } from 'react-icons/io5';
 import promoCodeService from '@services/promoCode.service';
 import { Combobox } from '@UI/comboBox/ComboBox';
 import { DatePickerWithPresets } from '@UI/datePickerComponent/DatePicker';
-import { Button, DataTable, EmtyState, PageHeader, FormSheet } from '@UI/Index';
+import {
+  Button,
+  DataTable,
+  EmtyState,
+  PageHeader,
+  FormSheet,
+  Segmented,
+  FilterPanel,
+  FilterSearch,
+} from '@UI/Index';
 import { ColumnDef } from '@tanstack/react-table';
 import PaginationComponent from '@UI/paginationComponent/PaginationComponent';
 import { useEffect, useState } from 'react';
@@ -28,6 +38,7 @@ import { Input } from '@shadecn/components/ui/input';
 import { ChartView } from './_Components/ChartView';
 
 import PromoCodeModelForm from './_Components/PromoCodeModelForm';
+import useDebounce from '@/hooks/useDebounce';
 import useGetCitiesOptions from '@/hooks/useGetCitiesOptions';
 
 import useGetSegmentsOptions from '@/hooks/useGetSegmentsOptions';
@@ -65,8 +76,18 @@ const PromoCodeList = () => {
     return foundTab ? foundTab : tabs[0]; // Default to the first tab if none match
   });
   const [business, setBusiness] = useState('');
+  const debouncedBusiness = useDebounce(business.trim(), 500);
   const { data, isLoading, mutate } = useSWR(
-    ['get-all-promo-codes', pageIndex, activeAudience, dateObj, status, searchParams, isChart],
+    [
+      'get-all-promo-codes',
+      pageIndex,
+      activeAudience,
+      dateObj,
+      status,
+      searchParams,
+      isChart,
+      debouncedBusiness,
+    ],
     () =>
       searchParams &&
       promoCodeService.getAllPromoCode({
@@ -80,7 +101,8 @@ const PromoCodeList = () => {
         segment: searchParams.get('segment') ?? undefined,
         isGraphView: isChart,
         totalItems: 0,
-        business: activeAudience.searchParam === 'b2b' && business ? business : undefined,
+        business:
+          activeAudience.searchParam === 'b2b' && debouncedBusiness ? debouncedBusiness : undefined,
       })
   );
 
@@ -93,7 +115,7 @@ const PromoCodeList = () => {
     }
     setSearchParams(newParams);
     setActiveAudience(tab);
-    mutate();
+    setPageIndex(1);
   };
 
   // const handleEdit = async (id) => {
@@ -195,84 +217,59 @@ const PromoCodeList = () => {
           actions={<Button onClick={() => setOpenSheet(true)}>{t('addNewPromoCode')}</Button>}
         />
       </div>
-      <div className="flex w-full flex-col gap-3 rounded-lg border border-border bg-card p-4">
-        <div className="flex w-full items-center gap-3">
-          {/* Tabs scroll inside their space so the view switch is never pushed off. */}
+      <FilterPanel
+        tabs={
           <Tabs
             className="min-w-0 flex-1"
-            defaultValue={activeAudience.label}
+            value={activeAudience.label}
             onValueChange={(value) => handleTabChange(tabs.find((tab) => tab.label === value))}>
-            <TabsList className="w-full justify-start overflow-x-auto scrollbar-hide">
-              {tabs.map((tab, index) => (
-                <TabsTrigger className="capitalize" value={tab.label} key={index}>
+            <TabsList>
+              {tabs.map((tab) => (
+                <TabsTrigger className="capitalize" value={tab.label} key={tab.label}>
                   {tab.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
-          <div
-            role="group"
-            aria-label={t('view')}
-            className="flex shrink-0 overflow-hidden rounded-md border border-border">
-            {[
-              { chart: false, label: t('table'), icon: <FaThList size={16} /> },
+        }
+        trailing={
+          <Segmented
+            label={t('view')}
+            value={isChart ? 'chart' : 'table'}
+            onChange={(v) => setIschart(v === 'chart')}
+            options={[
+              { value: 'table', label: t('table'), icon: <FaThList size={15} />, iconOnly: true },
               {
-                chart: true,
+                value: 'chart',
                 label: t('chart'),
-                icon: <BsBarChartLineFill className="rotate-90" size={16} />,
+                icon: <BsBarChartLineFill className="rotate-90" size={15} />,
+                iconOnly: true,
               },
-            ].map((view) => (
-              <button
-                key={view.label}
-                type="button"
-                aria-label={view.label}
-                aria-pressed={isChart === view.chart}
-                title={view.label}
-                className={`flex h-9 w-9 items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring ${
-                  isChart === view.chart
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card text-muted-foreground hover:bg-accent'
-                }`}
-                onClick={() => setIschart(view.chart)}>
-                {view.icon}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center justify-end gap-2 sm:[&>*]:w-56">
-          {activeAudience.searchParam === 'b2b' && (
-            <div className="flex items-center justify-center gap-2">
-              <Input
-                className="h-10 w-[200px]"
-                value={business}
-                onChange={(e) => setBusiness(e.target.value)}
-                placeholder={t('business')}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    mutate();
-                  }
-                }}
-              />
-              <Button onClick={() => mutate()} variant="secondary" size="sm">
-                {t('search')}
-              </Button>
-            </div>
-          )}{' '}
+            ]}
+          />
+        }>
+        {isB2b && (
+          <FilterSearch
+            value={business}
+            onChange={(v) => {
+              setBusiness(v);
+              setPageIndex(1);
+            }}
+            placeholder={t('searchBusiness')}
+            label={t('business')}
+          />
+        )}
+        <div className="[&>button]:w-full">
           <DatePickerWithPresets setDateObj={setDateObj} />
-          {citiesOptions && (
-            <Combobox placeholder={t('city')} dataArray={citiesOptions} filterParam="city" />
-          )}
-          {segmentsOptions && activeAudience.searchParam === 'segment' && (
-            <Combobox
-              placeholder={t('segment')}
-              dataArray={segmentsOptions}
-              filterParam="segment"
-            />
-          )}
-          {<Combobox placeholder={t('status')} dataArray={statusOptions} filterParam="status" />}
-          {/* if type is b2b, show business input field for b2b business name */}
         </div>
-      </div>
+        {citiesOptions && (
+          <Combobox placeholder={t('city')} dataArray={citiesOptions} filterParam="city" />
+        )}
+        {segmentsOptions && activeAudience.searchParam === 'segment' && (
+          <Combobox placeholder={t('segment')} dataArray={segmentsOptions} filterParam="segment" />
+        )}
+        <Combobox placeholder={t('status')} dataArray={statusOptions} filterParam="status" />
+      </FilterPanel>
 
       {!isChart ? (
         <DataTable

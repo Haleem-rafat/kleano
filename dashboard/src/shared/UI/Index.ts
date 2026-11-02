@@ -34,3 +34,5 @@ export {
   ChartSkeleton,
   PageSkeleton,
 } from './Skeleton/Skeleton';
+export { default as Segmented } from './Segmented/Segmented';
+export { default as FilterPanel, FilterSearch } from './FilterPanel/FilterPanel';

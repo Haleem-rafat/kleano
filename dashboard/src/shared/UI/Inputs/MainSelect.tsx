@@ -122,8 +122,8 @@ export default function MainSelect({
             onClick={handleButtonClick}
             className={cn(
               fieldClass,
-              'min-h-10 h-auto min-w-0 py-1.5 font-normal hover:bg-card',
-              { 'min-h-8 text-xs': size === 'xs' },
+              'min-h-[2.5rem] h-auto min-w-0 py-1.5 font-normal hover:bg-card',
+              { 'min-h-[2rem] text-xs': size === 'xs' },
               className
             )}>
             <div className="flex w-full min-w-0 items-center justify-between gap-2">
@@ -158,7 +158,7 @@ export default function MainSelect({
               )}
               <ChevronDown
                 className={cn(
-                  'size-4 shrink-0 cursor-pointer text-muted-foreground transition-transform',
+                  'h-4 w-4 shrink-0 cursor-pointer text-muted-foreground transition-transform',
                   {
                     'rotate-180': isPopoverOpen,
                   }

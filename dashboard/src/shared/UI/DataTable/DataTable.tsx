@@ -201,7 +201,7 @@ export function DataTable<TData, TValue>({
                 <TableRow key={`skeleton-${i}`} className="hover:bg-transparent">
                   {Array.from({ length: visibleColumns }).map((__, j) => (
                     <TableCell key={j}>
-                      <div className="max-w-40 h-4 w-3/4 animate-pulse rounded bg-muted" />
+                      <div className="max-w-[10rem] h-4 w-3/4 animate-pulse rounded bg-muted" />
                     </TableCell>
                   ))}
                 </TableRow>

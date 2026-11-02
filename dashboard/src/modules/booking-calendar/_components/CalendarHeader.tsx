@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 /* eslint-disable no-unused-vars */
 import React from 'react';
-import { Button } from '@UI/Index';
+import { Button, Segmented } from '@UI/Index';
 import { CalendarView, CalendarFilters } from '../_types/calendar.types';
 import { Switch } from '@/shadecn/components/ui/switch';
 import { Label } from '@/shadecn/components/ui/label';
@@ -37,9 +37,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   };
 
   return (
-    <div className="flex items-center justify-between rounded-lg border bg-card p-4">
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
       {/* Navigation and View Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         {/* Navigation Buttons */}
         {onNavigate && (
           <div className="flex items-center gap-1">
@@ -67,21 +67,12 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           </div>
         )}
 
-        {/* View Toggle Buttons */}
-        <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
-          {viewButtons.map((view) => (
-            <Button
-              key={view.key}
-              variant={currentView === view.key ? 'primary' : 'secondary'}
-              size="sm"
-              onClick={() => onViewChange(view.key)}
-              className={`px-3 py-1 text-sm ${
-                currentView === view.key ? 'bg-primary text-white shadow-sm' : 'hover:bg-card'
-              }`}>
-              {view.label}
-            </Button>
-          ))}
-        </div>
+        <Segmented
+          label={t('view')}
+          value={currentView}
+          onChange={onViewChange}
+          options={viewButtons.map((v) => ({ value: v.key, label: t(v.label) }))}
+        />
       </div>
 
       {/* Filters */}

@@ -70,7 +70,7 @@ export default function FormSheet({
  * takes its own space, so it never covers the last field.
  */
 export const SheetActions = ({ children }: { children: ReactNode }) => (
-  <div className="sm:[&>button]:min-w-32 sticky bottom-0 z-10 -mx-6 -mb-5 mt-auto flex flex-col-reverse gap-2 border-t border-border bg-card px-6 py-4 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto">
+  <div className="sm:[&>button]:min-w-[8rem] sticky bottom-0 z-10 -mx-6 -mb-5 mt-auto flex flex-col-reverse gap-2 border-t border-border bg-card px-6 py-4 sm:flex-row sm:justify-end [&>button]:w-full sm:[&>button]:w-auto">
     {children}
   </div>
 );

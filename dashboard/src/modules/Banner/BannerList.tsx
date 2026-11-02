@@ -50,7 +50,7 @@ const BannerList = () => {
       header: t('description'),
       accessorKey: 'description',
       cell: ({ row }) => (
-        <span className="max-w-64 block truncate">{row.original?.description}</span>
+        <span className="max-w-[16rem] block truncate">{row.original?.description}</span>
       ),
     },
     {
@@ -64,7 +64,7 @@ const BannerList = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="max-w-56 block truncate text-primary hover:underline">
+            className="max-w-[14rem] block truncate text-primary hover:underline">
             {row.original.externalUrl}
           </a>
         ) : (

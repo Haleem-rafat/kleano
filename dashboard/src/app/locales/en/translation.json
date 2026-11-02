@@ -680,5 +680,7 @@
   "noRefund": "No refund",
   "fullRefund": "Full refund",
   "keepOrder": "Keep order",
-  "cancelOrder": "Cancel order"
+  "cancelOrder": "Cancel order",
+  "searchBusiness": "Search business…",
+  "stage": "Stage"
 }

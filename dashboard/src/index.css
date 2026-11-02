@@ -366,30 +366,6 @@ table tbody tr {
 table tbody tr:hover {
   background: #fafafb;
 }
-[role='tablist'] {
-  height: auto;
-  gap: 4px;
-  padding: 0;
-  background: transparent;
-  border-bottom: 1px solid #e6e6e9;
-  border-radius: 0;
-  overflow-x: auto;
-}
-[role='tab'] {
-  margin: 0 !important;
-  padding: 8px 12px;
-  border-radius: 0;
-  border-bottom: 2px solid transparent;
-  color: #6b6b73;
-  font-size: 13px;
-  font-weight: 500;
-  background: transparent !important;
-  box-shadow: none !important;
-}
-[role='tab'][data-state='active'] {
-  color: hsl(var(--primary));
-  border-bottom-color: hsl(var(--primary));
-}
 ::-webkit-scrollbar-thumb {
   background: #d4d4d8;
 }
@@ -401,9 +377,6 @@ table tbody tr:hover {
 main {
   min-width: 0;
   overflow-x: clip;
-}
-[role='tablist'] {
-  scrollbar-width: none;
 }
 @media (max-width: 640px) {
   .fc-toolbar {

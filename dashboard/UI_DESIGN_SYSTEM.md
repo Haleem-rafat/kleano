@@ -67,6 +67,14 @@ values in classes, gradients on headers or buttons, class names built at runtime
 - `InfoList`: label/value pairs on details pages (never grey boxes per value).
 - Stat tiles: `rounded-lg border bg-card px-4 py-3`, small label, `text-lg` value.
 - `CityAvailability`: where a service, plan or add-on is offered (pause/resume/add).
+- Tabs and switches: shared `Tabs` and `Segmented` (`@UI/Index`) use one boxed style
+  (`segmentGroup`/`segmentItem` in `field.ts`): a bordered box, selected option filled
+  with primary, scrolls sideways and keeps the selected tab in view. Use `Segmented` for
+  view toggles and 2–5 quick filters instead of a dropdown.
+- Filter bars: a `grid gap-2 sm:grid-cols-2 lg:grid-cols-4` under the tabs, controls full
+  width, search fields with a leading icon. Changing a filter resets to page 1.
+- Tailwind is 3.3: no numeric `min-w-*`, `max-w-*`, `min-h-*` or `size-*`; use brackets
+  (`min-w-[8rem]`) or `h-4 w-4`.
 - `RichTextEditor`: long formatted text (Terms). The app renders the saved HTML.
 
 ## Patterns

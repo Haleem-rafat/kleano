@@ -1,7 +1,15 @@
 import { IoSearchOutline } from 'react-icons/io5';
 import React, { useState } from 'react';
 import { generatePath, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, EmtyState, DataTable, FormSheet, PageHeader } from '@UI/Index';
+import {
+  Button,
+  EmtyState,
+  DataTable,
+  FormSheet,
+  PageHeader,
+  FilterPanel,
+  FilterSearch,
+} from '@UI/Index';
 import adminsService from '@services/admins.service';
 import useSWR from 'swr';
 import { useTranslation } from 'react-i18next';
@@ -68,35 +76,28 @@ const AdminsList = () => {
         description={t('Manage admin users and permissions')}
         actions={<Button onClick={() => setOpenSheet(true)}>{t('addNewAdmin')}</Button>}
       />
-      <label className="relative block w-full sm:w-72">
-        <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          type="search"
-          onChange={(e) => setSearch(e.target.value)}
-          value={search}
-          placeholder={t('search')}
-          aria-label={t('search')}
-          className="h-9 ps-9"
-        />
-      </label>
-
       {/* Main Content */}
       <div>
         <div>
-          {/* Filter Tabs */}
-          <div className="mb-6">
-            <Tabs
-              defaultValue={tabs[0].status}
-              onValueChange={(value) => handleTabChange(tabs.find((tab) => tab.status === value))}>
-              <TabsList>
-                {tabs.map((tab, index) => (
-                  <TabsTrigger value={tab.status} key={index} className="">
-                    {t(tab.title)}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          </div>
+          <FilterPanel
+            className="mb-5"
+            tabs={
+              <Tabs
+                defaultValue={tabs[0].status}
+                onValueChange={(value) =>
+                  handleTabChange(tabs.find((tab) => tab.status === value))
+                }>
+                <TabsList>
+                  {tabs.map((tab, index) => (
+                    <TabsTrigger value={tab.status} key={index}>
+                      {t(tab.title)}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            }>
+            <FilterSearch value={search} onChange={setSearch} placeholder={t('search')} />
+          </FilterPanel>
 
           {/* Data Table */}
           <div className="mb-6">

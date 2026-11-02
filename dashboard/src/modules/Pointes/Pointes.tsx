@@ -79,7 +79,7 @@ export default function Pointes() {
             ))}
 
             <div className="flex justify-end border-t border-border pt-4">
-              <Button type="submit" size="md" className="min-w-32" loading={isloading}>
+              <Button type="submit" size="md" className="min-w-[8rem]" loading={isloading}>
                 {t('save')}
               </Button>
             </div>

@@ -3,7 +3,16 @@ import { ROUTES } from '@constants/routes';
 import usersService from '@services/users.service';
 import { Input } from '@shadecn/components/ui/input';
 import { ColumnDef } from '@tanstack/react-table';
-import { Button, DataTable, EmtyState, MainAvatar, PageHeader } from '@UI/Index';
+import {
+  Button,
+  DataTable,
+  EmtyState,
+  MainAvatar,
+  PageHeader,
+  Segmented,
+  FilterPanel,
+  FilterSearch,
+} from '@UI/Index';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
@@ -178,38 +187,30 @@ export default function UsersList() {
           </Button>
         }
       />
-      <div className="flex flex-wrap items-center gap-2">
-        <label className="relative w-full sm:w-72">
-          <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            onChange={(e) => {
-              setSearch(e.target.value);
+      <FilterPanel
+        tabs={
+          <Segmented
+            label={t('status')}
+            value={filter}
+            onChange={(v) => {
+              setFilter(v);
               setPage(1);
             }}
-            value={search}
-            placeholder={t('search')}
-            aria-label={t('search')}
-            className="h-9 ps-9"
+            options={[
+              { value: 'ACTIVE', label: t('active') },
+              { value: 'SUSPENDED', label: t('suspended') },
+            ]}
           />
-        </label>
-        <Select
-          value={filter}
-          onValueChange={(e) => {
-            setFilter(e as 'SUSPENDED' | 'ACTIVE');
+        }>
+        <FilterSearch
+          value={search}
+          onChange={(v) => {
+            setSearch(v);
             setPage(1);
-          }}>
-          <SelectTrigger className="h-9 w-40" aria-label={t('status')}>
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="ACTIVE">{t('active')}</SelectItem>
-              <SelectItem value="SUSPENDED">{t('suspended')}</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
-      </div>
+          }}
+          placeholder={t('search')}
+        />
+      </FilterPanel>
       <DataTable
         columns={columns}
         data={data?.dataList ?? []}

@@ -35,6 +35,8 @@ import {
   MainAvatar,
   PageHeader,
   FormSheet,
+  FilterPanel,
+  FilterSearch,
 } from '@UI/Index';
 import { ColumnDef } from '@tanstack/react-table';
 import { DatePickerWithPresets } from '@UI/datePickerComponent/DatePicker';
@@ -269,20 +271,12 @@ export default function BikersList() {
           </>
         }
       />
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <label className="relative w-full sm:w-72">
-          <IoSearchOutline className="pointer-events-none absolute start-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            type="search"
-            onChange={(e) => setSearch(e.target.value)}
-            value={search}
-            placeholder={t('search')}
-            aria-label={t('search')}
-            className="h-9 ps-9"
-          />
-        </label>
-        <DatePickerWithPresets setDateObj={setDateObj} />
-      </div>
+      <FilterPanel>
+        <FilterSearch value={search} onChange={setSearch} placeholder={t('search')} />
+        <div className="[&>button]:w-full">
+          <DatePickerWithPresets setDateObj={setDateObj} />
+        </div>
+      </FilterPanel>
       <DataTable
         columns={columns}
         data={(data?.data as IBikers[]) ?? []}
