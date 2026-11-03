@@ -62,7 +62,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!isLocale(locale)) notFound();
 
   return (
-    <html lang={locale} dir={dirOf(locale)} className={`${readex.variable} ${plex.variable}`} suppressHydrationWarning>
+    <html lang={locale} dir={dirOf(locale)} className={`${readex.variable} ${plex.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <ThemeProvider>{children as ReactNode}</ThemeProvider>
       </body>
