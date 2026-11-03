@@ -60,7 +60,8 @@ export function isExpired(jwt: string): boolean {
   }
 }
 
-type Tokens = { data?: { accessToken?: string; refreshToken?: string } };
+/** POST /auth/refresh-token replies { data: { access_token, refresh_token } }. */
+type Tokens = { data?: { access_token?: string; refresh_token?: string } };
 
 /**
  * Swaps the refresh token for new tokens (POST /auth/refresh-token), like the apps do.
@@ -74,8 +75,8 @@ export async function refreshSession(session: Session): Promise<Session | 'rejec
       method: 'POST',
       json: { refresh_token: session.refresh },
     });
-    const access = res.data?.accessToken;
-    const refresh = res.data?.refreshToken;
+    const access = res.data?.access_token;
+    const refresh = res.data?.refresh_token;
     if (!access || !refresh) return 'rejected';
     await setSession(session.role, access, refresh);
     return { role: session.role, access, refresh };

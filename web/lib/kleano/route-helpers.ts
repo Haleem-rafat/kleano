@@ -15,7 +15,13 @@ export function errorResponse(error: unknown, lang: 'ar' | 'en') {
       { status: error.status >= 400 ? error.status : 502 },
     );
   }
-  return NextResponse.json({ message: offline(lang) }, { status: 502 });
+  // fetch() itself failed: the backend could not be reached.
+  if (error instanceof TypeError) {
+    return NextResponse.json({ message: offline(lang) }, { status: 502 });
+  }
+  // Anything else is a reply we did not expect; keep the details in the server log.
+  console.error('[kleano] unexpected backend reply:', error);
+  return NextResponse.json({ message: fallback(lang) }, { status: 500 });
 }
 
 const fallback = (lang: 'ar' | 'en') => (lang === 'ar' ? 'حدث خطأ ما. حاول مرة أخرى.' : 'Something went wrong. Try again.');

@@ -4,7 +4,8 @@ import { errorResponse, langOf } from '@/lib/kleano/route-helpers';
 import { deviceId, setSession } from '@/lib/kleano/session';
 import { toAsciiDigits } from '@/lib/phone';
 
-type LoginReply = { data?: { accessToken?: string; refreshToken?: string; userName?: string } };
+/** The backend replies with snake_case tokens (auth.service.ts), as the apps' AuthModel reads them. */
+type LoginReply = { data?: { access_token?: string; refresh_token?: string; userName?: string } };
 
 /** Step 2 of customer log in: phone + texted code (POST /auth/users/login). Tokens go into httpOnly cookies. */
 export async function POST(req: NextRequest) {
@@ -20,8 +21,8 @@ export async function POST(req: NextRequest) {
       lang,
       json: { phone, otp: code, fcmToken: await deviceId() },
     });
-    const access = res.data?.accessToken;
-    const refresh = res.data?.refreshToken;
+    const access = res.data?.access_token;
+    const refresh = res.data?.refresh_token;
     if (!access || !refresh) throw new Error('No tokens in login reply');
     await setSession('customer', access, refresh);
     return NextResponse.json({ userName: res.data?.userName ?? null });

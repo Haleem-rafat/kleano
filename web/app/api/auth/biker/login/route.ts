@@ -3,7 +3,8 @@ import { backendFetch } from '@/lib/kleano/backend';
 import { errorResponse, langOf } from '@/lib/kleano/route-helpers';
 import { deviceId, setSession } from '@/lib/kleano/session';
 
-type LoginReply = { data?: { accessToken?: string; refreshToken?: string; userName?: string } };
+/** The backend replies with snake_case tokens (auth.service.ts), as the apps' AuthModel reads them. */
+type LoginReply = { data?: { access_token?: string; refresh_token?: string; userName?: string } };
 
 /** Biker log in: user name + password (POST /auth/bikers/login), as in biker-app AuthRepo.bikerLogin. */
 export async function POST(req: NextRequest) {
@@ -21,8 +22,8 @@ export async function POST(req: NextRequest) {
       lang,
       json: { userName: userName.trim(), password, fcmToken: await deviceId() },
     });
-    const access = res.data?.accessToken;
-    const refresh = res.data?.refreshToken;
+    const access = res.data?.access_token;
+    const refresh = res.data?.refresh_token;
     if (!access || !refresh) throw new Error('No tokens in login reply');
     await setSession('biker', access, refresh);
     return NextResponse.json({ userName: res.data?.userName ?? null });
