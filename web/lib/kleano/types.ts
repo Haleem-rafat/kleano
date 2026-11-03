@@ -17,7 +17,9 @@ export type Location = {
   longitude: number;
   streetName?: string;
   subAdministrativeArea?: string;
+  /** Saved places carry the city and area ids that the free-time lookup needs. */
   city?: City | string;
+  area?: { _id: string } | string;
   country?: string;
   isSaved?: boolean;
   savedName?: string;
@@ -136,6 +138,15 @@ export function localized(text: LocalizedText | undefined, locale: string): stri
   if (!text) return '';
   return (locale === 'ar' ? text.ar : text.en) ?? text.en ?? text.ar ?? '';
 }
+
+/** An id from a field the backend sends either as an id or as a populated object. */
+export function idOf(value: { _id: string } | string | undefined): string {
+  if (!value) return '';
+  return typeof value === 'string' ? value : value._id;
+}
+
+/** One free time from GET /user/biker-schedules (Saudi wall-clock "HH:mm"). */
+export type Slot = { timeSlot: string; day?: string; availableBikersCount?: number; isAvailable: boolean };
 
 export function cityName(city: Location['city'], locale: string): string {
   if (!city || typeof city === 'string') return '';

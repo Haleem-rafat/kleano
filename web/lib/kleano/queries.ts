@@ -2,7 +2,9 @@
 
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { kleano } from './client';
+import { idOf } from './types';
 import type {
+  AddOn,
   Banner,
   Location,
   Order,
@@ -10,6 +12,7 @@ import type {
   Paged,
   Plan,
   Profile,
+  Slot,
   Vehicle,
   WashingService,
   Wrapped,
@@ -87,3 +90,53 @@ export const useDeleteVehicle = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['vehicles'] }),
   });
 };
+
+export const useAddOns = (location: Location | undefined) =>
+  useQuery({
+    queryKey: ['add-ons', location?._id],
+    enabled: Boolean(location),
+    retry: false,
+    queryFn: () => kleano<Wrapped<AddOn[]>>(`/add-ons/user/all?${where(location!)}`).then((r) => r.data ?? []),
+  });
+
+const DAYS = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+/** Free times for one day at a saved place (GET /user/biker-schedules), as in BookingOrderRepo. */
+export const useSlots = (location: Location | undefined, dateYmd: string | undefined) =>
+  useQuery({
+    queryKey: ['slots', location?._id, dateYmd],
+    enabled: Boolean(location && dateYmd && idOf(location.city as { _id: string } | string) && idOf(location.area)),
+    queryFn: () => {
+      const city = idOf(location!.city as { _id: string } | string);
+      const area = idOf(location!.area);
+      // The backend reads days on the Saudi clock (biker-schedule/utils/saudi-assignment-day.util.ts).
+      const day = DAYS[new Date(`${dateYmd}T12:00:00+03:00`).getUTCDay()];
+      return kleano<Wrapped<Slot[]>>(`/user/biker-schedules?city=${city}&area=${area}&day=${day}&date=${dateYmd}`).then((r) => r.data ?? []);
+    },
+  });
+
+export type PromoResult = { totalPayAfterDiscount: number; discountAmount: number };
+
+export const checkPromo = (code: string, totalPrice: number) =>
+  kleano<Wrapped<PromoResult>>(`/orders/user/promo-code-discount?promoCode=${encodeURIComponent(code)}&totalPrice=${totalPrice}`).then((r) => r.data);
+
+export type NewOrder = {
+  washingServices: string[];
+  addOns?: string[];
+  vehicle: string;
+  location: { latitude: string; longitude: string; streetName: string; subAdministrativeArea?: string; country: string };
+  startTime: string;
+  bookingDate: string;
+  timeSlot: string;
+  type: 'SERVICE_BOOKING';
+  totalPrice: number;
+  paymentType: 'WALLET';
+  code?: string;
+  isCarFreshened: boolean;
+};
+
+/** Same two calls as the app: POST /orders/user/create-order, then PATCH /orders/user/pay-order. */
+export const createOrder = (order: NewOrder) =>
+  kleano<Wrapped<{ _id: string }>>('/orders/user/create-order', { json: order }).then((r) => r.data);
+
+export const payOrder = (orderId: string) => kleano('/orders/user/pay-order', { method: 'PATCH', json: { order: orderId } });
