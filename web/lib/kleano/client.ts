@@ -16,8 +16,13 @@ function lang(): 'ar' | 'en' {
   return typeof document !== 'undefined' && document.documentElement.lang === 'en' ? 'en' : 'ar';
 }
 
+/** The biker web app lives under /[locale]/biker; everything else is the customer app. */
+function role(): 'customer' | 'biker' {
+  return typeof window !== 'undefined' && /^\/(ar|en)\/biker(\/|$)/.test(window.location.pathname) ? 'biker' : 'customer';
+}
+
 async function request<T>(url: string, init: { method?: string; json?: unknown } = {}): Promise<T> {
-  const headers: Record<string, string> = { 'x-kleano-lang': lang() };
+  const headers: Record<string, string> = { 'x-kleano-lang': lang(), 'x-kleano-role': role() };
   if (init.json !== undefined) headers['Content-Type'] = 'application/json';
   const res = await fetch(url, {
     method: init.method ?? (init.json !== undefined ? 'POST' : 'GET'),
@@ -38,7 +43,7 @@ export const authApi = {
   customerLogin: (phone: string, otp: string) => request<{ userName: string | null }>('/api/auth/customer/login', { json: { phone, otp } }),
   bikerLogin: (userName: string, password: string) =>
     request<{ userName: string | null }>('/api/auth/biker/login', { json: { userName, password } }),
-  logout: () => request<{ ok: true }>('/api/auth/logout', { method: 'POST' }),
+  logout: (who: 'customer' | 'biker') => request<{ ok: true }>('/api/auth/logout', { json: { role: who } }),
 };
 
 /** Calls to the Kleano API through the forwarding route, e.g. kleano('/orders/user/all'). */

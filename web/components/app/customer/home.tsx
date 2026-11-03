@@ -133,17 +133,17 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
       ) : null}
 
       <SectionTitle title={t.home.services} />
-      {!location ? (
-        <Empty icon={<MapPin />} text={t.home.noLocation} />
-      ) : services.isPending ? (
+      {saved.isPending || profile.isPending || (location && services.isPending) ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <Skeleton key={i} className="h-36 rounded-2xl" />
           ))}
         </div>
+      ) : !location ? (
+        <Empty icon={<MapPin />} text={t.home.noLocation} />
       ) : services.isError ? (
         <Failed message={services.error.message || t.home.notAvailable} onRetry={() => services.refetch()} t={t} />
-      ) : services.data.length === 0 ? (
+      ) : !services.data?.length ? (
         <Empty icon={<MapPin />} text={t.home.notAvailable} />
       ) : (
         <HoverEffect

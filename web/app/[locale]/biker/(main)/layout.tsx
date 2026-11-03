@@ -9,7 +9,7 @@ import { getSession } from '@/lib/kleano/session';
 export default async function BikerMainLayout({ children, params }: LayoutProps<'/[locale]/biker'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  if ((await getSession())?.role !== 'biker') redirect(`/${locale}/biker/login`);
+  if (!(await getSession('biker'))) redirect(`/${locale}/biker/login`);
   return (
     <AppShell role="biker" locale={locale} t={getAppDictionary(locale)} themeLabel={getDictionary(locale).theme}>
       {children}

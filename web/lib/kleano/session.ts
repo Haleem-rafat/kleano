@@ -4,36 +4,39 @@ import { backendFetch } from './backend';
 
 export type Role = 'customer' | 'biker';
 
-const ACCESS = 'kleano_access';
-const REFRESH = 'kleano_refresh';
-const ROLE = 'kleano_role';
+/**
+ * One login per role, side by side: logging in as a biker never logs the customer out (and the
+ * other way round). Cookies: kleano_customer_access / _refresh and kleano_biker_access / _refresh.
+ */
+const ACCESS = (role: Role) => `kleano_${role}_access`;
+const REFRESH = (role: Role) => `kleano_${role}_refresh`;
 const DEVICE = 'kleano_device';
 
 const secure = process.env.NODE_ENV === 'production';
 const base = { httpOnly: true, secure, sameSite: 'lax' as const, path: '/' };
-const MONTH = 60 * 60 * 24 * 30;
+// The backend's refresh token lives 60 days (auth.service.ts generateRefreshToken).
+const SIXTY_DAYS = 60 * 60 * 24 * 60;
 
 export type Session = { role: Role; access: string; refresh: string };
 
-export async function getSession(): Promise<Session | null> {
+export async function getSession(role: Role): Promise<Session | null> {
   const jar = await cookies();
-  const role = jar.get(ROLE)?.value;
-  const access = jar.get(ACCESS)?.value;
-  const refresh = jar.get(REFRESH)?.value;
-  if ((role !== 'customer' && role !== 'biker') || !access || !refresh) return null;
+  const access = jar.get(ACCESS(role))?.value;
+  const refresh = jar.get(REFRESH(role))?.value;
+  if (!access || !refresh || isExpired(refresh)) return null;
   return { role, access, refresh };
 }
 
 export async function setSession(role: Role, access: string, refresh: string) {
   const jar = await cookies();
-  jar.set(ROLE, role, { ...base, maxAge: MONTH });
-  jar.set(ACCESS, access, { ...base, maxAge: MONTH });
-  jar.set(REFRESH, refresh, { ...base, maxAge: MONTH });
+  jar.set(ACCESS(role), access, { ...base, maxAge: SIXTY_DAYS });
+  jar.set(REFRESH(role), refresh, { ...base, maxAge: SIXTY_DAYS });
 }
 
-export async function clearSession() {
+export async function clearSession(role: Role) {
   const jar = await cookies();
-  for (const name of [ROLE, ACCESS, REFRESH]) jar.delete(name);
+  jar.delete(ACCESS(role));
+  jar.delete(REFRESH(role));
 }
 
 /**
@@ -46,7 +49,7 @@ export async function deviceId(): Promise<string> {
   const existing = jar.get(DEVICE)?.value;
   if (existing) return existing;
   const id = `web-${crypto.randomUUID()}`;
-  jar.set(DEVICE, id, { ...base, maxAge: MONTH * 12 });
+  jar.set(DEVICE, id, { ...base, maxAge: SIXTY_DAYS * 6 });
   return id;
 }
 
@@ -82,6 +85,6 @@ export async function refreshSession(session: Session): Promise<Session | 'rejec
     return { role: session.role, access, refresh };
   } catch (error) {
     const status = (error as { status?: number }).status;
-    return status === 401 || status === 403 || status === 404 ? 'rejected' : 'offline';
+    return status === 401 || status === 404 ? 'rejected' : 'offline';
   }
 }

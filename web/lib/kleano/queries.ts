@@ -32,9 +32,18 @@ export const useSavedLocations = () =>
 export const useBanners = () =>
   useQuery({ queryKey: ['banners'], queryFn: () => kleano<Wrapped<Banner[]>>('/banners/active-banner').then((r) => r.data ?? []) });
 
-/** Where services and plans are priced: the default saved place, else the profile's location. */
+/** A location the backend can price: real coordinates and a country (the profile's can be 0,0). */
+const usable = (l: Location | undefined): l is Location =>
+  Boolean(l && l.country && (Math.abs(l.latitude) > 0.0001 || Math.abs(l.longitude) > 0.0001));
+
+/**
+ * Where services and plans are priced: the default saved place, else any saved place, else the
+ * profile's location. Returns undefined until the saved places have loaded, so nothing is asked
+ * for with an empty location.
+ */
 export function pickLocation(saved: Location[] | undefined, profile: Profile | undefined): Location | undefined {
-  return saved?.find((l) => l.isDefault) ?? saved?.[0] ?? profile?.location;
+  if (!saved) return undefined;
+  return [saved.find((l) => l.isDefault), ...saved, profile?.location].find(usable);
 }
 
 const where = (l: Location) =>

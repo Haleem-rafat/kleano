@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { backendUrl } from '@/lib/kleano/backend';
 import { langOf } from '@/lib/kleano/route-helpers';
-import { clearSession, getSession, isExpired, refreshSession, type Session } from '@/lib/kleano/session';
+import { clearSession, getSession, isExpired, refreshSession, type Role, type Session } from '@/lib/kleano/session';
 
 /**
  * Forwards the web app's calls to the Kleano API with the signed-in token, the same way the
@@ -19,17 +19,19 @@ async function forward(req: NextRequest, path: string[]) {
   }
 
   const lang = langOf(req);
+  // Which app is calling: the customer and biker logins are kept apart.
+  const role: Role = req.headers.get('x-kleano-role') === 'biker' ? 'biker' : 'customer';
   const url = `${backendUrl}/${target}${req.nextUrl.search}`;
   const hasBody = req.method !== 'GET' && req.method !== 'HEAD';
   // Read the body once so the request can be retried after a token refresh.
   const body = hasBody ? await req.arrayBuffer() : undefined;
   const contentType = req.headers.get('content-type');
 
-  let session: Session | null = await getSession();
+  let session: Session | null = await getSession(role);
   if (session && isExpired(session.access)) {
     const refreshed = await refreshSession(session);
     if (refreshed === 'rejected') {
-      await clearSession();
+      await clearSession(role);
       return NextResponse.json({ message: 'Session expired' }, { status: 401 });
     }
     if (refreshed !== 'offline') session = refreshed;
@@ -48,7 +50,7 @@ async function forward(req: NextRequest, path: string[]) {
   if (res.status === 403 && session) {
     const refreshed = await refreshSession(session);
     if (refreshed === 'rejected') {
-      await clearSession();
+      await clearSession(role);
       return NextResponse.json({ message: 'Session expired' }, { status: 401 });
     }
     if (refreshed !== 'offline') res = await send(refreshed.access);

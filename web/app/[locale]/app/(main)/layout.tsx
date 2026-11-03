@@ -9,7 +9,7 @@ import { getSession } from '@/lib/kleano/session';
 export default async function CustomerMainLayout({ children, params }: LayoutProps<'/[locale]/app'>) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  if ((await getSession())?.role !== 'customer') redirect(`/${locale}/app/login`);
+  if (!(await getSession('customer'))) redirect(`/${locale}/app/login`);
   return (
     <AppShell role="customer" locale={locale} t={getAppDictionary(locale)} themeLabel={getDictionary(locale).theme}>
       {children}
