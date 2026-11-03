@@ -13,7 +13,7 @@ This repo holds every part of the platform:
 | [`biker-app/`](biker-app) | App for bikers: receive orders, update wash status, earnings | Flutter, BLoC |
 | [`dashboard/`](dashboard) | Admin web dashboard | React, Vite, Tailwind, shadcn/ui |
 | [`backend/`](backend) | API used by both apps and the dashboard | NestJS 9, MongoDB, Socket.IO |
-| [`landing/`](landing) | Marketing page | Static HTML |
+| [`web/`](web) | Website: landing page now; customer and biker web apps next | Next.js 16, React 19, Tailwind 4 |
 | [`docs/`](docs) | Design system, handoff notes, backend review | Markdown |
 
 Live API: `https://kleano-backend.onrender.com/api/`
@@ -207,10 +207,22 @@ owner's OK. Open security notes: [`docs/backend-review.md`](docs/backend-review.
 
 ---
 
-## Landing page — `landing/`
+## Website — `web/`
 
-A single static page (`index.html` + `img/`). Open it in a browser or serve the folder,
-for example `npx serve landing -l 4100`.
+Next.js site in Arabic (`/ar`, the default) and English (`/en`), light and dark mode, built
+from the apps' design tokens, logo and photos. `/` sends visitors to their browser's language.
+Today it holds the landing page; the customer and biker web apps come next
+(plan: [`docs/superpowers/specs/2026-11-03-kleano-web-design.md`](docs/superpowers/specs/2026-11-03-kleano-web-design.md)).
+
+```bash
+cd web
+npm install
+npm run dev        # http://localhost:4100
+npm run typecheck && npm run lint && npm run build
+```
+
+Optional settings (`web/.env.local`): `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_STORE_URL`,
+`NEXT_PUBLIC_GOOGLE_PLAY_URL`. Without store links the download buttons stay on the page.
 
 ---
 

@@ -1,0 +1,102 @@
+@import 'tailwindcss';
+
+/*
+ * Kleano tokens for the web. Values follow customer-app/lib/core/design/tokens.dart
+ * (KColors, KRadius, KSpace). Step 2 of docs/superpowers/specs/2026-11-03-kleano-web-design.md
+ * replaces this block with a file generated from tokens.dart.
+ */
+:root {
+  --bg: #f4f2f6;
+  --surface: #ffffff;
+  --ink: #1c1c1e;
+  --muted: #66636b;
+  --line: #e2dee6;
+  --brand: #543063;
+  --on-brand: #ffffff;
+  --tint: #ece5f0;
+  --on-tint: #3f2350;
+  --ok: #34c759;
+  --photo-ink: #ffffff;
+  --r-field: 14px;
+  --r-card: 22px;
+  --r-sheet: 34px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #0b0a0c;
+    --surface: #1c1b1e;
+    --ink: #ffffff;
+    --muted: #a39fa8;
+    --line: #2e2b31;
+    --brand: #b88cd0;
+    --on-brand: #1c1023;
+    --tint: #2a2030;
+    --on-tint: #e6d6f0;
+    --ok: #30d158;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b0a0c;
+  --surface: #1c1b1e;
+  --ink: #ffffff;
+  --muted: #a39fa8;
+  --line: #2e2b31;
+  --brand: #b88cd0;
+  --on-brand: #1c1023;
+  --tint: #2a2030;
+  --on-tint: #e6d6f0;
+  --ok: #30d158;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
+  --color-tint: var(--tint);
+  --color-on-tint: var(--on-tint);
+  --radius-field: var(--r-field);
+  --radius-card: var(--r-card);
+  --radius-sheet: var(--r-sheet);
+  --font-display: var(--font-readex), var(--font-plex), system-ui, sans-serif;
+  --font-body: var(--font-plex), var(--font-readex), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 17px/1.65 var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Theme toggle: show the icon for the mode you switch to. */
+.theme-toggle .icon-sun { display: none; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .theme-toggle .icon-sun { display: block; }
+  :root:not([data-theme='light']) .theme-toggle .icon-moon { display: none; }
+}
+:root[data-theme='dark'] .theme-toggle .icon-sun { display: block; }
+:root[data-theme='dark'] .theme-toggle .icon-moon { display: none; }

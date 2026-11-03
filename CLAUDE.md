@@ -1,7 +1,7 @@
 # Kleano apps — rules for every session
 
 One repo: two Flutter apps sharing one design system, `customer-app/` and `biker-app/`,
-plus `dashboard/` (React admin), `landing/` (marketing page) and `backend/` (NestJS +
+plus `dashboard/` (React admin), `web/` (Next.js website: landing page, then customer and biker web apps) and `backend/` (NestJS +
 MongoDB API, live at `kleano-backend.onrender.com`). Read `docs/HANDOFF.md` first, then
 `docs/design-system.md`; for backend work `docs/backend-review.md`. Design system page:
 https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
@@ -34,6 +34,8 @@ https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
 - Keep BLoC/cubit calls, navigation and validation unchanged when restyling.
 - After app changes: `flutter analyze` (0 errors) and `flutter test` in both apps,
   `customer-app/tool/sync_design.sh --check`, then check on the simulator before saying done.
+- After website changes (in `web/`): `npm run typecheck`, `npm run lint`, `npm run build`
+  (0 errors), then check `/ar` and `/en` in a phone-size and a desktop browser, light and dark.
 - After backend changes (in `backend/`): `npx tsc -p tsconfig.build.json --noEmit`
   (0 errors), `npm run lint`, `npm test`. Keep response shapes unchanged: the apps and
   dashboard parse them.

@@ -23,7 +23,7 @@ One git repo (root `kleano/`); each folder used to be its own repo.
   `customer-app/tool/sync_design.sh` then `customer-app/tool/sync_design.sh --check`.
   `ios/Runner/KleanoNative.swift` is identical in both apps: copy it across by hand.
 - `dashboard/` — React admin dashboard (Vite, Tailwind, shadcn); `npm run dev`, port 4000.
-- `landing/` — static marketing page (port 4100 when served locally).
+- `web/` — Next.js website (`npm run dev`, port 4100): landing page in Arabic and English, light and dark. Replaced the static `landing/` folder on 2026-11-03. Plan for the web apps: `docs/superpowers/specs/2026-11-03-kleano-web-design.md`.
 - `backend/` — NestJS 9 + MongoDB API that the apps and dashboard call; plain folder in this
   repo like `dashboard/` (no history before 2026-11-02). The apps use
   `https://kleano-backend.onrender.com/api/`. `backend/.github/workflows/push.yml` is the
