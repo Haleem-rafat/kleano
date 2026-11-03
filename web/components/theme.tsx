@@ -5,10 +5,10 @@ import { ThemeProvider as NextThemes, useTheme } from 'next-themes';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 
-/** Light, dark or the device setting. Sets data-theme on <html>, which globals.css reads. */
+/** Dark first, with a light option. Sets data-theme on <html>, which globals.css reads. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   return (
-    <NextThemes attribute="data-theme" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <NextThemes attribute="data-theme" defaultTheme="dark" enableSystem disableTransitionOnChange>
       {children}
     </NextThemes>
   );

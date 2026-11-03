@@ -111,8 +111,17 @@
 
 /* Fonts come from next/font as runtime variables, so this block is not inline. */
 @theme {
-  --font-sans: var(--font-plex), var(--font-readex), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: var(--font-geist), var(--font-plex), system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-heading: var(--font-readex), var(--font-plex), system-ui, sans-serif;
+  /* Landing page headlines: Fraunces for English; Arabic falls through to Alexandria. */
+  --font-display: var(--font-fraunces), var(--font-alexandria), Georgia, serif;
+  --font-label: var(--font-mono-latin), ui-monospace, monospace;
+  --animate-marquee: marquee var(--animation-duration, 40s) linear infinite;
+  @keyframes marquee {
+    to {
+      transform: translateX(calc(-50% - 1.5rem));
+    }
+  }
 }
 
 @layer base {
@@ -170,4 +179,16 @@
 /* Aceternity's input and card shadow. */
 @theme {
   --shadow-input: 0px 2px 3px -1px rgb(0 0 0 / 0.1), 0px 1px 0px 0px rgb(25 28 33 / 0.02), 0px 0px 0px 1px rgb(25 28 33 / 0.08);
+}
+
+/* Landing page: fine paper grain over everything, under the content. Cheap: one tiled SVG. */
+.lp-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.035;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
 }

@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next';
-import { IBM_Plex_Sans_Arabic, Readex_Pro } from 'next/font/google';
+import { Alexandria, Fraunces, Geist, Geist_Mono, IBM_Plex_Sans_Arabic, Readex_Pro } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@/components/theme';
-import { getDictionary } from '@/lib/dictionaries';
+import { getDictionary } from '@/lib/content';
 import { dirOf, isLocale, locales } from '@/lib/i18n';
 import { siteUrl } from '@/lib/site';
 import '../globals.css';
@@ -21,6 +21,12 @@ const plex = IBM_Plex_Sans_Arabic({
   variable: '--font-plex',
   display: 'swap',
 });
+
+// Fraunces (English) and Alexandria (Arabic) for landing headlines, Geist for English text, Geist Mono for labels.
+const fraunces = Fraunces({ subsets: ['latin'], axes: ['opsz', 'SOFT'], variable: '--font-fraunces', display: 'swap' });
+const alexandria = Alexandria({ subsets: ['arabic'], variable: '--font-alexandria', display: 'swap' });
+const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
+const mono = Geist_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono-latin', display: 'swap' });
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -62,7 +68,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!isLocale(locale)) notFound();
 
   return (
-    <html lang={locale} dir={dirOf(locale)} className={`${readex.variable} ${plex.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang={locale} dir={dirOf(locale)} className={`${readex.variable} ${plex.variable} ${fraunces.variable} ${alexandria.variable} ${geist.variable} ${mono.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <ThemeProvider>{children as ReactNode}</ThemeProvider>
       </body>

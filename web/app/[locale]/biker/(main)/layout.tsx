@@ -1,7 +1,7 @@
 import { notFound, redirect } from 'next/navigation';
 import { AppShell } from '@/components/app/app-shell';
 import { getAppDictionary } from '@/lib/app-dictionary';
-import { getDictionary } from '@/lib/dictionaries';
+import { getDictionary } from '@/lib/content';
 import { isLocale } from '@/lib/i18n';
 import { getSession } from '@/lib/kleano/session';
 
