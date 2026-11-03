@@ -6,7 +6,7 @@ const en = {
     description:
       'Book a car wash from your phone. A Kleano biker comes to your car, at home or at work, and you follow every stage live.',
   },
-  nav: { how: 'How it works', services: 'Services', tracking: 'Live tracking', bikers: 'For bikers', sections: 'Sections' },
+  nav: { how: 'How it works', services: 'Services', tracking: 'Live tracking', bikers: 'For bikers', sections: 'Sections', menu: 'Menu' },
   langSwitch: 'العربية',
   theme: 'Switch light or dark mode',
   hero: {
@@ -20,11 +20,9 @@ const en = {
     photoAlt: 'A Kleano biker washing a white car',
   },
   status: {
-    title: 'Your car is being washed',
-    live: 'Live',
-    stages: ['Booked', 'On the way', 'Washing', 'Done'],
-    note: 'Example of the live status in the app',
-    label: 'Example wash status: booked, on the way, washing now, done next',
+    island: { title: 'Washing your car', stage: '3 of 4' },
+    tapHint: 'Tap the Dynamic Island',
+    screenAlt: 'The Kleano app on iPhone',
   },
   how: {
     eyebrow: 'How it works',
@@ -72,6 +70,9 @@ const en = {
     ],
     cta: 'Join as a biker',
     photoAlt: 'A biker holding a phone to accept a wash request',
+    screenAlt: 'The Kleano Biker app on iPhone',
+    tabCustomers: 'For customers',
+    tabBikers: 'For bikers',
   },
   get: {
     title: 'Get Kleano on your phone',
@@ -90,7 +91,7 @@ const ar: Dictionary = {
     title: 'كلينو | سيارتك تُغسل في مكان وقوفها',
     description: 'احجز غسيل سيارتك من هاتفك. يأتي سائق كلينو إلى سيارتك في المنزل أو العمل، وتتابع كل مرحلة مباشرة.',
   },
-  nav: { how: 'كيف يعمل', services: 'الخدمات', tracking: 'التتبع المباشر', bikers: 'للسائقين', sections: 'الأقسام' },
+  nav: { how: 'كيف يعمل', services: 'الخدمات', tracking: 'التتبع المباشر', bikers: 'للسائقين', sections: 'الأقسام', menu: 'القائمة' },
   langSwitch: 'English',
   theme: 'التبديل بين الوضع الفاتح والداكن',
   hero: {
@@ -104,11 +105,9 @@ const ar: Dictionary = {
     photoAlt: 'سائق كلينو يغسل سيارة بيضاء',
   },
   status: {
-    title: 'يتم غسيل سيارتك الآن',
-    live: 'مباشر',
-    stages: ['تم الحجز', 'في الطريق', 'الغسيل', 'تم'],
-    note: 'مثال على حالة الغسيل المباشرة في التطبيق',
-    label: 'مثال لحالة الغسيل: تم الحجز، في الطريق، الغسيل الآن، ثم تم',
+    island: { title: 'يتم غسيل سيارتك', stage: '٣ من ٤' },
+    tapHint: 'اضغط على الجزيرة الديناميكية',
+    screenAlt: 'تطبيق كلينو على iPhone',
   },
   how: {
     eyebrow: 'كيف يعمل',
@@ -152,6 +151,9 @@ const ar: Dictionary = {
     points: ['تصلك طلبات الغسيل القريبة منك فور وصولها.', 'حدد أيام ومناطق عملك.', 'تابع غسلاتك وأرباحك في مكان واحد.'],
     cta: 'انضم كسائق',
     photoAlt: 'سائق يحمل هاتفًا لقبول طلب غسيل',
+    screenAlt: 'تطبيق كلينو للسائقين على iPhone',
+    tabCustomers: 'للعملاء',
+    tabBikers: 'للسائقين',
   },
   get: {
     title: 'حمّل كلينو على هاتفك',

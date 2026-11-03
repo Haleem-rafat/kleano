@@ -1,89 +1,138 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* next-themes writes data-theme="dark" on <html>; Tailwind's dark: follows it. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /*
- * Kleano tokens for the web. Values follow customer-app/lib/core/design/tokens.dart
- * (KColors, KRadius, KSpace). Step 2 of docs/superpowers/specs/2026-11-03-kleano-web-design.md
- * replaces this block with a file generated from tokens.dart.
+ * Kleano colours for shadcn/ui and Cult UI components.
+ * Values follow customer-app/lib/core/design/tokens.dart (KColors, KRadius).
  */
 :root {
-  --bg: #f4f2f6;
-  --surface: #ffffff;
-  --ink: #1c1c1e;
-  --muted: #66636b;
-  --line: #e2dee6;
-  --brand: #543063;
-  --on-brand: #ffffff;
-  --tint: #ece5f0;
-  --on-tint: #3f2350;
-  --ok: #34c759;
-  --photo-ink: #ffffff;
-  --r-field: 14px;
-  --r-card: 22px;
-  --r-sheet: 34px;
+  --background: #f4f2f6;
+  --foreground: #1c1c1e;
+  --card: #ffffff;
+  --card-foreground: #1c1c1e;
+  --popover: #ffffff;
+  --popover-foreground: #1c1c1e;
+  --primary: #543063;
+  --primary-foreground: #ffffff;
+  --secondary: #ece5f0;
+  --secondary-foreground: #3f2350;
+  --muted: #eceaef;
+  --muted-foreground: #66636b;
+  --accent: #ece5f0;
+  --accent-foreground: #3f2350;
+  --destructive: #ff3b30;
+  --success: #34c759;
+  --border: #e2dee6;
+  --input: #e2dee6;
+  --ring: #543063;
+  --radius: 0.875rem;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0b0a0c;
-    --surface: #1c1b1e;
-    --ink: #ffffff;
-    --muted: #a39fa8;
-    --line: #2e2b31;
-    --brand: #b88cd0;
-    --on-brand: #1c1023;
-    --tint: #2a2030;
-    --on-tint: #e6d6f0;
-    --ok: #30d158;
+    --background: #0b0a0c;
+    --foreground: #ffffff;
+    --card: #1c1b1e;
+    --card-foreground: #ffffff;
+    --popover: #1c1b1e;
+    --popover-foreground: #ffffff;
+    --primary: #b88cd0;
+    --primary-foreground: #1c1023;
+    --secondary: #2a2030;
+    --secondary-foreground: #e6d6f0;
+    --muted: #232126;
+    --muted-foreground: #a39fa8;
+    --accent: #2a2030;
+    --accent-foreground: #e6d6f0;
+    --destructive: #ff453a;
+    --success: #30d158;
+    --border: #2e2b31;
+    --input: #2e2b31;
+    --ring: #b88cd0;
     color-scheme: dark;
   }
 }
 
 :root[data-theme='dark'] {
-  --bg: #0b0a0c;
-  --surface: #1c1b1e;
-  --ink: #ffffff;
-  --muted: #a39fa8;
-  --line: #2e2b31;
-  --brand: #b88cd0;
-  --on-brand: #1c1023;
-  --tint: #2a2030;
-  --on-tint: #e6d6f0;
-  --ok: #30d158;
+  --background: #0b0a0c;
+  --foreground: #ffffff;
+  --card: #1c1b1e;
+  --card-foreground: #ffffff;
+  --popover: #1c1b1e;
+  --popover-foreground: #ffffff;
+  --primary: #b88cd0;
+  --primary-foreground: #1c1023;
+  --secondary: #2a2030;
+  --secondary-foreground: #e6d6f0;
+  --muted: #232126;
+  --muted-foreground: #a39fa8;
+  --accent: #2a2030;
+  --accent-foreground: #e6d6f0;
+  --destructive: #ff453a;
+  --success: #30d158;
+  --border: #2e2b31;
+  --input: #2e2b31;
+  --ring: #b88cd0;
   color-scheme: dark;
 }
 
 @theme inline {
-  --color-bg: var(--bg);
-  --color-surface: var(--surface);
-  --color-ink: var(--ink);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
-  --color-line: var(--line);
-  --color-brand: var(--brand);
-  --color-on-brand: var(--on-brand);
-  --color-tint: var(--tint);
-  --color-on-tint: var(--on-tint);
-  --radius-field: var(--r-field);
-  --radius-card: var(--r-card);
-  --radius-sheet: var(--r-sheet);
-  --font-display: var(--font-readex), var(--font-plex), system-ui, sans-serif;
-  --font-body: var(--font-plex), var(--font-readex), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  /* KRadius: field 14, card 22, sheet 34. */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-card: 22px;
+  --radius-sheet: 34px;
 }
 
-html {
-  scroll-behavior: smooth;
+/* Fonts come from next/font as runtime variables, so this block is not inline. */
+@theme {
+  --font-sans: var(--font-plex), var(--font-readex), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: var(--font-readex), var(--font-plex), system-ui, sans-serif;
 }
 
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font: 400 17px/1.65 var(--font-body);
-  -webkit-font-smoothing: antialiased;
-}
-
-:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 3px;
-  border-radius: 8px;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-size: 17px;
+    line-height: 1.65;
+  }
+  h1,
+  h2,
+  h3 {
+    @apply font-heading;
+    text-wrap: balance;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -92,11 +141,10 @@ body {
   }
 }
 
-/* Theme toggle: show the icon for the mode you switch to. */
-.theme-toggle .icon-sun { display: none; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme='light']) .theme-toggle .icon-sun { display: block; }
-  :root:not([data-theme='light']) .theme-toggle .icon-moon { display: none; }
+/* The Dynamic Island is always black, so it uses the dark-theme brand purple in both themes. */
+:root {
+  --island-accent: #b88cd0;
 }
-:root[data-theme='dark'] .theme-toggle .icon-sun { display: block; }
-:root[data-theme='dark'] .theme-toggle .icon-moon { display: none; }
+@theme inline {
+  --color-island-accent: var(--island-accent);
+}

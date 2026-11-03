@@ -1,8 +1,9 @@
 'use client';
 
+import { Moon, Sun } from 'lucide-react';
 import { ThemeProvider as NextThemes, useTheme } from 'next-themes';
 import type { ReactNode } from 'react';
-import { MoonIcon, SunIcon } from './icons';
+import { Button } from '@/components/ui/button';
 
 /** Light, dark or the device setting. Sets data-theme on <html>, which globals.css reads. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -13,18 +14,18 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/** Both icons render; CSS shows the sun in dark mode and the moon in light mode. */
+/** Both icons render; Tailwind's dark: variant shows the right one before hydration. */
 export function ThemeToggle({ label }: { label: string }) {
   const { resolvedTheme, setTheme } = useTheme();
   return (
-    <button
-      type="button"
-      className="lp-chip theme-toggle"
+    <Button
+      variant="outline"
+      size="chip"
       aria-label={label}
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
     >
-      <SunIcon className="icon-sun" />
-      <MoonIcon className="icon-moon" />
-    </button>
+      <Moon className="dark:hidden" />
+      <Sun className="hidden dark:block" />
+    </Button>
   );
 }
