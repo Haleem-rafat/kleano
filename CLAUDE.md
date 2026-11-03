@@ -29,6 +29,14 @@ https://claude.ai/artifact/CW6q57miq9LELeaHnCxeCk
 - If something you need isn't in the design system, add it there (customer app),
   run `customer-app/tool/sync_design.sh`, and document it — don't style it inline.
 
+## Website (`web/`) design (owner's rule, 2026-11-03)
+
+- Build web screens from **Aceternity UI** (https://ui.aceternity.com,
+  `npx shadcn@latest add @aceternity/<name>`) plus shadcn/ui, in Kleano's colours and fonts.
+  Don't copy the phone apps' look onto the web, and don't use Cult UI.
+- Adapt every Aceternity part before use: Kleano colour tokens instead of its blues and
+  greys, right-to-left for Arabic, real buttons with labels, lucide icons.
+
 ## Working rules
 
 - Keep BLoC/cubit calls, navigation and validation unchanged when restyling.

@@ -2,11 +2,9 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme';
+import { BackgroundBeams } from '@/components/ui/background-beams';
 
-/**
- * Web version of the apps' KAuthScaffold: brand header with the logo (the one place the
- * design system allows a purple band), then the form on a card.
- */
+/** Log in page: Aceternity Background Beams behind an Aceternity sign-up-form style card. */
 export function AuthShell({
   title,
   subtitle,
@@ -23,22 +21,22 @@ export function AuthShell({
   children: ReactNode;
 }) {
   return (
-    <div className="min-h-dvh bg-background">
-      <div className="bg-primary pt-[env(safe-area-inset-top)] text-primary-foreground">
-        <div className="mx-auto flex max-w-md items-center justify-between px-4 pt-4">
-          <Link href={homeHref} aria-label={homeLabel}>
-            <Logo className="h-10 w-auto" />
-          </Link>
-          <ThemeToggle label={themeLabel} />
+    <div className="relative flex min-h-dvh flex-col overflow-hidden bg-background antialiased">
+      <BackgroundBeams />
+      <header className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between px-4 pt-[calc(16px+env(safe-area-inset-top))] md:px-8">
+        <Link href={homeHref} aria-label={homeLabel} className="text-primary">
+          <Logo className="h-10 w-auto" />
+        </Link>
+        <ThemeToggle label={themeLabel} />
+      </header>
+      <main className="relative z-10 flex flex-1 items-center justify-center px-4 py-10">
+        <div className="shadow-input w-full max-w-md rounded-2xl bg-card p-6 md:p-8">
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          <div className="mt-2 max-w-sm text-sm text-muted-foreground">{subtitle}</div>
+          <div className="my-8 h-px w-full bg-gradient-to-r from-transparent via-border to-transparent" />
+          {children}
         </div>
-        <div className="mx-auto grid max-w-md gap-2 px-4 pt-10 pb-16">
-          <h1 className="text-[34px] leading-tight font-extrabold">{title}</h1>
-          <div className="text-primary-foreground/85">{subtitle}</div>
-        </div>
-      </div>
-      <div className="mx-auto -mt-8 max-w-md px-4 pb-10">
-        <div className="rounded-sheet bg-card p-6 shadow-sm">{children}</div>
-      </div>
+      </main>
     </div>
   );
 }

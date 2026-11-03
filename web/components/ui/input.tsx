@@ -1,18 +1,53 @@
-import * as React from "react"
-import { cn } from "cn"
+"use client";
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import { useMotionTemplate, useMotionValue, motion } from "motion/react";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40",
-        className
-      )}
-      {...props}
-    />
-  )
-}
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
-export { Input }
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    const radius = 100; // change this to increase the rdaius of the hover effect
+    const [visible, setVisible] = React.useState(false);
+
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent<HTMLDivElement>) {
+      const { left, top } = currentTarget.getBoundingClientRect();
+
+      mouseX.set(clientX - left);
+      mouseY.set(clientY - top);
+    }
+    return (
+      <motion.div
+        style={{
+          background: useMotionTemplate`
+        radial-gradient(
+          ${visible ? radius + "px" : "0px"} circle at ${mouseX}px ${mouseY}px,
+          var(--primary),
+          transparent 80%
+        )
+      `,
+        }}
+        onMouseMove={handleMouseMove}
+        onMouseEnter={() => setVisible(true)}
+        onMouseLeave={() => setVisible(false)}
+        className="group/input rounded-lg p-[2px] transition duration-300"
+      >
+        <input
+          type={type}
+          className={cn(
+            `shadow-input flex h-12 w-full rounded-md border-none bg-muted px-3.5 py-2 text-base text-foreground transition duration-400 group-hover/input:shadow-none file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:ring-[2px] focus-visible:ring-primary focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:ring-[2px] aria-invalid:ring-destructive`,
+            className,
+          )}
+          ref={ref}
+          {...props}
+        />
+      </motion.div>
+    );
+  },
+);
+Input.displayName = "Input";
+
+export { Input };

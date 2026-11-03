@@ -6,8 +6,8 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
 /**
- * Web version of the apps' KTextField: label above (footnote, secondary colour), filled field,
- * radius 14, purple border when focused, red border and message below on error.
+ * Aceternity sign-up-form field: label above an Aceternity Input (glow follows the pointer),
+ * with optional fixed text before the value (the +20 dial code) or a button after it.
  */
 export function Field({
   id,
@@ -16,45 +16,38 @@ export function Field({
   start,
   end,
   className,
+  dir,
   ...props
 }: ComponentProps<typeof Input> & {
   id: string;
   label: string;
   error?: string | null;
-  /** Something fixed before the text, e.g. the +20 dial code. */
   start?: ReactNode;
-  /** Something after the text, e.g. a show-password button. */
   end?: ReactNode;
 }) {
   const errorId = `${id}-error`;
   return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={id} className="text-[13px] font-normal text-muted-foreground">
-        {label}
-      </Label>
-      <div
-        // A left-to-right value (a phone number) keeps its prefix on the left, even in Arabic.
-        dir={props.dir}
-        className={cn(
-          'flex h-[52px] items-center gap-2 rounded-[14px] border-2 border-transparent bg-muted px-3.5 transition-colors focus-within:border-primary',
-          error && 'border-destructive focus-within:border-destructive',
-        )}
-      >
-        {start}
+    <div className="flex w-full flex-col gap-2">
+      <Label htmlFor={id}>{label}</Label>
+      {/* A left-to-right value (a phone number) keeps its prefix on the left, even in Arabic. */}
+      <div className="relative" dir={dir}>
+        {start ? (
+          <span className="pointer-events-none absolute inset-y-0 start-4 z-10 flex items-center font-medium text-muted-foreground">
+            {start}
+          </span>
+        ) : null}
         <Input
           id={id}
+          dir={dir}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? errorId : undefined}
-          className={cn(
-            'h-full min-w-0 flex-1 rounded-none border-0 bg-transparent px-0 text-[17px] shadow-none focus-visible:ring-0 dark:bg-transparent',
-            className,
-          )}
+          className={cn(start && 'ps-14', end && 'pe-12', className)}
           {...props}
         />
-        {end}
+        {end ? <span className="absolute inset-y-0 end-2 z-10 flex items-center">{end}</span> : null}
       </div>
       {error ? (
-        <p id={errorId} role="alert" className="text-[13px] text-destructive">
+        <p id={errorId} role="alert" className="text-sm text-destructive">
           {error}
         </p>
       ) : null}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, type FormEvent } from 'react';
 import { AuthShell } from '@/components/app/auth-shell';
 import { Field } from '@/components/app/field';
+import { GlowButton } from '@/components/app/glow-button';
 import { Button } from '@/components/ui/button';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -110,10 +111,10 @@ export function CustomerLogin({ t, locale, themeLabel }: { t: AppDictionary; loc
             autoFocus
             required
           />
-          <Button type="submit" size="xl" className="w-full" disabled={busy || input.length < 9}>
+          <GlowButton type="submit" disabled={busy || input.length < 9}>
             {busy ? <Loader2 className="animate-spin" /> : null}
             {t.customer.continue}
-          </Button>
+          </GlowButton>
           <p className="text-center text-sm text-muted-foreground">{t.customer.noAccount}</p>
         </form>
       </AuthShell>
@@ -168,10 +169,10 @@ export function CustomerLogin({ t, locale, themeLabel }: { t: AppDictionary; loc
             {error}
           </p>
         ) : null}
-        <Button type="submit" size="xl" className="w-full" disabled={busy || code.length !== 6}>
+        <GlowButton type="submit" disabled={busy || code.length !== 6}>
           {busy ? <Loader2 className="animate-spin" /> : null}
           {t.customer.verify}
-        </Button>
+        </GlowButton>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <Button
             type="button"

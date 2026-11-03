@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { AuthShell } from '@/components/app/auth-shell';
 import { Field } from '@/components/app/field';
-import { Button } from '@/components/ui/button';
+import { GlowButton } from '@/components/app/glow-button';
 import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
 import { ApiError, authApi } from '@/lib/kleano/client';
@@ -69,10 +69,10 @@ export function BikerLogin({ t, locale, themeLabel }: { t: AppDictionary; locale
             </button>
           }
         />
-        <Button type="submit" size="xl" className="mt-1 w-full" disabled={busy || !userName.trim() || !password}>
+        <GlowButton type="submit" className="mt-1" disabled={busy || !userName.trim() || !password}>
           {busy ? <Loader2 className="animate-spin" /> : null}
           {t.biker.login}
-        </Button>
+        </GlowButton>
         <p className="text-center text-sm text-muted-foreground">{t.biker.forgot}</p>
       </form>
     </AuthShell>

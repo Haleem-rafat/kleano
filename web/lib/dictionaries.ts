@@ -21,8 +21,6 @@ const en = {
   },
   status: {
     island: { title: 'Washing your car', stage: '3 of 4' },
-    tapHint: 'Tap the Dynamic Island',
-    screenAlt: 'The Kleano app on iPhone',
   },
   how: {
     eyebrow: 'How it works',
@@ -70,7 +68,6 @@ const en = {
     ],
     cta: 'Join as a biker',
     photoAlt: 'A biker holding a phone to accept a wash request',
-    screenAlt: 'The Kleano Biker app on iPhone',
     tabCustomers: 'For customers',
     tabBikers: 'For bikers',
   },
@@ -106,8 +103,6 @@ const ar: Dictionary = {
   },
   status: {
     island: { title: 'يتم غسيل سيارتك', stage: '٣ من ٤' },
-    tapHint: 'اضغط على الجزيرة الديناميكية',
-    screenAlt: 'تطبيق كلينو على iPhone',
   },
   how: {
     eyebrow: 'كيف يعمل',
@@ -151,7 +146,6 @@ const ar: Dictionary = {
     points: ['تصلك طلبات الغسيل القريبة منك فور وصولها.', 'حدد أيام ومناطق عملك.', 'تابع غسلاتك وأرباحك في مكان واحد.'],
     cta: 'انضم كسائق',
     photoAlt: 'سائق يحمل هاتفًا لقبول طلب غسيل',
-    screenAlt: 'تطبيق كلينو للسائقين على iPhone',
     tabCustomers: 'للعملاء',
     tabBikers: 'للسائقين',
   },

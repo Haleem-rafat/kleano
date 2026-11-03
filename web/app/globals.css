@@ -148,3 +148,26 @@
 @theme inline {
   --color-island-accent: var(--island-accent);
 }
+
+/* Aceternity Background Beams in Kleano purples. */
+:root {
+  --beam-a: #8e5ba6;
+  --beam-b: #543063;
+  --beam-c: #b88cd0;
+  --beam-line: #d8cfe0;
+}
+:root[data-theme='dark'] {
+  --beam-b: #b88cd0;
+  --beam-line: #3a3240;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --beam-b: #b88cd0;
+    --beam-line: #3a3240;
+  }
+}
+
+/* Aceternity's input and card shadow. */
+@theme {
+  --shadow-input: 0px 2px 3px -1px rgb(0 0 0 / 0.1), 0px 1px 0px 0px rgb(25 28 33 / 0.02), 0px 0px 0px 1px rgb(25 28 33 / 0.08);
+}

@@ -15,21 +15,18 @@ import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { AppleIcon, PlayIcon } from '@/components/icons';
 import { Logo } from '@/components/logo';
-import { AppPhone } from '@/components/site/app-phone';
 import { SiteHeader } from '@/components/site/site-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { DirectionAwareTabs } from '@/components/ui/direction-aware-tabs';
-import { HaloBadge } from '@/components/ui/halo-badge';
+import { Spotlight } from '@/components/ui/spotlight-new';
+import { Tabs } from '@/components/ui/tabs';
 import { getDictionary } from '@/lib/dictionaries';
 import { isLocale } from '@/lib/i18n';
 import { storeLinks } from '@/lib/site';
 import biker from '@/public/images/biker.jpg';
 import inside from '@/public/images/inside.jpg';
 import outside from '@/public/images/outside.jpg';
-import bikerScreen from '@/public/images/screens/biker-app.jpg';
-import customerScreen from '@/public/images/screens/customer-app.jpg';
 import washing from '@/public/images/washing.jpg';
 
 function SectionHead({ eyebrow, title, lead }: { eyebrow: string; title: string; lead?: string }) {
@@ -70,11 +67,18 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
 
       <main id="top">
         {/* Hero: the promise on one side, the app's live wash status on the other. */}
-        <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-10 pb-16 md:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:pt-16 lg:pb-24">
+        <div className="relative isolate overflow-hidden">
+          {/* Aceternity Spotlight in Kleano purple behind the hero. */}
+          <Spotlight />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-4 pt-10 pb-16 md:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:pt-16 lg:pb-24">
           <div className="grid min-w-0 gap-6">
-            <HaloBadge live variant="default" className="text-xs">
+            <Badge variant="outline" className="h-7 w-fit gap-2 bg-card px-3 text-xs">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex size-full animate-ping rounded-full bg-success opacity-60 motion-reduce:animate-none" />
+                <span className="relative inline-flex size-2 rounded-full bg-success" />
+              </span>
               {t.hero.eyebrow}
-            </HaloBadge>
+            </Badge>
             <h1 className="text-[clamp(40px,6.4vw,72px)] leading-[1.04] font-bold tracking-[-0.025em] rtl:leading-[1.25] rtl:tracking-normal">
               {t.hero.title}
             </h1>
@@ -121,19 +125,23 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
             </div>
-            <div className="absolute -bottom-8 start-4 sm:start-8 lg:-start-10">
-              <AppPhone
-                screen={customerScreen}
-                alt={t.status.screenAlt}
-                scale={0.62}
-                priority
-                island={{ title: t.status.island.title, stage: t.status.island.stage, progress: 66 }}
-              />
-              <p className="mt-2 text-center text-xs text-muted-foreground">
-                {t.status.tapHint}
-              </p>
+            {/* The app's live wash status, as a card over the photo. */}
+            <div className="absolute start-4 -bottom-6 w-[min(320px,86%)] rounded-card bg-card p-4 shadow-input sm:start-8 lg:-start-8">
+              <div className="flex items-center justify-between gap-3">
+                <b className="font-heading text-[15px] font-semibold">{t.status.island.title}</b>
+                <span className="text-xs text-muted-foreground tabular-nums">{t.status.island.stage}</span>
+              </div>
+              <ol className="mt-3 grid grid-cols-4 gap-1.5">
+                {t.tracking.steps.map((step, i) => (
+                  <li key={step.title} className={i === 2 ? 'grid gap-1.5 text-center text-xs font-semibold' : 'grid gap-1.5 text-center text-xs text-muted-foreground'}>
+                    <span className={i <= 2 ? 'h-1 rounded-full bg-primary' : 'h-1 rounded-full bg-border'} />
+                    {step.title}
+                  </li>
+                ))}
+              </ol>
             </div>
           </div>
+        </div>
         </div>
 
         <Section id="how">
@@ -240,17 +248,18 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
           </div>
         </Section>
 
-        {/* One place for both apps: customers and bikers, switched with Cult UI's direction-aware tabs. */}
+        {/* One place for both apps: customers and bikers, switched with Aceternity's stacked tabs. */}
         <Section id="bikers">
-          <DirectionAwareTabs
-            rtl={locale === 'ar'}
-            className="mb-8"
+          <div className="relative flex h-[50rem] flex-col items-start [perspective:1000px] sm:h-[44rem] md:h-[30rem]">
+          <Tabs
+            containerClassName="w-fit rounded-full bg-muted p-1"
+            contentClassName="mt-6"
             tabs={[
               {
-                id: 0,
-                label: t.bikers.tabCustomers,
+                value: 'customers',
+                title: t.bikers.tabCustomers,
                 content: (
-                  <div className="grid gap-5 pt-2 md:grid-cols-[1.2fr_0.8fr]">
+                  <div className="grid h-full gap-5 rounded-sheet bg-background md:grid-cols-[1.2fr_0.8fr]">
                     <Card className="rounded-card border-0 bg-primary py-8 text-primary-foreground shadow-none">
                       <CardContent className="grid gap-4 px-8">
                         <span className="text-[13px] font-semibold tracking-[0.08em] uppercase opacity-80 rtl:text-sm rtl:tracking-normal">
@@ -280,15 +289,12 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
                 ),
               },
               {
-                id: 1,
-                label: t.bikers.tabBikers,
+                value: 'bikers',
+                title: t.bikers.tabBikers,
                 content: (
-                  <div className="grid items-center gap-8 overflow-hidden rounded-sheet bg-card pt-2 md:grid-cols-[0.9fr_1.1fr]">
-                    <div className="relative min-h-80 self-stretch">
+                  <div className="grid h-full items-center gap-8 overflow-hidden rounded-sheet bg-card shadow-input md:grid-cols-[0.9fr_1.1fr]">
+                    <div className="relative min-h-72 self-stretch">
                       <Image src={biker} alt={t.bikers.photoAlt} fill placeholder="blur" sizes="(max-width: 768px) 100vw, 480px" className="object-cover object-[60%_40%]" />
-                      <div className="absolute inset-0 grid place-items-center bg-black/25">
-                        <AppPhone screen={bikerScreen} alt={t.bikers.screenAlt} scale={0.55} />
-                      </div>
                     </div>
                     <div className="grid content-center gap-5 px-6 pb-8 md:py-10 md:pe-10 md:ps-0">
                       <span className="text-[13px] font-semibold tracking-[0.08em] text-primary uppercase rtl:text-sm rtl:tracking-normal">
@@ -317,6 +323,7 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
               },
             ]}
           />
+          </div>
         </Section>
 
         <Section id="get">
