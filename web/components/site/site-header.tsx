@@ -1,73 +1,76 @@
 'use client';
 
-import { Globe, Menu } from 'lucide-react';
+import { Globe } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Logo } from '@/components/logo';
 import { ThemeToggle } from '@/components/theme';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import type { Dictionary } from '@/lib/dictionaries';
 import type { Locale } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
-const sections = ['how', 'services', 'tracking', 'bikers'] as const;
+/** Past this, the bar gathers into a pill. Not 0, so an iOS rubber-band cannot flicker it. */
+const CONTRACT_AT = 24;
 
+/** One passive scroll listener, work deferred to a frame; nothing measures layout. */
+function useContracted() {
+  const [contracted, setContracted] = useState(false);
+  useEffect(() => {
+    let queued = false;
+    const update = () => {
+      queued = false;
+      setContracted(window.scrollY > CONTRACT_AT);
+    };
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return contracted;
+}
+
+/**
+ * Landing header, after Framecast's: a transparent full-width bar at the top of the page that
+ * gathers into a centred floating pill once content runs under it. It never hides, so the
+ * "Book a wash" button is always one tap away. Section links live in the dock below.
+ */
 export function SiteHeader({ t, locale }: { t: Dictionary; locale: Locale }) {
-  const [open, setOpen] = useState(false);
+  const contracted = useContracted();
   const other: Locale = locale === 'ar' ? 'en' : 'ar';
   const brand = locale === 'ar' ? 'كلينو' : 'Kleano';
 
   return (
-    <header className="sticky top-0 z-40 border-b bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md">
-      <div className="mx-auto flex h-17 max-w-6xl items-center gap-5 px-4 md:px-8">
-        <a href="#top" aria-label={brand} className="text-primary">
+    <header className="fixed inset-x-0 top-0 z-40 px-3 pt-[calc(10px+env(safe-area-inset-top))]">
+      <div
+        className={cn(
+          'mx-auto flex h-14 items-center gap-3 transition-all duration-300 ease-out',
+          contracted ? 'max-w-3xl rounded-full border bg-card/85 px-3 shadow-input backdrop-blur-xl' : 'max-w-6xl px-2 md:px-5',
+        )}
+      >
+        <a href="#top" aria-label={brand} className="ps-2 text-primary">
           <Logo className="h-9 w-auto" />
         </a>
-
-        <nav aria-label={t.nav.sections} className="ms-auto hidden items-center gap-6 lg:flex">
-          {sections.map((id) => (
-            <a key={id} href={`#${id}`} className="text-[15px] text-muted-foreground transition-colors hover:text-foreground">
-              {t.nav[id]}
-            </a>
-          ))}
-        </nav>
-
-        <div className="ms-auto flex items-center gap-2 lg:ms-0">
-          <Button asChild variant="outline" size="chip">
+        <div className="ms-auto flex items-center gap-2">
+          <Button asChild variant="ghost" size="chip" className="hidden sm:inline-flex">
             <Link href={`/${other}`} hrefLang={other} lang={other}>
               <Globe />
               {t.langSwitch}
             </Link>
           </Button>
+          <Button asChild variant="ghost" size="chip" className="sm:hidden" aria-label={t.langSwitch}>
+            <Link href={`/${other}`} hrefLang={other} lang={other}>
+              <Globe />
+            </Link>
+          </Button>
           <ThemeToggle label={t.theme} />
-
-          <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="chip" className="lg:hidden" aria-label={t.nav.menu}>
-                <Menu />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side={locale === 'ar' ? 'left' : 'right'} className="w-72">
-              <SheetHeader>
-                <SheetTitle className="text-primary">
-                  <Logo className="h-8 w-auto" />
-                  <span className="sr-only">{brand}</span>
-                </SheetTitle>
-              </SheetHeader>
-              <nav aria-label={t.nav.sections} className="grid gap-1 px-4">
-                {sections.map((id) => (
-                  <a
-                    key={id}
-                    href={`#${id}`}
-                    onClick={() => setOpen(false)}
-                    className="rounded-lg px-3 py-3 text-base font-medium hover:bg-muted"
-                  >
-                    {t.nav[id]}
-                  </a>
-                ))}
-              </nav>
-            </SheetContent>
-          </Sheet>
+          <Button asChild className="h-10 px-4 text-sm font-semibold">
+            <Link href={`/${locale}/app/book`}>{t.hero.ctaBook}</Link>
+          </Button>
         </div>
       </div>
     </header>
