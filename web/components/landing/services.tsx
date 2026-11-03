@@ -28,7 +28,7 @@ function PhotoTile({ img, alt, title, body, className }: { img: StaticImageData;
         </Parallax>
         <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
         <div className="grid gap-1 p-6">
-          <h3 className="font-display text-3xl font-medium rtl:text-2xl rtl:font-semibold">{title}</h3>
+          <h3 className="font-display text-2xl font-semibold">{title}</h3>
           <p className="text-white/80">{body}</p>
         </div>
       </div>
@@ -39,7 +39,7 @@ function PhotoTile({ img, alt, title, body, className }: { img: StaticImageData;
 function TileText({ title, body }: { title: string; body: string }) {
   return (
     <div className="grid gap-1.5">
-      <h3 className="font-display text-2xl font-medium rtl:text-xl rtl:font-semibold">{title}</h3>
+      <h3 className="font-display text-xl font-semibold">{title}</h3>
       <p className="text-pretty text-muted-foreground">{body}</p>
     </div>
   );

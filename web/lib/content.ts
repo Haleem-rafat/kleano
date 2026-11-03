@@ -39,6 +39,9 @@ const en = {
     statusCard: 'The live wash status card in the Kleano app, showing the biker has arrived',
     bookingOrder: 'The Booking Order screen in the Kleano app: your car, the date and the free times',
     customerStatus: 'The Kleano app home screen with the live status of a wash',
+    bikerOrders: 'The Orders screen in the Kleano Biker app with the wash progress button',
+    bikerSchedule: 'The My Schedule screen in the Kleano Biker app',
+    bikerEarnings: 'The Earnings screen in the Kleano Biker app',
     note: 'Real screens from the Kleano apps.',
   },
   logos: {
@@ -79,9 +82,16 @@ const en = {
   bikers: {
     label: 'For bikers',
     title: 'Wash cars with Kleano',
-    points: ['Get wash requests near you, the moment they arrive.', 'Set the days and areas you work.', 'Follow your washes and earnings in one place.'],
+    points: ['Get wash requests near you, the moment they arrive.', 'See your working days and areas.', 'Follow your washes and earnings in one place.'],
     cta: 'Biker log in',
     photoAlt: 'A Kleano biker washing a white car',
+    flowTitle: 'A biker\'s day in the app',
+    steps: [
+      { title: 'Go online', body: 'Switch on when you are ready to work. Your washes and rating are on the same screen.', tag: 'Today' },
+      { title: 'Take the wash', body: 'See the car, the time and the address, update the wash progress, and call or message the customer.', tag: 'Orders' },
+      { title: 'See your schedule', body: 'Your working days, times and areas in one list.', tag: 'My Schedule' },
+      { title: 'Track your earnings', body: 'Today, weekends and all time, with your completed washes.', tag: 'Earnings' },
+    ],
   },
   plans: {
     label: 'Plans',
@@ -156,6 +166,9 @@ const ar: Dictionary = {
     statusCard: 'بطاقة حالة الغسيل المباشرة في تطبيق كلينو، وتظهر وصول الكابتن',
     bookingOrder: 'شاشة طلب الحجز في تطبيق كلينو: سيارتك والتاريخ والمواعيد المتاحة',
     customerStatus: 'الشاشة الرئيسية لتطبيق كلينو مع الحالة المباشرة للغسيل',
+    bikerOrders: 'شاشة الطلبات في تطبيق كلينو للكباتن مع زر تقدم الغسيل',
+    bikerSchedule: 'شاشة جدول العمل في تطبيق كلينو للكباتن',
+    bikerEarnings: 'شاشة الأرباح في تطبيق كلينو للكباتن',
     note: 'شاشات حقيقية من تطبيقات كلينو.',
   },
   logos: {
@@ -196,9 +209,16 @@ const ar: Dictionary = {
   bikers: {
     label: 'للكباتن',
     title: 'اغسل السيارات مع كلينو',
-    points: ['تصلك طلبات الغسيل القريبة منك فور وصولها.', 'حدد أيام ومناطق عملك.', 'تابع غسلاتك وأرباحك في مكان واحد.'],
+    points: ['تصلك طلبات الغسيل القريبة منك فور وصولها.', 'شاهد أيام ومناطق عملك.', 'تابع غسلاتك وأرباحك في مكان واحد.'],
     cta: 'دخول الكباتن',
     photoAlt: 'كابتن كلينو يغسل سيارة بيضاء',
+    flowTitle: 'يوم الكابتن في التطبيق',
+    steps: [
+      { title: 'ابدأ العمل', body: 'فعّل حالتك عندما تكون مستعدًا للعمل. غسلاتك وتقييمك على الشاشة نفسها.', tag: 'اليوم' },
+      { title: 'نفّذ الغسلة', body: 'شاهد السيارة والوقت والعنوان، وحدّث تقدم الغسيل، واتصل بالعميل أو راسله.', tag: 'الطلبات' },
+      { title: 'شاهد جدولك', body: 'أيام وأوقات ومناطق عملك في قائمة واحدة.', tag: 'جدول العمل' },
+      { title: 'تابع أرباحك', body: 'اليوم وعطلات نهاية الأسبوع وكل الوقت، مع غسلاتك المكتملة.', tag: 'الأرباح' },
+    ],
   },
   plans: {
     label: 'الباقات',

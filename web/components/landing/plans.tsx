@@ -17,7 +17,7 @@ export function Plans({ t, locale }: { t: Dictionary['plans']; locale: string })
             <div className="relative flex h-full flex-col gap-6 rounded-[20px] bg-card p-7">
               <div className="grid gap-2">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <h3 className="font-display text-3xl font-medium rtl:text-2xl rtl:font-semibold">{plan.name}</h3>
+                  <h3 className="font-display text-2xl font-semibold">{plan.name}</h3>
                   {plan.tag ? <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">{plan.tag}</span> : null}
                 </div>
                 <p className="text-muted-foreground">{plan.body}</p>

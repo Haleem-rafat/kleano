@@ -12,7 +12,7 @@ export function Logos({ t }: { t: Dictionary['logos'] }) {
         <Label>{t.title}</Label>
         <InfiniteMovingCards
           className="w-full"
-          items={BRANDS.map((brand) => ({ key: brand, content: <span className="font-display text-2xl whitespace-nowrap text-muted-foreground md:text-3xl">{brand}</span> }))}
+          items={BRANDS.map((brand) => ({ key: brand, content: <span className="font-display text-xl font-medium whitespace-nowrap text-muted-foreground md:text-2xl">{brand}</span> }))}
         />
         <p className="text-xs text-muted-foreground">{t.note}</p>
       </ScrollIn>

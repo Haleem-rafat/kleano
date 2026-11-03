@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Alexandria, Fraunces, Geist, Geist_Mono, IBM_Plex_Sans_Arabic, Readex_Pro } from 'next/font/google';
+import { Alexandria, Inter, Noto_Sans_Arabic } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { ThemeProvider } from '@/components/theme';
@@ -8,25 +8,10 @@ import { dirOf, isLocale, locales } from '@/lib/i18n';
 import { siteUrl } from '@/lib/site';
 import '../globals.css';
 
-const readex = Readex_Pro({
-  subsets: ['arabic', 'latin'],
-  weight: ['500', '600', '700'],
-  variable: '--font-readex',
-  display: 'swap',
-});
-
-const plex = IBM_Plex_Sans_Arabic({
-  subsets: ['arabic', 'latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-plex',
-  display: 'swap',
-});
-
-// Fraunces (English) and Alexandria (Arabic) for landing headlines, Geist for English text, Geist Mono for labels.
-const fraunces = Fraunces({ subsets: ['latin'], axes: ['opsz', 'SOFT'], variable: '--font-fraunces', display: 'swap' });
-const alexandria = Alexandria({ subsets: ['arabic'], variable: '--font-alexandria', display: 'swap' });
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist', display: 'swap' });
-const mono = Geist_Mono({ subsets: ['latin'], weight: ['400', '500'], variable: '--font-mono-latin', display: 'swap' });
+// One headline family for both languages, and an easy-reading text face for each.
+const alexandria = Alexandria({ subsets: ['arabic', 'latin'], variable: '--font-alexandria', display: 'swap' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
+const notoArabic = Noto_Sans_Arabic({ subsets: ['arabic'], variable: '--font-noto-arabic', display: 'swap' });
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -68,7 +53,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<'/[
   if (!isLocale(locale)) notFound();
 
   return (
-    <html lang={locale} dir={dirOf(locale)} className={`${readex.variable} ${plex.variable} ${fraunces.variable} ${alexandria.variable} ${geist.variable} ${mono.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
+    <html lang={locale} dir={dirOf(locale)} className={`${alexandria.variable} ${inter.variable} ${notoArabic.variable}`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
         <ThemeProvider>{children as ReactNode}</ThemeProvider>
       </body>

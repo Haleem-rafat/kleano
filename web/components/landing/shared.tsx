@@ -1,6 +1,6 @@
 'use client';
 
-import { motion, useReducedMotion, useScroll, useTransform } from 'motion/react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { useRef, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -22,13 +22,12 @@ export function Reveal({ children, className, delay = 0 }: { children: ReactNode
 /** Rises and fades in tied to the scroll position, so the whole page moves as you scroll. */
 export function ScrollIn({ children, className }: { children: ReactNode; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
-  const still = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start 1', 'start 0.6'] });
-  const opacity = useTransform(scrollYProgress, [0, 1], [still ? 1 : 0.15, 1]);
-  const y = useTransform(scrollYProgress, [0, 1], [still ? 0 : 70, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [still ? 1 : 0.97, 1]);
+  const opacity = useTransform(scrollYProgress, [0, 1], [0.15, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [70, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [0.97, 1]);
   return (
-    <motion.div ref={ref} style={{ opacity, y, scale }} className={className}>
+    <motion.div ref={ref} style={{ opacity, y, scale }} className={cn('motion-reduce:!transform-none motion-reduce:!opacity-100', className)}>
       {children}
     </motion.div>
   );
@@ -37,11 +36,10 @@ export function ScrollIn({ children, className }: { children: ReactNode; classNa
 /** Drifts gently against the page as it scrolls; stands still under reduced motion. */
 export function Parallax({ children, className, distance = 30 }: { children: ReactNode; className?: string; distance?: number }) {
   const ref = useRef<HTMLDivElement>(null);
-  const still = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
-  const y = useTransform(scrollYProgress, [0, 1], [still ? 0 : distance, still ? 0 : -distance]);
+  const y = useTransform(scrollYProgress, [0, 1], [distance, -distance]);
   return (
-    <motion.div ref={ref} style={{ y }} className={className}>
+    <motion.div ref={ref} style={{ y }} className={cn('motion-reduce:!transform-none', className)}>
       {children}
     </motion.div>
   );
@@ -71,15 +69,15 @@ export function SectionHead({ number, label, title, lead, center }: { number: st
 
 /** Small engraved-style label. */
 export function Label({ children, className }: { children: ReactNode; className?: string }) {
-  return <span className={cn('font-label text-xs tracking-[0.14em] text-muted-foreground uppercase rtl:font-sans rtl:text-sm rtl:font-medium rtl:tracking-normal', className)}>{children}</span>;
+  return <span className={cn('text-[13px] font-semibold tracking-[0.1em] text-primary uppercase rtl:text-sm rtl:tracking-normal', className)}>{children}</span>;
 }
 
 export function Display({ as: Tag = 'h2', children, className }: { as?: 'h1' | 'h2' | 'h3'; children: ReactNode; className?: string }) {
   return (
     <Tag
       className={cn(
-        'font-display font-medium tracking-[-0.025em] text-balance rtl:font-semibold rtl:tracking-normal',
-        Tag === 'h1' ? 'text-[clamp(42px,6.8vw,80px)] leading-[1.03] rtl:text-[clamp(36px,5.8vw,68px)] rtl:leading-[1.25]' : 'text-[clamp(32px,4.4vw,54px)] leading-[1.08] rtl:text-[clamp(28px,3.6vw,44px)] rtl:leading-[1.3]',
+        'font-display font-semibold tracking-[-0.02em] text-balance rtl:tracking-normal',
+        Tag === 'h1' ? 'text-[clamp(36px,6vw,72px)] leading-[1.1] rtl:leading-[1.3]' : 'text-[clamp(28px,3.8vw,46px)] leading-[1.15] rtl:leading-[1.35]',
         className,
       )}
     >

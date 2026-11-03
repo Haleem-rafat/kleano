@@ -45,7 +45,7 @@
     --secondary: #2a2030;
     --secondary-foreground: #e6d6f0;
     --muted: #232126;
-    --muted-foreground: #a39fa8;
+    --muted-foreground: #b6b2bb;
     --accent: #2a2030;
     --accent-foreground: #e6d6f0;
     --destructive: #ff453a;
@@ -69,7 +69,7 @@
   --secondary: #2a2030;
   --secondary-foreground: #e6d6f0;
   --muted: #232126;
-  --muted-foreground: #a39fa8;
+  --muted-foreground: #b6b2bb;
   --accent: #2a2030;
   --accent-foreground: #e6d6f0;
   --destructive: #ff453a;
@@ -111,11 +111,9 @@
 
 /* Fonts come from next/font as runtime variables, so this block is not inline. */
 @theme {
-  --font-sans: var(--font-geist), var(--font-plex), system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-heading: var(--font-readex), var(--font-plex), system-ui, sans-serif;
-  /* Landing page headlines: Fraunces for English; Arabic falls through to Alexandria. */
-  --font-display: var(--font-fraunces), var(--font-alexandria), Georgia, serif;
-  --font-label: var(--font-mono-latin), ui-monospace, monospace;
+  --font-sans: var(--font-inter), var(--font-noto-arabic), system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-heading: var(--font-alexandria), var(--font-noto-arabic), system-ui, sans-serif;
+  --font-display: var(--font-alexandria), var(--font-noto-arabic), system-ui, sans-serif;
   --animate-marquee: marquee var(--animation-duration, 40s) linear infinite;
   @keyframes marquee {
     to {
@@ -135,6 +133,11 @@
     @apply bg-background font-sans text-foreground antialiased;
     font-size: 17px;
     line-height: 1.65;
+  }
+  /* Arabic reads smaller than Latin at the same size. */
+  [dir='rtl'] body {
+    font-size: 18px;
+    line-height: 1.8;
   }
   h1,
   h2,
