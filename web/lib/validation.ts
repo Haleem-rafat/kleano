@@ -28,6 +28,16 @@ export const phoneRule = (t: AppDictionary) =>
     .transform((v) => toAsciiDigits(v).trim())
     .pipe(z.string().min(1, t.rules.requiredPhone).min(9, t.rules.phoneLength));
 
+/** The app only asks that brand, model and plate are filled in (edit_vehicles_screen.dart _save). */
+export const vehicleSchema = (t: AppDictionary) =>
+  z.object({
+    brand: z.string().min(1, t.cars.incomplete),
+    model: z.string().min(1, t.cars.incomplete),
+    plateNumber: z.string().min(1, t.cars.incomplete),
+    color: z.string(),
+  });
+export type VehicleForm = z.input<ReturnType<typeof vehicleSchema>>;
+
 export const signupSchema = (t: AppDictionary) =>
   z.object({
     userName: nameRule(t),

@@ -36,6 +36,8 @@ export type Profile = {
   imageLink?: string;
   gender?: string;
   isSubscribed?: boolean;
+  isAllowNotification?: boolean;
+  dob?: string;
   location?: Location;
 };
 
@@ -71,9 +73,57 @@ export type Plan = {
   duration?: number;
   durationUnit?: string;
   usageCount?: number;
+  pointsToPay?: number;
+  isSubscribed?: boolean;
   description?: LocalizedText[];
   washingServices?: WashingService[];
   icon?: Icon;
+};
+
+/** backend/src/subscriptions/schemas: remainingWashes counts down from plan.usageCount. */
+export type Subscription = {
+  _id: string;
+  plan?: Plan;
+  remainingWashes?: number;
+  washesCount?: number;
+  expiryDate?: string;
+  status?: string;
+};
+
+/** GET /users/points-system */
+export type PointsInfo = { points: number; pointsExchange: number; redeemLimit: number };
+
+export type PromoCode = {
+  _id: string;
+  code: string;
+  expiryDate?: string;
+  discountPercentage?: number;
+  discountFixedNumber?: number;
+  status?: string;
+  numberOfUses?: number;
+};
+
+export type KleanoNotification = {
+  _id: string;
+  message?: { arTitle?: string; arBody?: string; enTitle?: string; enBody?: string };
+  isRead?: boolean;
+  type?: string;
+  orderId?: string;
+  createdAt?: string;
+};
+
+export type ContactInfo = {
+  contactTitle?: string;
+  emails?: string[];
+  phoneNumbers?: string[];
+  whatsAppNumber?: string;
+  facebookLink?: string;
+  instagramLink?: string;
+  twitterLink?: string;
+  youtubeLink?: string;
+  linkedinLink?: string;
+  tiktokLink?: string;
+  website?: string;
 };
 
 export type Banner = {
@@ -85,7 +135,7 @@ export type Banner = {
   externalUrl?: string;
 };
 
-export type Biker = { _id: string; userName?: string; phone?: string; imageLink?: string; rating?: number };
+export type Biker = { _id: string; userName?: string; phone?: string; imageLink?: string; rating?: number; latitude?: number; longitude?: number };
 
 /** backend/src/orders/schemas/orders.schema.ts OrderStatus */
 export type OrderStatus =
@@ -124,6 +174,11 @@ export type Order = {
   discount?: number;
   totalPay?: number;
   pointsDiscount?: number;
+  appliedPoints?: number;
+  isPointsApplied?: boolean;
+  isCarFreshened?: boolean;
+  description?: string;
+  type?: string;
   carBeforeWashLink?: string;
   carAfterWashLink?: string;
   ratingOfBiker?: number;

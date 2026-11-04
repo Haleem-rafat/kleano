@@ -15,9 +15,7 @@ import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
 import { ApiError } from '@/lib/kleano/client';
 import {
-  checkPromo,
-  createOrder,
-  payOrder,
+  ordersApi,
   pickLocation,
   useAddOns,
   useProfile,
@@ -123,7 +121,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
     if (!promoInput.trim()) return;
     setPromoBusy(true);
     try {
-      const res = await checkPromo(promoInput.trim(), subtotal);
+      const res = await ordersApi.promoDiscount(promoInput.trim(), subtotal);
       setPromo({ ...res, code: promoInput.trim(), forSubtotal: subtotal });
       toast.success(t.book.promoApplied);
     } catch (e) {
@@ -138,7 +136,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
     const start = new Date(`${day}T${slot}:00+03:00`).toISOString();
     setWorking(0);
     try {
-      const order = await createOrder({
+      const order = await ordersApi.create({
         washingServices: [service._id],
         addOns: addOnIds.length ? addOnIds : undefined,
         vehicle: vehicle._id,
@@ -159,7 +157,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
         isCarFreshened: freshener,
       });
       setWorking(1);
-      await payOrder(order._id);
+      await ordersApi.pay(order._id);
       setWorking(2);
       await Promise.all([qc.invalidateQueries({ queryKey: ['orders'] }), qc.invalidateQueries({ queryKey: ['profile'] })]);
       toast.success(t.book.done);
