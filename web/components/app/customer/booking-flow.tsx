@@ -33,6 +33,16 @@ import { cn } from '@/lib/utils';
 
 type Step = 0 | 1 | 2 | 3;
 
+/**
+ * The saved place's coordinate, never rounded. The backend reuses a place only on an exact match;
+ * otherwise it makes a new one and may give it another area, where no biker has this shift, so the
+ * order would reach no biker. It also requires at least five decimals.
+ */
+export function exactCoordinate(value: number): string {
+  const text = String(value);
+  return /^-?\d+\.\d{5,}$/.test(text) ? text : value.toFixed(6);
+}
+
 /** Next 7 days as YYYY-MM-DD on the Saudi clock, which is how the backend reads booking days. */
 function nextDays(count = 7): string[] {
   const now = Date.now() + 3 * 60 * 60 * 1000;
@@ -172,8 +182,8 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
         addOns: addOnIds.length ? addOnIds : undefined,
         vehicle: vehicle._id,
         location: {
-          latitude: place.latitude.toFixed(6),
-          longitude: place.longitude.toFixed(6),
+          latitude: exactCoordinate(place.latitude),
+          longitude: exactCoordinate(place.longitude),
           streetName: place.streetName || place.savedName || cityName(place.city, locale) || '-',
           subAdministrativeArea: place.subAdministrativeArea || undefined,
           country: place.country ?? '',
