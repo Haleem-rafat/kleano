@@ -11,6 +11,8 @@ export const formatDate = (isoString) => {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
+    // Kleano works in Saudi Arabia: every admin sees the Saudi clock, wherever they are.
+    timeZone: 'Asia/Riyadh',
   });
 };
 

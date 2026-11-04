@@ -4,7 +4,7 @@ import { Check, BadgeCheck, CreditCard, Loader2, MapPin, Wallet } from 'lucide-r
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Empty, Failed, Money, PageTitle, SectionTitle } from '@/components/app/bits';
+import { SAUDI_TIME, Empty, Failed, Money, PageTitle, SectionTitle } from '@/components/app/bits';
 import { CardsSkeleton, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,7 +15,7 @@ import { pickLocation, useMySubscription, usePlans, useProfile, useSavedLocation
 import { localized, type Plan } from '@/lib/kleano/types';
 import { cn } from '@/lib/utils';
 
-const dateFormat = (locale: Locale) => new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium' });
+const dateFormat = (locale: Locale) => new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeZone: SAUDI_TIME });
 
 function duration(p: Plan, t: AppDictionary) {
   if (!p.duration) return '';

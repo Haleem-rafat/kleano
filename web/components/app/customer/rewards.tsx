@@ -4,7 +4,7 @@ import { ArrowRight, Coins, Copy, Smartphone, Sprout, TicketPercent, Wallet } fr
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { BalanceCard, Empty, Failed, Money, PageTitle, SectionTitle } from '@/components/app/bits';
+import { BalanceCard, SAUDI_TIME, Empty, Failed, Money, PageTitle, SectionTitle } from '@/components/app/bits';
 import { RowsSkeleton, Segmented } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -113,7 +113,7 @@ export function CustomerPromos({ t, locale }: { t: AppDictionary; locale: Locale
   const [status, setStatus] = useState<PromoStatus>('ACTIVE');
   const codes = usePromoCodes(status);
   const statuses: PromoStatus[] = ['ACTIVE', 'USED', 'EXPIRED'];
-  const date = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium' });
+  const date = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeZone: SAUDI_TIME });
 
   const copy = async (code: string) => {
     try {

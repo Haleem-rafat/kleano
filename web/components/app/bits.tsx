@@ -8,6 +8,9 @@ import type { AppDictionary } from '@/lib/app-dictionary';
 import type { OrderStatus } from '@/lib/kleano/types';
 import { cn } from '@/lib/utils';
 
+/** Kleano works in Saudi Arabia, so every time shows the Saudi clock, wherever the viewer is. */
+export const SAUDI_TIME = 'Asia/Riyadh';
+
 /** Shared pieces of the customer web app: headings, money, status and the three states. */
 
 export function PageTitle({ title, subtitle, action }: { title: string; subtitle?: ReactNode; action?: ReactNode }) {
@@ -122,5 +125,5 @@ export function Failed({ message, onRetry, t }: { message: string; onRetry: () =
 
 export function formatWhen(iso: string | undefined, locale: string) {
   if (!iso) return '';
-  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: SAUDI_TIME }).format(new Date(iso));
 }

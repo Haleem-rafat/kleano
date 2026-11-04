@@ -50,6 +50,8 @@ export const useSlots = (location: Location | undefined, dateYmd: string | undef
   useQuery({
     queryKey: ['slots', location?._id, dateYmd],
     enabled: Boolean(location && dateYmd && idOf(location.city as { _id: string } | string) && idOf(location.area)),
+    // As in the app: a time less than 30 minutes away can't be booked. Slots are Saudi clock times.
+    select: (slots: Slot[]) => slots.filter((s) => new Date(`${dateYmd}T${s.timeSlot}:00+03:00`).getTime() >= Date.now() + 30 * 60 * 1000),
     queryFn: () => {
       const city = idOf(location!.city as { _id: string } | string);
       const area = idOf(location!.area);
