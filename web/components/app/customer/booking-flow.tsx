@@ -1,8 +1,9 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { ArrowLeft, ArrowRight, Car, Check, Clock, CreditCard, Loader2, MapPin, Sparkles, Tag, Wallet, X } from 'lucide-react';
+import { ArrowLeft, ArrowRight, BadgeCheck, Car, Check, Clock, Coins, CreditCard, Loader2, MapPin, Sparkles, Tag, Wallet, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
@@ -22,10 +23,12 @@ import {
   useSavedLocations,
   useServices,
   useSlots,
+  useSubscriptionAt,
   useVehicles,
   type PromoResult,
 } from '@/lib/kleano/queries';
 import { cityName, localized } from '@/lib/kleano/types';
+import { toAsciiDigits } from '@/lib/phone';
 import { cn } from '@/lib/utils';
 
 type Step = 0 | 1 | 2 | 3;
@@ -86,6 +89,11 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
   const [checkedPromo, setPromo] = useState<(PromoResult & { code: string; forSubtotal: number }) | null>(null);
   const [promoBusy, setPromoBusy] = useState(false);
   const [working, setWorking] = useState<number | null>(null);
+  const [notes, setNotes] = useState('');
+  const [pointsInput, setPointsInput] = useState('');
+  const [points, setPoints] = useState<{ used: number; discount: number; forSubtotal: number } | null>(null);
+  const [pointsBusy, setPointsBusy] = useState(false);
+  const [pointsError, setPointsError] = useState<string | null>(null);
 
   // Smart defaults: the default saved place and the first car.
   const places = useMemo(() => saved.data?.filter((l) => l.latitude && l.country) ?? [], [saved.data]);
@@ -96,19 +104,25 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
   const services = useServices(place);
   const addOns = useAddOns(place);
   const slots = useSlots(place, day);
+  // Subscribers book on their plan: a service is then an extra, not a must (booking_main_screen.dart).
+  const subscribed = profile.data?.isSubscribed === true;
+  const planHere = useSubscriptionAt(place, subscribed);
+  const planOk = subscribed && planHere.isSuccess && !planHere.data.message;
   const service = services.data?.find((s) => s._id === serviceId);
   const chosenAddOns = addOns.data?.filter((a) => addOnIds.includes(a._id)) ?? [];
   const subtotal = (service?.price ?? 0) + chosenAddOns.reduce((sum, a) => sum + a.price, 0);
   // A promo code was checked against one total; it only counts while the total is the same.
   const promo = checkedPromo && checkedPromo.forSubtotal === subtotal ? checkedPromo : null;
-  const total = promo ? promo.totalPayAfterDiscount : subtotal;
+  // Points were priced against one total too. The backend takes them off after the promo code.
+  const usedPoints = points && points.forSubtotal === subtotal ? points : null;
+  const total = Math.max(0, (promo ? promo.totalPayAfterDiscount : subtotal) - (usedPoints?.discount ?? 0));
   // The first free time of the chosen day is used until you pick another one.
   const slot = slots.data?.some((s) => s.timeSlot === pickedSlot && s.isAvailable)
     ? pickedSlot
     : (slots.data?.find((s) => s.isAvailable)?.timeSlot ?? null);
   const balance = profile.data?.walletBalance ?? 0;
 
-  const canContinue = [Boolean(service), Boolean(vehicle && place), Boolean(slot), balance >= total][step];
+  const canContinue = [Boolean(service) || planOk, Boolean(vehicle && place), Boolean(slot), balance >= total][step];
   const blocker = [t.book.pickService, t.book.pickCarPlace, t.book.pickTime, t.book.notEnough][step];
 
   const go = (next: Step) => {
@@ -131,13 +145,30 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
     }
   };
 
+  const applyPoints = async () => {
+    const wanted = Number(toAsciiDigits(pointsInput).trim());
+    const available = profile.data?.points ?? 0;
+    if (!Number.isInteger(wanted) || wanted <= 0) return setPointsError(t.review.enterValid);
+    if (wanted > available) return setPointsError(`${t.review.exceed} ${available} ${t.review.pointsWord}`);
+    setPointsError(null);
+    setPointsBusy(true);
+    try {
+      const res = await ordersApi.pointsDiscount(wanted);
+      setPoints({ used: wanted, discount: res.discountAmount, forSubtotal: subtotal });
+    } catch (e) {
+      setPointsError(e instanceof ApiError ? e.message : t.common.error);
+    } finally {
+      setPointsBusy(false);
+    }
+  };
+
   const confirm = async () => {
-    if (!service || !vehicle || !place || !slot) return;
+    if ((!service && !planOk) || !vehicle || !place || !slot) return;
     const start = new Date(`${day}T${slot}:00+03:00`).toISOString();
     setWorking(0);
     try {
       const order = await ordersApi.create({
-        washingServices: [service._id],
+        washingServices: service ? [service._id] : undefined,
         addOns: addOnIds.length ? addOnIds : undefined,
         vehicle: vehicle._id,
         location: {
@@ -147,21 +178,27 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
           subAdministrativeArea: place.subAdministrativeArea || undefined,
           country: place.country ?? '',
         },
+        description: notes.trim() || undefined,
         startTime: start,
         bookingDate: start,
         timeSlot: slot,
-        type: 'SERVICE_BOOKING',
+        type: subscribed ? 'SUBSCRIPTION_BOOKING' : 'SERVICE_BOOKING',
+        subscription: subscribed ? planHere.data?.subscription?._id : undefined,
         totalPrice: subtotal,
-        paymentType: 'WALLET',
+        // Same rule as create_order_data_request.dart: nothing owed means it's on the plan.
+        paymentType: subtotal === 0 ? 'SUBSCRIBED' : 'WALLET',
         code: promo?.code,
         isCarFreshened: freshener,
+        appliedPoints: usedPoints?.used,
       });
       setWorking(1);
-      await ordersApi.pay(order._id);
+      // A booking with nothing left to pay is already active on the backend (processFreeOrder).
+      const created = await ordersApi.details(order._id);
+      if (created.status === 'PENDING_USER_PAYMENT') await ordersApi.pay(order._id);
       setWorking(2);
-      await Promise.all([qc.invalidateQueries({ queryKey: ['orders'] }), qc.invalidateQueries({ queryKey: ['profile'] })]);
+      await Promise.all([qc.invalidateQueries({ queryKey: ['orders'] }), qc.invalidateQueries({ queryKey: ['profile'] }), qc.invalidateQueries({ queryKey: ['subscription'] })]);
       toast.success(t.book.done);
-      setTimeout(() => router.push(`/${locale}/app/bookings/${order._id}`), 900);
+      router.push(`/${locale}/app/bookings/${order._id}`);
     } catch (e) {
       setWorking(null);
       toast.error(e instanceof ApiError ? e.message : t.common.error);
@@ -171,7 +208,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
   const loading = saved.isPending || profile.isPending || vehicles.isPending;
 
   return (
-    <div className="pb-28 lg:pb-0">
+    <div className="pb-24 lg:pb-0">
       <MultiStepLoader loadingStates={t.book.working.map((text) => ({ text }))} loading={working !== null} value={working ?? 0} loop={false} />
       <PageTitle title={t.book.title} />
 
@@ -221,10 +258,35 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
               <motion.div key={step} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.2 }}>
                 {step === 0 ? (
                   <div className="grid gap-8">
+                    {subscribed && place ? (
+                      planHere.isPending ? (
+                        <Skeleton className="h-24 rounded-2xl" />
+                      ) : planOk ? (
+                        <section className="flex items-center gap-4 rounded-2xl border bg-card p-4">
+                          <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
+                            <BadgeCheck className="size-5" aria-hidden="true" />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="font-semibold">{t.plans.bookOnPlan}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {localized(planHere.data?.subscription?.plan?.type, locale)} · {t.plans.remaining}: <span className="tabular-nums">{planHere.data?.subscription?.remainingWashes}/{planHere.data?.subscription?.washesCount ?? planHere.data?.subscription?.plan?.usageCount}</span>
+                            </p>
+                          </div>
+                        </section>
+                      ) : (
+                        <section className="grid gap-3 rounded-2xl bg-destructive/5 p-4">
+                          <p className="text-sm">{t.plans.notHere}</p>
+                          <Button variant="outline" size="chip" className="w-fit" onClick={() => go(1)}>
+                            {t.plans.changePlace}
+                          </Button>
+                        </section>
+                      )
+                    ) : null}
                     <section>
                       <h2 className="mb-3 text-lg font-semibold">{t.book.chooseService}</h2>
+                      {planOk ? <p className="mb-3 text-sm text-muted-foreground">{t.plans.extraHint}</p> : null}
                       {!place ? (
-                        <Empty icon={<MapPin />} text={t.book.noPlaces} />
+                        <Empty icon={<MapPin />} text={t.book.noPlaces} action={<Button asChild size="chip"><Link href={`/${locale}/app/places/new`}>{t.places.add}</Link></Button>} />
                       ) : services.isPending ? (
                         <Skeleton className="h-28 rounded-2xl" />
                       ) : services.isError ? (
@@ -234,7 +296,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                       ) : (
                         <div role="radiogroup" className="grid gap-3 sm:grid-cols-2">
                           {services.data.map((s) => (
-                            <Choice key={s._id} selected={s._id === serviceId} onSelect={() => setServiceId(s._id)}>
+                            <Choice key={s._id} selected={s._id === serviceId} onSelect={() => setServiceId(subscribed && s._id === serviceId ? null : s._id)}>
                               <div className="grid gap-2 pe-8">
                                 <span className="font-semibold">{localized(s.name, locale)}</span>
                                 {s.description?.length ? (
@@ -256,7 +318,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                       )}
                     </section>
 
-                    {place && service ? (
+                    {place && (service || planOk) ? (
                       <section>
                         <h2 className="mb-3 text-lg font-semibold">{t.book.extras}</h2>
                         {addOns.isPending ? (
@@ -310,7 +372,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                     <section>
                       <h2 className="mb-3 text-lg font-semibold">{t.book.chooseCar}</h2>
                       {!vehicles.data?.length ? (
-                        <Empty icon={<Car />} text={t.book.noCars} />
+                        <Empty icon={<Car />} text={t.book.noCars} action={<Button asChild size="chip"><Link href={`/${locale}/app/cars`}>{t.plans.addCar}</Link></Button>} />
                       ) : (
                         <div role="radiogroup" className="grid gap-3 sm:grid-cols-2">
                           {vehicles.data.map((v) => (
@@ -334,7 +396,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                     <section>
                       <h2 className="mb-3 text-lg font-semibold">{t.book.choosePlace}</h2>
                       {!places.length ? (
-                        <Empty icon={<MapPin />} text={t.book.noPlaces} />
+                        <Empty icon={<MapPin />} text={t.book.noPlaces} action={<Button asChild size="chip"><Link href={`/${locale}/app/places/new`}>{t.places.add}</Link></Button>} />
                       ) : (
                         <div role="radiogroup" className="grid gap-3 sm:grid-cols-2">
                           {places.map((l) => (
@@ -427,6 +489,12 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                   <div className="grid gap-6">
                     <section>
                       <h2 className="mb-3 text-lg font-semibold">{t.book.payWith}</h2>
+                      {total === 0 ? (
+                        <p className="flex items-center gap-2 rounded-2xl bg-secondary px-4 py-3 text-sm text-secondary-foreground">
+                          <BadgeCheck className="size-4 shrink-0" aria-hidden="true" />
+                          {t.plans.paidByPlan}
+                        </p>
+                      ) : (
                       <div role="radiogroup" className="grid gap-3">
                         <Choice selected onSelect={() => undefined}>
                           <span className="flex items-center gap-3 pe-8">
@@ -445,9 +513,18 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                           <CreditCard className="size-4 shrink-0" aria-hidden="true" />
                           {t.book.cardInApp}
                         </p>
-                        {balance < total ? <p className="text-sm text-destructive">{t.book.notEnough}</p> : null}
+                        {balance < total ? (
+                          <p className="text-sm text-destructive">
+                            {t.book.notEnough}{' '}
+                            <Link href={`/${locale}/app/wallet`} className="font-semibold underline">
+                              {t.plans.goToWallet}
+                            </Link>
+                          </p>
+                        ) : null}
                       </div>
+                      )}
                     </section>
+                    {subtotal > 0 ? (
                     <section>
                       <h2 className="mb-3 text-lg font-semibold">{t.book.promo}</h2>
                       {promo ? (
@@ -478,6 +555,64 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                           </Button>
                         </form>
                       )}
+                    </section>
+                    ) : null}
+                    {subtotal > 0 && (profile.data?.points ?? 0) > 0 ? (
+                      <section>
+                        <h2 className="mb-3 flex flex-wrap items-center justify-between gap-2 text-lg font-semibold">
+                          {t.review.points}
+                          <span className="rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">
+                            {t.review.available}: <span className="tabular-nums">{profile.data?.points}</span>
+                          </span>
+                        </h2>
+                        {usedPoints ? (
+                          <div className="flex items-center justify-between gap-3 rounded-2xl bg-secondary px-4 py-3 text-secondary-foreground">
+                            <span className="inline-flex items-center gap-2 font-medium">
+                              <Coins className="size-4" aria-hidden="true" />
+                              {t.review.applied} · <span className="tabular-nums">{usedPoints.used}</span>
+                            </span>
+                            <Button variant="ghost" size="sm" onClick={() => setPoints(null)}>
+                              <X />
+                              {t.review.remove}
+                            </Button>
+                          </div>
+                        ) : (
+                          <form
+                            className="grid gap-2"
+                            onSubmit={(e) => {
+                              e.preventDefault();
+                              void applyPoints();
+                            }}
+                          >
+                            <div className="flex gap-2">
+                              <div className="flex-1">
+                                <Input value={pointsInput} onChange={(e) => setPointsInput(e.target.value)} inputMode="numeric" placeholder={t.review.enterPoints} aria-label={t.review.enterPoints} aria-invalid={Boolean(pointsError)} dir="ltr" />
+                              </div>
+                              <Button type="submit" variant="secondary" className="h-12 px-5" disabled={pointsBusy || !pointsInput.trim()}>
+                                {pointsBusy ? <Loader2 className="animate-spin" /> : null}
+                                {t.review.apply}
+                              </Button>
+                            </div>
+                            {pointsError ? (
+                              <p role="alert" className="text-sm text-destructive">
+                                {pointsError}
+                              </p>
+                            ) : null}
+                          </form>
+                        )}
+                      </section>
+                    ) : null}
+                    <section>
+                      <label htmlFor="booking-notes" className="mb-3 block text-lg font-semibold">
+                        {t.review.notes}
+                      </label>
+                      <textarea
+                        id="booking-notes"
+                        value={notes}
+                        onChange={(e) => setNotes(e.target.value)}
+                        rows={3}
+                        className="shadow-input w-full resize-y rounded-md bg-muted px-3.5 py-3 text-base focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                      />
                     </section>
                   </div>
                 ) : null}
@@ -536,6 +671,14 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                   </dd>
                 </div>
               ) : null}
+              {usedPoints ? (
+                <div className="flex justify-between gap-3 text-success">
+                  <dt>{t.review.discount}</dt>
+                  <dd>
+                    <Money value={-usedPoints.discount} t={t} />
+                  </dd>
+                </div>
+              ) : null}
             </dl>
             <div className="flex items-baseline justify-between border-t pt-4">
               <span className="font-semibold">{t.book.total}</span>
@@ -546,7 +689,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 border-t bg-background/95 px-4 py-3 backdrop-blur-xl md:bottom-0 lg:hidden">
+      <div className="fixed inset-x-0 bottom-[calc(84px+env(safe-area-inset-bottom))] z-30 border-t bg-background px-4 py-3 md:start-[76px] md:bottom-0 lg:hidden">
         <div className="mx-auto flex max-w-3xl items-center gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-xs text-muted-foreground">{t.book.total}</p>
