@@ -10,6 +10,7 @@ import { LandingNavbar } from '@/components/landing/navbar';
 import { Plans } from '@/components/landing/plans';
 import { Services } from '@/components/landing/services';
 import { Tracking } from '@/components/landing/tracking';
+import { Wash3D } from '@/components/landing/wash-3d';
 import { getDictionary } from '@/lib/content';
 import { isLocale } from '@/lib/i18n';
 import { siteUrl } from '@/lib/site';
@@ -44,6 +45,7 @@ export default async function LandingPage({ params }: PageProps<'/[locale]'>) {
       <LandingNavbar t={t} locale={locale} />
       <main>
         <Hero t={t} locale={locale} />
+        <Wash3D t={t.wash} locale={locale} />
         <Logos t={t.logos} />
         <Services t={t.services} />
         <HowItWorks t={t.how} screens={t.screens} />
