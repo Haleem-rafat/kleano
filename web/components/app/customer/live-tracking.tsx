@@ -1,7 +1,7 @@
 'use client';
 
 import { SAUDI_TIME } from '@/components/app/bits';
-import { orderPercent, ProgressBar } from '@/components/app/order-parts';
+import { orderPercent, PersonThumb, ProgressBar } from '@/components/app/order-parts';
 import { Bike, Check, Droplets, ExternalLink, MapPinned, MessageCircle, Phone, Radio, Sparkles, Star, WifiOff, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -93,14 +93,7 @@ export function LiveTracking({ order, t, locale }: { order: Order; t: AppDiction
 
         {order.biker ? (
           <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-muted p-3">
-            {order.biker.imageLink ? (
-              // eslint-disable-next-line @next/next/no-img-element -- biker photo from the backend's storage
-              <img src={order.biker.imageLink} alt="" width={44} height={44} loading="lazy" className="size-11 rounded-full object-cover" />
-            ) : (
-              <span className="grid size-11 place-items-center rounded-full bg-secondary text-primary">
-                <Bike className="size-5" aria-hidden="true" />
-              </span>
-            )}
+            <PersonThumb src={order.biker.imageLink} name={order.biker.userName} t={t} />
             <div className="min-w-0 flex-1 basis-32">
               <p className="truncate font-medium">{order.biker.userName}</p>
               {order.biker.rating ? (

@@ -73,7 +73,7 @@ export function CustomerCars({ t }: { t: AppDictionary; locale: Locale }) {
             content: (
               <div className="grid gap-4">
                 <div className="flex items-start justify-between gap-3">
-                  <CarThumb vehicle={v} />
+                  <CarThumb vehicle={v} t={t} />
                   <div className="flex gap-1">
                     <button
                       type="button"

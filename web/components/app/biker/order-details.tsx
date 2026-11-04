@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Failed, Money, StatusBadge, formatSlot, formatWhen } from '@/components/app/bits';
-import { CarThumb, orderPercent, OrderProgress, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
+import { CarThumb, orderPercent, OrderProgress, OrderTimeline, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
 import { RowsSkeleton, Sheet, StickyActions } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -157,7 +157,12 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
               <ArrowLeft className="rtl:-scale-x-100" />
             </Link>
           </Button>
-          <h1 className="truncate text-2xl font-bold md:text-3xl">{t.b.washDetails}</h1>
+          <div className="min-w-0">
+            <h1 className="truncate text-2xl font-bold md:text-3xl">{t.b.washDetails}</h1>
+            <p className="truncate text-xs text-muted-foreground">
+              {t.progress.orderNo} <span dir="ltr">#{o._id.slice(-6)}</span>
+            </p>
+          </div>
         </div>
         <StatusBadge status={o.status} t={t} label={t.b.status[o.status as keyof AppDictionary['b']['status']]} />
       </div>
@@ -180,7 +185,7 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
           <Block icon={<User />} title={t.b.client}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <PersonThumb src={o.user?.imageLink} name={o.user?.userName} />
+                <PersonThumb src={o.user?.imageLink} name={o.user?.userName} t={t} />
                 <p className="min-w-0 truncate font-semibold">{o.user?.userName ?? '—'}</p>
               </div>
               {phone && !done ? (
@@ -221,7 +226,7 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
           <Block icon={<Car />} title={t.b.car}>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex min-w-0 items-center gap-3">
-                <CarThumb vehicle={o.vehicle} />
+                <CarThumb vehicle={o.vehicle} t={t} />
                 <p className="font-semibold">{[car, o.vehicle?.color].filter(Boolean).join(' · ') || '—'}</p>
               </div>
               {o.vehicle?.plateNumber ? (
@@ -269,9 +274,13 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
             </Block>
           ) : null}
 
-          {o.carBeforeWashLink || o.carAfterWashLink ? (
-            <Block icon={<Camera />} title={t.b.photos}>
-              <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.b.beforeWash} afterLabel={t.b.afterWash} compareLabel={t.progress.compare} />
+          <Block icon={<Camera />} title={t.b.photos}>
+            <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.b.beforeWash} afterLabel={t.b.afterWash} t={t} />
+          </Block>
+
+          {o.createdAt ? (
+            <Block icon={<Clock />} title={t.progress.timeline}>
+              <OrderTimeline order={o} t={t} locale={locale} />
             </Block>
           ) : null}
 

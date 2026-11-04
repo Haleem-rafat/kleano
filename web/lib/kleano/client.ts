@@ -44,6 +44,45 @@ function messageFrom(data: unknown): string | undefined {
 
 export const SESSION_EXPIRED_EVENT = 'kleano:session-expired';
 
+/**
+ * Everything cached or on its way belongs to the account it was asked for. When the account changes:
+ * calls still running are dropped (a late reply could even restore the old cookies), the page's
+ * cached data is wiped, and other tabs are told.
+ */
+export const SESSION_CHANGED_EVENT = 'kleano:session-changed';
+const CHANNEL = 'kleano-session';
+let inFlight = new AbortController();
+
+export function dropRunningCalls() {
+  inFlight.abort();
+  inFlight = new AbortController();
+}
+
+export function announceSessionChange(notifyOtherTabs = true) {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new Event(SESSION_CHANGED_EVENT));
+  if (notifyOtherTabs && 'BroadcastChannel' in window) {
+    const channel = new BroadcastChannel(CHANNEL);
+    channel.postMessage('changed');
+    channel.close();
+  }
+}
+
+export function onOtherTabSessionChange(listener: () => void) {
+  if (!('BroadcastChannel' in window)) return () => undefined;
+  const channel = new BroadcastChannel(CHANNEL);
+  channel.onmessage = listener;
+  return () => channel.close();
+}
+
+/** Logging in or out: nothing from the previous account may survive it. */
+async function switchingAccount<T>(call: () => Promise<T>): Promise<T> {
+  dropRunningCalls();
+  const result = await call();
+  announceSessionChange();
+  return result;
+}
+
 export type KleanoRequest = { method?: string; json?: unknown; form?: FormData };
 
 async function request<T>(url: string, init: KleanoRequest = {}): Promise<T> {
@@ -57,6 +96,7 @@ async function request<T>(url: string, init: KleanoRequest = {}): Promise<T> {
       method: init.method ?? (hasBody ? 'POST' : 'GET'),
       headers,
       body: init.form ?? (init.json !== undefined ? JSON.stringify(init.json) : undefined),
+      signal: url.startsWith('/api/kleano') ? inFlight.signal : undefined,
     });
   } catch {
     throw new ApiError(lang() === 'ar' ? 'تعذر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.' : "Couldn't connect. Check your internet and try again.", 0);
@@ -75,17 +115,17 @@ async function request<T>(url: string, init: KleanoRequest = {}): Promise<T> {
 /** Log in, sign up, log out and other calls to this site's own routes. */
 export const authApi = {
   sendCustomerOtp: (phone: string, dialCode?: string) => request<{ phone: string }>('/api/auth/customer/send-otp', { json: { phone, dialCode } }),
-  customerLogin: (phone: string, otp: string) => request<{ userName: string | null }>('/api/auth/customer/login', { json: { phone, otp } }),
+  customerLogin: (phone: string, otp: string) => switchingAccount(() => request<{ userName: string | null }>('/api/auth/customer/login', { json: { phone, otp } })),
   /** Step 1 of sign up: the backend keeps a pending user and texts a code. */
   customerRegister: (input: { userName: string; email?: string; phone: string; dialCode?: string }) =>
     request<{ phone: string }>('/api/auth/customer/register', { json: input }),
-  customerVerifyRegister: (phone: string, otp: string) => request<{ userName: string | null }>('/api/auth/customer/verify-register', { json: { phone, otp } }),
+  customerVerifyRegister: (phone: string, otp: string) => switchingAccount(() => request<{ userName: string | null }>('/api/auth/customer/verify-register', { json: { phone, otp } })),
   customerResendRegister: (phone: string) => request<{ phone: string }>('/api/auth/customer/resend-register', { json: { phone } }),
   bikerLogin: (userName: string, password: string) =>
-    request<{ userName: string | null }>('/api/auth/biker/login', { json: { userName, password } }),
-  logout: (who: 'customer' | 'biker') => request<{ ok: true }>('/api/auth/logout', { json: { role: who } }),
+    switchingAccount(() => request<{ userName: string | null }>('/api/auth/biker/login', { json: { userName, password } })),
+  logout: (who: 'customer' | 'biker') => switchingAccount(() => request<{ ok: true }>('/api/auth/logout', { json: { role: who } })),
   /** Ends the customer session after the account was deleted; the backend has nothing left to log out. */
-  clearSession: () => request<{ ok: true }>('/api/auth/logout', { json: { role: 'customer', localOnly: true } }),
+  clearSession: () => switchingAccount(() => request<{ ok: true }>('/api/auth/logout', { json: { role: 'customer', localOnly: true } })),
 };
 
 /** Calls to the Kleano API through the forwarding route, e.g. kleano('/orders/user/all'). */

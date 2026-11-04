@@ -1,10 +1,11 @@
 'use client';
 
-import { Bell, CalendarDays, Camera, KeyRound, Languages, Loader2, LogOut, Pencil, Phone, Star, Wallet } from 'lucide-react';
+import { Bell, CalendarDays, Camera, IdCard, KeyRound, Languages, Loader2, LogOut, Pencil, Phone, Star, Wallet } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
-import { Failed, PageTitle } from '@/components/app/bits';
+import { Failed, PageTitle, formatWhen } from '@/components/app/bits';
+import { PersonThumb } from '@/components/app/order-parts';
 import { Field } from '@/components/app/field';
 import { Row, RowGroup, RowsSkeleton, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
@@ -138,19 +139,13 @@ export function BikerAccount({ t, locale }: { t: AppDictionary; locale: Locale }
   if (profile.isPending) return <RowsSkeleton label={t.common.loading} />;
   if (profile.isError) return <Failed message={profile.error.message} onRetry={() => profile.refetch()} t={t} />;
   const p = profile.data;
-  const initials = (p.userName ?? '').split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
 
   return (
     <div>
       <PageTitle title={t.nav.profile} />
       <div className="grid gap-4 lg:grid-cols-2">
         <section className="flex items-center gap-4 rounded-2xl border bg-card p-4 lg:col-span-2">
-          {p.imageLink ? (
-            // eslint-disable-next-line @next/next/no-img-element -- biker photos come from the backend's storage
-            <img src={p.imageLink} alt="" width={64} height={64} className="size-16 rounded-full object-cover" />
-          ) : (
-            <span className="grid size-16 shrink-0 place-items-center rounded-full bg-primary text-lg font-semibold text-primary-foreground">{initials}</span>
-          )}
+          <PersonThumb src={p.imageLink} name={p.userName} t={t} className="size-16 text-lg" />
           <div className="min-w-0 flex-1">
             <p className="truncate text-lg font-semibold">{p.userName}</p>
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
@@ -165,6 +160,8 @@ export function BikerAccount({ t, locale }: { t: AppDictionary; locale: Locale }
         </section>
         <RowGroup>
           <Row icon={<Phone />} title={t.b.phone} subtitle={<bdi dir="ltr">{p.phone}</bdi>} />
+          {p.nationalId ? <Row icon={<IdCard />} title={t.progress.nationalId} subtitle={<bdi dir="ltr">{p.nationalId}</bdi>} /> : null}
+          {p.createdAt ? <Row icon={<CalendarDays />} title={t.progress.memberSince} subtitle={formatWhen(p.createdAt, locale)} /> : null}
           <Row icon={<KeyRound />} title={t.b.editPassword} chevron onClick={() => setSheet('password')} />
           <Row icon={<Languages />} title={t.welcome.language} chevron onClick={language} />
         </RowGroup>

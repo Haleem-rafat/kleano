@@ -2,7 +2,7 @@
 
 import { FileText, Globe, Mail, MessageCircle, Phone, Share2 } from 'lucide-react';
 import { useState } from 'react';
-import { Failed, PageTitle, SectionTitle } from '@/components/app/bits';
+import { Empty, Failed, PageTitle, SectionTitle } from '@/components/app/bits';
 import { TermsSheet } from '@/components/app/customer/terms';
 import { Row, RowGroup, RowsSkeleton } from '@/components/app/kit';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -48,7 +48,7 @@ export function CustomerAbout({ t }: { t: AppDictionary; locale: Locale }) {
       ) : contact.isError ? (
         <Failed message={contact.error.message} onRetry={() => contact.refetch()} t={t} />
       ) : !info ? (
-        <p className="text-muted-foreground">{t.about.empty}</p>
+        <Empty compact icon={<Phone />} text={t.about.empty} />
       ) : (
         <div className="grid gap-4 lg:grid-cols-2">
           {info.emails?.length ? (

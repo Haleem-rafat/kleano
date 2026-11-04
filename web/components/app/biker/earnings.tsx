@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarDays, CheckCircle2, Wallet } from 'lucide-react';
-import { BalanceCard, Failed, Money, PageTitle } from '@/components/app/bits';
+import { BalanceCard, Empty, Failed, Money, PageTitle } from '@/components/app/bits';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { AppDictionary } from '@/lib/app-dictionary';
 import { useCommission, useTotalWashes } from '@/lib/kleano/domains/biker';
@@ -19,6 +19,8 @@ export function BikerEarnings({ t }: { t: AppDictionary }) {
       <PageTitle title={t.nav.earnings} />
       {commission.isError ? (
         <Failed message={commission.error.message} onRetry={() => commission.refetch()} t={t} />
+      ) : commission.isSuccess && !commission.data?.allTime?.ordersCount ? (
+        <Empty icon={<Wallet />} text={t.progress.noEarnings} />
       ) : (
         <div className="grid gap-4 lg:grid-cols-[3fr_2fr]">
           <BalanceCard icon={<Wallet />} label={t.b.allTime} className="min-h-52 content-between">

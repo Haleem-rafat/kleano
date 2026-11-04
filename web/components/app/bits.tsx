@@ -83,10 +83,11 @@ export function Loading({ label }: { label: string }) {
   );
 }
 
-export function Empty({ icon, text, action }: { icon: ReactNode; text: string; action?: ReactNode }) {
+export function Empty({ icon, text, action, compact }: { icon: ReactNode; text: string; action?: ReactNode; compact?: boolean }) {
   return (
-    <div className="grid justify-items-center gap-4 rounded-2xl bg-muted/60 px-6 py-12 text-center">
-      <span className="grid size-14 place-items-center rounded-full bg-secondary text-primary [&_svg]:size-7">{icon}</span>
+    <div className={cn('relative isolate grid justify-items-center gap-4 overflow-hidden rounded-2xl border bg-card px-6 text-center', compact ? 'py-6' : 'py-12')}>
+      <span aria-hidden="true" className="absolute top-0 left-1/2 -z-10 size-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/10 blur-2xl" />
+      <span className={cn('grid place-items-center rounded-full bg-secondary text-primary ring-8 ring-secondary/40', compact ? 'size-11 [&_svg]:size-5' : 'size-14 [&_svg]:size-7')}>{icon}</span>
       <p className="max-w-sm text-muted-foreground">{text}</p>
       {action}
     </div>

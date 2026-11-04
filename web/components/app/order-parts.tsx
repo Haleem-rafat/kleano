@@ -1,9 +1,11 @@
 'use client';
 
-import { Bike, Check, Clock, Droplets, Sparkles, type LucideIcon } from 'lucide-react';
+import { Bike, Check, Clock, Droplets, ImageOff, Maximize2, Sparkles, type LucideIcon } from 'lucide-react';
 import { useState, type CSSProperties, type ReactNode } from 'react';
+import { formatWhen } from '@/components/app/bits';
+import { ImageViewer, ZoomImage } from '@/components/app/image-viewer';
 import type { AppDictionary } from '@/lib/app-dictionary';
-import type { Icon, OrderStatus, Vehicle } from '@/lib/kleano/types';
+import type { Icon, Order, OrderStatus, Vehicle } from '@/lib/kleano/types';
 import { cn } from '@/lib/utils';
 
 /** The real pictures and progress of an order, shared by the customer and biker web apps. */
@@ -77,7 +79,10 @@ export function OrderProgress({ status, t, compact, className }: { status: Order
 const CAR_ART: Record<string, string> = { sedan: 'sedan', hatchback: 'hatchback', suv: 'SUV', van: 'van' };
 
 /** The customer's photo of the car, or the app's drawing of its type. */
-export function CarThumb({ vehicle, className }: { vehicle?: Vehicle; className?: string }) {
+export function CarThumb({ vehicle, className, t }: { vehicle?: Vehicle; className?: string; /** Pass it where the photo may open big (not inside a link). */ t?: AppDictionary }) {
+  if (vehicle?.imageLink && t) {
+    return <ZoomImage src={vehicle.imageLink} alt={[vehicle.brand, vehicle.model].filter(Boolean).join(' ')} t={t} className={cn('size-14 shrink-0 rounded-xl object-cover', className)} />;
+  }
   if (vehicle?.imageLink) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- car photos come from the backend's storage
@@ -94,7 +99,8 @@ export function CarThumb({ vehicle, className }: { vehicle?: Vehicle; className?
 }
 
 /** A person's photo, or their initials. */
-export function PersonThumb({ src, name, fallback, className }: { src?: string; name?: string; fallback?: ReactNode; className?: string }) {
+export function PersonThumb({ src, name, fallback, className, t }: { src?: string; name?: string; fallback?: ReactNode; className?: string; t?: AppDictionary }) {
+  if (src && t) return <ZoomImage src={src} alt={name ?? ''} t={t} className={cn('size-11 shrink-0 rounded-full object-cover', className)} />;
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element -- photos come from the backend's storage
@@ -117,17 +123,30 @@ export function ServiceThumb({ icon, className }: { icon?: Icon; className?: str
   );
 }
 
-/** Before and after the wash: drag across to compare when both exist, otherwise the one photo. */
-export function WashPhotos({ before, after, beforeLabel, afterLabel, compareLabel }: { before?: string; after?: string; beforeLabel: string; afterLabel: string; compareLabel: string }) {
+/** Before and after the wash: drag across to compare when both exist. Any photo opens full size. */
+export function WashPhotos({ before, after, beforeLabel, afterLabel, t }: { before?: string; after?: string; beforeLabel: string; afterLabel: string; t: AppDictionary }) {
   const [split, setSplit] = useState(50);
-  const chip = 'absolute top-2 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white';
-  if (!before && !after) return null;
-  if (!before || !after) {
+  const [viewing, setViewing] = useState<number | null>(null);
+  const images = [before ? { src: before, alt: beforeLabel } : null, after ? { src: after, alt: afterLabel } : null].filter((i): i is { src: string; alt: string } => Boolean(i));
+  const chip = 'pointer-events-none absolute top-2 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white';
+  const viewer = viewing !== null ? <ImageViewer images={images} start={viewing} t={t} onClose={() => setViewing(null)} /> : null;
+  if (images.length === 0) {
+    return (
+      <p className="flex items-center gap-2 rounded-xl bg-muted/60 p-4 text-sm text-muted-foreground">
+        <ImageOff className="size-4 shrink-0" aria-hidden="true" />
+        {t.progress.noPhotos}
+      </p>
+    );
+  }
+  if (images.length === 1) {
     return (
       <figure className="relative overflow-hidden rounded-xl">
-        {/* eslint-disable-next-line @next/next/no-img-element -- wash photos come from the backend's storage */}
-        <img src={before ?? after} alt={before ? beforeLabel : afterLabel} loading="lazy" className="aspect-[4/3] w-full object-cover" />
-        <figcaption className={cn(chip, 'start-2')}>{before ? beforeLabel : afterLabel}</figcaption>
+        <button type="button" aria-label={`${t.progress.viewPhoto}: ${images[0].alt}`} onClick={() => setViewing(0)} className="block w-full cursor-zoom-in">
+          {/* eslint-disable-next-line @next/next/no-img-element -- wash photos come from the backend's storage */}
+          <img src={images[0].src} alt={images[0].alt} loading="lazy" className="aspect-[4/3] w-full object-cover" />
+        </button>
+        <figcaption className={cn(chip, 'start-2')}>{images[0].alt}</figcaption>
+        {viewer}
       </figure>
     );
   }
@@ -143,7 +162,33 @@ export function WashPhotos({ before, after, beforeLabel, afterLabel, compareLabe
       <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 w-0.5 -translate-x-1/2 bg-white shadow" style={{ left: `${split}%` }}>
         <span className="absolute top-1/2 left-1/2 size-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white bg-black/50" />
       </span>
-      <input type="range" min={0} max={100} value={split} aria-label={compareLabel} onChange={(e) => setSplit(Number(e.target.value))} className="absolute inset-0 size-full cursor-ew-resize opacity-0" />
+      <input type="range" min={0} max={100} value={split} aria-label={t.progress.compare} onChange={(e) => setSplit(Number(e.target.value))} className="absolute inset-0 size-full cursor-ew-resize opacity-0" />
+      <button type="button" aria-label={t.progress.viewBig} onClick={() => setViewing(0)} className="absolute right-2 bottom-2 grid size-10 place-items-center rounded-full bg-black/60 text-white transition hover:bg-black/80">
+        <Maximize2 className="size-4.5" aria-hidden="true" />
+      </button>
+      {viewer}
     </div>
+  );
+}
+
+/** When each step really happened, from the times the backend saves. */
+export function OrderTimeline({ order, t, locale }: { order: Order; t: AppDictionary; locale: string }) {
+  const rows = [
+    { label: t.progress.booked, at: order.createdAt },
+    { label: t.progress.onTheWay, at: order.OnTheWayAt },
+    { label: t.progress.washStarted, at: order.onWashingAt },
+    { label: t.progress.finished, at: order.status === 'COMPLETED' ? order.endTime : undefined },
+  ].filter((r) => r.at);
+  return (
+    <ol className="grid gap-3">
+      {rows.map((row, i) => (
+        <li key={row.label} className="relative flex items-start justify-between gap-3 ps-5 text-sm">
+          <span aria-hidden="true" className="absolute start-0 top-1.5 size-2.5 rounded-full bg-primary" />
+          {i < rows.length - 1 ? <span aria-hidden="true" className="absolute start-[4.5px] top-4 -bottom-3 w-px bg-border" /> : null}
+          <span className="font-medium">{row.label}</span>
+          <span className="text-end text-muted-foreground">{formatWhen(row.at, locale)}</span>
+        </li>
+      ))}
+    </ol>
   );
 }

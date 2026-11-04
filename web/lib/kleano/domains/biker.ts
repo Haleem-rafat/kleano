@@ -16,6 +16,7 @@ export type BikerProfile = {
   rating?: number;
   totalWashes?: number;
   nationalId?: string;
+  createdAt?: string;
   city?: { name?: LocalizedText } | string;
 };
 export type CommissionPeriod = { totalCommission?: number; ordersCount?: number };

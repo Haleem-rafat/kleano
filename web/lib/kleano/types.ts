@@ -179,6 +179,8 @@ export type Order = {
   isCarFreshened?: boolean;
   description?: string;
   type?: string;
+  OnTheWayAt?: string;
+  onWashingAt?: string;
   carBeforeWashLink?: string;
   carAfterWashLink?: string;
   ratingOfBiker?: number;

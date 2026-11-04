@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Failed, Money, StatusBadge, formatWhen } from '@/components/app/bits';
-import { CarThumb, OrderProgress, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
+import { CarThumb, OrderProgress, OrderTimeline, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
 import { Confirm, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -223,12 +223,12 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
       {back}
       <section className="grid gap-5 rounded-[var(--radius-card)] border bg-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <CarThumb vehicle={o.vehicle} className="size-16" />
+          <CarThumb vehicle={o.vehicle} className="size-16" t={t} />
           <div className="min-w-0 flex-1 basis-48">
             <p className="text-sm text-muted-foreground">{t.bookings.details}</p>
             <h1 className="text-2xl font-bold md:text-3xl">{localized(o.washingServices?.[0]?.name, locale) || t.bookings.details}</h1>
             <p className="mt-1 truncate text-xs text-muted-foreground">
-              {t.order.requestId}: <span dir="ltr">{o._id}</span>
+              {t.progress.orderNo} <span dir="ltr">#{o._id.slice(-6)}</span> · {t.progress.orderDate}: {formatWhen(o.createdAt, locale)}
             </p>
           </div>
           <StatusBadge status={o.status} t={t} />
@@ -272,7 +272,7 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
 
         <Section title={t.bookings.car} icon={<Car />}>
           <div className="flex items-center gap-3">
-            <CarThumb vehicle={o.vehicle} />
+            <CarThumb vehicle={o.vehicle} t={t} />
             <p className="font-medium">{[o.vehicle?.brand, o.vehicle?.model].filter(Boolean).join(' ') || '—'}</p>
           </div>
           <p className="text-sm text-muted-foreground">
@@ -283,12 +283,23 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
         <Section title={t.bookings.place} icon={<MapPin />}>
           <p className="font-medium">{o.location?.savedName || o.location?.streetName || '—'}</p>
           <p className="text-sm text-muted-foreground">{[o.location?.subAdministrativeArea, cityName(o.location?.city, locale)].filter(Boolean).join(' · ')}</p>
+          {o.location?.latitude && o.location.longitude ? (
+            <a href={`https://www.google.com/maps/search/?api=1&query=${o.location.latitude},${o.location.longitude}`} target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm font-medium text-primary hover:underline">
+              {t.progress.map}
+            </a>
+          ) : null}
         </Section>
+
+        {!o.biker && !['CANCELLED_BY_USER', 'CANCELLED_BY_ADMIN', 'CANCELLED_BY_BIKER', 'PAYMENT_FAILED', 'PENDING_USER_PAYMENT'].includes(o.status) ? (
+          <Section title={t.bookings.biker} icon={<Bike />}>
+            <p className="text-sm text-muted-foreground">{t.progress.noBiker}</p>
+          </Section>
+        ) : null}
 
         {o.biker && !live ? (
           <Section title={t.bookings.biker} icon={<Bike />}>
             <div className="flex items-center gap-3">
-              <PersonThumb src={o.biker.imageLink} name={o.biker.userName} />
+              <PersonThumb src={o.biker.imageLink} name={o.biker.userName} t={t} />
               <div className="min-w-0">
                 <p className="truncate font-medium">{o.biker.userName}</p>
                 {o.biker.rating ? (
@@ -357,6 +368,18 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
             <dt className="text-muted-foreground">{t.order.total}</dt>
             <dd><Money value={o.totalPrice} t={t} /></dd>
           </div>
+          {o.paymentType ? (
+            <div className="flex justify-between gap-3 text-sm">
+              <dt className="text-muted-foreground">{t.progress.paymentType}</dt>
+              <dd>{t.progress.pay[o.paymentType as keyof AppDictionary['progress']['pay']] ?? o.paymentType}</dd>
+            </div>
+          ) : null}
+          {o.promoCode?.code ? (
+            <div className="flex justify-between gap-3 text-sm">
+              <dt className="text-muted-foreground">{t.progress.promo}</dt>
+              <dd className="font-mono" dir="ltr">{o.promoCode.code}</dd>
+            </div>
+          ) : null}
           {o.discount ? (
             <div className="flex justify-between gap-3 text-sm text-success">
               <dt>{t.order.discount}</dt>
@@ -376,9 +399,15 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
         </dl>
       </Section>
 
-      {o.carBeforeWashLink || o.carAfterWashLink ? (
+      {o.createdAt ? (
+        <Section title={t.progress.timeline} icon={<Clock />}>
+          <OrderTimeline order={o} t={t} locale={locale} />
+        </Section>
+      ) : null}
+
+      {!['PENDING_USER_PAYMENT', 'PAYMENT_FAILED', 'CANCELLED_BY_USER', 'CANCELLED_BY_ADMIN', 'CANCELLED_BY_BIKER'].includes(o.status) ? (
         <Section title={t.bookings.photos} icon={<Sparkles />}>
-          <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.bookings.before} afterLabel={t.bookings.after} compareLabel={t.progress.compare} />
+          <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.bookings.before} afterLabel={t.bookings.after} t={t} />
         </Section>
       ) : null}
 

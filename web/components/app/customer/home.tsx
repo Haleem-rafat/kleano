@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowRight, Car, ChevronDown, Clock, Coins, MapPin, Wallet, type LucideIcon } from 'lucide-react';
+import { ArrowRight, CalendarClock, Car, ChevronDown, Clock, Coins, CreditCard, MapPin, Wallet, type LucideIcon } from 'lucide-react';
 import { motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { OrderProgress } from '@/components/app/order-parts';
 import { Empty, Failed, Money, SectionTitle, StatusBadge, formatWhen } from '@/components/app/bits';
+import { ZoomImage } from '@/components/app/image-viewer';
 import { Button } from '@/components/ui/button';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -113,6 +114,17 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
           </div>
           <OrderProgress status={next.status} t={t} />
         </Link>
+      ) : active.isSuccess ? (
+        <Empty
+          compact
+          icon={<CalendarClock />}
+          text={t.progress.noActive}
+          action={
+            <Button asChild size="chip">
+              <Link href={`${base}/book`}>{t.home.bookNow}</Link>
+            </Button>
+          }
+        />
       ) : null}
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -204,12 +216,21 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
                       {picture}
                     </a>
                   ) : (
-                    picture
+                    <ZoomImage src={s.src} alt={s.title ?? t.home.offers} t={t}>
+                      {picture}
+                    </ZoomImage>
                   )}
                 </li>
               );
             })}
           </ul>
+        </div>
+      ) : null}
+
+      {location && plans.isSuccess && plans.data.length === 0 ? (
+        <div>
+          <SectionTitle title={t.home.plans} />
+          <Empty compact icon={<CreditCard />} text={t.progress.noPlans} />
         </div>
       ) : null}
 

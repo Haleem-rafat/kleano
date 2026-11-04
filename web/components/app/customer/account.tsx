@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Failed, Money, PageTitle, SectionTitle } from '@/components/app/bits';
+import { ZoomImage } from '@/components/app/image-viewer';
 import { Field } from '@/components/app/field';
 import { Confirm, PickerField, Row, RowGroup, Segmented, Sheet } from '@/components/app/kit';
 import { PhoneField } from '@/components/app/phone-field';
@@ -26,10 +27,11 @@ import { useMedia } from '@/lib/use-media';
 import { buildInternationalPhone, cleanPhoneInput, defaultDialCode } from '@/lib/phone';
 import { phoneSchema, profileSchema, type PhoneForm, type ProfileForm } from '@/lib/validation';
 
-function Avatar({ profile, size }: { profile: Profile; size: 'lg' | 'sm' }) {
+function Avatar({ profile, size, t }: { profile: Profile; size: 'lg' | 'sm'; /** Pass it where the photo may open big. */ t?: AppDictionary }) {
   const initials = profile.userName?.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('') ?? '';
   const px = size === 'lg' ? 64 : 48;
   const box = size === 'lg' ? 'size-16 text-xl' : 'size-12 text-base';
+  if (profile.imageLink && t) return <ZoomImage src={profile.imageLink} alt={profile.userName ?? ''} t={t} className={`${box} rounded-full object-cover`} />;
   if (profile.imageLink) {
     // eslint-disable-next-line @next/next/no-img-element -- profile photo from the backend's storage
     return <img src={profile.imageLink} alt="" width={px} height={px} className={`${box} rounded-full object-cover`} />;
@@ -76,7 +78,7 @@ export function CustomerAccount({ t, locale }: { t: AppDictionary; locale: Local
       <PageTitle title={t.profile.title} />
 
       <section className="mb-4 flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] border bg-card p-5">
-        {p ? <Avatar profile={p} size="lg" /> : <Skeleton className="size-16 rounded-full" />}
+        {p ? <Avatar profile={p} size="lg" t={t} /> : <Skeleton className="size-16 rounded-full" />}
         <div className="min-w-0 flex-1 basis-40">
           {p ? (
             <>

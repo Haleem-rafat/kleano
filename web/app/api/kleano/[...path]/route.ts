@@ -65,7 +65,8 @@ async function forward(req: NextRequest, path: string[]) {
 
   return new NextResponse(res.body, {
     status: res.status,
-    headers: { 'Content-Type': res.headers.get('content-type') ?? 'application/json' },
+    // Personal data: a browser or proxy must never keep it for the next account.
+    headers: { 'Content-Type': res.headers.get('content-type') ?? 'application/json', 'Cache-Control': 'private, no-store' },
   });
 }
 
