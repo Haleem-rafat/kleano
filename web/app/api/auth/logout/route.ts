@@ -5,10 +5,10 @@ import { clearSession, deviceId, getSession, type Role } from '@/lib/kleano/sess
 
 /** Logs one role out on the backend (removes this browser's token) and clears that role's cookies. */
 export async function POST(req: NextRequest) {
-  const { role: asked } = (await req.json().catch(() => ({}))) as { role?: string };
+  const { role: asked, localOnly } = (await req.json().catch(() => ({}))) as { role?: string; localOnly?: boolean };
   const role: Role = asked === 'biker' ? 'biker' : 'customer';
   const session = await getSession(role);
-  if (session) {
+  if (session && !localOnly) {
     const path = session.role === 'biker' ? '/auth/bikers/logout' : '/auth/users/logout';
     try {
       await backendFetch(path, {
