@@ -1,5 +1,6 @@
 import { notFound, redirect } from 'next/navigation';
 import { AppShell } from '@/components/app/app-shell';
+import { BikerLive } from '@/components/app/biker/live';
 import { getAppDictionary } from '@/lib/app-dictionary';
 import { getDictionary } from '@/lib/content';
 import { isLocale } from '@/lib/i18n';
@@ -12,6 +13,7 @@ export default async function BikerMainLayout({ children, params }: LayoutProps<
   if (!(await getSession('biker'))) redirect(`/${locale}/biker/login`);
   return (
     <AppShell role="biker" locale={locale} t={getAppDictionary(locale)} themeLabel={getDictionary(locale).theme}>
+      <BikerLive t={getAppDictionary(locale)} />
       {children}
     </AppShell>
   );

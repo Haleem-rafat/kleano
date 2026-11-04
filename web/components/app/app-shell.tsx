@@ -32,6 +32,7 @@ import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
 import { authApi } from '@/lib/kleano/client';
 import { accountApi } from '@/lib/kleano/domains/account';
+import { bikerApi } from '@/lib/kleano/domains/biker';
 import { useProfile } from '@/lib/kleano/queries';
 import { cn } from '@/lib/utils';
 
@@ -61,9 +62,11 @@ function navFor(role: 'customer' | 'biker', locale: Locale, t: AppDictionary): N
   if (role === 'customer') return customerNav(locale, t);
   const base = `/${locale}/biker`;
   return [
-    { href: base, label: t.nav.orders, icon: Bike },
-    { href: `${base}/schedule`, label: t.nav.schedule, icon: CalendarDays },
+    { href: base, label: t.nav.home, icon: Home },
+    { href: `${base}/orders`, label: t.nav.orders, icon: Bike },
     { href: `${base}/earnings`, label: t.nav.earnings, icon: Wallet },
+    { href: `${base}/schedule`, label: t.nav.schedule, icon: CalendarDays },
+    { href: `${base}/notifications`, label: t.nav.notifications, icon: Bell },
     { href: `${base}/account`, label: t.nav.profile, icon: User, group: 'more' },
   ];
 }
@@ -121,7 +124,7 @@ export function AppShell({
   const customer = role === 'customer';
   const bookHref = customer ? `/${locale}/app/book` : null;
   const isActive = (href: string) => (href === home ? pathname === href : pathname.startsWith(href));
-  const dockItems = customer ? items.filter((i) => [t.nav.home, t.nav.bookings, t.nav.vehicles, t.nav.profile].includes(i.label)) : items;
+  const dockItems = items.filter((i) => (customer ? [t.nav.home, t.nav.bookings, t.nav.vehicles, t.nav.profile] : [t.nav.home, t.nav.orders, t.nav.earnings, t.nav.profile]).includes(i.label));
 
   const openPalette = () => {
     setPaletteLoaded(true);
@@ -160,7 +163,7 @@ export function AppShell({
   const other: Locale = locale === 'ar' ? 'en' : 'ar';
   const switchLanguage = () => {
     // The backend sends notifications in this language too (ProfileRepo.updateUserLanguage).
-    if (customer) void accountApi.language(other).catch(() => undefined);
+    void (customer ? accountApi.language(other) : bikerApi.language(other)).catch(() => undefined);
     router.push(`/${other}${pathname.slice(3)}`);
   };
 
@@ -235,22 +238,15 @@ export function AppShell({
             <span className="hidden md:block" />
           )}
           <div className="flex items-center gap-2">
-            {customer ? (
-              <Button asChild variant="outline" size="chip" className="px-3">
-                <Link href={`/${locale}/app/notifications`} aria-label={t.nav.notifications}>
-                  <Bell />
-                </Link>
-              </Button>
-            ) : null}
+            <Button asChild variant="outline" size="chip" className="px-3">
+              <Link href={`/${locale}/${customer ? 'app' : 'biker'}/notifications`} aria-label={t.nav.notifications}>
+                <Bell />
+              </Link>
+            </Button>
             <Button variant="outline" size="chip" className="px-3" onClick={switchLanguage} aria-label={t.welcome.language} title={t.welcome.language}>
               <Languages />
             </Button>
             <ThemeToggle label={themeLabel} />
-            {customer ? null : (
-              <Button variant="outline" size="chip" className="md:hidden" onClick={logout} disabled={leaving} aria-label={t.nav.logout}>
-                <LogOut className="rtl:-scale-x-100" />
-              </Button>
-            )}
           </div>
         </header>
 

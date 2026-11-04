@@ -63,3 +63,12 @@ Without it:
 - **`userOS`** only has `ANDROID` and `IOS`. The web leaves it out, so web bookings can't be told
   apart in reports. It needs a `WEB` value.
 - **`order-details/:orderId`** has no owner check, so any signed-in user can read any order by id.
+
+## Biker web app
+
+- **Forgot password** stays in the Kleano Biker app: its reset needs a code to the phone, and the web has no biker route for that yet.
+- **Street name on accept.** The backend requires `streetName` when a biker accepts. The app looks it up with Google; the web sends "Current location" until `NEXT_PUBLIC_GOOGLE_MAPS_KEY` is set up for this.
+- **Location needs HTTPS and permission.** Accepting a job and sharing the biker's position on the way use the browser's location. The site must be on HTTPS, and tracking only runs while the page is open, unlike the app.
+- **New-job sound and push.** The sound plays only after the page has been touched, and there is no push when the tab is closed.
+- **Cancel by biker.** `PATCH /orders/biker/cancel-order` exists, but the app has no button for it, so the web has none either.
+- **One socket per biker.** As with customers, the web and the app replace each other's live connection.

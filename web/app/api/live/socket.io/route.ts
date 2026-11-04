@@ -3,7 +3,7 @@ import { backendUrl } from '@/lib/kleano/backend';
 import { clearSession, getSession, isExpired, refreshSession } from '@/lib/kleano/session';
 
 /**
- * Same-origin door to the backend's Socket.IO, polling transport only, customer session only.
+ * Same-origin door to the backend's Socket.IO, polling transport only, for whichever app asks (?role=biker).
  * It adds the Authorization header the gateway reads, so page JavaScript never holds the token.
  * It forwards nothing except /socket.io/ with the query Socket.IO itself sends.
  */
@@ -17,13 +17,14 @@ async function forward(req: NextRequest) {
     return NextResponse.json({ message: 'Not available' }, { status: 404 });
   }
 
-  let session = await getSession('customer');
+  const role = query.get('role') === 'biker' ? 'biker' : 'customer';
+  let session = await getSession(role);
   if (!session) return NextResponse.json({ message: 'Session expired' }, { status: 401 });
   // Only the first request of a connection is checked by the backend, so that's where it must be fresh.
   if (!query.get('sid') && isExpired(session.access)) {
     const refreshed = await refreshSession(session);
     if (refreshed === 'rejected') {
-      await clearSession('customer');
+      await clearSession(role);
       return NextResponse.json({ message: 'Session expired' }, { status: 401 });
     }
     if (refreshed !== 'offline') session = refreshed;

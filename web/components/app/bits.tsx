@@ -49,10 +49,10 @@ const tone: Partial<Record<OrderStatus, string>> = {
   SCHEDULED: 'bg-muted text-muted-foreground',
 };
 
-export function StatusBadge({ status, t }: { status: OrderStatus; t: AppDictionary }) {
+export function StatusBadge({ status, t, label }: { status: OrderStatus; t: AppDictionary; label?: string }) {
   return (
     <span className={cn('inline-flex h-7 items-center rounded-full px-3 text-xs font-semibold', tone[status] ?? 'bg-secondary text-secondary-foreground')}>
-      {t.status[status] ?? status}
+      {label ?? t.status[status] ?? status}
     </span>
   );
 }
