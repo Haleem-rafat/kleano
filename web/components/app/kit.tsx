@@ -354,7 +354,7 @@ export function Segmented<T extends string>({
   return (
     <div role="tablist" aria-label={label} className={cn('inline-flex max-w-full rounded-full bg-muted p-1', className)}>
       {options.map((o) => (
-        <button key={o.value} role="tab" type="button" aria-selected={value === o.value} onClick={() => onChange(o.value)} className="relative min-w-0 flex-1 rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap">
+        <button key={o.value} role="tab" type="button" aria-selected={value === o.value} onClick={() => onChange(o.value)} className="relative min-w-0 flex-1 rounded-full px-2.5 py-2 text-sm font-medium whitespace-nowrap sm:px-4">
           {value === o.value ? <motion.span layoutId={`${group}-pill`} className="absolute inset-0 rounded-full bg-card shadow-sm" transition={{ type: 'spring', bounce: 0.25, duration: 0.5 }} /> : null}
           <span className={cn('relative', value === o.value ? 'text-foreground' : 'text-muted-foreground')}>{o.label}</span>
         </button>

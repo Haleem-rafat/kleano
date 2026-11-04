@@ -38,6 +38,18 @@ export const vehicleSchema = (t: AppDictionary) =>
   });
 export type VehicleForm = z.input<ReturnType<typeof vehicleSchema>>;
 
+export const profileSchema = (t: AppDictionary) =>
+  z.object({
+    userName: nameRule(t),
+    email: emailRule(t),
+    gender: z.string(),
+    dob: z.string(),
+  });
+export type ProfileForm = z.input<ReturnType<typeof profileSchema>>;
+
+export const phoneSchema = (t: AppDictionary) => z.object({ phone: phoneRule(t) });
+export type PhoneForm = z.input<ReturnType<typeof phoneSchema>>;
+
 export const signupSchema = (t: AppDictionary) =>
   z.object({
     userName: nameRule(t),

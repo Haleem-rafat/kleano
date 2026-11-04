@@ -104,7 +104,7 @@ export function CustomerPlaces({ t, locale }: { t: AppDictionary; locale: Locale
         onOpenChange={(open) => !open && setTarget(null)}
         title={t.places.delete}
         description={t.places.deleteBody}
-        confirmLabel={t.cars.delete}
+        confirmLabel={t.common.delete}
         cancelLabel={t.cars.cancel}
         destructive
         onConfirm={() => {

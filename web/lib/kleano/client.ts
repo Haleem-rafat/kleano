@@ -34,7 +34,9 @@ function messageFrom(data: unknown): string | undefined {
   if (typeof message === 'string') return message;
   if (Array.isArray(message)) return message.join('\n');
   if (message && typeof message === 'object') {
-    const m = message as LocalizedMessage;
+    const m = message as LocalizedMessage & { message?: unknown };
+    // Some services throw { success, message: { ar, en } } inside the exception's own message.
+    if (m.message) return messageFrom(m);
     return (lang() === 'ar' ? m.ar : m.en) ?? m.en ?? m.ar;
   }
   return undefined;
