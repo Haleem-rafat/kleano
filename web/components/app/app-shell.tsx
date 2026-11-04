@@ -19,6 +19,7 @@ import {
   Wallet,
   type LucideIcon,
 } from 'lucide-react';
+import { motion } from 'motion/react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -31,27 +32,28 @@ import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
 import { authApi } from '@/lib/kleano/client';
 import { accountApi } from '@/lib/kleano/domains/account';
+import { useProfile } from '@/lib/kleano/queries';
 import { cn } from '@/lib/utils';
 
 // Only downloaded the first time someone opens it.
 const CommandPalette = dynamic(() => import('@/components/app/command-palette').then((m) => m.CommandPalette), { ssr: false });
 
-export type NavItem = { href: string; label: string; icon: LucideIcon };
+export type NavItem = { href: string; label: string; icon: LucideIcon; group?: 'wash' | 'rewards' | 'more' };
 
 /** Every customer screen: the sidebar and the palette show all of them, the phone dock the main four. */
 export function customerNav(locale: Locale, t: AppDictionary): NavItem[] {
   const base = `/${locale}/app`;
   return [
-    { href: base, label: t.nav.home, icon: Home },
-    { href: `${base}/bookings`, label: t.nav.bookings, icon: ClipboardList },
-    { href: `${base}/cars`, label: t.nav.vehicles, icon: Car },
-    { href: `${base}/places`, label: t.places.title, icon: MapPin },
-    { href: `${base}/plans`, label: t.nav.plans, icon: CreditCard },
-    { href: `${base}/wallet`, label: t.nav.wallet, icon: Wallet },
-    { href: `${base}/points`, label: t.nav.points, icon: Coins },
-    { href: `${base}/promos`, label: t.nav.promos, icon: TicketPercent },
-    { href: `${base}/notifications`, label: t.nav.notifications, icon: Bell },
-    { href: `${base}/account`, label: t.nav.profile, icon: User },
+    { href: base, label: t.nav.home, icon: Home, group: 'wash' },
+    { href: `${base}/bookings`, label: t.nav.bookings, icon: ClipboardList, group: 'wash' },
+    { href: `${base}/cars`, label: t.nav.vehicles, icon: Car, group: 'wash' },
+    { href: `${base}/places`, label: t.places.title, icon: MapPin, group: 'wash' },
+    { href: `${base}/plans`, label: t.nav.plans, icon: CreditCard, group: 'rewards' },
+    { href: `${base}/wallet`, label: t.nav.wallet, icon: Wallet, group: 'rewards' },
+    { href: `${base}/points`, label: t.nav.points, icon: Coins, group: 'rewards' },
+    { href: `${base}/promos`, label: t.nav.promos, icon: TicketPercent, group: 'rewards' },
+    { href: `${base}/notifications`, label: t.nav.notifications, icon: Bell, group: 'more' },
+    { href: `${base}/account`, label: t.nav.profile, icon: User, group: 'more' },
   ];
 }
 
@@ -62,8 +64,33 @@ function navFor(role: 'customer' | 'biker', locale: Locale, t: AppDictionary): N
     { href: base, label: t.nav.orders, icon: Bike },
     { href: `${base}/schedule`, label: t.nav.schedule, icon: CalendarDays },
     { href: `${base}/earnings`, label: t.nav.earnings, icon: Wallet },
-    { href: `${base}/account`, label: t.nav.profile, icon: User },
+    { href: `${base}/account`, label: t.nav.profile, icon: User, group: 'more' },
   ];
+}
+
+/** The sidebar's sections. The biker app has few screens, so it has no headings. */
+function groupsOf(items: NavItem[], t: AppDictionary) {
+  if (!items[0]?.group) return [{ label: '', items }];
+  const labels = { wash: t.nav.groupWash, rewards: t.nav.groupRewards, more: t.nav.groupMore };
+  return (['wash', 'rewards', 'more'] as const).map((g) => ({ label: labels[g], items: items.filter((i) => i.group === g) }));
+}
+
+/** Who is signed in, at the foot of the sidebar, with the way out beside it. */
+function SidebarAccount({ t, locale, onLogout, leaving }: { t: AppDictionary; locale: Locale; onLogout: () => void; leaving: boolean }) {
+  const profile = useProfile();
+  const name = profile.data?.userName ?? '';
+  const initials = name.split(' ').filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+  return (
+    <div className="flex items-center justify-center gap-2 border-t pt-3 lg:justify-between">
+      <Link href={`/${locale}/app/account`} aria-label={t.nav.profile} className="hidden min-w-0 flex-1 items-center gap-2.5 rounded-xl p-1 transition hover:bg-muted/70 lg:flex">
+        <span className="grid size-9 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">{initials || <User className="size-4" aria-hidden="true" />}</span>
+        <span className="min-w-0 truncate text-sm font-medium">{name}</span>
+      </Link>
+      <button type="button" onClick={onLogout} disabled={leaving} aria-label={t.nav.logout} title={t.nav.logout} className="grid size-10 shrink-0 place-items-center rounded-xl text-muted-foreground transition hover:bg-muted/70 hover:text-foreground disabled:opacity-50">
+        <LogOut className="size-[18px] rtl:-scale-x-100" aria-hidden="true" />
+      </button>
+    </div>
+  );
 }
 
 /**
@@ -140,42 +167,51 @@ export function AppShell({
   return (
     <div className="flex min-h-dvh w-full bg-background">
       {/* Tablet: icons only. Desktop: icons and words. */}
-      <aside className="sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col justify-between gap-6 border-e bg-card px-3 py-5 md:flex lg:w-[264px] lg:px-4">
-        <div className="flex min-h-0 flex-col gap-6">
-          <Link href={home} aria-label={t.brand} className="grid place-items-center text-primary lg:justify-items-start lg:px-2">
-            <Logo className="h-9 w-auto lg:h-10" />
-          </Link>
-          {bookHref ? (
-            <Button asChild size="xl" className="size-13 px-0 lg:w-full lg:px-6">
-              <Link href={bookHref} aria-label={t.home.bookNow}>
-                <Plus />
-                <span className="hidden lg:inline">{t.home.bookNow}</span>
-              </Link>
-            </Button>
-          ) : null}
-          <nav aria-label={t.nav.menu} className="-mx-1 grid min-h-0 gap-1 overflow-y-auto px-1">
-            {items.map(({ href, label, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                title={label}
-                aria-label={label}
-                aria-current={isActive(href) ? 'page' : undefined}
-                className={cn(
-                  'flex h-11 shrink-0 items-center justify-center gap-3 rounded-xl text-[15px] font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground lg:justify-start lg:px-3',
-                  isActive(href) && 'bg-secondary text-secondary-foreground hover:bg-secondary hover:text-secondary-foreground',
-                )}
-              >
-                <Icon className="size-5 shrink-0" aria-hidden="true" />
-                <span className="hidden truncate lg:inline">{label}</span>
-              </Link>
-            ))}
-          </nav>
-        </div>
-        <Button variant="ghost" className="h-11 w-full justify-center gap-2 border-t pt-0 text-muted-foreground lg:justify-start lg:px-3" onClick={logout} disabled={leaving} aria-label={t.nav.logout} title={t.nav.logout}>
-          <LogOut className="size-4.5 rtl:-scale-x-100" />
-          <span className="hidden lg:inline">{t.nav.logout}</span>
-        </Button>
+      <aside className="sticky top-0 hidden h-dvh w-[76px] shrink-0 flex-col gap-5 border-e bg-card/60 px-3 py-5 md:flex lg:w-[248px] lg:px-4">
+        <Link href={home} aria-label={t.brand} className="grid place-items-center text-primary lg:justify-items-start lg:px-2">
+          <Logo className="h-9 w-auto" />
+        </Link>
+        {bookHref ? (
+          <Button asChild className="h-11 w-full rounded-xl px-0 font-semibold lg:px-4">
+            <Link href={bookHref} aria-label={t.home.bookNow}>
+              <Plus className="size-5" />
+              <span className="hidden lg:inline">{t.home.bookNow}</span>
+            </Link>
+          </Button>
+        ) : null}
+        <nav aria-label={t.nav.menu} className="-mx-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-1">
+          {groupsOf(items, t).map((group, g) => (
+            <div key={g} className="grid gap-0.5">
+              {group.label ? <p className="mb-1 hidden px-3 text-xs font-medium text-muted-foreground/80 lg:block">{group.label}</p> : null}
+              {group.items.map(({ href, label, icon: Icon }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  title={label}
+                  aria-label={label}
+                  aria-current={isActive(href) ? 'page' : undefined}
+                  className={cn(
+                    'relative flex h-10 shrink-0 items-center justify-center gap-3 rounded-xl text-[15px] font-medium text-muted-foreground transition-colors hover:text-foreground lg:justify-start lg:px-3',
+                    isActive(href) ? 'text-secondary-foreground hover:text-secondary-foreground' : 'hover:bg-muted/70',
+                  )}
+                >
+                  {/* The highlight slides from the old screen to the new one. */}
+                  {isActive(href) ? <motion.span layoutId="nav-active" transition={{ type: 'spring', stiffness: 420, damping: 36 }} className="absolute inset-0 rounded-xl bg-secondary" /> : null}
+                  <Icon className="relative size-[18px] shrink-0" aria-hidden="true" />
+                  <span className="relative hidden truncate lg:inline">{label}</span>
+                </Link>
+              ))}
+            </div>
+          ))}
+        </nav>
+        {customer ? (
+          <SidebarAccount t={t} locale={locale} onLogout={logout} leaving={leaving} />
+        ) : (
+          <Button variant="ghost" className="h-10 w-full justify-center gap-2 text-muted-foreground lg:justify-start lg:px-3" onClick={logout} disabled={leaving} aria-label={t.nav.logout} title={t.nav.logout}>
+            <LogOut className="size-4.5 rtl:-scale-x-100" />
+            <span className="hidden lg:inline">{t.nav.logout}</span>
+          </Button>
+        )}
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">

@@ -74,10 +74,10 @@ export function CustomerCars({ t }: { t: AppDictionary; locale: Locale }) {
                 <div className="flex items-start justify-between gap-3">
                   {v.imageLink ? (
                     // eslint-disable-next-line @next/next/no-img-element -- car photos come from the backend's storage
-                    <img src={v.imageLink} alt="" width={64} height={64} loading="lazy" className="size-16 rounded-xl object-cover" />
+                    <img src={v.imageLink} alt="" width={64} height={64} loading="lazy" className="size-14 rounded-xl object-cover" />
                   ) : (
-                    <span className="grid size-16 place-items-center rounded-xl bg-secondary text-primary">
-                      <Car className="size-8" aria-hidden="true" />
+                    <span className="grid size-14 place-items-center rounded-xl bg-secondary text-primary">
+                      <Car className="size-7" aria-hidden="true" />
                     </span>
                   )}
                   <div className="flex gap-1">
@@ -104,7 +104,7 @@ export function CustomerCars({ t }: { t: AppDictionary; locale: Locale }) {
                   <p className="text-sm text-muted-foreground">{[v.color && (t.cars.colors[v.color as keyof AppDictionary['cars']['colors']] ?? v.color), v.type].filter(Boolean).join(' · ')}</p>
                 </div>
                 {v.plateNumber ? (
-                  <span className="w-fit rounded-lg border-2 border-foreground/80 px-3 py-1 font-mono text-sm font-bold tracking-widest" dir="ltr">
+                  <span className="w-fit rounded-md border border-foreground/30 bg-muted/60 px-2.5 py-0.5 font-mono text-sm font-bold tracking-widest" dir="ltr">
                     {v.plateNumber}
                   </span>
                 ) : null}

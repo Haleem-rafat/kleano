@@ -70,15 +70,15 @@ export function CustomerBookings({ t, locale }: { t: AppDictionary; locale: Loca
                   desktop && selected === o._id && 'border-primary',
                 )}
               >
-                <span className="grid size-12 shrink-0 place-items-center rounded-xl bg-secondary text-primary">
+                <span className="hidden size-12 shrink-0 place-items-center rounded-xl bg-secondary text-primary sm:grid">
                   <Car className="size-6" aria-hidden="true" />
                 </span>
                 <div className="grid min-w-0 flex-1 gap-1">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <p className="truncate font-semibold">{localized(o.washingServices?.[0]?.name, locale) || '—'}</p>
+                    <p className="min-w-0 truncate font-semibold">{localized(o.washingServices?.[0]?.name, locale) || '—'}</p>
                     <StatusBadge status={o.status} t={t} />
                   </div>
-                  <p className="truncate text-sm text-muted-foreground">
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
                     {[formatWhen(o.startTime, locale), [o.vehicle?.brand, o.vehicle?.model].filter(Boolean).join(' ')].filter(Boolean).join(' · ')}
                   </p>
                 </div>

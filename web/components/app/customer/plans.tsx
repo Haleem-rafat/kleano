@@ -1,6 +1,6 @@
 'use client';
 
-import { BadgeCheck, CreditCard, Loader2, MapPin, Wallet } from 'lucide-react';
+import { Check, BadgeCheck, CreditCard, Loader2, MapPin, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -98,24 +98,27 @@ export function CustomerPlans({ t, locale }: { t: AppDictionary; locale: Locale 
           {plans.data.map((p) => {
             const active = p.isSubscribed || mine.data?.plan?._id === p._id;
             return (
-              <li key={p._id} className={cn('flex flex-col gap-4 rounded-[var(--radius-card)] border bg-card p-5', active && 'border-primary')}>
+              <li key={p._id} className={cn('relative flex flex-col gap-4 overflow-hidden rounded-[var(--radius-card)] border bg-card p-5 pt-6 transition hover:shadow-input', active && 'border-primary')}>
+                <span aria-hidden="true" className="absolute inset-x-0 top-0 h-1.5" style={{ background: p.color || 'var(--primary)' }} />
                 <div className="flex items-center justify-between gap-3">
                   <h3 className="flex min-w-0 items-center gap-2 text-lg font-semibold">
-                    <span className="size-3 shrink-0 rounded-full" style={{ background: p.color || 'var(--primary)' }} aria-hidden="true" />
                     <span className="truncate">{localized(p.type, locale)}</span>
                   </h3>
                   {active ? <span className="shrink-0 rounded-full bg-secondary px-3 py-1 text-xs font-semibold text-secondary-foreground">{t.plans.subscribed}</span> : null}
                 </div>
                 <div>
-                  <Money value={p.price} t={t} className="text-3xl font-bold" />
+                  <Money value={p.price} t={t} className="text-4xl font-bold tracking-tight" />
                   <p className="text-sm text-muted-foreground">
                     {[p.usageCount ? `${p.usageCount} ${t.plans.washes}` : '', duration(p, t)].filter(Boolean).join(' · ')}
                   </p>
                 </div>
                 {p.description?.length ? (
-                  <ul className="grid gap-1 text-sm text-muted-foreground">
+                  <ul className="grid gap-1.5 text-sm text-muted-foreground">
                     {p.description.map((d, i) => (
-                      <li key={i}>• {localized(d, locale)}</li>
+                      <li key={i} className="flex gap-2">
+                        <Check className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+                        {localized(d, locale)}
+                      </li>
                     ))}
                   </ul>
                 ) : null}
@@ -126,7 +129,7 @@ export function CustomerPlans({ t, locale }: { t: AppDictionary; locale: Locale 
                   </p>
                 ) : null}
                 <Button
-                  variant="secondary"
+                  variant={active ? 'secondary' : 'default'}
                   size="xl"
                   className="mt-auto w-full"
                   onClick={() => (hasPlan ? toast.info(t.plans.alreadySubscribed) : setChoosing(p))}

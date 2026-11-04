@@ -56,6 +56,13 @@ async function forward(req: NextRequest, path: string[]) {
     if (refreshed !== 'offline') res = await send(refreshed.access);
   }
 
+  // A 401 sends the page to log in, and log in sends anyone with cookies back here: drop them, or
+  // the two would bounce forever.
+  if (res.status === 401) {
+    await clearSession(role);
+    return NextResponse.json({ message: 'Session expired' }, { status: 401 });
+  }
+
   return new NextResponse(res.body, {
     status: res.status,
     headers: { 'Content-Type': res.headers.get('content-type') ?? 'application/json' },

@@ -32,6 +32,9 @@ const en = {
     minPassword: 'Use at least 8 characters',
   },
   nav: {
+    groupWash: 'Wash',
+    groupRewards: 'Money and rewards',
+    groupMore: 'You',
     home: 'Home',
     bookings: 'Bookings',
     vehicles: 'My cars',
@@ -61,6 +64,11 @@ const en = {
   home: {
     hello: 'Hello',
     tagline: 'Your car, washed where it is parked.',
+    stages: ['Booked', 'Biker on the way', 'Washing', 'Done'],
+    noPlaceShort: 'Add a place',
+    bookService: 'Book this',
+    myBookings: 'My bookings',
+    offers: 'Offers',
     bookNow: 'Book Now',
     services: 'Services',
     plans: 'Subscriptions plans',
@@ -474,6 +482,9 @@ const ar: AppDictionary = {
     minPassword: 'استخدم 8 أحرف على الأقل',
   },
   nav: {
+    groupWash: 'الغسيل',
+    groupRewards: 'المال والمكافآت',
+    groupMore: 'أنت',
     home: 'الرئيسية',
     bookings: 'الحجوزات',
     vehicles: 'سياراتي',
@@ -503,6 +514,11 @@ const ar: AppDictionary = {
   home: {
     hello: 'مرحبا',
     tagline: 'نغسل سيارتك في مكانها.',
+    stages: ['تم الحجز', 'الكابتن في الطريق', 'جارٍ الغسيل', 'تم'],
+    noPlaceShort: 'أضف مكانًا',
+    bookService: 'احجز الآن',
+    myBookings: 'حجوزاتي',
+    offers: 'العروض',
     bookNow: 'احجز الآن',
     services: 'الخدمات',
     plans: 'خطط الباقات',

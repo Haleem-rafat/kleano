@@ -227,7 +227,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                 aria-current={current ? 'step' : undefined}
                 className="group grid w-full gap-2 text-start disabled:cursor-default"
               >
-                <span className="h-1.5 overflow-hidden rounded-full bg-muted">
+                <span className="h-1 overflow-hidden rounded-full bg-muted">
                   <motion.span
                     className="block h-full rounded-full bg-primary"
                     initial={false}
@@ -236,8 +236,10 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                   />
                 </span>
                 <span className={cn('flex items-center gap-1.5 text-xs font-medium md:text-sm', current ? 'text-foreground' : 'text-muted-foreground', reachable && 'group-hover:text-primary')}>
-                  {done ? <Check className="size-3.5 text-primary" aria-hidden="true" /> : <span className="tabular-nums">{(i + 1).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en')}</span>}
-                  <span className="truncate">{label}</span>
+                  <span className={cn('grid size-5 shrink-0 place-items-center rounded-full text-[11px] tabular-nums', done || current ? 'bg-primary text-primary-foreground' : 'bg-muted')}>
+                    {done ? <Check className="size-3" aria-hidden="true" /> : (i + 1).toLocaleString(locale === 'ar' ? 'ar-EG' : 'en')}
+                  </span>
+                  <span className={cn('truncate', !current && 'max-sm:hidden')}>{label}</span>
                 </span>
               </button>
             </li>
