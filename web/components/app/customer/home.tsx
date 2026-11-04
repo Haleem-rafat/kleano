@@ -9,6 +9,7 @@ import { HoverEffect } from '@/components/ui/card-hover-effect';
 import Carousel from '@/components/ui/carousel';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
@@ -140,7 +141,15 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
           ))}
         </div>
       ) : !location ? (
-        <Empty icon={<MapPin />} text={t.home.noLocation} />
+        <Empty
+          icon={<MapPin />}
+          text={t.home.noLocation}
+          action={
+            <Button asChild size="chip">
+              <Link href={`${base}/places/new`}>{t.places.add}</Link>
+            </Button>
+          }
+        />
       ) : services.isError ? (
         <Failed message={services.error.message || t.home.notAvailable} onRetry={() => services.refetch()} t={t} />
       ) : !services.data?.length ? (
@@ -184,11 +193,19 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
 
       {location && plans.data && plans.data.length > 0 ? (
         <>
-          <SectionTitle title={t.home.plans} />
+          <SectionTitle
+            title={t.home.plans}
+            action={
+              <Link href={`${base}/plans`} className="text-sm font-medium text-primary hover:underline">
+                {t.common.viewAll}
+              </Link>
+            }
+          />
           <HoverEffect
             className="-mx-2"
             items={plans.data.map((p) => ({
               id: p._id,
+              href: `${base}/plans`,
               content: (
                 <div className="grid gap-3">
                   <span className="size-3 rounded-full" style={{ background: p.color || 'var(--primary)' }} aria-hidden="true" />
