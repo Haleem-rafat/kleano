@@ -1,7 +1,7 @@
 'use client';
 
 import { CalendarOff, CalendarX, Clock, MapPin } from 'lucide-react';
-import { Empty, Failed, PageTitle } from '@/components/app/bits';
+import { Empty, Failed, PageTitle, formatSlot } from '@/components/app/bits';
 import { RowsSkeleton } from '@/components/app/kit';
 import type { AppDictionary } from '@/lib/app-dictionary';
 import type { Locale } from '@/lib/i18n';
@@ -45,9 +45,9 @@ export function BikerSchedule({ t, locale }: { t: AppDictionary; locale: Locale 
                   <ul className="grid gap-2">
                     {today.map((s, i) => (
                       <li key={i} className="grid gap-1 rounded-xl bg-secondary/60 p-3 text-sm">
-                        <span className="flex items-center gap-1.5 font-semibold" dir="ltr">
+                        <span className="flex items-center gap-1.5 font-semibold">
                           <Clock className="size-3.5 text-primary" aria-hidden="true" />
-                          {s.timeSlot}
+                          {formatSlot(s.timeSlot, locale)}
                         </span>
                         <span className="flex items-center gap-1.5 text-muted-foreground">
                           <MapPin className="size-3.5 shrink-0" aria-hidden="true" />

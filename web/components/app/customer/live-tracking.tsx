@@ -19,7 +19,7 @@ const STAGES: { status: OrderStatus; icon: LucideIcon; label: keyof AppDictionar
   { status: 'COMPLETED', icon: Sparkles, label: 'completed' },
 ];
 
-const timeFormat = (locale: Locale) => new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { timeStyle: 'short', timeZone: SAUDI_TIME });
+const timeFormat = (locale: Locale) => new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { timeStyle: 'short', hour12: true, timeZone: SAUDI_TIME });
 
 /** Biker and car on one map. Only drawn when a Google Maps key exists. */
 function TrackingMap({ biker, car, locale, t }: { biker: LatLng | null; car: LatLng; locale: Locale; t: AppDictionary }) {

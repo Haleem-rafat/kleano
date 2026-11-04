@@ -125,5 +125,13 @@ export function Failed({ message, onRetry, t }: { message: string; onRetry: () =
 
 export function formatWhen(iso: string | undefined, locale: string) {
   if (!iso) return '';
-  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', timeZone: SAUDI_TIME }).format(new Date(iso));
+  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short', hour12: true, timeZone: SAUDI_TIME }).format(new Date(iso));
+}
+
+/** A slot or shift ("13:15", already Saudi clock) as people read it: 1:15 PM. Sent to the backend unchanged. */
+export function formatSlot(slot: string | undefined, locale: string) {
+  if (!slot) return '';
+  const date = new Date(`2000-01-01T${slot}:00Z`);
+  if (Number.isNaN(date.getTime())) return slot;
+  return new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'UTC' }).format(date);
 }

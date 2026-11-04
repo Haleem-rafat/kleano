@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { Empty, Failed, Money, PageTitle } from '@/components/app/bits';
+import { formatSlot, Empty, Failed, Money, PageTitle } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MultiStepLoader } from '@/components/ui/multi-step-loader';
@@ -488,7 +488,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                               )}
                               dir="ltr"
                             >
-                              {s.isAvailable ? s.timeSlot : `${s.timeSlot} · ${t.book.full}`}
+                              {s.isAvailable ? formatSlot(s.timeSlot, locale) : `${formatSlot(s.timeSlot, locale)} · ${t.book.full}`}
                             </button>
                           ))}
                         </div>
@@ -671,7 +671,7 @@ export function BookingFlow({ t, locale }: { t: AppDictionary; locale: Locale })
                   <Clock className="size-4 shrink-0" aria-hidden="true" />
                   <span>
                     {new Intl.DateTimeFormat(locale === 'ar' ? 'ar-EG' : 'en-GB', { dateStyle: 'medium', timeZone: 'Asia/Riyadh' }).format(new Date(`${day}T12:00:00+03:00`))}{' '}
-                    <span dir="ltr">{slot}</span>
+                    <span>{formatSlot(slot, locale)}</span>
                   </span>
                 </div>
               ) : null}

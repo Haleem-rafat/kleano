@@ -4,7 +4,7 @@ import { ArrowLeft, Camera, Car, CheckCircle2, Clock, ImagePlus, Loader2, MapPin
 import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
-import { Failed, Money, StatusBadge, formatWhen } from '@/components/app/bits';
+import { Failed, Money, StatusBadge, formatSlot, formatWhen } from '@/components/app/bits';
 import { RowsSkeleton, Sheet, StickyActions } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -224,7 +224,7 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
           </Block>
 
           <Block icon={<Clock />} title={t.b.washingDate}>
-            <p>{formatWhen(o.startTime, locale) || o.timeSlot || '—'}</p>
+            <p>{formatWhen(o.startTime, locale) || formatSlot(o.timeSlot, locale) || '—'}</p>
           </Block>
 
           <Block icon={<Car />} title={t.b.car}>
