@@ -4,7 +4,8 @@ import { ArrowRight, Car, ChevronDown, Clock, Coins, MapPin, Wallet, type Lucide
 import { motion } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Empty, Failed, Money, OrderStages, SectionTitle, StatusBadge, formatWhen } from '@/components/app/bits';
+import { OrderProgress } from '@/components/app/order-parts';
+import { Empty, Failed, Money, SectionTitle, StatusBadge, formatWhen } from '@/components/app/bits';
 import { Button } from '@/components/ui/button';
 import { GlowingEffect } from '@/components/ui/glowing-effect';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -110,7 +111,7 @@ export function CustomerHome({ t, locale }: { t: AppDictionary; locale: Locale }
               <ArrowRight className="size-5 shrink-0 text-muted-foreground transition group-hover:text-primary rtl:-scale-x-100" aria-hidden="true" />
             </span>
           </div>
-          <OrderStages status={next.status} t={t} />
+          <OrderProgress status={next.status} t={t} />
         </Link>
       ) : null}
 

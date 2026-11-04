@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Failed, Money, StatusBadge, formatWhen } from '@/components/app/bits';
+import { CarThumb, OrderProgress, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
 import { Confirm, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -222,7 +223,8 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
       {back}
       <section className="grid gap-5 rounded-[var(--radius-card)] border bg-card p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
+          <CarThumb vehicle={o.vehicle} className="size-16" />
+          <div className="min-w-0 flex-1 basis-48">
             <p className="text-sm text-muted-foreground">{t.bookings.details}</p>
             <h1 className="text-2xl font-bold md:text-3xl">{localized(o.washingServices?.[0]?.name, locale) || t.bookings.details}</h1>
             <p className="mt-1 truncate text-xs text-muted-foreground">
@@ -231,6 +233,7 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
           </div>
           <StatusBadge status={o.status} t={t} />
         </div>
+        {!live ? <OrderProgress status={o.status} t={t} /> : null}
         {o.cancellationReason ? <p className="text-sm text-muted-foreground">{o.cancellationReason}</p> : null}
         {canCancel ? (
           <Button variant="destructive" size="chip" className="w-fit" onClick={() => setConfirming(true)}>
@@ -268,7 +271,10 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
         </Section>
 
         <Section title={t.bookings.car} icon={<Car />}>
-          <p className="font-medium">{[o.vehicle?.brand, o.vehicle?.model].filter(Boolean).join(' ') || '—'}</p>
+          <div className="flex items-center gap-3">
+            <CarThumb vehicle={o.vehicle} />
+            <p className="font-medium">{[o.vehicle?.brand, o.vehicle?.model].filter(Boolean).join(' ') || '—'}</p>
+          </div>
           <p className="text-sm text-muted-foreground">
             {[o.vehicle?.color && (t.cars.colors[o.vehicle.color as keyof AppDictionary['cars']['colors']] ?? o.vehicle.color), o.vehicle?.plateNumber && `${t.cars.plate} ${o.vehicle.plateNumber}`].filter(Boolean).join(' · ')}
           </p>
@@ -281,7 +287,18 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
 
         {o.biker && !live ? (
           <Section title={t.bookings.biker} icon={<Bike />}>
-            <p className="font-medium">{o.biker.userName}</p>
+            <div className="flex items-center gap-3">
+              <PersonThumb src={o.biker.imageLink} name={o.biker.userName} />
+              <div className="min-w-0">
+                <p className="truncate font-medium">{o.biker.userName}</p>
+                {o.biker.rating ? (
+                  <p className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+                    <Star className="size-3.5 fill-current" aria-hidden="true" />
+                    <span className="tabular-nums">{o.biker.rating.toFixed(1)}</span>
+                  </p>
+                ) : null}
+              </div>
+            </div>
             {o.biker.phone ? (
               <a href={`tel:${o.biker.phone}`} dir="ltr" className="inline-flex items-center gap-1.5 text-sm text-primary">
                 <Phone className="size-4" aria-hidden="true" />
@@ -301,8 +318,11 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
       <Section title={t.bookings.services} icon={<Sparkles />}>
         <ul className="grid gap-2">
           {o.washingServices?.map((s) => (
-            <li key={s._id} className="flex justify-between gap-3">
-              <span>{localized(s.name, locale)}</span>
+            <li key={s._id} className="flex items-center justify-between gap-3">
+              <span className="flex min-w-0 items-center gap-2.5">
+                <ServiceThumb icon={s.icon} />
+                {localized(s.name, locale)}
+              </span>
               <Money value={s.price} t={t} />
             </li>
           ))}
@@ -311,8 +331,11 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
         {o.addOns?.length ? (
           <ul className="grid gap-2">
             {o.addOns.map((a) => (
-              <li key={a._id} className="flex justify-between gap-3">
-                <span>{localized(a.name, locale)}</span>
+              <li key={a._id} className="flex items-center justify-between gap-3">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <ServiceThumb icon={a.icon} />
+                  {localized(a.name, locale)}
+                </span>
                 <Money value={a.price} t={t} />
               </li>
             ))}
@@ -355,20 +378,7 @@ export function BookingDetails({ id, t, locale, embedded }: { id: string; t: App
 
       {o.carBeforeWashLink || o.carAfterWashLink ? (
         <Section title={t.bookings.photos} icon={<Sparkles />}>
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { src: o.carBeforeWashLink, label: t.bookings.before },
-              { src: o.carAfterWashLink, label: t.bookings.after },
-            ].map((p) =>
-              p.src ? (
-                <figure key={p.label} className="grid gap-2">
-                  {/* eslint-disable-next-line @next/next/no-img-element -- photos come from the backend's storage */}
-                  <img src={p.src} alt={p.label} loading="lazy" width={300} height={400} className="aspect-[3/4] w-full rounded-xl object-cover" />
-                  <figcaption className="text-center text-sm text-muted-foreground">{p.label}</figcaption>
-                </figure>
-              ) : null,
-            )}
-          </div>
+          <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.bookings.before} afterLabel={t.bookings.after} compareLabel={t.progress.compare} />
         </Section>
       ) : null}
 

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { toast } from 'sonner';
 import { Empty, Failed, PageTitle } from '@/components/app/bits';
+import { CarThumb } from '@/components/app/order-parts';
 import { Field } from '@/components/app/field';
 import { CardsSkeleton, Confirm, PickerField, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
@@ -72,14 +73,7 @@ export function CustomerCars({ t }: { t: AppDictionary; locale: Locale }) {
             content: (
               <div className="grid gap-4">
                 <div className="flex items-start justify-between gap-3">
-                  {v.imageLink ? (
-                    // eslint-disable-next-line @next/next/no-img-element -- car photos come from the backend's storage
-                    <img src={v.imageLink} alt="" width={64} height={64} loading="lazy" className="size-14 rounded-xl object-cover" />
-                  ) : (
-                    <span className="grid size-14 place-items-center rounded-xl bg-secondary text-primary">
-                      <Car className="size-7" aria-hidden="true" />
-                    </span>
-                  )}
+                  <CarThumb vehicle={v} />
                   <div className="flex gap-1">
                     <button
                       type="button"

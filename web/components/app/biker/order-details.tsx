@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { Failed, Money, StatusBadge, formatSlot, formatWhen } from '@/components/app/bits';
+import { CarThumb, orderPercent, OrderProgress, PersonThumb, ServiceThumb, WashPhotos } from '@/components/app/order-parts';
 import { RowsSkeleton, Sheet, StickyActions } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -28,19 +29,6 @@ function Block({ icon, title, children }: { icon: ReactNode; title: string; chil
       </h2>
       {children}
     </section>
-  );
-}
-
-function StageBar({ step, t }: { step: number; t: AppDictionary }) {
-  return (
-    <ol className="grid grid-cols-4 gap-1.5">
-      {t.b.stages.map((label, i) => (
-        <li key={label} className="grid gap-1.5" aria-current={i === step ? 'step' : undefined}>
-          <span className={cn('h-1.5 rounded-full', i < step ? 'bg-primary' : i === step ? 'animate-pulse bg-primary motion-reduce:animate-none' : 'bg-muted')} />
-          <span className={cn('truncate text-xs font-medium', i <= step ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
-        </li>
-      ))}
-    </ol>
   );
 }
 
@@ -174,9 +162,9 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
         <StatusBadge status={o.status} t={t} label={t.b.status[o.status as keyof AppDictionary['b']['status']]} />
       </div>
 
-      {typeof step === 'number' ? (
+      {orderPercent(o.status) !== null ? (
         <section className="rounded-2xl border bg-card p-4">
-          <StageBar step={step} t={t} />
+          <OrderProgress status={o.status} t={t} />
         </section>
       ) : null}
 
@@ -191,7 +179,10 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
         <div className="grid gap-4">
           <Block icon={<User />} title={t.b.client}>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="min-w-0 truncate font-semibold">{o.user?.userName ?? '—'}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                <PersonThumb src={o.user?.imageLink} name={o.user?.userName} />
+                <p className="min-w-0 truncate font-semibold">{o.user?.userName ?? '—'}</p>
+              </div>
               {phone && !done ? (
                 <div className="flex gap-2">
                   <Button asChild variant="outline" size="chip">
@@ -229,7 +220,10 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
 
           <Block icon={<Car />} title={t.b.car}>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="font-semibold">{[car, o.vehicle?.color].filter(Boolean).join(' · ') || '—'}</p>
+              <div className="flex min-w-0 items-center gap-3">
+                <CarThumb vehicle={o.vehicle} />
+                <p className="font-semibold">{[car, o.vehicle?.color].filter(Boolean).join(' · ') || '—'}</p>
+              </div>
               {o.vehicle?.plateNumber ? (
                 <span className="rounded-md border border-foreground/30 bg-muted/60 px-2.5 py-0.5 font-mono text-sm font-bold tracking-widest" dir="ltr">
                   {o.vehicle.plateNumber}
@@ -243,8 +237,11 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
           <Block icon={<Sparkles />} title={t.b.services}>
             <ul className="grid gap-2">
               {(o.washingServices ?? []).map((s) => (
-                <li key={s._id} className="flex justify-between gap-3">
-                  <span>{localized(s.name, locale)}</span>
+                <li key={s._id} className="flex items-center justify-between gap-3">
+                  <span className="flex min-w-0 items-center gap-2.5">
+                    <ServiceThumb icon={s.icon} />
+                    {localized(s.name, locale)}
+                  </span>
                   {s.duration ? (
                     <span className="shrink-0 text-sm text-muted-foreground">
                       {s.duration} {t.common.min}
@@ -253,8 +250,8 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
                 </li>
               ))}
               {(o.addOns ?? []).map((a) => (
-                <li key={a._id} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+                <li key={a._id} className="flex items-center gap-2.5 text-sm text-muted-foreground">
+                  <ServiceThumb icon={a.icon} />
                   {localized(a.name, locale)}
                 </li>
               ))}
@@ -274,20 +271,7 @@ export function BikerOrderDetails({ id, t, locale }: { id: string; t: AppDiction
 
           {o.carBeforeWashLink || o.carAfterWashLink ? (
             <Block icon={<Camera />} title={t.b.photos}>
-              <div className="grid grid-cols-2 gap-3">
-                {[
-                  { src: o.carBeforeWashLink, label: t.b.beforeWash },
-                  { src: o.carAfterWashLink, label: t.b.afterWash },
-                ].map((p) =>
-                  p.src ? (
-                    <figure key={p.label} className="grid gap-1.5">
-                      {/* eslint-disable-next-line @next/next/no-img-element -- wash photos come from the backend's storage */}
-                      <img src={p.src} alt={p.label} loading="lazy" className="aspect-[4/3] w-full rounded-xl object-cover" />
-                      <figcaption className="text-xs text-muted-foreground">{p.label}</figcaption>
-                    </figure>
-                  ) : null,
-                )}
-              </div>
+              <WashPhotos before={o.carBeforeWashLink} after={o.carAfterWashLink} beforeLabel={t.b.beforeWash} afterLabel={t.b.afterWash} compareLabel={t.progress.compare} />
             </Block>
           ) : null}
 

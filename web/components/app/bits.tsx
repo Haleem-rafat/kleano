@@ -75,23 +75,6 @@ export function BalanceCard({ icon, label, children, className }: { icon: ReactN
   );
 }
 
-const stageIndex = (status: OrderStatus) => (status === 'COMPLETED' ? 3 : status === 'ON_WASHING' ? 2 : status === 'BIKER_ON_THE_WAY' || status === 'BIKER_ARRIVED' ? 1 : 0);
-
-/** Where an active wash has got to, in four steps. */
-export function OrderStages({ status, t, className }: { status: OrderStatus; t: AppDictionary; className?: string }) {
-  const at = stageIndex(status);
-  return (
-    <ol className={cn('grid grid-cols-4 gap-1.5', className)}>
-      {t.home.stages.map((label, i) => (
-        <li key={label} className="grid gap-1.5" aria-current={i === at ? 'step' : undefined}>
-          <span className={cn('h-1 rounded-full', i < at ? 'bg-primary' : i === at ? 'animate-pulse bg-primary motion-reduce:animate-none' : 'bg-muted')} />
-          <span className={cn('truncate text-[11px] font-medium md:text-xs', i <= at ? 'text-foreground' : 'text-muted-foreground')}>{label}</span>
-        </li>
-      ))}
-    </ol>
-  );
-}
-
 export function Loading({ label }: { label: string }) {
   return (
     <div role="status" aria-label={label} className="grid place-items-center py-16">

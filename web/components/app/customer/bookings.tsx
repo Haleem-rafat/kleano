@@ -1,11 +1,12 @@
 'use client';
 
-import { ArrowRight, CalendarX, Car, ClipboardList, Loader2 } from 'lucide-react';
+import { ArrowRight, CalendarX, ClipboardList, Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Empty, Failed, Money, PageTitle, StatusBadge, formatWhen } from '@/components/app/bits';
 import { BookingDetails } from '@/components/app/customer/booking-details';
+import { CarThumb, OrderProgress } from '@/components/app/order-parts';
 import { RowsSkeleton, Segmented, Sheet } from '@/components/app/kit';
 import { Button } from '@/components/ui/button';
 import type { AppDictionary } from '@/lib/app-dictionary';
@@ -70,9 +71,7 @@ export function CustomerBookings({ t, locale }: { t: AppDictionary; locale: Loca
                   desktop && selected === o._id && 'border-primary',
                 )}
               >
-                <span className="hidden size-12 shrink-0 place-items-center rounded-xl bg-secondary text-primary sm:grid">
-                  <Car className="size-6" aria-hidden="true" />
-                </span>
+                <CarThumb vehicle={o.vehicle} className="size-12 sm:size-14" />
                 <div className="grid min-w-0 flex-1 gap-1">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                     <p className="min-w-0 truncate font-semibold">{localized(o.washingServices?.[0]?.name, locale) || '—'}</p>
@@ -81,6 +80,7 @@ export function CustomerBookings({ t, locale }: { t: AppDictionary; locale: Loca
                   <p className="line-clamp-2 text-sm text-muted-foreground">
                     {[formatWhen(o.startTime, locale), [o.vehicle?.brand, o.vehicle?.model].filter(Boolean).join(' ')].filter(Boolean).join(' · ')}
                   </p>
+                  {group === 'ACTIVE' ? <OrderProgress status={o.status} t={t} compact className="mt-1" /> : null}
                 </div>
                 <div className={cn('hidden text-end sm:block', desktop && 'xl:hidden')}>
                   <Money value={o.totalPay ?? o.totalPrice} t={t} className="font-bold" />

@@ -40,7 +40,6 @@ const en = {
     activeJobs: 'Active orders', active: 'Active', completed: 'Completed',
     noActive: 'No active orders right now', noCompleted: 'No completed washes yet',
     support: 'Support', supportBody: 'Talk to Kleano on WhatsApp',
-    stages: ['On the way', 'Arrived', 'Washing', 'Completed'],
     choosePhoto: 'Choose or take a photo', yourRating: 'Your rating to client', clientRating: 'Client rating for you',
     rated: 'Thanks for your rating', sendRating: 'Send',
     currentLocation: 'Current location', accepted: 'Order accepted',
@@ -59,6 +58,7 @@ const en = {
     editProfile: 'Edit profile', changePhoto: 'Change photo', name: 'Name', nameRequired: 'Enter your name', saved: 'Saved', save: 'Save', edit: 'Edit', phone: 'Phone',
     editPassword: 'Edit password', oldPassword: 'Old password', newPassword: 'New password', againPassword: 'Re-enter new password', passwordsDiffer: 'The passwords do not match', passwordChanged: 'Password changed',
   },
+  progress: { stages: ['Booked', 'On the way', 'Arrived', 'Washing', 'Done'], compare: 'Drag to compare before and after' },
   nav: {
     groupWash: 'Wash',
     groupRewards: 'Money and rewards',
@@ -92,7 +92,6 @@ const en = {
   home: {
     hello: 'Hello',
     tagline: 'Your car, washed where it is parked.',
-    stages: ['Booked', 'Biker on the way', 'Washing', 'Done'],
     noPlaceShort: 'Add a place',
     bookService: 'Book this',
     myBookings: 'My bookings',
@@ -518,7 +517,6 @@ const ar: AppDictionary = {
     activeJobs: 'الطلبات النشطة', active: 'نشط', completed: 'مكتمل',
     noActive: 'لا توجد طلبات نشطة الآن', noCompleted: 'لا توجد غسلات مكتملة بعد',
     support: 'الدعم', supportBody: 'تحدث مع كلينو على واتساب',
-    stages: ['في الطريق', 'وصل', 'جارٍ الغسيل', 'مكتمل'],
     choosePhoto: 'اختر صورة أو التقطها', yourRating: 'تقييمك للعميل', clientRating: 'تقييم العميل لك',
     rated: 'شكرًا على تقييمك', sendRating: 'إرسال',
     currentLocation: 'الموقع الحالي', accepted: 'تم قبول الطلب',
@@ -537,6 +535,7 @@ const ar: AppDictionary = {
     editProfile: 'تعديل الملف', changePhoto: 'تغيير الصورة', name: 'الاسم', nameRequired: 'أدخل اسمك', saved: 'تم الحفظ', save: 'حفظ', edit: 'تعديل', phone: 'الهاتف',
     editPassword: 'تعديل كلمة المرور', oldPassword: 'كلمة المرور القديمة', newPassword: 'كلمة مرور جديدة', againPassword: 'أعد إدخال كلمة المرور الجديدة', passwordsDiffer: 'كلمتا المرور غير متطابقتين', passwordChanged: 'تم تغيير كلمة المرور',
   },
+  progress: { stages: ['تم الحجز', 'في الطريق', 'وصل', 'جارٍ الغسيل', 'تم'], compare: 'اسحب للمقارنة بين قبل وبعد' },
   nav: {
     groupWash: 'الغسيل',
     groupRewards: 'المال والمكافآت',
@@ -570,7 +569,6 @@ const ar: AppDictionary = {
   home: {
     hello: 'مرحبا',
     tagline: 'نغسل سيارتك في مكانها.',
-    stages: ['تم الحجز', 'الكابتن في الطريق', 'جارٍ الغسيل', 'تم'],
     noPlaceShort: 'أضف مكانًا',
     bookService: 'احجز الآن',
     myBookings: 'حجوزاتي',

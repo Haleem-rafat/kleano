@@ -1,6 +1,7 @@
 'use client';
 
 import { SAUDI_TIME } from '@/components/app/bits';
+import { orderPercent, ProgressBar } from '@/components/app/order-parts';
 import { Bike, Check, Droplets, ExternalLink, MapPinned, MessageCircle, Phone, Radio, Sparkles, Star, WifiOff, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -73,6 +74,7 @@ export function LiveTracking({ order, t, locale }: { order: Order; t: AppDiction
           </span>
         </div>
 
+        <ProgressBar percent={orderPercent(order.status) ?? 0} label={t.tracking.title} />
         <ol className="grid grid-cols-4 gap-2">
           {STAGES.map((s, i) => {
             const done = current >= i;
